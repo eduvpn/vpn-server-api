@@ -28,13 +28,14 @@ class CrlFetcher
 
     public function fetch()
     {
+        $crlFile = sprintf('%s/ca.crl', $this->crlPath);
+        $tmpFile = sprintf('%s.tmp', $crlFile);
         $crlData = $this->client->get($this->crlUrl)->getBody();
-        $tmpFile = tempnam(sys_get_temp_dir(), 'crl');
+
         if (false === @file_put_contents($tmpFile, $crlData)) {
             throw new RuntimeException('unable to write CRL to temporary file');
         }
 
-        $crlFile = sprintf('%s/ca.crl', $this->crlPath);
         if (file_exists($crlFile)) {
             if (filesize($tmpFile) < filesize($crlFile)) {
                 throw new RuntimeException('downloaded CRL size is smaller than current CRL size');
