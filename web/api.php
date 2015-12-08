@@ -32,6 +32,11 @@ try {
 
     $manage = new Manage($iniReader->v('socket'));
 
+    $crlFetcher = new CrlFetcher(
+        $iniReader->v('Crl', 'crlUrl'),
+        $iniReader->v('Crl', 'crlPath')
+    );
+
     $service = new Service();
     $service->get(
         '/status',
@@ -49,6 +54,15 @@ try {
         function (Request $request) use ($manage) {
             $configId = $request->getPostParameter('config_id');
             $manage->killClient($configId);
+
+            return new JsonResponse();
+        }
+    );
+
+    $service->post(
+        '/refreshCrl',
+        function (Request $request) use ($crlFetcher) {
+            $crlFetcher->fetch();
 
             return new JsonResponse();
         }
