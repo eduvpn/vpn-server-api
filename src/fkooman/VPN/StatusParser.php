@@ -1,0 +1,79 @@
+<?php
+
+namespace fkooman\VPN;
+
+class StatusParser
+{
+    /** @var array */
+    private $clientList;
+
+    /** @var array */
+    private $routingTable;
+
+    public function __construct($statusData)
+    {
+        $this->clientList = self::getClientList($statusData);
+        $this->routingTable = self::getRoutingTable($statusData, count($this->clientList) + 5);
+    }
+
+    public function getClientInfo()
+    {
+        // combine the data from clientList and routingTable and return it
+        // XXX: what if one ID is connected multiple times?
+
+        $clientData = array();
+        foreach ($this->clientList as $clientInfo) {
+            list($clientId, $clientIpPort) = explode(',', $clientInfo);
+            // XXX: what about native IPv6 connections to OpenVPN?
+            list($clientIp, $clientPort) = explode(':', $clientIpPort);
+
+            $clientData[$clientId] = array(
+                'client_ip' => $clientIp,
+                'vpn_ip' => array(),
+            );
+        }
+
+        // walk through routing table and add vpn IPs
+        foreach ($this->routingTable as $routingInfo) {
+            list($vpnIp, $clientId) = explode(',', $routingInfo);
+            $clientData[$clientId]['vpn_ip'][] = $vpnIp;
+        }
+
+        return $clientData;
+    }
+
+    private static function getClientList($statusData)
+    {
+        $splitData = self::splitData($statusData);
+
+        // clientList always starts at index 3
+        $clientList = array();
+        $i = 3;
+        // walk through the list until we hit 'ROUTING TABLE'
+        while (0 !== strpos($splitData[$i], 'ROUTING TABLE')) {
+            $clientList[] = $splitData[$i];
+            ++$i;
+        }
+
+        return $clientList;
+    }
+
+    private static function getRoutingTable($statusData, $startIndex)
+    {
+        $splitData = self::splitData($statusData);
+        $routingTable = array();
+        $i = $startIndex;
+        // walk through the list until we hit 'GLOBAL STATS'
+        while (0 !== strpos($splitData[$i], 'GLOBAL STATS')) {
+            $routingTable[] = $splitData[$i];
+            ++$i;
+        }
+
+        return $routingTable;
+    }
+
+    private static function splitData($statusData)
+    {
+        return explode("\n", $statusData);
+    }
+}

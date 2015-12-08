@@ -1,0 +1,27 @@
+{
+    "authors": [
+        {
+            "email": "fkooman@tuxed.net",
+            "name": "Fran\u00e7ois Kooman",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "fkooman\\VPN\\": "src/"
+        }
+    },
+    "description": "OpenVPN server API",
+    "license": "Apache-2.0",
+    "name": "fkooman/vpn-server-api",
+    "require": {
+        "clue/socket-raw": "^1.2.0",
+        "ext-sockets": "*",
+        "fkooman/http": "^1.0.0",
+        "fkooman/ini": "^1.0.0",
+        "fkooman/rest": "^1.0.0",
+        "fkooman/rest-plugin-authentication": "^2.0.0",
+        "fkooman/rest-plugin-authentication-basic": "^2.0.0",
+        "php": ">=5.4"
+    }
+}

@@ -1,0 +1,5 @@
+socket = "tcp://localhost:7505"
+
+[BasicAuthentication]
+; foo:bar
+foo = $2y$10$nuIiy1pTYoBjPI89yuWfueTLTier0kBufq3V5jRxkH6xr2/QAH7UW
