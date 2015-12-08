@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "49ce7e0e47926d245869a3485cd51279",
-    "content-hash": "dba17c1e2abd2f0377d4a2f245cd06a9",
+    "hash": "508482cb5647a83e7cce216ceac29f49",
+    "content-hash": "3ea12cda1d8e01eb5b65d2cc8e954bb8",
     "packages": [
         {
             "name": "clue/socket-raw",
@@ -353,7 +353,47 @@
             "time": "2014-11-20 16:49:30"
         }
     ],
-    "packages-dev": [],
+    "packages-dev": [
+        {
+            "name": "fkooman/io",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fkooman/php-lib-io.git",
+                "reference": "0c2d8c49b1e37b9e3593c9e8dc51f4abc0c6712a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fkooman/php-lib-io/zipball/0c2d8c49b1e37b9e3593c9e8dc51f4abc0c6712a",
+                "reference": "0c2d8c49b1e37b9e3593c9e8dc51f4abc0c6712a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-date": "*",
+                "ext-openssl": "*",
+                "ext-spl": "*",
+                "php": ">= 5.3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "fkooman\\IO\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "François Kooman",
+                    "email": "fkooman@tuxed.net"
+                }
+            ],
+            "description": "Simple IO library",
+            "time": "2015-10-03 11:35:44"
+        }
+    ],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],
