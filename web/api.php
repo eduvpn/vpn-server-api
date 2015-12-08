@@ -24,6 +24,7 @@ use fkooman\Rest\Service;
 use fkooman\VPN\Manage;
 use fkooman\Http\Request;
 use fkooman\Http\JsonResponse;
+use fkooman\VPN\CrlFetcher;
 
 try {
     $iniReader = IniReader::fromFile(
