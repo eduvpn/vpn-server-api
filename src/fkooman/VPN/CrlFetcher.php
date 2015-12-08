@@ -28,19 +28,19 @@ class CrlFetcher
 
     public function fetch()
     {
-        $crlData = $this->client->get($crlUri)->getBody();
+        $crlData = $this->client->get($this->crlUrl)->getBody();
         $tmpFile = tempnam(sys_get_temp_dir(), 'crl');
         if (false === @file_put_contents($tmpFile, $crlData)) {
             throw new RuntimeException('unable to write CRL to temporary file');
         }
 
-        if (file_exists($crlFile)) {
-            if (filesize($tmpFile) < filesize($crlFile)) {
+        if (file_exists($this->crlPath)) {
+            if (filesize($tmpFile) < filesize($this->crlPath)) {
                 throw new RuntimeException('downloaded CRL size is smaller than current CRL size');
             }
         }
 
-        if (false === @rename($tmpFile, $crlFile)) {
+        if (false === @rename($tmpFile, $this->crlPath)) {
             throw new Exception('unable to move downloaded CRL to CRL location');
         }
     }
