@@ -15,7 +15,11 @@ TODO:
 To generate a password for `config/config.ini`, use this and replace `s3cr3t` 
 with your password:
 
-    php -r "echo password_hash('s3cr3t', PASSWORD_DEFAULT) . PHP_EOL;"
+    php -r "require_once 'vendor/autoload.php'; echo password_hash('s3cr3t', PASSWORD_DEFAULT) . PHP_EOL;"
+
+# Run
+
+    php -S localhost:8080 -t web/
 
 # API
 
