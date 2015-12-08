@@ -34,14 +34,15 @@ class CrlFetcher
             throw new RuntimeException('unable to write CRL to temporary file');
         }
 
-        if (file_exists($this->crlPath)) {
-            if (filesize($tmpFile) < filesize($this->crlPath)) {
+        $crlFile = sprintf('%s/ca.crl', $this->crlPath);
+        if (file_exists($crlFile)) {
+            if (filesize($tmpFile) < filesize($crlFile)) {
                 throw new RuntimeException('downloaded CRL size is smaller than current CRL size');
             }
         }
 
-        if (false === @rename($tmpFile, $this->crlPath)) {
-            throw new Exception('unable to move downloaded CRL to CRL location');
+        if (false === @rename($tmpFile, $crlFile)) {
+            throw new RuntimeException('unable to move downloaded CRL to CRL location');
         }
     }
 }
