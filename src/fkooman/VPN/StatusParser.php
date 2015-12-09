@@ -23,12 +23,15 @@ class StatusParser
 
         $clientData = array();
         foreach ($this->clientList as $clientInfo) {
-            list($clientId, $clientIpPort) = explode(',', $clientInfo);
+            list($clientId, $clientIpPort, $bytesReceived, $bytesSent, $connectedSince) = explode(',', $clientInfo);
             // XXX: what about native IPv6 connections to OpenVPN?
             list($clientIp, $clientPort) = explode(':', $clientIpPort);
 
             $clientData[$clientId] = array(
+                'bytes_received' => intval($bytesReceived),
+                'bytes_sent' => intval($bytesSent),
                 'client_ip' => $clientIp,
+                'connected_since' => $connectedSince,
                 'vpn_ip' => array(),
             );
         }
