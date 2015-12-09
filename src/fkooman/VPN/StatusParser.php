@@ -4,14 +4,18 @@ namespace fkooman\VPN;
 
 class StatusParser
 {
+    /** @var string */
+    private $socketId;
+
     /** @var array */
     private $clientList;
 
     /** @var array */
     private $routingTable;
 
-    public function __construct($statusData)
+    public function __construct($socketId, $statusData)
     {
+        $this->socketId = $socketId;
         $this->clientList = self::getClientList($statusData);
         $this->routingTable = self::getRoutingTable($statusData, count($this->clientList) + 5);
     }
@@ -31,7 +35,9 @@ class StatusParser
                 'bytes_received' => intval($bytesReceived),
                 'bytes_sent' => intval($bytesSent),
                 'client_ip' => $clientIp,
-                'connected_since' => $connectedSince,
+                'common_name' => $clientId,
+                'connected_since' => strtotime(trim($connectedSince)),
+                'socket_id' => $this->socketId,
                 'vpn_ip' => array(),
             );
         }
@@ -42,7 +48,16 @@ class StatusParser
             $clientData[$clientId]['vpn_ip'][] = $vpnIp;
         }
 
-        return $clientData;
+        // now turn this into a normal array with numeric index
+        $asArray = array(
+            //'connectedClients' => array(),
+        );
+
+        foreach ($clientData as $k => $v) {
+            $asArray[] = $v;
+        }
+
+        return $asArray;
     }
 
     private static function getClientList($statusData)

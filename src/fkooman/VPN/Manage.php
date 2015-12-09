@@ -4,23 +4,29 @@ namespace fkooman\VPN;
 
 class Manage
 {
-    /** @var SocketStatus */
+    /** @var array */
     private $socketStatus;
 
-    public function __construct($socketAddress)
+    public function __construct(array $socketAddresses)
     {
-        $this->socketStatus = new SocketStatus($socketAddress);
+        foreach ($socketAddresses as $socketAddress) {
+            $this->socketStatus[$socketAddress] = new SocketStatus($socketAddress);
+        }
     }
 
     public function getClientInfo()
     {
-        $statusParser = new StatusParser($this->socketStatus->fetchStatus());
+        $combinedClientInfo = array();
+        foreach ($this->socketStatus as $k => $v) {
+            $statusParser = new StatusParser($k, $v->fetchStatus());
+            $combinedClientInfo = array_merge($combinedClientInfo, $statusParser->getClientInfo());
+        }
 
-        return $statusParser->getClientInfo();
+        return array('items' => $combinedClientInfo);
     }
 
-    public function killClient($commonName)
+    public function killClient($socketId, $commonName)
     {
-        $this->socketStatus->killClient($commonName);
+        $this->socketStatus[$socketId]->killClient($commonName);
     }
 }

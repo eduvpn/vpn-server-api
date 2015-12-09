@@ -31,7 +31,7 @@ try {
         dirname(__DIR__).'/config/config.ini'
     );
 
-    $manage = new Manage($iniReader->v('socket'));
+    $manage = new Manage($iniReader->v('OpenVpnManagement', 'socket'));
 
     $crlFetcher = new CrlFetcher(
         $iniReader->v('Crl', 'crlUrl'),
@@ -53,8 +53,9 @@ try {
     $service->post(
         '/disconnect',
         function (Request $request) use ($manage) {
-            $configId = $request->getPostParameter('config_id');
-            $manage->killClient($configId);
+            $socketId = $request->getPostParameter('socket_id');
+            $configId = $request->getPostParameter('common_name');
+            $manage->killClient($socketId, $configId);
 
             return new JsonResponse();
         }
@@ -78,7 +79,7 @@ try {
 
             return $userList[$userId];
         },
-        array('realm' => 'OpenVPN Management API')
+        array('realm' => 'VPN Server API')
     );
 
     $authenticationPlugin = new AuthenticationPlugin();

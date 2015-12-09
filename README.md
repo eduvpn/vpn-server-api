@@ -28,10 +28,30 @@ List all connected clients:
 
     $ curl -u admin:s3cr3t http://localhost/vpn-server-api/api.php/status
 
+    {
+        "items": [
+            {
+                "bytes_received": 15937,
+                "bytes_sent": 16999,
+                "client_ip": "1.2.3.4",
+                "common_name": "fkooman_five",
+                "connected_since": 1449676274,
+                "socket_id": "tcp://localhost:7506",
+                "vpn_ip": [
+                    "fd00:4343:4343::1000",
+                    "10.43.43.2"
+                ]
+            }
+        ]
+    }
+
 ## Disconnect
 Disconnect a currently connected client:
 
-    $ curl -u admin:s3cr3t -d 'config_id=foo_bar' http://localhost/vpn-server-api/api.php/disconnect
+    $ curl -u admin:s3cr3t -d 'socket_id=tcp://localhost:7506&common_name=fkooman_five' http://localhost/vpn-server-api/api.php/disconnect
+
+You have to specify the `socket_id` and `common_name` of the client in the POST
+body.
 
 ## Refresh CRL
 Trigger the reload of the CRL at the OpenVPN server:

@@ -21,9 +21,9 @@ class StatusParserTest extends PHPUnit_Framework_TestCase
         foreach ($fileList as $fileName) {
             $outputFile = $fileName.'.output';
 
-            $statusParser = new StatusParser($io->readFile($fileName));
+            $statusParser = new StatusParser('tcp://localhost:7505', $io->readFile($fileName));
 
-            //var_dump(Json::encode($statusParser->getClientInfo()));
+#            var_dump(Json::encode($statusParser->getClientInfo()));
 
             $this->assertSame(
                 Json::decodeFile($outputFile),
