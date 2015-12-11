@@ -8,15 +8,17 @@
     ],
     "autoload": {
         "psr-0": {
-            "fkooman\\VPN\\": "src/"
+            "fkooman\\VPN\\Server\\": "src/"
         }
     },
-    "description": "OpenVPN server API",
+    "description": "REST service to control OpenVPN instances",
     "license": "Apache-2.0",
-    "name": "fkooman/vpn-server-api",
+    "name": "eduVPN/vpn-server-api",
     "require": {
         "clue/socket-raw": "^1.2.0",
+        "ext-date": "*",
         "ext-sockets": "*",
+        "ext-spl": "*",
         "fkooman/http": "^1.0.0",
         "fkooman/ini": "^1.0.0",
         "fkooman/rest": "^1.0.0",
@@ -26,6 +28,7 @@
         "php": ">=5.4"
     },
     "require-dev": {
-        "fkooman/io": "^1.0.0"
+        "fkooman/io": "^1.0.0",
+        "fkooman/json": "^1.0.0"
     }
 }

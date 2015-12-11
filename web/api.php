@@ -21,10 +21,10 @@ use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
 use fkooman\Rest\Plugin\Authentication\Basic\BasicAuthentication;
 use fkooman\Ini\IniReader;
 use fkooman\Rest\Service;
-use fkooman\VPN\Manage;
+use fkooman\VPN\Server\Manage;
 use fkooman\Http\Request;
 use fkooman\Http\JsonResponse;
-use fkooman\VPN\CrlFetcher;
+use fkooman\VPN\Server\CrlFetcher;
 
 try {
     $iniReader = IniReader::fromFile(

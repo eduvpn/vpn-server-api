@@ -1,12 +1,12 @@
 [OpenVpnManagement]
 ; list of management sockets to connect to
 socket[] = "tcp://localhost:7505"
-socket[] = "tcp://localhost:7506"
+;socket[] = "tcp://localhost:7506"
 
 [BasicAuthentication]
 ; admin:s3cr3t
 admin = "$2y$10$uA77iLeDLaU.a.KRuhUYKuziuZacuWzodpqLok2XBQLXvig6UaB9a"
 
 [Crl]
-crlUrl = 'http://localhost/vpn-cert-service/api.php/ca.crl'
+crlUrl = 'http://localhost/vpn-config-api/api.php/ca.crl'
 crlPath = '/var/www/vpn-server-api/data'
