@@ -9,4 +9,4 @@ admin = "$2y$10$uA77iLeDLaU.a.KRuhUYKuziuZacuWzodpqLok2XBQLXvig6UaB9a"
 
 [Crl]
 crlUrl = 'http://localhost/vpn-config-api/api.php/ca.crl'
-crlPath = '/var/www/vpn-server-api/data'
+crlPath = '/var/lib/vpn-server-api'
