@@ -46,10 +46,10 @@ class Manage
         );
 
         foreach ($this->socketStatus as $k => $v) {
-            $serverInfo['items'][] = array(
-                'version' => $v->fetchVersion(),
-                'socket' => $k,
-            );
+            $info = $v->fetchServerInfo();
+            $info['socket'] = $k;
+
+            $serverInfo['items'][] = $info;
         }
 
         return $serverInfo;

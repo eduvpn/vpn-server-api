@@ -48,13 +48,22 @@ class SocketStatus
         return $this->readStatus();
     }
 
-    public function fetchVersion()
+    public function fetchServerInfo()
     {
         // ask for version
         $this->socket->write("version\n");
 
         // read and return status
-        return $this->readVersion();
+        $version = $this->readVersion();
+
+        $this->socket->write("load-stats\n");
+
+        $stats = $this->readStats();
+
+        return array(
+            'version' => $version,
+            'stats' => $stats,
+        );
     }
 
     private function readLine()
@@ -80,12 +89,30 @@ class SocketStatus
             $inputLine = $this->readLine();
             if (0 === strpos($inputLine, $versionPrefix)) {
                 $versionStart = substr($inputLine, strlen($versionPrefix));
+                $this->readAll();
 
                 return substr($versionStart, 0, strpos($versionStart, ' '));
             }
         } while (0 !== strpos($inputLine, 'END'));
 
         return 'Unknown';
+    }
+
+    // SUCCESS: nclients=0,bytesin=72769349,bytesout=523432947
+    private function readStats()
+    {
+        $stats = array();
+        $successPrefix = 'SUCCESS: ';
+        $inputLine = trim($this->readLine());
+        if (0 === strpos($inputLine, $successPrefix)) {
+            $items = explode(',', substr($inputLine, strlen($successPrefix)));
+            foreach ($items as $item) {
+                list($key, $value) = explode('=', $item);
+                $stats[$key] = intval($value);
+            }
+        }
+
+        return $stats;
     }
 
     private function readAll()
