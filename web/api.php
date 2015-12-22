@@ -50,6 +50,17 @@ try {
         }
     );
 
+    $service->get(
+        '/info',
+        function (Request $request) use ($manage) {
+            $serverInfo = $manage->getServerInfo();
+            $response = new JsonResponse();
+            $response->setBody($serverInfo);
+
+            return $response;
+        }
+    );
+
     $service->post(
         '/disconnect',
         function (Request $request) use ($manage) {

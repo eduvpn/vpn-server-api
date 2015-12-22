@@ -39,6 +39,22 @@ class Manage
         return array('items' => $combinedClientInfo);
     }
 
+    public function getServerInfo()
+    {
+        $serverInfo = array(
+            'items' => array(),
+        );
+
+        foreach ($this->socketStatus as $k => $v) {
+            $serverInfo['items'][] = array(
+                'version' => $v->fetchVersion(),
+                'socket' => $k,
+            );
+        }
+
+        return $serverInfo;
+    }
+
     public function killClient($socketId, $commonName)
     {
         $this->socketStatus[$socketId]->killClient($commonName);

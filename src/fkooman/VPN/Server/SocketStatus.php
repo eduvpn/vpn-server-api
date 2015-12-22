@@ -48,6 +48,15 @@ class SocketStatus
         return $this->readStatus();
     }
 
+    public function fetchVersion()
+    {
+        // ask for version
+        $this->socket->write("version\n");
+
+        // read and return status
+        return $this->readVersion();
+    }
+
     private function readLine()
     {
         return $this->socket->read(256, PHP_NORMAL_READ);
@@ -62,6 +71,21 @@ class SocketStatus
         } while (0 !== strpos($inputLine, 'END'));
 
         return $msg;
+    }
+
+    private function readVersion()
+    {
+        $versionPrefix = 'OpenVPN Version: OpenVPN ';
+        do {
+            $inputLine = $this->readLine();
+            if (0 === strpos($inputLine, $versionPrefix)) {
+                $versionStart = substr($inputLine, strlen($versionPrefix));
+
+                return substr($versionStart, 0, strpos($versionStart, ' '));
+            }
+        } while (0 !== strpos($inputLine, 'END'));
+
+        return 'Unknown';
     }
 
     private function readAll()
