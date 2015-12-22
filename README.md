@@ -55,14 +55,25 @@ List configured OpenVPN servers:
         "items": [
             {
                 "socket": "tcp://localhost:7505",
+                "stats": {
+                    "bytesin": 72778254,
+                    "bytesout": 523442058,
+                    "nclients": 0
+                },
                 "version": "2.3.8"
             },
             {
                 "socket": "tcp://localhost:7506",
+                "stats": {
+                    "bytesin": 54779,
+                    "bytesout": 70475,
+                    "nclients": 1
+                },
                 "version": "2.3.8"
             }
         ]
     }
+
 
 ## Disconnect
 Disconnect a currently connected client:

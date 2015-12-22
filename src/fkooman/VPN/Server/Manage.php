@@ -16,6 +16,8 @@
  */
 namespace fkooman\VPN\Server;
 
+use Socket\Raw\Exception;
+
 class Manage
 {
     /** @var array */
@@ -24,7 +26,12 @@ class Manage
     public function __construct(array $socketAddresses)
     {
         foreach ($socketAddresses as $socketAddress) {
-            $this->socketStatus[$socketAddress] = new SocketStatus($socketAddress);
+            try {
+                $socketStatus = new SocketStatus($socketAddress);
+            } catch (Exception $e) {
+                $socketStatus = false;
+            }
+            $this->socketStatus[$socketAddress] = $socketStatus;
         }
     }
 
@@ -32,8 +39,10 @@ class Manage
     {
         $combinedClientInfo = array();
         foreach ($this->socketStatus as $k => $v) {
-            $statusParser = new StatusParser($k, $v->fetchStatus());
-            $combinedClientInfo = array_merge($combinedClientInfo, $statusParser->getClientInfo());
+            if (false !== $v) {
+                $statusParser = new StatusParser($k, $v->fetchStatus());
+                $combinedClientInfo = array_merge($combinedClientInfo, $statusParser->getClientInfo());
+            }
         }
 
         return array('items' => $combinedClientInfo);
@@ -46,8 +55,13 @@ class Manage
         );
 
         foreach ($this->socketStatus as $k => $v) {
-            $info = $v->fetchServerInfo();
-            $info['socket'] = $k;
+            $info = array(
+                'socket' => $k,
+                'available' => false !== $v,
+            );
+            if (false !== $v) {
+                $info = array_merge($info, $v->fetchServerInfo());
+            }
 
             $serverInfo['items'][] = $info;
         }
