@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.2 (2015-12-22)
+## 1.1.0 (2015-12-22)
 - add server info API call
 - catch exception when socket connection does not work
 - update README
