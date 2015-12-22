@@ -3,9 +3,10 @@ This service runs on the OpenVPN instances to control their behavior. It will
 implement the following API calls:
 
 Implemented:
-* retrieve a list of connected clients
-* disconnect a connected client
-* trigger CRL refresh
+* Retrieve a list of connected clients
+* Disconnect a connected client
+* Trigger CRL refresh
+* Server info
 
 TODO:
 * prevent clients from connecting (temporary block)
@@ -41,6 +42,24 @@ List all connected clients:
                     "fd00:4343:4343::1000",
                     "10.43.43.2"
                 ]
+            }
+        ]
+    }
+
+## Server Info
+List configured OpenVPN servers:
+
+    $ curl -u admin:s3cr3t http://localhost/vpn-server-api/api.php/info
+
+    {
+        "items": [
+            {
+                "socket": "tcp://localhost:7505",
+                "version": "2.3.8"
+            },
+            {
+                "socket": "tcp://localhost:7506",
+                "version": "2.3.8"
             }
         ]
     }
