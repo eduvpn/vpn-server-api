@@ -21,25 +21,30 @@ use RuntimeException;
 class Manage
 {
     /** @var array */
-    private $sockets;
+    private $servers;
 
     public function __construct(array $servers)
     {
+        $this->servers = array();
         foreach ($servers as $server) {
             try {
                 $socket = new Socket($server['socket']);
             } catch (RuntimeException $e) {
                 $socket = false;
             }
-            $this->sockets[$server['id']] = $socket;
+            $this->servers[] = array(
+                'id' => $server['id'],
+                'socket' => $socket,
+                'name' => $server['name'],
+            );
         }
     }
 
     public function __destruct()
     {
-        foreach ($this->sockets as $socket) {
-            if (false !== $socket) {
-                $socket->close();
+        foreach ($this->servers as $server) {
+            if (false !== $server['socket']) {
+                $server['socket']->close();
             }
         }
     }
@@ -48,17 +53,19 @@ class Manage
     {
         $connections = array();
 
-        foreach ($this->sockets as $id => $socket) {
-            if (false === $socket) {
+        foreach ($this->servers as $server) {
+            if (false === $server['socket']) {
                 // cannot connect to OpenVpn instance, instance is dead
                 $connections[] = array(
-                    'id' => $id,
+                    'id' => $server['id'],
+                    'name' => $server['name'],
                     'clients' => array(),
                 );
             } else {
-                $api = new Api($socket);
+                $api = new Api($server['socket']);
                 $connections[] = array(
-                    'id' => $id,
+                    'id' => $server['id'],
+                    'name' => $server['name'],
                     'clients' => $api->getStatus(),
                 );
             }
@@ -70,17 +77,19 @@ class Manage
     public function getServerInfo()
     {
         $serverInfo = array();
-        foreach ($this->sockets as $id => $socket) {
-            if (false === $socket) {
+        foreach ($this->servers as $server) {
+            if (false === $server['socket']) {
                 // cannot connect to OpenVpn instance, instance is dead
                 $serverInfo[] = array(
-                    'id' => $id,
+                    'id' => $server['id'],
+                    'name' => $server['name'],
                     'up' => false,
                 );
             } else {
-                $api = new Api($socket);
+                $api = new Api($server['socket']);
                 $info = $api->getLoadStats();
-                $info['id'] = $id;
+                $info['id'] = $server['id'];
+                $info['name'] = $server['name'];
                 $info['up'] = true;
                 $info['version'] = $api->getVersion();
                 $serverInfo[] = $info;
@@ -92,8 +101,14 @@ class Manage
 
     public function killClient($id, $commonName)
     {
-        $api = new Api($this->sockets[$id]);
+        foreach ($this->servers as $server) {
+            if ($id === $server['id']) {
+                $api = new Api($server['socket']);
 
-        return $api->killClient($commonName);
+                return $api->killClient($commonName);
+            }
+        }
+
+        return false;
     }
 }
