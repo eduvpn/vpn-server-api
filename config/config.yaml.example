@@ -1,11 +1,11 @@
 # The OpenVPN instances we control
 OpenVpn:
-    - id: udp_1194_server
-      name: My UDP server
+    - id: udp_1194
+      name: UDP Server
       socket: tcp://localhost:7505
 
-    - id: tcp_443_server
-      name: My TCP server
+    - id: tcp_443
+      name: TCP Server
       socket: tcp://localhost:7506
 
 # The API users
