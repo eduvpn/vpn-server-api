@@ -41,6 +41,11 @@ class StatusParser
         #GLOBAL_STATS,Max bcast/mcast queue length,0
         #END
 
+        // for now, we log all statusData to get a good corpus for writing
+        // tests
+
+        error_log(json_encode($statusData));
+
         $clientListStart = 0;
         $routingTableStart = 0;
         $globalStatsStart = 0;
@@ -62,7 +67,11 @@ class StatusParser
 
         // merge routing table in client list
         foreach ($parsedClientList as $key => $value) {
-            $parsedClientList[$key]['virtual_address'] = $parsedRoutingTable[$key];
+            if (!array_key_exists($key, $parsedRoutingTable)) {
+                $parsedClientList[$key]['virtual_address'] = array();
+            } else {
+                $parsedClientList[$key]['virtual_address'] = $parsedRoutingTable[$key];
+            }
         }
 
         return array_values($parsedClientList);

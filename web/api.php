@@ -43,9 +43,9 @@ try {
     $service->get(
         '/connections',
         function (Request $request) use ($manage) {
-            $clientInfo = $manage->getConnections();
+            $clientConnections = $manage->getConnections();
             $response = new JsonResponse();
-            $response->setBody($clientInfo);
+            $response->setBody($clientConnections);
 
             return $response;
         }
@@ -107,5 +107,5 @@ try {
     $service->run()->send();
 } catch (Exception $e) {
     error_log($e->getMessage());
-    die(sprintf('ERROR: %s', $e->getMessage()));
+    die(sprintf('ERROR: %s', $e->getMessage().$e->getTraceAsString()));
 }
