@@ -4,60 +4,47 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0da10148e72816d50c4de4a130176bc6",
-    "content-hash": "cc5f0c3a5421e7b50afc189caa0444cd",
+    "hash": "e96719771cb37b739bb426a20ff7d641",
+    "content-hash": "b82fac526f904ab8417a9f5b5c981463",
     "packages": [
         {
-            "name": "clue/socket-raw",
-            "version": "v1.2.0",
+            "name": "fkooman/config",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/clue/php-socket-raw.git",
-                "reference": "8a10282bcb1e45e076a8a8285237681380e55ea5"
+                "url": "https://github.com/fkooman/php-lib-config.git",
+                "reference": "961f2cb63bab8916c921a7b29a7eb3e22b5bcda1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clue/php-socket-raw/zipball/8a10282bcb1e45e076a8a8285237681380e55ea5",
-                "reference": "8a10282bcb1e45e076a8a8285237681380e55ea5",
+                "url": "https://api.github.com/repos/fkooman/php-lib-config/zipball/961f2cb63bab8916c921a7b29a7eb3e22b5bcda1",
+                "reference": "961f2cb63bab8916c921a7b29a7eb3e22b5bcda1",
                 "shasum": ""
             },
             "require": {
-                "ext-sockets": "*",
-                "php": ">=5.3"
+                "ext-spl": "*",
+                "php": ">=5.3.3",
+                "symfony/yaml": "^2.7"
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "Socket\\Raw\\": "src"
+                "psr-0": {
+                    "fkooman\\Config\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "MIT"
+                "Apache-2.0"
             ],
             "authors": [
                 {
-                    "name": "Christian Lück",
-                    "email": "christian@lueck.tv"
+                    "name": "François Kooman",
+                    "email": "fkooman@tuxed.net",
+                    "role": "Developer"
                 }
             ],
-            "description": "Simple and lightweight OOP wrapper for PHP's low level sockets extension (ext-sockets)",
-            "homepage": "https://github.com/clue/php-socket-raw",
-            "keywords": [
-                "Socket",
-                "client",
-                "datagram",
-                "dgram",
-                "icmp",
-                "ipv6",
-                "server",
-                "stream",
-                "tcp",
-                "udg",
-                "udp",
-                "unix"
-            ],
-            "time": "2015-03-18 23:48:01"
+            "description": "Read and write configuration files",
+            "time": "2015-11-09 18:12:16"
         },
         {
             "name": "fkooman/http",
@@ -102,44 +89,6 @@
             ],
             "description": "Simple PHP library for dealing with HTTP requests and responses.",
             "time": "2015-12-22 12:27:38"
-        },
-        {
-            "name": "fkooman/ini",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/fkooman/php-lib-ini.git",
-                "reference": "b380a88e42ce2184e822cc8b89223cd777c484be"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-lib-ini/zipball/b380a88e42ce2184e822cc8b89223cd777c484be",
-                "reference": "b380a88e42ce2184e822cc8b89223cd777c484be",
-                "shasum": ""
-            },
-            "require": {
-                "ext-spl": "*",
-                "php": ">=5.3.3"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "fkooman\\Ini\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "François Kooman",
-                    "email": "fkooman@tuxed.net",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Handle INI configuration files",
-            "time": "2015-07-13 12:06:01"
         },
         {
             "name": "fkooman/json",
@@ -554,6 +503,55 @@
             ],
             "description": "A lightweight implementation of CommonJS Promises/A for PHP",
             "time": "2015-07-03 13:48:55"
+        },
+        {
+            "name": "symfony/yaml",
+            "version": "v2.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "f79824187de95064a2f5038904c4d7f0227fedb5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/f79824187de95064a2f5038904c4d7f0227fedb5",
+                "reference": "f79824187de95064a2f5038904c4d7f0227fedb5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.9"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.8-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Yaml\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Yaml Component",
+            "homepage": "https://symfony.com",
+            "time": "2015-11-30 12:35:10"
         }
     ],
     "packages-dev": [
@@ -603,8 +601,6 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "ext-date": "*",
-        "ext-sockets": "*",
         "ext-spl": "*",
         "php": ">=5.4"
     },

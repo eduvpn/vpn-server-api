@@ -19,7 +19,8 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
 use fkooman\Rest\Plugin\Authentication\Basic\BasicAuthentication;
-use fkooman\Ini\IniReader;
+use fkooman\Config\Reader;
+use fkooman\Config\YamlFile;
 use fkooman\Rest\Service;
 use fkooman\VPN\Server\Manage;
 use fkooman\Http\Request;
@@ -27,22 +28,22 @@ use fkooman\Http\JsonResponse;
 use fkooman\VPN\Server\CrlFetcher;
 
 try {
-    $iniReader = IniReader::fromFile(
-        dirname(__DIR__).'/config/config.ini'
+    $reader = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
 
-    $manage = new Manage($iniReader->v('OpenVpnManagement', 'socket'));
+    $manage = new Manage($reader->v('OpenVpn'));
 
     $crlFetcher = new CrlFetcher(
-        $iniReader->v('Crl', 'crlUrl'),
-        $iniReader->v('Crl', 'crlPath')
+        $reader->v('Crl', 'url'),
+        $reader->v('Crl', 'path')
     );
 
     $service = new Service();
     $service->get(
-        '/status',
+        '/connections',
         function (Request $request) use ($manage) {
-            $clientInfo = $manage->getClientInfo();
+            $clientInfo = $manage->getConnections();
             $response = new JsonResponse();
             $response->setBody($clientInfo);
 
@@ -51,7 +52,7 @@ try {
     );
 
     $service->get(
-        '/info',
+        '/servers',
         function (Request $request) use ($manage) {
             $serverInfo = $manage->getServerInfo();
             $response = new JsonResponse();
@@ -62,13 +63,20 @@ try {
     );
 
     $service->post(
-        '/disconnect',
+        '/kill',
         function (Request $request) use ($manage) {
-            $socketId = $request->getPostParameter('socket_id');
-            $configId = $request->getPostParameter('common_name');
-            $manage->killClient($socketId, $configId);
+            // XXX: should we disconnect the user from all servers?
+            $id = $request->getPostParameter('id');
+            $commonName = $request->getPostParameter('common_name');
 
-            return new JsonResponse();
+            $response = new JsonResponse();
+            $response->setBody(
+                array(
+                    'ok' => $manage->killClient($id, $commonName),
+                )
+            );
+
+            return $response;
         }
     );
 
@@ -82,8 +90,8 @@ try {
     );
 
     $auth = new BasicAuthentication(
-        function ($userId) use ($iniReader) {
-            $userList = $iniReader->v('BasicAuthentication');
+        function ($userId) use ($reader) {
+            $userList = $reader->v('Users');
             if (!array_key_exists($userId, $userList)) {
                 return false;
             }

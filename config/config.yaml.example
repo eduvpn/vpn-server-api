@@ -1,0 +1,18 @@
+# The OpenVPN instances we control
+OpenVpn:
+    - id: udp_1194_server
+      name: My UDP server
+      socket: tcp://localhost:7505
+
+    - id: tcp_443_server
+      name: My TCP server
+      socket: tcp://localhost:7506
+
+# The API users
+Users:
+    admin: $2y$10$uA77iLeDLaU.a.KRuhUYKuziuZacuWzodpqLok2XBQLXvig6UaB9a
+
+# The Certificate Revocation List
+Crl:
+    url: http://localhost/vpn-config-api/api.php/ca.crl
+    path: /var/lib/vpn-server-api

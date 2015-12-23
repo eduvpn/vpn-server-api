@@ -16,96 +16,100 @@
  */
 namespace fkooman\VPN\Server;
 
+/**
+ * Parses the response from the OpenVPN `status 2` command.
+ *
+ * NOTE: The OpenVPN instance MUST NOT have --duplicate-cn in the configuration
+ * as we do not deal with multiple connections with the same CN, due to bugs in
+ * udp6 status report where the client port is not mentioned in the 
+ * 'Real Address' column
+ */
 class StatusParser
 {
-    /** @var string */
-    private $socketId;
-
-    /** @var array */
-    private $clientList;
-
-    /** @var array */
-    private $routingTable;
-
-    public function __construct($socketId, $statusData)
+    public static function parse(array $statusData)
     {
-        $this->socketId = $socketId;
-        $this->clientList = self::getClientList($statusData);
-        $this->routingTable = self::getRoutingTable($statusData, count($this->clientList) + 5);
+        #TITLE,OpenVPN 2.3.9 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Dec 16 2015
+        #TIME,Wed Dec 23 12:52:08 2015,1450875128
+        #HEADER,CLIENT_LIST,Common Name,Real Address,Virtual Address,Bytes Received,Bytes Sent,Connected Since,Connected Since (time_t),Username
+        #CLIENT_LIST,fkooman_ziptest,::ffff:91.64.87.183,10.42.42.2,127707,127903,Wed Dec 23 12:49:15 2015,1450874955,UNDEF
+        #CLIENT_LIST,sebas_tuxed_SGS6,::ffff:83.83.194.107,10.42.42.3,127229,180419,Wed Dec 23 12:05:28 2015,1450872328,UNDEF
+        #HEADER,ROUTING_TABLE,Virtual Address,Common Name,Real Address,Last Ref,Last Ref (time_t)
+        #ROUTING_TABLE,10.42.42.2,fkooman_ziptest,::ffff:91.64.87.183,Wed Dec 23 12:52:07 2015,1450875127
+        #ROUTING_TABLE,fd00:4242:4242::1000,fkooman_ziptest,::ffff:91.64.87.183,Wed Dec 23 12:50:42 2015,1450875042
+        #ROUTING_TABLE,fd00:4242:4242::1001,sebas_tuxed_SGS6,::ffff:83.83.194.107,Wed Dec 23 12:28:53 2015,1450873733
+        #ROUTING_TABLE,10.42.42.3,sebas_tuxed_SGS6,::ffff:83.83.194.107,Wed Dec 23 12:50:46 2015,1450875046
+        #GLOBAL_STATS,Max bcast/mcast queue length,0
+        #END
+
+        $clientListStart = 0;
+        $routingTableStart = 0;
+        $globalStatsStart = 0;
+
+        for ($i = 0; $i < sizeof($statusData); ++$i) {
+            if (0 === strpos($statusData[$i], 'HEADER,CLIENT_LIST')) {
+                $clientListStart = $i;
+            }
+            if (0 === strpos($statusData[$i], 'HEADER,ROUTING_TABLE')) {
+                $routingTableStart = $i;
+            }
+            if (0 === strpos($statusData[$i], 'GLOBAL_STATS')) {
+                $globalStatsStart = $i;
+            }
+        }
+
+        $parsedClientList = self::parseClientList(array_slice($statusData, $clientListStart, $routingTableStart - $clientListStart));
+        $parsedRoutingTable = self::parseRoutingTable(array_slice($statusData, $routingTableStart, $globalStatsStart - $routingTableStart));
+
+        // merge routing table in client list
+        foreach ($parsedClientList as $key => $value) {
+            $parsedClientList[$key]['virtual_address'] = $parsedRoutingTable[$key];
+        }
+
+        return array_values($parsedClientList);
     }
 
-    public function getClientInfo()
+    private static function parseClientList(array $clientList)
     {
-        // combine the data from clientList and routingTable and return it
-        // XXX: what if one ID is connected multiple times?
-
-        $clientData = array();
-        foreach ($this->clientList as $clientInfo) {
-            list($clientId, $clientIpPort, $bytesReceived, $bytesSent, $connectedSince) = explode(',', $clientInfo);
-            // XXX: what about native IPv6 connections to OpenVPN?
-            list($clientIp, $clientPort) = explode(':', $clientIpPort);
-
-            $clientData[$clientId] = array(
-                'bytes_received' => intval($bytesReceived),
-                'bytes_sent' => intval($bytesSent),
-                'client_ip' => $clientIp,
-                'common_name' => $clientId,
-                'connected_since' => strtotime(trim($connectedSince)),
-                'socket_id' => $this->socketId,
-                'vpn_ip' => array(),
+        #HEADER,CLIENT_LIST,Common Name,Real Address,Virtual Address,Bytes Received,Bytes Sent,Connected Since,Connected Since (time_t),Username
+        #CLIENT_LIST,fkooman_ziptest,::ffff:91.64.87.183,10.42.42.2,127707,127903,Wed Dec 23 12:49:15 2015,1450874955,UNDEF
+        #CLIENT_LIST,sebas_tuxed_SGS6,::ffff:83.83.194.107,10.42.42.3,127229,180419,Wed Dec 23 12:05:28 2015,1450872328,UNDEF
+        $parsedClientList = array();
+        for ($i = 1; $i < sizeof($clientList); ++$i) {
+            $parsedClient = str_getcsv($clientList[$i]);
+            $commonName = $parsedClient[1];
+            if (array_key_exists($commonName, $parsedClientList)) {
+                error_log('duplicate common name, possibly --duplicate-cn enabled in server configuration');
+            }
+            $parsedClientList[$commonName] = array(
+                'common_name' => $commonName,
+                'real_address' => $parsedClient[2],
+                //'virtual_address' => $parsedClient[3],
+                'bytes_in' => intval($parsedClient[4]),
+                'bytes_out' => intval($parsedClient[5]),
+                'connected_since' => intval($parsedClient[7]),
             );
         }
 
-        // walk through routing table and add vpn IPs
-        foreach ($this->routingTable as $routingInfo) {
-            list($vpnIp, $clientId) = explode(',', $routingInfo);
-            $clientData[$clientId]['vpn_ip'][] = $vpnIp;
-        }
-
-        // now turn this into a normal array with numeric index
-        $asArray = array(
-            //'connectedClients' => array(),
-        );
-
-        foreach ($clientData as $k => $v) {
-            $asArray[] = $v;
-        }
-
-        return $asArray;
+        return $parsedClientList;
     }
 
-    private static function getClientList($statusData)
+    private static function parseRoutingTable(array $routingTable)
     {
-        $splitData = self::splitData($statusData);
-
-        // clientList always starts at index 3
-        $clientList = array();
-        $i = 3;
-        // walk through the list until we hit 'ROUTING TABLE'
-        while (0 !== strpos($splitData[$i], 'ROUTING TABLE')) {
-            $clientList[] = $splitData[$i];
-            ++$i;
+        #HEADER,ROUTING_TABLE,Virtual Address,Common Name,Real Address,Last Ref,Last Ref (time_t)
+        #ROUTING_TABLE,10.42.42.2,fkooman_ziptest,::ffff:91.64.87.183,Wed Dec 23 12:52:07 2015,1450875127
+        #ROUTING_TABLE,fd00:4242:4242::1000,fkooman_ziptest,::ffff:91.64.87.183,Wed Dec 23 12:50:42 2015,1450875042
+        #ROUTING_TABLE,fd00:4242:4242::1001,sebas_tuxed_SGS6,::ffff:83.83.194.107,Wed Dec 23 12:28:53 2015,1450873733
+        #ROUTING_TABLE,10.42.42.3,sebas_tuxed_SGS6,::ffff:83.83.194.107,Wed Dec 23 12:50:46 2015,1450875046
+        $parsedRoutingTable = array();
+        for ($i = 1; $i < sizeof($routingTable); ++$i) {
+            $parsedRoute = str_getcsv($routingTable[$i]);
+            $commonName = $parsedRoute[2];
+            if (!array_key_exists($commonName, $parsedRoutingTable)) {
+                $parsedRoutingTable[$commonName] = array();
+            }
+            $parsedRoutingTable[$commonName][] = $parsedRoute[1];
         }
 
-        return $clientList;
-    }
-
-    private static function getRoutingTable($statusData, $startIndex)
-    {
-        $splitData = self::splitData($statusData);
-        $routingTable = array();
-        $i = $startIndex;
-        // walk through the list until we hit 'GLOBAL STATS'
-        while (0 !== strpos($splitData[$i], 'GLOBAL STATS')) {
-            $routingTable[] = $splitData[$i];
-            ++$i;
-        }
-
-        return $routingTable;
-    }
-
-    private static function splitData($statusData)
-    {
-        return explode("\n", $statusData);
+        return $parsedRoutingTable;
     }
 }

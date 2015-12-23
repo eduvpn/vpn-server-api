@@ -16,61 +16,84 @@
  */
 namespace fkooman\VPN\Server;
 
-use Socket\Raw\Exception;
+use RuntimeException;
 
 class Manage
 {
     /** @var array */
-    private $socketStatus;
+    private $sockets;
 
-    public function __construct(array $socketAddresses)
+    public function __construct(array $servers)
     {
-        foreach ($socketAddresses as $socketAddress) {
+        foreach ($servers as $server) {
             try {
-                $socketStatus = new SocketStatus($socketAddress);
-            } catch (Exception $e) {
-                $socketStatus = false;
+                $socket = new Socket($server['socket']);
+            } catch (RuntimeException $e) {
+                $socket = false;
             }
-            $this->socketStatus[$socketAddress] = $socketStatus;
+            $this->sockets[$server['id']] = $socket;
         }
     }
 
-    public function getClientInfo()
+    public function __destruct()
     {
-        $combinedClientInfo = array();
-        foreach ($this->socketStatus as $k => $v) {
-            if (false !== $v) {
-                $statusParser = new StatusParser($k, $v->fetchStatus());
-                $combinedClientInfo = array_merge($combinedClientInfo, $statusParser->getClientInfo());
+        foreach ($this->sockets as $socket) {
+            if (false !== $socket) {
+                $socket->close();
+            }
+        }
+    }
+
+    public function getConnections()
+    {
+        $connections = array();
+
+        foreach ($this->sockets as $id => $socket) {
+            if (false === $socket) {
+                // cannot connect to OpenVpn instance, instance is dead
+                $connections[] = array(
+                    'id' => $id,
+                    'clients' => array(),
+                );
+            } else {
+                $api = new Api($socket);
+                $connections[] = array(
+                    'id' => $id,
+                    'clients' => $api->getStatus(),
+                );
             }
         }
 
-        return array('items' => $combinedClientInfo);
+        return array('items' => $connections);
     }
 
     public function getServerInfo()
     {
-        $serverInfo = array(
-            'items' => array(),
-        );
-
-        foreach ($this->socketStatus as $k => $v) {
-            $info = array(
-                'socket' => $k,
-                'available' => false !== $v,
-            );
-            if (false !== $v) {
-                $info = array_merge($info, $v->fetchServerInfo());
+        $serverInfo = array();
+        foreach ($this->sockets as $id => $socket) {
+            if (false === $socket) {
+                // cannot connect to OpenVpn instance, instance is dead
+                $serverInfo[] = array(
+                    'id' => $id,
+                    'up' => false,
+                );
+            } else {
+                $api = new Api($socket);
+                $info = $api->getLoadStats();
+                $info['id'] = $id;
+                $info['up'] = true;
+                $info['version'] = $api->getVersion();
+                $serverInfo[] = $info;
             }
-
-            $serverInfo['items'][] = $info;
         }
 
-        return $serverInfo;
+        return array('items' => $serverInfo);
     }
 
-    public function killClient($socketId, $commonName)
+    public function killClient($id, $commonName)
     {
-        $this->socketStatus[$socketId]->killClient($commonName);
+        $api = new Api($this->sockets[$id]);
+
+        return $api->killClient($commonName);
     }
 }

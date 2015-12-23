@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.0 (...)
+- major refactor of the code and dependencies
+- new configuration format (YAML)
+- better API
+
 ## 1.1.0 (2015-12-22)
 - add server info API call
 - catch exception when socket connection does not work
