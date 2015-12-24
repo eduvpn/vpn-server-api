@@ -1,0 +1,40 @@
+#!/usr/bin/php
+<?php
+
+require_once dirname(__DIR__).'/vendor/autoload.php';
+
+use fkooman\Config\YamlFile;
+use fkooman\Config\IniFile;
+
+// read old config file
+$iniFile = new IniFile(dirname(__DIR__).'/config/config.ini');
+
+$iniConfig = $iniFile->readConfig();
+
+$newConfig = array();
+
+// OpenVpnManagement --> OpenVpn
+$newConfig['OpenVpn'] = array();
+$sockets = $iniConfig['OpenVpnManagement'];
+
+for ($i = 0; $i < sizeof($sockets['socket']); ++$i) {
+    $newConfig['OpenVpn'][] = array(
+        'id' => sprintf('server_%s', $i),
+        'name' => sprintf('Server %s', $i),
+        'socket' => $sockets['socket'][$i],
+    );
+}
+
+// BasicAuthentication --> Users
+$newConfig['Users'] = array();
+$basicAuth = $iniConfig['BasicAuthentication'];
+foreach ($basicAuth as $user => $hash) {
+    $newConfig['Users'][$user] = $hash;
+}
+
+// Crl
+$newConfig['Crl']['url'] = $iniConfig['Crl']['crlUrl'];
+$newConfig['Crl']['path'] = $iniConfig['Crl']['crlPath'];
+
+$yamlFile = new YamlFile(dirname(__DIR__).'/config/config.yaml');
+$yamlFile->writeConfig($newConfig);
