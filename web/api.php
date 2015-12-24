@@ -25,7 +25,10 @@ use fkooman\Rest\Service;
 use fkooman\VPN\Server\Manage;
 use fkooman\Http\Request;
 use fkooman\Http\JsonResponse;
+use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\VPN\Server\CrlFetcher;
+
+set_error_handler(array('fkooman\Rest\Service', 'handleErrors'));
 
 try {
     $reader = new Reader(
@@ -106,6 +109,8 @@ try {
     $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     $service->run()->send();
 } catch (Exception $e) {
-    error_log($e->getMessage());
-    die(sprintf('ERROR: %s', $e->getMessage().$e->getTraceAsString()));
+    // internal server error
+    error_log($e->__toString());
+    $e = new InternalServerErrorException($e->getMessage());
+    $e->getJsonResponse()->send();
 }
