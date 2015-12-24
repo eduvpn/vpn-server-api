@@ -27,8 +27,9 @@ use fkooman\Http\Request;
 use fkooman\Http\JsonResponse;
 use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\VPN\Server\CrlFetcher;
+use fkooman\VPN\Server\SimpleError;
 
-set_error_handler(array('fkooman\Rest\Service', 'handleErrors'));
+SimpleError::register();
 
 try {
     $reader = new Reader(
