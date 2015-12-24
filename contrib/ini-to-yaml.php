@@ -1,16 +1,16 @@
 #!/usr/bin/php
 <?php
 
-require_once dirname(__DIR__).'/vendor/autoload.php';
+require_once '/usr/share/php/fkooman/Config/autoload.php';
 
 use fkooman\Config\YamlFile;
 use fkooman\Config\IniFile;
 
 // read old config file
-$iniFile = new IniFile(dirname(__DIR__).'/config/config.ini');
+$iniFile = new IniFile('/etc/vpn-server-api/config.ini');
+$yamlFile = new YamlFile('/etc/vpn-server-api/config.yaml');
 
 $iniConfig = $iniFile->readConfig();
-
 $newConfig = array();
 
 // OpenVpnManagement --> OpenVpn
@@ -35,6 +35,4 @@ foreach ($basicAuth as $user => $hash) {
 // Crl
 $newConfig['Crl']['url'] = $iniConfig['Crl']['crlUrl'];
 $newConfig['Crl']['path'] = $iniConfig['Crl']['crlPath'];
-
-$yamlFile = new YamlFile(dirname(__DIR__).'/config/config.yaml');
 $yamlFile->writeConfig($newConfig);
