@@ -16,3 +16,7 @@ Users:
 Crl:
     url: http://localhost/vpn-config-api/api.php/ca.crl
     path: /var/lib/vpn-server-api
+
+# The Client Configuration Directory
+Ccd:
+    path: /var/lib/vpn-server-api/ccd

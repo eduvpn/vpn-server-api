@@ -28,6 +28,8 @@ use fkooman\Http\JsonResponse;
 use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\VPN\Server\CrlFetcher;
 use fkooman\VPN\Server\SimpleError;
+use fkooman\VPN\Server\CcdHandler;
+use fkooman\VPN\Server\Utils;
 
 SimpleError::register();
 
@@ -41,6 +43,10 @@ try {
     $crlFetcher = new CrlFetcher(
         $reader->v('Crl', 'url'),
         $reader->v('Crl', 'path')
+    );
+
+    $ccdHandler = new CcdHandler(
+        $reader->v('Ccd', 'path')
     );
 
     $service = new Service();
@@ -71,7 +77,10 @@ try {
         function (Request $request) use ($manage) {
             // XXX: should we disconnect the user from all servers?
             $id = $request->getPostParameter('id');
+            Utils::validateId($id);
+
             $commonName = $request->getPostParameter('common_name');
+            Utils::validateCommonName($commonName);
 
             $response = new JsonResponse();
             $response->setBody(
@@ -85,12 +94,68 @@ try {
     );
 
     $service->post(
+        '/disableCommonName',
+        function (Request $request) use ($ccdHandler) {
+            $commonName = $request->getPostParameter('common_name');
+            Utils::validateCommonName($commonName);
+
+            $response = new JsonResponse();
+            $response->setBody(
+                array(
+                    'ok' => $ccdHandler->disableCommonName($commonName),
+                )
+            );
+
+            return $response;
+        }
+    );
+
+    $service->post(
+        '/enableCommonName',
+        function (Request $request) use ($ccdHandler) {
+            $commonName = $request->getPostParameter('common_name');
+            Utils::validateCommonName($commonName);
+
+            $response = new JsonResponse();
+            $response->setBody(
+                array(
+                    'ok' => $ccdHandler->enableCommonName($commonName),
+                )
+            );
+
+            return $response;
+        }
+    );
+
+    $service->get(
+        '/disabledCommonNames',
+        function (Request $request) use ($ccdHandler) {
+            $response = new JsonResponse();
+            $response->setBody(
+                array(
+                    'items' => $ccdHandler->getDisabledCommonNames(),
+                )
+            );
+
+            return $response;
+        }
+    );
+
+    $service->post(
         '/refreshCrl',
         function (Request $request) use ($crlFetcher) {
-            $crlFetcher->fetch();
+            $response = new JsonResponse();
+            $response->setBody(
+                array(
+                    'ok' => $crlFetcher->fetch(),
+                )
+            );
 
-            return new JsonResponse();
-        }
+            return $response;
+        },
+        array(
+            'fkooman\Rest\Plugin\Authentication\AuthenticationPlugin' => array('enabled' => false),
+        )
     );
 
     $auth = new BasicAuthentication(
