@@ -77,7 +77,7 @@ try {
         function (Request $request) use ($manage) {
             // XXX: should we disconnect the user from all servers?
             $id = $request->getPostParameter('id');
-            Utils::validateId($id);
+            Utils::validateServerId($id);
 
             $commonName = $request->getPostParameter('common_name');
             Utils::validateCommonName($commonName);
@@ -130,10 +130,15 @@ try {
     $service->get(
         '/disabledCommonNames',
         function (Request $request) use ($ccdHandler) {
+            $userId = $request->getUrl()->getQueryParameter('filterByUser');
+            if (!is_null($userId)) {
+                Utils::validateUserId($userId);
+            }
+
             $response = new JsonResponse();
             $response->setBody(
                 array(
-                    'items' => $ccdHandler->getDisabledCommonNames(),
+                    'items' => $ccdHandler->getDisabledCommonNames($userId),
                 )
             );
 

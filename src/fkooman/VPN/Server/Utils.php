@@ -32,10 +32,17 @@ class Utils
         }
     }
 
-    public static function validateId($id)
+    public static function validateUserId($userId)
     {
-        if (0 === preg_match('/^[a-zA-Z0-9-_.@]+$/', $id)) {
-            throw new InvalidArgumentException('invalid characters in id');
+        if (0 === preg_match('/^[a-zA-Z0-9-_.@]+$/', $userId)) {
+            throw new InvalidArgumentException('invalid characters in userId');
+        }
+    }
+
+    public static function validateServerId($serverId)
+    {
+        if (0 === preg_match('/^[a-zA-Z0-9-_.@]+$/', $serverId)) {
+            throw new InvalidArgumentException('invalid characters in serverId');
         }
     }
 }

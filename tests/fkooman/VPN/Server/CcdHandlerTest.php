@@ -100,4 +100,20 @@ class CcdHandlerTest extends PHPUnit_Framework_TestCase
             $ccd->getDisabledCommonNames()
         );
     }
+
+    public function testGetDisabledCommonNamesByUser()
+    {
+        $ccd = new CcdHandler($this->ccdPath);
+        $ccd->disableCommonName('userA_foo');
+        $ccd->disableCommonName('userA_bar');
+        $ccd->disableCommonName('userB_xyz');
+
+        $this->assertSame(
+            array(
+                'userA_bar',
+                'userA_foo',
+            ),
+            $ccd->getDisabledCommonNames('userA')
+        );
+    }
 }

@@ -1,0 +1,14 @@
+OpenVPN CLIENT LIST
+Updated,Sun Dec 27 12:06:23 2015
+Common Name,Real Address,Bytes Received,Bytes Sent,Connected Since
+fkooman_samsung_i9300,91.64.87.183:43565,19187,30799,Sun Dec 27 12:05:02 2015
+sebas_tuxed_SGS6,83.83.194.107:57568,40388,82966,Sun Dec 27 11:20:22 2015
+ROUTING TABLE
+Virtual Address,Common Name,Real Address,Last Ref
+fd00:4242:4242::1003,fkooman_samsung_i9300,91.64.87.183:43565,Sun Dec 27 12:05:03 2015
+fd00:4242:4242::1001,sebas_tuxed_SGS6,83.83.194.107:57568,Sun Dec 27 11:20:22 2015
+10.42.42.3,sebas_tuxed_SGS6,83.83.194.107:57568,Sun Dec 27 12:05:11 2015
+10.42.42.5,fkooman_samsung_i9300,91.64.87.183:43565,Sun Dec 27 12:06:19 2015
+GLOBAL STATS
+Max bcast/mcast queue length,0
+END

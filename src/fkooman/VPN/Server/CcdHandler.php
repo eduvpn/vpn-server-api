@@ -78,10 +78,19 @@ class CcdHandler
         return false;
     }
 
-    public function getDisabledCommonNames()
+    public function getDisabledCommonNames($userId = null)
     {
+        if (!is_null($userId)) {
+            Utils::validateUserId($userId);
+        }
+
         $disabledCommonNames = array();
-        foreach (glob($this->ccdPath.'/*') as $commonNamePath) {
+        $pathFilter = sprintf('%s/*', $this->ccdPath);
+        if (!is_null($userId)) {
+            $pathFilter = sprintf('%s/%s_*', $this->ccdPath, $userId);
+        }
+
+        foreach (glob($pathFilter) as $commonNamePath) {
             if (false !== $fileContent = self::readFile($commonNamePath)) {
                 // read the file, check if it is disabled
                 if (1 === preg_match(self::DISABLE_REGEXP, $fileContent)) {
