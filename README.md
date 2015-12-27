@@ -1,3 +1,5 @@
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/eduVPN/vpn-server-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/eduVPN/vpn-server-api/?branch=master)
+
 # Introduction
 This service runs on the OpenVPN instances to control their behavior. It will
 implement the following API calls:
