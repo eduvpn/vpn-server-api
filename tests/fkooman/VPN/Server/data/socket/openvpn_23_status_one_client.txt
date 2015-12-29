@@ -1,0 +1,9 @@
+TITLE,OpenVPN 2.3.8 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Aug  4 2015
+TIME,Mon Dec 28 17:19:38 2015,1451323178
+HEADER,CLIENT_LIST,Common Name,Real Address,Virtual Address,Bytes Received,Bytes Sent,Connected Since,Connected Since (time_t),Username
+CLIENT_LIST,fkooman_samsung_i9300,91.64.87.183:43103,10.42.42.5,18301,30009,Mon Dec 28 17:19:27 2015,1451323167,UNDEF
+HEADER,ROUTING_TABLE,Virtual Address,Common Name,Real Address,Last Ref,Last Ref (time_t)
+ROUTING_TABLE,fd00:4242:4242::1003,fkooman_samsung_i9300,91.64.87.183:43103,Mon Dec 28 17:19:28 2015,1451323168
+ROUTING_TABLE,10.42.42.5,fkooman_samsung_i9300,91.64.87.183:43103,Mon Dec 28 17:19:32 2015,1451323172
+GLOBAL_STATS,Max bcast/mcast queue length,0
+END

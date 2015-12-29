@@ -1,0 +1,1 @@
+SUCCESS: common name 'fkooman_ziptest' found, 1 client(s) killed

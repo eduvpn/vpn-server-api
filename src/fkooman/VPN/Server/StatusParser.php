@@ -44,7 +44,7 @@ class StatusParser
         // for now, we log all statusData to get a good corpus for writing
         // tests
 
-        error_log(json_encode($statusData));
+        //error_log(json_encode($statusData));
 
         $clientListStart = 0;
         $routingTableStart = 0;

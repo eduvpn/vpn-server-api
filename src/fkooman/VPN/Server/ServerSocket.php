@@ -18,32 +18,63 @@ namespace fkooman\VPN\Server;
 
 use RuntimeException;
 
-class Socket
+/**
+ * Abstraction to use the OpenVPN management interface using a socket 
+ * connection.
+ */
+class ServerSocket implements ServerSocketInterface
 {
     /** @var resource */
     private $socket;
 
+    /** @var string */
+    private $socketAddress;
+
+    /** @var int */
+    private $timeOut;
+
+    /**
+     * Connect to an OpenVPN management socket.
+     *
+     * @param string $socketAddress the socket to connect to, e.g.: 
+     *                              "tcp://localhost:7505"
+     * @param int    $timeOut       the amount of time to wait before 
+     *                              giving up on trying to connect
+     */
     public function __construct($socketAddress, $timeOut = 5)
     {
-        $this->socket = @stream_socket_client($socketAddress, $errno, $errstr, $timeOut);
-        if (!$this->socket) {
-            throw new RuntimeException(sprintf('%s (%s)', $errstr, $errno));
+        $this->socket = null;
+        $this->socketAddress = $socketAddress;
+        $this->timeOut = $timeOut;
+    }
+
+    public function open()
+    {
+        $this->socket = @stream_socket_client($this->socketAddress, $errno, $errstr, $this->timeOut);
+        if (false === $this->socket) {
+            throw new RuntimeException(
+                sprintf('%s (%s)', $errstr, $errno)
+            );
         }
+        // turn off logging as the output may interfere with our management 
+        // session, we do not care about the output
+        $this->command('log off');
     }
 
     /**
      * Send an OpenVPN command and get the response.
      *
-     * @param string $cmd the OpenVPN command, e.g. 'status', 'version', 'kill'
+     * @param string $command the OpenVPN command, e.g. 'status', 'version', 'kill'
      *
      * @return array the response lines in an array, every line as element
      */
-    public function command($cmd)
+    public function command($command)
     {
-        $this->write(sprintf("%s\n", $cmd));
-        $dataArray = $this->read();
+        $this->write(
+            sprintf("%s\n", $command)
+        );
 
-        return $dataArray;
+        return $this->read();
     }
 
     /**

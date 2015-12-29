@@ -21,15 +21,14 @@ use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
 use fkooman\Rest\Plugin\Authentication\Basic\BasicAuthentication;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
-use fkooman\Rest\Service;
-use fkooman\VPN\Server\Manage;
-use fkooman\Http\Request;
-use fkooman\Http\JsonResponse;
+use fkooman\VPN\Server\ServerService;
+use fkooman\VPN\Server\ServerManager;
+use fkooman\VPN\Server\ServerApi;
+use fkooman\VPN\Server\ServerSocket;
 use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\VPN\Server\CrlFetcher;
 use fkooman\VPN\Server\SimpleError;
 use fkooman\VPN\Server\CcdHandler;
-use fkooman\VPN\Server\Utils;
 
 SimpleError::register();
 
@@ -38,132 +37,35 @@ try {
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
 
-    $manage = new Manage($reader->v('OpenVpn'));
-
+    // handles fetching the certificate revocation list
     $crlFetcher = new CrlFetcher(
         $reader->v('Crl', 'url'),
         $reader->v('Crl', 'path')
     );
 
+    // handles the client configuration directory
     $ccdHandler = new CcdHandler(
         $reader->v('Ccd', 'path')
     );
 
-    $service = new Service();
-    $service->get(
-        '/connections',
-        function (Request $request) use ($manage) {
-            $clientConnections = $manage->getConnections();
-            $response = new JsonResponse();
-            $response->setBody($clientConnections);
+    // handles the connection to the various OpenVPN instances
+    $serverManager = new ServerManager();
+    foreach ($reader->v('OpenVpn') as $openVpnServer) {
+        // loop through all configured OpenVPN instances and add them 
+        // to the manager
+        $serverManager->addServer(
+            $openVpnServer['id'],
+            $openVpnServer['name'],
+            new ServerApi(
+                new ServerSocket($openVpnServer['socket'])
+            )
+        );
+    }
 
-            return $response;
-        }
-    );
+    // http request router
+    $service = new ServerService($serverManager, $ccdHandler, $crlFetcher);
 
-    $service->get(
-        '/servers',
-        function (Request $request) use ($manage) {
-            $serverInfo = $manage->getServerInfo();
-            $response = new JsonResponse();
-            $response->setBody($serverInfo);
-
-            return $response;
-        }
-    );
-
-    $service->post(
-        '/kill',
-        function (Request $request) use ($manage) {
-            // XXX: should we disconnect the user from all servers?
-            $id = $request->getPostParameter('id');
-            Utils::validateServerId($id);
-
-            $commonName = $request->getPostParameter('common_name');
-            Utils::validateCommonName($commonName);
-
-            $response = new JsonResponse();
-            $response->setBody(
-                array(
-                    'ok' => $manage->killClient($id, $commonName),
-                )
-            );
-
-            return $response;
-        }
-    );
-
-    $service->post(
-        '/disableCommonName',
-        function (Request $request) use ($ccdHandler) {
-            $commonName = $request->getPostParameter('common_name');
-            Utils::validateCommonName($commonName);
-
-            $response = new JsonResponse();
-            $response->setBody(
-                array(
-                    'ok' => $ccdHandler->disableCommonName($commonName),
-                )
-            );
-
-            return $response;
-        }
-    );
-
-    $service->post(
-        '/enableCommonName',
-        function (Request $request) use ($ccdHandler) {
-            $commonName = $request->getPostParameter('common_name');
-            Utils::validateCommonName($commonName);
-
-            $response = new JsonResponse();
-            $response->setBody(
-                array(
-                    'ok' => $ccdHandler->enableCommonName($commonName),
-                )
-            );
-
-            return $response;
-        }
-    );
-
-    $service->get(
-        '/disabledCommonNames',
-        function (Request $request) use ($ccdHandler) {
-            $userId = $request->getUrl()->getQueryParameter('filterByUser');
-            if (!is_null($userId)) {
-                Utils::validateUserId($userId);
-            }
-
-            $response = new JsonResponse();
-            $response->setBody(
-                array(
-                    'items' => $ccdHandler->getDisabledCommonNames($userId),
-                )
-            );
-
-            return $response;
-        }
-    );
-
-    $service->post(
-        '/refreshCrl',
-        function (Request $request) use ($crlFetcher) {
-            $response = new JsonResponse();
-            $response->setBody(
-                array(
-                    'ok' => $crlFetcher->fetch(),
-                )
-            );
-
-            return $response;
-        },
-        array(
-            'fkooman\Rest\Plugin\Authentication\AuthenticationPlugin' => array('enabled' => false),
-        )
-    );
-
-    $auth = new BasicAuthentication(
+    $apiAuth = new BasicAuthentication(
         function ($userId) use ($reader) {
             $userList = $reader->v('Users');
             if (!array_key_exists($userId, $userList)) {
@@ -176,7 +78,7 @@ try {
     );
 
     $authenticationPlugin = new AuthenticationPlugin();
-    $authenticationPlugin->register($auth, 'api');
+    $authenticationPlugin->register($apiAuth, 'api');
     $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     $service->run()->send();
 } catch (Exception $e) {

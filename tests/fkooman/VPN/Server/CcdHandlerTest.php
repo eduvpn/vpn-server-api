@@ -45,35 +45,35 @@ class CcdHandlerTest extends PHPUnit_Framework_TestCase
     {
         $ccd = new CcdHandler($this->ccdPath);
         $this->assertTrue($ccd->disableCommonName('foo'));
-        $this->assertFileEquals(__DIR__.'/data/disabled', $this->ccdPath.'/foo');
+        $this->assertFileEquals(__DIR__.'/data/ccd/disabled', $this->ccdPath.'/foo');
     }
 
     public function testDisableExistingFile()
     {
         $ccd = new CcdHandler($this->ccdPath);
         $this->assertTrue($ccd->disableCommonName('bar'));
-        $this->assertFileEquals(__DIR__.'/data/existing_disabled', $this->ccdPath.'/bar');
+        $this->assertFileEquals(__DIR__.'/data/ccd/existing_disabled', $this->ccdPath.'/bar');
     }
 
     public function testDisableAlreadyDisabled()
     {
         $ccd = new CcdHandler($this->ccdPath);
         $this->assertFalse($ccd->disableCommonName('foobar'));
-        $this->assertFileEquals(__DIR__.'/data/existing_disabled', $this->ccdPath.'/foobar');
+        $this->assertFileEquals(__DIR__.'/data/ccd/existing_disabled', $this->ccdPath.'/foobar');
     }
 
     public function testEnableExistingFile()
     {
         $ccd = new CcdHandler($this->ccdPath);
         $this->assertFalse($ccd->enableCommonName('bar'));
-        $this->assertFileEquals(__DIR__.'/data/existing_enabled', $this->ccdPath.'/bar');
+        $this->assertFileEquals(__DIR__.'/data/ccd/existing_enabled', $this->ccdPath.'/bar');
     }
 
     public function testEnableDisabledFile()
     {
         $ccd = new CcdHandler($this->ccdPath);
         $this->assertTrue($ccd->enableCommonName('foobar'));
-        $this->assertFileEquals(__DIR__.'/data/existing_enabled', $this->ccdPath.'/foobar');
+        $this->assertFileEquals(__DIR__.'/data/ccd/existing_enabled', $this->ccdPath.'/foobar');
     }
 
     public function testEnableNonExistingFile()

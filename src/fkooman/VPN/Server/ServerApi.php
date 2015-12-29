@@ -16,25 +16,36 @@
  */
 namespace fkooman\VPN\Server;
 
-class Api
+/**
+ * Higher level abstraction of ServerSocket providing a cleaner API that 
+ * performs some post processing making it easier for applications to use.
+ */
+class ServerApi implements ServerApiInterface
 {
-    /** @var Socket */
+    /** @var SocketInterface */
     private $socket;
 
-    public function __construct(Socket $socket)
+    public function __construct(ServerSocketInterface $socket)
     {
         $this->socket = $socket;
+    }
 
-        // turn off log that may mess up our responses
-        $this->socket->command('log off');
+    public function connect()
+    {
+        $this->socket->open();
+    }
+
+    public function disconnect()
+    {
+        $this->socket->close();
     }
 
     /**
-     * Get information about the connected clients.
+     * Obtain information about connected clients.
      *
      * @return array information about the connected clients
      */
-    public function getStatus()
+    public function status()
     {
         $response = $this->socket->command('status 2');
 
@@ -42,15 +53,12 @@ class Api
     }
 
     /**
-     * Get the OpenVPN version string.
+     * Obtain OpenVPN version information.
      * 
      * @return string the OpenVPN version string
      */
-    public function getVersion()
+    public function version()
     {
-        #OpenVPN Version: OpenVPN 2.3.9 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Dec 16 2015
-        #Management Version: 1
-        #END
         $response = $this->socket->command('version');
 
         return substr(
@@ -60,21 +68,22 @@ class Api
     }
 
     /**
-     * Get the current load statistics from the OpenVPN instance.
+     * Obtain the current load statistics from OpenVPN.
      * 
-     * @return array some load statistics
+     * @return array load statistics
      */
-    public function getLoadStats()
+    public function loadStats()
     {
-        #SUCCESS: nclients=2,bytesin=8303338,bytesout=12680522
-        $loadStats = array();
         $keyMapping = array(
             'nclients' => 'number_of_clients',
             'bytesin' => 'bytes_in',
             'bytesout' => 'bytes_out',
         );
+
         $response = $this->socket->command('load-stats');
+
         $statArray = explode(',', substr($response[0], strlen('SUCCESS: ')));
+        $loadStats = array();
         foreach ($statArray as $statItem) {
             list($key, $value) = explode('=', $statItem);
             if (array_key_exists($key, $keyMapping)) {
@@ -86,16 +95,14 @@ class Api
     }
 
     /**
-     * Kill a currently connected client.
+     * Disconnect a client.
      *
      * @param string $commonName the common name of the connection to kill
      *
      * @return bool true on success, false on failure
      */
-    public function killClient($commonName)
+    public function kill($commonName)
     {
-        #ERROR: common name 'sdkjfhksjdhfsdf' not found
-        #SUCCESS: common name 'fkooman_ziptest' found, 1 client(s) killed
         $response = $this->socket->command(sprintf('kill %s', $commonName));
 
         return 0 === strpos($response[0], 'SUCCESS: ');

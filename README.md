@@ -1,94 +1,88 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/eduVPN/vpn-server-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/eduVPN/vpn-server-api/?branch=master)
 
 # Introduction
-This service runs on the OpenVPN instances to control their behavior. It will
-implement the following API calls:
 
-Implemented:
-* Retrieve a list of connected clients
-* Disconnect a connected client
-* Trigger CRL refresh
-* Server info
+This service runs on the same server as the OpenVPN instance(s) and is able to
+control them.
 
-TODO:
-* prevent clients from connecting (temporary block)
-* unprevent clients from connecting (temporary block)
+It implements the following features:
+- access the OpenVPN management interface:
+  - get version information
+  - get current load statistics
+  - get connection status (list currently connected clients)
+  - kill active connections
+- provision a client specific configuration (CCD)
+- trigger a CRL reload from the CA to prevent revoked client configurations 
+  from being used
+
+The service makes this functionality available through a HTTP API.
 
 # Configuration
-To generate a password for `config/config.ini`, use this and replace `s3cr3t` 
-with your password:
 
-    php -r "require_once 'vendor/autoload.php'; echo password_hash('s3cr3t', PASSWORD_DEFAULT) . PHP_EOL;"
+## Authentication
 
-# Run
+TBD
 
-    php -S localhost:8080 -t web/
+## Management Interface
+
+TBD
+
+## CCD
+
+TBD
+
+## CRL
+
+TBD
 
 # API
 
-## Status
-List all connected clients:
+## Version
 
-    $ curl -u admin:s3cr3t http://localhost/vpn-server-api/api.php/status
+    GET /version
 
-    {
-        "items": [
-            {
-                "bytes_received": 15937,
-                "bytes_sent": 16999,
-                "client_ip": "1.2.3.4",
-                "common_name": "fkooman_five",
-                "connected_since": 1449676274,
-                "socket_id": "tcp://localhost:7506",
-                "vpn_ip": [
-                    "fd00:4343:4343::1000",
-                    "10.43.43.2"
-                ]
-            }
-        ]
-    }
+## Load Statistics
 
-## Server Info
-List configured OpenVPN servers:
+    GET /load-stats
 
-    $ curl -u admin:s3cr3t http://localhost/vpn-server-api/api.php/info
+## Connection Status
 
-    {
-        "items": [
-            {
-                "socket": "tcp://localhost:7505",
-                "stats": {
-                    "bytesin": 72778254,
-                    "bytesout": 523442058,
-                    "nclients": 0
-                },
-                "version": "2.3.8"
-            },
-            {
-                "socket": "tcp://localhost:7506",
-                "stats": {
-                    "bytesin": 54779,
-                    "bytesout": 70475,
-                    "nclients": 1
-                },
-                "version": "2.3.8"
-            }
-        ]
-    }
+    GET /status
 
+## Kill Connection
 
-## Disconnect
-Disconnect a currently connected client:
+    POST /kill
+        common_name=foo_bar
 
-    $ curl -u admin:s3cr3t -d 'socket_id=tcp://localhost:7506&common_name=fkooman_five' http://localhost/vpn-server-api/api.php/disconnect
+## Disable Configuration
 
-You have to specify the `socket_id` and `common_name` of the client in the POST
-body.
+Disable a configuration for a particular CN.
 
-## Refresh CRL
-Trigger the reload of the CRL at the OpenVPN server:
+    POST /ccd/disable
+        common_name=foo_bar
 
-    $ curl -u admin:s3cr3t -X POST http://localhost/vpn-server-api/api.php/refreshCrl
+## Enable Configuration
+
+Enable a configuration for a particular CN, this actually means the `disable`
+command is removed from the CCD.
+
+    POST /ccd/enable
+        common_name=foo_bar
+
+## Get Disabled Configurations
+
+Obtain a list of disabled CNs. Optionally you can use the query parameter 
+`commonNameStartsWith` to filter the returned results.
+
+    GET /ccd/disable?commonNameStartsWith=foo_
+
+## Certificate Revocation List
+
+    POST /crl/refresh
+
+# Running
+
+    php -S localhost:8080 -t web/
 
 # License
 Licensed under the Apache License, Version 2.0;

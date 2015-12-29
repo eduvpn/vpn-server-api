@@ -1,0 +1,3 @@
+OpenVPN Version: OpenVPN 2.3.8 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Aug  4 2015
+Management Version: 1
+END

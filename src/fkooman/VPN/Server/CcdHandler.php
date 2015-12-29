@@ -18,6 +18,11 @@ namespace fkooman\VPN\Server;
 
 use RuntimeException;
 
+/**
+ * Manage the Client Configuration Directory (CCD) used by the OpenVPN 
+ * instances running on this machine. It can be used to set client specific
+ * configurations based on the CN.
+ */
 class CcdHandler
 {
     /** @var string */
