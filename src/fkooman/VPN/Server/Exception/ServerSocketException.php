@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace fkooman\VPN\Server;
+namespace fkooman\VPN\Server\Exception;
 
-interface ServerApiInterface
+use RuntimeException;
+
+class ServerSocketException extends RuntimeException
 {
-    public function status();
-    public function version();
-    public function loadStats();
-    public function kill($commonName);
 }

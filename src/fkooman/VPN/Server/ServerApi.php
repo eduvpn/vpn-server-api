@@ -23,21 +23,16 @@ namespace fkooman\VPN\Server;
 class ServerApi implements ServerApiInterface
 {
     /** @var SocketInterface */
-    private $socket;
+    private $serverSocket;
 
-    public function __construct(ServerSocketInterface $socket)
+    public function __construct(ServerSocketInterface $serverSocket)
     {
-        $this->socket = $socket;
+        $this->serverSocket = $serverSocket;
     }
 
-    public function connect()
+    public function __destruct()
     {
-        $this->socket->open();
-    }
-
-    public function disconnect()
-    {
-        $this->socket->close();
+        $this->serverSocket->close();
     }
 
     /**
@@ -47,7 +42,7 @@ class ServerApi implements ServerApiInterface
      */
     public function status()
     {
-        $response = $this->socket->command('status 2');
+        $response = $this->serverSocket->command('status 2');
 
         return StatusParser::parse($response);
     }
@@ -59,7 +54,7 @@ class ServerApi implements ServerApiInterface
      */
     public function version()
     {
-        $response = $this->socket->command('version');
+        $response = $this->serverSocket->command('version');
 
         return substr(
             $response[0],
@@ -80,7 +75,7 @@ class ServerApi implements ServerApiInterface
             'bytesout' => 'bytes_out',
         );
 
-        $response = $this->socket->command('load-stats');
+        $response = $this->serverSocket->command('load-stats');
 
         $statArray = explode(',', substr($response[0], strlen('SUCCESS: ')));
         $loadStats = array();
@@ -103,7 +98,7 @@ class ServerApi implements ServerApiInterface
      */
     public function kill($commonName)
     {
-        $response = $this->socket->command(sprintf('kill %s', $commonName));
+        $response = $this->serverSocket->command(sprintf('kill %s', $commonName));
 
         return 0 === strpos($response[0], 'SUCCESS: ');
     }

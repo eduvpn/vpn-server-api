@@ -16,8 +16,6 @@
  */
 namespace fkooman\VPN\Server;
 
-use RuntimeException;
-
 /**
  * Manage all OpenVPN servers controlled by this service using each instance's
  * ServerApi.
@@ -25,47 +23,26 @@ use RuntimeException;
 class ServerManager
 {
     /** @var array */
-    private $onlineServers;
-
-    /** @var array */
-    private $offlineServers;
+    private $servers;
 
     public function __construct()
     {
-        $this->onlineServers = array();
-        $this->offlineServers = array();
+        $this->servers = array();
     }
 
     public function addServer($id, $name, ServerApiInterface $serverApi)
     {
-        try {
-            $serverApi->connect();
-            $this->onlineServers[] = array(
-                'id' => $id,
-                'name' => $name,
-                'api' => $serverApi,
-            );
-        } catch (RuntimeException $e) {
-            $this->offlineServers[] = array(
-                'id' => $id,
-                'name' => $name,
-                'error' => 'offline',
-                'error_description' => $e->getMessage(),
-            );
-        }
-    }
-
-    public function __deconstruct()
-    {
-        foreach ($this->onlineServers as $server) {
-            $server['api']->disconnect();
-        }
+        $this->servers[] = array(
+            'id' => $id,
+            'name' => $name,
+            'api' => $serverApi,
+        );
     }
 
     public function version()
     {
         $serverVersions = array();
-        foreach ($this->onlineServers as $server) {
+        foreach ($this->servers as $server) {
             $serverVersions[] = array(
                 'id' => $server['id'],
                 'name' => $server['name'],
@@ -84,7 +61,7 @@ class ServerManager
     public function status()
     {
         $serverConnections = array();
-        foreach ($this->onlineServers as $server) {
+        foreach ($this->servers as $server) {
             $serverConnections[] = array(
                 'id' => $server['id'],
                 'name' => $server['name'],
@@ -103,7 +80,7 @@ class ServerManager
     public function loadStats()
     {
         $loadStats = array();
-        foreach ($this->onlineServers as $server) {
+        foreach ($this->servers as $server) {
             $loadStats[] = array(
                 'id' => $server['id'],
                 'name' => $server['name'],
@@ -125,7 +102,7 @@ class ServerManager
     public function kill($commonName)
     {
         $killStats = array();
-        foreach ($this->onlineServers as $server) {
+        foreach ($this->servers as $server) {
             $killStats[] = array(
                 'id' => $server['id'],
                 'name' => $server['name'],

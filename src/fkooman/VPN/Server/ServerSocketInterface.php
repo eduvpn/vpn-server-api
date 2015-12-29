@@ -18,8 +18,6 @@ namespace fkooman\VPN\Server;
 
 interface ServerSocketInterface
 {
-    public function open();
-
     /**
      * Send an OpenVPN command and get the response.
      *

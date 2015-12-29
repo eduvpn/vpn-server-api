@@ -16,7 +16,7 @@
  */
 namespace fkooman\VPN\Server;
 
-use RuntimeException;
+use fkooman\VPN\Server\Exception\ServerSocketException;
 
 /**
  * Abstraction to use the OpenVPN management interface using a socket 
@@ -27,12 +27,6 @@ class ServerSocket implements ServerSocketInterface
     /** @var resource */
     private $socket;
 
-    /** @var string */
-    private $socketAddress;
-
-    /** @var int */
-    private $timeOut;
-
     /**
      * Connect to an OpenVPN management socket.
      *
@@ -40,19 +34,15 @@ class ServerSocket implements ServerSocketInterface
      *                              "tcp://localhost:7505"
      * @param int    $timeOut       the amount of time to wait before 
      *                              giving up on trying to connect
+     *
+     * @throws \fkooman\VPN\Server\Exception\ServerSocketException in case the
+     *                                                             connection fails or read/write fails
      */
     public function __construct($socketAddress, $timeOut = 5)
     {
-        $this->socket = null;
-        $this->socketAddress = $socketAddress;
-        $this->timeOut = $timeOut;
-    }
-
-    public function open()
-    {
-        $this->socket = @stream_socket_client($this->socketAddress, $errno, $errstr, $this->timeOut);
+        $this->socket = @stream_socket_client($socketAddress, $errno, $errstr, $timeOut);
         if (false === $this->socket) {
-            throw new RuntimeException(
+            throw new ServerSocketException(
                 sprintf('%s (%s)', $errstr, $errno)
             );
         }
@@ -64,9 +54,12 @@ class ServerSocket implements ServerSocketInterface
     /**
      * Send an OpenVPN command and get the response.
      *
-     * @param string $command the OpenVPN command, e.g. 'status', 'version', 'kill'
+     * @param string $command a OpenVPN management command and parameters
      *
-     * @return array the response lines in an array, every line as element
+     * @return array the response lines as array values
+     *
+     * @throws \fkooman\VPN\Server\Exception\ServerSocketException in case 
+     *                                                             read/write fails
      */
     public function command($command)
     {
@@ -83,14 +76,14 @@ class ServerSocket implements ServerSocketInterface
     public function close()
     {
         if (false === @fclose($this->socket)) {
-            throw new RuntimeException('unable to close the socket');
+            throw new ServerSocketException('unable to close the socket');
         }
     }
 
     private function write($data)
     {
         if (false === @fwrite($this->socket, $data)) {
-            throw new RuntimeException('unable to write to socket');
+            throw new ServerSocketException('unable to write to socket');
         }
     }
 
@@ -99,7 +92,7 @@ class ServerSocket implements ServerSocketInterface
         $dataBuffer = array();
         while (!feof($this->socket) && !$this->isEndOfResponse(end($dataBuffer))) {
             if (false === $readData = @fgets($this->socket, 4096)) {
-                throw new RuntimeException('unable to read from socket');
+                throw new ServerSocketException('unable to read from socket');
             }
             $dataBuffer[] = trim($readData);
         }
