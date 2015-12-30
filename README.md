@@ -23,7 +23,7 @@ The service makes this functionality available through a HTTP API.
 
 TBD
 
-## Management Interface
+## OpenVPN
 
 TBD
 
@@ -36,32 +36,143 @@ TBD
 TBD
 
 # API
+Behind the title is the component the API calls are relevant for. The calls 
+with OpenVPN are sent to ALL configured OpenVPN instances. The others are 
+shared by all OpenVPN instances.
 
-## Version
+The OpenVPN calls return the response for the API request from all OpenVPN 
+servers. The response is in the JSON format. The response is wrapped in an
+`items` object that contain an array with responses from each of the OpenVPN 
+servers. Each entry for a server also has an `ok` field which indicates 
+whether the response from the server was handled correctly. If e.g. a server
+is down, `ok` will be set to the boolean `false`. If the server is up and 
+responded to the request the result will be `true`.
+
+## Version (OpenVPN)
+Retrieve the versions of the OpenVPN instances:
+
+### Call
 
     GET /version
 
-## Load Statistics
+### Response
+Here you can see two configured servers, one with the identifier `UDP` and one
+with the identifier `TCP`. The `TCP` instance is down, or otherwise 
+unavailable. Always check the `ok` field before accessing the responses, in 
+this case in the `version` field.
+
+    {
+        "items": [
+            {
+                "id": "UDP",
+                "ok": true,
+                "version": "OpenVPN 2.3.8 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Aug  4 2015"
+            },
+            {
+                "id": "TCP",
+                "ok": false
+            }
+        ]
+    }
+
+## Load Statistics (OpenVPN)
+
+### Call
 
     GET /load-stats
 
-## Connection Status
+### Response
+
+    {
+        "items": [
+            {
+                "id": "UDP",
+                "load-stats": {
+                    "bytes_in": 3051316,
+                    "bytes_out": 7112958,
+                    "number_of_clients": 1
+                },
+                "ok": true
+            }
+        ]
+    }
+
+## Connection Status (OpenVPN)
+
+### Call
 
     GET /status
 
-## Kill Connection
+### Response
+
+    {
+        "items": [
+            {
+                "id": "UDP",
+                "ok": true,
+                "status": [
+                    {
+                        "bytes_in": 60937,
+                        "bytes_out": 63493,
+                        "common_name": "fkooman_samsung_i9300",
+                        "connected_since": 1451489134,
+                        "real_address": "10.64.87.183:51565",
+                        "virtual_address": [
+                            "fd00:4242:4242::1003",
+                            "10.42.42.5"
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+
+## Kill Connection (OpenVPN)
+
+The kill command will go to all OpenVPN instances, and you can see whether or
+not a client was killed.
+
+### Call
 
     POST /kill
-        common_name=foo_bar
+        common_name=fkooman_samsung_i9300
 
-## Disable Configuration
+### Response
+
+Here no client was killed, note that the response is still `ok`, but it just
+was not able to kill this particular client. The `kill` field here shows 
+whether or not a client was killed:
+
+    {
+        "items": [
+            {
+                "id": "UDP",
+                "kill": false,
+                "ok": true
+            }
+        ]
+    }
+
+Here a client was actually killed:
+
+    {
+        "items": [
+            {
+                "id": "UDP",
+                "kill": true,
+                "ok": true
+            }
+        ]
+    }
+
+## Disable Configuration (CCD)
 
 Disable a configuration for a particular CN.
 
     POST /ccd/disable
         common_name=foo_bar
 
-## Enable Configuration
+## Enable Configuration (CCD)
 
 Enable a configuration for a particular CN, this actually means the `disable`
 command is removed from the CCD.
@@ -69,14 +180,14 @@ command is removed from the CCD.
     POST /ccd/enable
         common_name=foo_bar
 
-## Get Disabled Configurations
+## Get Disabled Configurations (CCD)
 
 Obtain a list of disabled CNs. Optionally you can use the query parameter 
 `commonNameStartsWith` to filter the returned results.
 
     GET /ccd/disable?commonNameStartsWith=foo_
 
-## Certificate Revocation List
+## Certificate Revocation List (CRL)
 
     POST /crl/refresh
 

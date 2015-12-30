@@ -38,11 +38,4 @@ class Utils
             throw new InvalidArgumentException('invalid characters in userId');
         }
     }
-
-    public static function validateServerId($serverId)
-    {
-        if (0 === preg_match('/^[a-zA-Z0-9-_.@]+$/', $serverId)) {
-            throw new InvalidArgumentException('invalid characters in serverId');
-        }
-    }
 }

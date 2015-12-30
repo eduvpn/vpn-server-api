@@ -30,24 +30,16 @@ class ServerManager
         $this->servers = array();
     }
 
-    public function addServer($id, $name, ServerApiInterface $serverApi)
+    public function addServer(ServerApi $serverApi)
     {
-        $this->servers[] = array(
-            'id' => $id,
-            'name' => $name,
-            'api' => $serverApi,
-        );
+        $this->servers[] = $serverApi;
     }
 
     public function version()
     {
         $serverVersions = array();
         foreach ($this->servers as $server) {
-            $serverVersions[] = array(
-                'id' => $server['id'],
-                'name' => $server['name'],
-                'version' => $server['api']->version(),
-            );
+            $serverVersions[] = $server->version();
         }
 
         return array('items' => $serverVersions);
@@ -62,11 +54,7 @@ class ServerManager
     {
         $serverConnections = array();
         foreach ($this->servers as $server) {
-            $serverConnections[] = array(
-                'id' => $server['id'],
-                'name' => $server['name'],
-                'status' => $server['api']->status(),
-            );
+            $serverConnections[] = $server->status();
         }
 
         return array('items' => $serverConnections);
@@ -81,11 +69,7 @@ class ServerManager
     {
         $loadStats = array();
         foreach ($this->servers as $server) {
-            $loadStats[] = array(
-                'id' => $server['id'],
-                'name' => $server['name'],
-                'stats' => $server['api']->loadStats(),
-            );
+            $loadStats[] = $server->loadStats();
         }
 
         return array('items' => $loadStats);
@@ -103,11 +87,7 @@ class ServerManager
     {
         $killStats = array();
         foreach ($this->servers as $server) {
-            $killStats[] = array(
-                'id' => $server['id'],
-                'name' => $server['name'],
-                'cn_kill' => $server['api']->kill($commonName),
-            );
+            $killStats[] = $server->kill($commonName);
         }
 
         return array('items' => $killStats);

@@ -16,23 +16,29 @@
  */
 namespace fkooman\VPN\Server;
 
+use fkooman\VPN\Server\Exception\ServerSocketException;
+
 /**
  * Higher level abstraction of ServerSocket providing a cleaner API that 
  * performs some post processing making it easier for applications to use.
  */
-class ServerApi implements ServerApiInterface
+class ServerApi
 {
+    /** @var string */
+    private $id;
+
     /** @var SocketInterface */
     private $serverSocket;
 
-    public function __construct(ServerSocketInterface $serverSocket)
+    public function __construct($id, ServerSocketInterface $serverSocket)
     {
+        $this->id = $id;
         $this->serverSocket = $serverSocket;
     }
 
-    public function __destruct()
+    public function getId()
     {
-        $this->serverSocket->close();
+        return $this->id;
     }
 
     /**
@@ -42,9 +48,15 @@ class ServerApi implements ServerApiInterface
      */
     public function status()
     {
-        $response = $this->serverSocket->command('status 2');
+        try {
+            $this->serverSocket->open();
+            $response = $this->serverSocket->command('status 2');
+            $this->serverSocket->close();
 
-        return StatusParser::parse($response);
+            return $this->ok('status', StatusParser::parse($response));
+        } catch (ServerSocketException $e) {
+            return $this->error();
+        }
     }
 
     /**
@@ -54,12 +66,18 @@ class ServerApi implements ServerApiInterface
      */
     public function version()
     {
-        $response = $this->serverSocket->command('version');
+        try {
+            $this->serverSocket->open();
+            $response = $this->serverSocket->command('version');
+            $this->serverSocket->close();
 
-        return substr(
-            $response[0],
-            strlen('OpenVPN Version: ')
-        );
+            return $this->ok(
+                'version',
+                substr($response[0], strlen('OpenVPN Version: '))
+            );
+        } catch (ServerSocketException $e) {
+            return $this->error();
+        }
     }
 
     /**
@@ -69,37 +87,64 @@ class ServerApi implements ServerApiInterface
      */
     public function loadStats()
     {
-        $keyMapping = array(
-            'nclients' => 'number_of_clients',
-            'bytesin' => 'bytes_in',
-            'bytesout' => 'bytes_out',
-        );
+        try {
+            $keyMapping = array(
+                'nclients' => 'number_of_clients',
+                'bytesin' => 'bytes_in',
+                'bytesout' => 'bytes_out',
+            );
 
-        $response = $this->serverSocket->command('load-stats');
+            $this->serverSocket->open();
+            $response = $this->serverSocket->command('load-stats');
+            $this->serverSocket->close();
 
-        $statArray = explode(',', substr($response[0], strlen('SUCCESS: ')));
-        $loadStats = array();
-        foreach ($statArray as $statItem) {
-            list($key, $value) = explode('=', $statItem);
-            if (array_key_exists($key, $keyMapping)) {
-                $loadStats[$keyMapping[$key]] = intval($value);
+            $statArray = explode(',', substr($response[0], strlen('SUCCESS: ')));
+            $loadStats = array();
+            foreach ($statArray as $statItem) {
+                list($key, $value) = explode('=', $statItem);
+                if (array_key_exists($key, $keyMapping)) {
+                    $loadStats[$keyMapping[$key]] = intval($value);
+                }
             }
-        }
 
-        return $loadStats;
+            return $this->ok('load-stats', $loadStats);
+        } catch (ServerSocketException $e) {
+            return $this->error();
+        }
     }
 
     /**
      * Disconnect a client.
      *
      * @param string $commonName the common name of the connection to kill
-     *
-     * @return bool true on success, false on failure
      */
     public function kill($commonName)
     {
-        $response = $this->serverSocket->command(sprintf('kill %s', $commonName));
+        try {
+            $this->serverSocket->open();
+            $response = $this->serverSocket->command(sprintf('kill %s', $commonName));
+            $this->serverSocket->close();
 
-        return 0 === strpos($response[0], 'SUCCESS: ');
+            return $this->ok('kill', 0 === strpos($response[0], 'SUCCESS: '));
+        } catch (ServerSocketException $e) {
+            return $this->error();
+        }
+    }
+
+    private function ok($command, $response)
+    {
+        return array(
+            'id' => $this->getId(),
+            'ok' => true,
+            $command => $response,
+        );
+    }
+
+    private function error()
+    {
+        return array(
+            'id' => $this->getId(),
+            'ok' => false,
+        );
     }
 }

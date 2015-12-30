@@ -19,16 +19,32 @@ namespace fkooman\VPN\Server;
 interface ServerSocketInterface
 {
     /**
+     * Open the socket.
+     *
+     * @param int $timeOut the amount of time to wait before 
+     *                     giving up on trying to connect
+     *
+     * @throws Exception\ServerSocketException if the socket cannot be opened 
+     *                                         within timeout
+     */
+    public function open();
+
+    /**
      * Send an OpenVPN command and get the response.
      *
-     * @param string $command the OpenVPN command, e.g. 'status', 'version', 'kill'
+     * @param string $command a OpenVPN management command and parameters
      *
-     * @return array the response lines in an array, every line as element
+     * @return array the response lines as array values
+     *
+     * @throws Exception\ServerSocketException in case read/write fails or 
+     *                                         socket is not open
      */
     public function command($command);
 
     /**
      * Close the socket connection.
+     *
+     * @throws Exception\ServerSocketException if socket is not open
      */
     public function close();
 }

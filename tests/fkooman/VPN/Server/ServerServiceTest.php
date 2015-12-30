@@ -25,7 +25,7 @@ use fkooman\VPN\Server\Test\TestSocket;
 
 class ServerServiceTest extends PHPUnit_Framework_TestCase
 {
-    public function testVersionNoServers()
+    public function testVersion()
     {
         $request = new Request(
             array(
@@ -38,10 +38,8 @@ class ServerServiceTest extends PHPUnit_Framework_TestCase
         );
 
         $m = new ServerManager();
-        $serverOne = new ServerApi(new TestSocket(self::readFile('openvpn_23_version.txt')));
-        $serverTwo = new ServerApi(new TestSocket(self::readFile('openvpn_23_version.txt')));
-        $m->addServer('one', 'One', $serverOne);
-        $m->addServer('two', 'Two', $serverTwo);
+        $serverOne = new ServerApi('one', new TestSocket(self::readFile('openvpn_23_version.txt')));
+        $m->addServer($serverOne);
         $ccd = new CcdHandler('/foo');
         $crl = new CrlFetcher('http://localhost/ca.crl', '/foo');
         $service = new ServerService($m, $ccd, $crl);
@@ -49,9 +47,9 @@ class ServerServiceTest extends PHPUnit_Framework_TestCase
             array(
                 'HTTP/1.1 200 OK',
                 'Content-Type: application/json',
-                'Content-Length: 307',
+                'Content-Length: 156',
                 '',
-                '{"items":[{"id":"one","name":"One","version":"OpenVPN 2.3.8 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Aug  4 2015"},{"id":"two","name":"Two","version":"OpenVPN 2.3.8 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Aug  4 2015"}]}',
+                '{"items":[{"id":"one","ok":true,"version":"OpenVPN 2.3.8 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Aug  4 2015"}]}',
             ),
             $service->run($request)->toArray()
         );

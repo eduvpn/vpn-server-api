@@ -36,26 +36,25 @@ class ServerManagerTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function testVersion()
+    public function testUnableToConnect()
     {
         $m = new ServerManager();
-        $serverOne = new ServerApi(new TestSocket(self::readFile('openvpn_23_version.txt')));
-        $serverTwo = new ServerApi(new TestSocket(self::readFile('openvpn_23_version.txt')));
-        $m->addServer('one', 'One', $serverOne);
-        $m->addServer('two', 'Two', $serverTwo);
-
+        $serverOne = new ServerApi('one', new TestSocket(self::readFile('openvpn_23_version.txt')));
+        // serverTwo is not available
+        $serverTwo = new ServerApi('two', new TestSocket(self::readFile('openvpn_23_version.txt'), true));
+        $m->addServer($serverOne);
+        $m->addServer($serverTwo);
         $this->assertSame(
             array(
                 'items' => array(
                     array(
                         'id' => 'one',
-                        'name' => 'One',
+                        'ok' => true,
                         'version' => 'OpenVPN 2.3.8 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Aug  4 2015',
                     ),
                     array(
                         'id' => 'two',
-                        'name' => 'Two',
-                        'version' => 'OpenVPN 2.3.8 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Aug  4 2015',
+                        'ok' => false,
                     ),
                 ),
             ),
@@ -63,19 +62,19 @@ class ServerManagerTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function testLoadStats()
+    public function testLoadStatsOneServer()
     {
         $m = new ServerManager();
-        $serverOne = new ServerApi(new TestSocket(self::readFile('openvpn_23_load_stats.txt')));
-        $m->addServer('one', 'One', $serverOne);
+        $serverOne = new ServerApi('one', new TestSocket(self::readFile('openvpn_23_load_stats.txt')));
+        $m->addServer($serverOne);
 
         $this->assertSame(
             array(
                 'items' => array(
                     array(
                         'id' => 'one',
-                        'name' => 'One',
-                        'stats' => array(
+                        'ok' => true,
+                        'load-stats' => array(
                             'number_of_clients' => 0,
                             'bytes_in' => 2224463,
                             'bytes_out' => 6102370,
@@ -87,28 +86,31 @@ class ServerManagerTest extends PHPUnit_Framework_TestCase
         );
     }
 
-    public function testStatus()
+    public function testStatusTwoServers()
     {
         $m = new ServerManager();
-        $serverOne = new ServerApi(new TestSocket(self::readFile('openvpn_23_status_one_client.txt')));
-        $serverTwo = new ServerApi(new TestSocket(self::readFile('openvpn_23_status_two_clients.txt')));
-        $m->addServer('one', 'One', $serverOne);
-        $m->addServer('two', 'Two', $serverTwo);
+        $serverOne = new ServerApi('one', new TestSocket(self::readFile('openvpn_23_status_one_client.txt')));
+        $serverTwo = new ServerApi('two', new TestSocket(self::readFile('openvpn_23_status_two_clients.txt')));
+        $m->addServer($serverOne);
+        $m->addServer($serverTwo);
         $this->assertSame(
-'{"items":[{"id":"one","name":"One","status":[{"common_name":"fkooman_samsung_i9300","real_address":"91.64.87.183:43103","bytes_in":18301,"bytes_out":30009,"connected_since":1451323167,"virtual_address":["fd00:4242:4242::1003","10.42.42.5"]}]},{"id":"two","name":"Two","status":[{"common_name":"fkooman_ziptest","real_address":"::ffff:91.64.87.183","bytes_in":127707,"bytes_out":127903,"connected_since":1450874955,"virtual_address":["10.42.42.2","fd00:4242:4242::1000"]},{"common_name":"sebas_tuxed_SGS6","real_address":"::ffff:83.83.194.107","bytes_in":127229,"bytes_out":180419,"connected_since":1450872328,"virtual_address":["fd00:4242:4242::1001","10.42.42.3"]}]}]}',
+            '{"items":[{"id":"one","ok":true,"status":[{"common_name":"fkooman_samsung_i9300","real_address":"91.64.87.183:43103","bytes_in":18301,"bytes_out":30009,"connected_since":1451323167,"virtual_address":["fd00:4242:4242::1003","10.42.42.5"]}]},{"id":"two","ok":true,"status":[{"common_name":"fkooman_ziptest","real_address":"::ffff:91.64.87.183","bytes_in":127707,"bytes_out":127903,"connected_since":1450874955,"virtual_address":["10.42.42.2","fd00:4242:4242::1000"]},{"common_name":"sebas_tuxed_SGS6","real_address":"::ffff:83.83.194.107","bytes_in":127229,"bytes_out":180419,"connected_since":1450872328,"virtual_address":["fd00:4242:4242::1001","10.42.42.3"]}]}]}',
             json_encode($m->status())
         );
     }
 
-    public function testKill()
+    public function testKillThreeServers()
     {
         $m = new ServerManager();
-        $serverOne = new ServerApi(new TestSocket(self::readFile('openvpn_23_kill_success.txt')));
-        $serverTwo = new ServerApi(new TestSocket(self::readFile('openvpn_23_kill_error.txt')));
-        $m->addServer('one', 'One', $serverOne);
-        $m->addServer('two', 'Two', $serverTwo);
+        $serverOne = new ServerApi('one', new TestSocket(self::readFile('openvpn_23_kill_success.txt')));
+        $serverTwo = new ServerApi('two', new TestSocket(self::readFile('openvpn_23_kill_error.txt')));
+        $serverThree = new ServerApi('three', new TestSocket(self::readFile('openvpn_23_kill_error.txt')));
+
+        $m->addServer($serverOne);
+        $m->addServer($serverTwo);
+        $m->addServer($serverThree);
         $this->assertSame(
-            '{"items":[{"id":"one","name":"One","cn_kill":true},{"id":"two","name":"Two","cn_kill":false}]}',
+            '{"items":[{"id":"one","ok":true,"kill":true},{"id":"two","ok":true,"kill":false},{"id":"three","ok":true,"kill":false}]}',
             json_encode($m->kill('foo'))
         );
     }

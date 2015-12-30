@@ -24,6 +24,9 @@ use fkooman\VPN\Server\Exception\ServerSocketException;
  */
 class ServerSocket implements ServerSocketInterface
 {
+    /** @var string */
+    private $socketAddress;
+
     /** @var resource */
     private $socket;
 
@@ -32,15 +35,16 @@ class ServerSocket implements ServerSocketInterface
      *
      * @param string $socketAddress the socket to connect to, e.g.: 
      *                              "tcp://localhost:7505"
-     * @param int    $timeOut       the amount of time to wait before 
-     *                              giving up on trying to connect
-     *
-     * @throws \fkooman\VPN\Server\Exception\ServerSocketException in case the
-     *                                                             connection fails or read/write fails
      */
-    public function __construct($socketAddress, $timeOut = 5)
+    public function __construct($socketAddress)
     {
-        $this->socket = @stream_socket_client($socketAddress, $errno, $errstr, $timeOut);
+        $this->socketAddress = $socketAddress;
+        $this->socket = null;
+    }
+
+    public function open($timeOut = 5)
+    {
+        $this->socket = @stream_socket_client($this->socketAddress, $errno, $errstr, $timeOut);
         if (false === $this->socket) {
             throw new ServerSocketException(
                 sprintf('%s (%s)', $errstr, $errno)
@@ -51,18 +55,9 @@ class ServerSocket implements ServerSocketInterface
         $this->command('log off');
     }
 
-    /**
-     * Send an OpenVPN command and get the response.
-     *
-     * @param string $command a OpenVPN management command and parameters
-     *
-     * @return array the response lines as array values
-     *
-     * @throws \fkooman\VPN\Server\Exception\ServerSocketException in case 
-     *                                                             read/write fails
-     */
     public function command($command)
     {
+        $this->requireOpenSocket();
         $this->write(
             sprintf("%s\n", $command)
         );
@@ -70,11 +65,9 @@ class ServerSocket implements ServerSocketInterface
         return $this->read();
     }
 
-    /**
-     * Close the socket connection.
-     */
     public function close()
     {
+        $this->requireOpenSocket();
         if (false === @fclose($this->socket)) {
             throw new ServerSocketException('unable to close the socket');
         }
@@ -110,5 +103,12 @@ class ServerSocket implements ServerSocketInterface
         }
 
         return false;
+    }
+
+    private function requireOpenSocket()
+    {
+        if (is_null($this->socket)) {
+            throw new ServerSocketException('socket not open');
+        }
     }
 }

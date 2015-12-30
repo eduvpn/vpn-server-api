@@ -51,18 +51,12 @@ try {
     // handles the connection to the various OpenVPN instances
     $serverManager = new ServerManager();
     foreach ($reader->v('OpenVpn') as $openVpnServer) {
-        try {
-            $serverApi = new ServerApi(
-                new ServerSocket($openVpnServer['socket'])
-            );
-            $serverManager->addServer(
+        $serverManager->addServer(
+            new ServerApi(
                 $openVpnServer['id'],
-                $openVpnServer['name'],
-                $serverApi
-            );
-        } catch (ServerSocketException $e) {
-            // unable to connect, ignore server
-        }
+                new ServerSocket($openVpnServer['socket'])
+            )
+        );
     }
 
     // http request router

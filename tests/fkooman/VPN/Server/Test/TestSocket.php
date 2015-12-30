@@ -17,6 +17,7 @@
 namespace fkooman\VPN\Server\Test;
 
 use fkooman\VPN\Server\ServerSocketInterface;
+use fkooman\VPN\Server\Exception\ServerSocketException;
 
 /**
  * Abstraction to use the OpenVPN management interface using a socket 
@@ -27,13 +28,19 @@ class TestSocket implements ServerSocketInterface
     /** @var resource */
     private $returnData;
 
-    public function __construct($returnData)
+    private $connectFail;
+
+    public function __construct($returnData, $connectFail = false)
     {
         $this->returnData = $returnData;
+        $this->connectFail = $connectFail;
     }
 
     public function open()
     {
+        if ($this->connectFail) {
+            throw new ServerSocketException('unable to connect to socket');
+        }
     }
 
     public function command($command)
