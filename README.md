@@ -35,6 +35,10 @@ TBD
 
 TBD
 
+# Running
+
+    php -S localhost:8080 -t web/
+
 # API
 Behind the title is the component the API calls are relevant for. The calls 
 with OpenVPN are sent to ALL configured OpenVPN instances. The others are 
@@ -169,31 +173,57 @@ Here a client was actually killed:
 
 Disable a configuration for a particular CN.
 
+### Call
+
     POST /ccd/disable
         common_name=foo_bar
+
+### Response
 
 ## Enable Configuration (CCD)
 
 Enable a configuration for a particular CN, this actually means the `disable`
 command is removed from the CCD.
 
+### Call
+
     POST /ccd/enable
         common_name=foo_bar
+
+### Response
 
 ## Get Disabled Configurations (CCD)
 
 Obtain a list of disabled CNs. Optionally you can use the query parameter 
-`commonNameStartsWith` to filter the returned results.
+`user_id` to filter the returned results.
 
-    GET /ccd/disable?commonNameStartsWith=foo_
+### Call
+
+    GET /ccd/disable?user_id=foo
+
+### Response
 
 ## Certificate Revocation List (CRL)
 
-    POST /crl/refresh
+This will fetch the CRL from a configured endpoint. This needs to be triggered
+whenever a configuration is revoked.
 
-# Running
+### Call
 
-    php -S localhost:8080 -t web/
+    POST /crl/fetch
+
+### Response
+
+    {
+        "ok": true
+    }
+
+Or in case of an error:
+
+    {
+        "error": "unable to download CRL",
+        "ok": false
+    }
 
 # License
 Licensed under the Apache License, Version 2.0;
