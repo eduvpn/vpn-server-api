@@ -24,9 +24,5 @@
         "fkooman/rest-plugin-authentication-basic": "^2.0.0",
         "guzzlehttp/guzzle": "^5.3",
         "php": ">=5.4"
-    },
-    "require-dev": {
-        "fkooman/io": "^1.0.0",
-        "fkooman/json": "^1.0.0"
     }
 }

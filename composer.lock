@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "50e6d722bf46990635e98a179b83e308",
-    "content-hash": "9b7fa40787f0e03cf7a462885eddc18a",
+    "hash": "e110ad4539395c86799683a8c0095088",
+    "content-hash": "a015e75edd1f8b077649e21d4a0441f5",
     "packages": [
         {
             "name": "fkooman/config",
@@ -554,47 +554,7 @@
             "time": "2015-12-26 13:37:56"
         }
     ],
-    "packages-dev": [
-        {
-            "name": "fkooman/io",
-            "version": "1.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/fkooman/php-lib-io.git",
-                "reference": "0c2d8c49b1e37b9e3593c9e8dc51f4abc0c6712a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-lib-io/zipball/0c2d8c49b1e37b9e3593c9e8dc51f4abc0c6712a",
-                "reference": "0c2d8c49b1e37b9e3593c9e8dc51f4abc0c6712a",
-                "shasum": ""
-            },
-            "require": {
-                "ext-date": "*",
-                "ext-openssl": "*",
-                "ext-spl": "*",
-                "php": ">= 5.3.3"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "fkooman\\IO\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "François Kooman",
-                    "email": "fkooman@tuxed.net"
-                }
-            ],
-            "description": "Simple IO library",
-            "time": "2015-10-03 11:35:44"
-        }
-    ],
+    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],
