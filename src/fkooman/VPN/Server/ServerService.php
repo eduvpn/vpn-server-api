@@ -146,14 +146,10 @@ class ServerService extends Service
         );
 
         $this->post(
-            '/crl/refresh',
+            '/crl/fetch',
             function (Request $request) {
                 $response = new JsonResponse();
-                $response->setBody(
-                    array(
-                        'ok' => $this->crlFetcher->fetch(),
-                    )
-                );
+                $response->setBody($this->crlFetcher->fetch());
 
                 return $response;
             }

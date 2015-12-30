@@ -17,8 +17,11 @@
 namespace fkooman\VPN\Server;
 
 use GuzzleHttp\Client;
-use RuntimeException;
+use GuzzleHttp\Exception\TransferException;
 
+/**
+ * Fetch and store the CRL used by OpenVPN.
+ */
 class CrlFetcher
 {
     /** @var string */
@@ -27,9 +30,13 @@ class CrlFetcher
     /** @var string */
     private $crlPath;
 
-    /** @var GuzzleHttp/Client */
+    /** @var \GuzzleHttp\Client */
     private $client;
 
+    /**
+     * @param string $crlUrl  the URL location to fetch from
+     * @param string $crlPath the folder to write to
+     */
     public function __construct($crlUrl, $crlPath, Client $client = null)
     {
         $this->crlUrl = $crlUrl;
@@ -40,24 +47,35 @@ class CrlFetcher
         $this->client = $client;
     }
 
+    /**
+     * Fetch and store the CRL.
+     */
     public function fetch()
     {
         $crlFile = sprintf('%s/ca.crl', $this->crlPath);
         $tmpFile = sprintf('%s.tmp', $crlFile);
-        $crlData = $this->client->get($this->crlUrl)->getBody();
 
-        if (false === @file_put_contents($tmpFile, $crlData)) {
-            throw new RuntimeException('unable to write CRL to temporary file');
-        }
+        try {
+            $response = $this->client->get($this->crlUrl);
+            $crlData = $response->getBody();
 
-        if (file_exists($crlFile)) {
-            if (filesize($tmpFile) < filesize($crlFile)) {
-                throw new RuntimeException('downloaded CRL size is smaller than current CRL size');
+            if (false === @file_put_contents($tmpFile, $crlData)) {
+                // unable to write tmp file
+                return ['ok' => false, 'error' => 'unable to store CRL'];
             }
-        }
 
-        if (false === @rename($tmpFile, $crlFile)) {
-            throw new RuntimeException('unable to move downloaded CRL to CRL location');
+            if (false === @rename($tmpFile, $crlFile)) {
+                // unable to rename tmp file to crl file
+                @unlink($tmpFile);
+
+                return ['ok' => false, 'error' => 'unable to store CRL'];
+            }
+
+            // succeeded        
+            return ['ok' => true];
+        } catch (TransferException $e) {
+            // Guzzle catch all exception
+            return ['ok' => false, 'error' => 'unable to download CRL'];
         }
     }
 }
