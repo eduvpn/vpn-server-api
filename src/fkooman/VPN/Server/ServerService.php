@@ -20,6 +20,7 @@ namespace fkooman\VPN\Server;
 use fkooman\Rest\Service;
 use fkooman\Http\JsonResponse;
 use fkooman\Http\Request;
+use fkooman\Http\Exception\BadRequestException;
 
 /**
  * This class registers and handles routes.
@@ -94,6 +95,9 @@ class ServerService extends Service
             '/ccd/disable',
             function (Request $request) {
                 $commonName = $request->getPostParameter('common_name');
+                if (is_null($commonName)) {
+                    throw new BadRequestException('missing common_name');
+                }
                 Utils::validateCommonName($commonName);
 
                 $response = new JsonResponse();
@@ -107,10 +111,10 @@ class ServerService extends Service
             }
         );
 
-        $this->post(
-            '/ccd/enable',
+        $this->delete(
+            '/ccd/disable',
             function (Request $request) {
-                $commonName = $request->getPostParameter('common_name');
+                $commonName = $request->getUrl()->getQueryParameter('common_name');
                 Utils::validateCommonName($commonName);
 
                 $response = new JsonResponse();
@@ -137,7 +141,8 @@ class ServerService extends Service
                 $response = new JsonResponse();
                 $response->setBody(
                     array(
-                        'items' => $this->ccdHandler->getDisabledCommonNames($userId),
+                        'ok' => true,
+                        'disabled' => $this->ccdHandler->getDisabledCommonNames($userId),
                     )
                 );
 

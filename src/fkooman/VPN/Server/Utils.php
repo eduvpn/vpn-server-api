@@ -16,26 +16,26 @@
  */
 namespace fkooman\VPN\Server;
 
-use InvalidArgumentException;
+use fkooman\Http\Exception\BadRequestException;
 
 class Utils
 {
     public static function validateCommonName($commonName)
     {
         if (0 === preg_match('/^[a-zA-Z0-9-_.@]+$/', $commonName)) {
-            throw new InvalidArgumentException('invalid characters in common name');
+            throw new BadRequestException('invalid characters in common name');
         }
 
         // MUST NOT be '..'
         if ('..' === $commonName) {
-            throw new InvalidArgumentException('common name cannot be ".."');
+            throw new BadRequestException('common name cannot be ".."');
         }
     }
 
     public static function validateUserId($userId)
     {
         if (0 === preg_match('/^[a-zA-Z0-9-_.@]+$/', $userId)) {
-            throw new InvalidArgumentException('invalid characters in userId');
+            throw new BadRequestException('invalid characters in userId');
         }
     }
 }

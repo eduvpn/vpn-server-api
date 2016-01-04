@@ -11,38 +11,61 @@ It implements the following features:
   - get current load statistics
   - get connection status (list currently connected clients)
   - kill active connections
-- provision a client specific configuration (CCD)
+- provision a client specific configuration (CCD):
+  - disable a particular CN
 - trigger a CRL reload from the CA to prevent revoked client configurations 
-  from being used
+  from being used in new connections
 
 The service makes this functionality available through a HTTP API.
 
 # Configuration
 
+You can modify the configuration in the `config/config.yaml`, see 
+`config/config.yaml.example` for the example.
+
 ## Authentication
 
-TBD
+The user name here is `admin` and the password is the 
+[password_hash](https://secure.php.net/password_hash) of `s3cr3t`.
+
+    Users:
+        admin: $2y$10$uA77iLeDLaU.a.KRuhUYKuziuZacuWzodpqLok2XBQLXvig6UaB9a
+
 
 ## OpenVPN
+Here you configure the OpenVPN instances running on this machine. The socket
+points to the TCP management session of the particular OpenVPN instance.
 
-TBD
+    OpenVpn:
+        - { socket: 'tcp://localhost:7505', id: udp_1194 }
+        - { socket: 'tcp://localhost:7506', id: tcp_443 }
 
 ## CCD
+Here you configure the path where the CCD files need to be written to. This 
+needs to be writable by this service, and also the OpenVPN instances need to
+be configured to use this with `--client-config-dir`.
 
-TBD
+    Ccd:
+        path: /var/lib/vpn-server-api/ccd
 
 ## CRL
+Here you configure the URL where the CRL will be available and the path where
+the CRL will be written to. The path needs to be writable by this service and
+the OpenVPN instances need to be configured to use the CRL at this path using 
+`--crl-verify`.
 
-TBD
+    Crl:
+        url: http://localhost/vpn-config-api/api.php/ca.crl
+        path: /var/lib/vpn-server-api
 
 # Running
 
     php -S localhost:8080 -t web/
 
 # API
-Behind the title is the component the API calls are relevant for. The calls 
-with OpenVPN are sent to ALL configured OpenVPN instances. The others are 
-shared by all OpenVPN instances.
+Behind the section headings below the component for which the particular call
+is relevant for is listed. The calls with OpenVPN are sent to ALL configured 
+OpenVPN instances. The others are shared by all OpenVPN instances.
 
 The OpenVPN calls return the response for the API request from all OpenVPN 
 servers. The response is in the JSON format. The response is wrapped in an
@@ -50,7 +73,9 @@ servers. The response is in the JSON format. The response is wrapped in an
 servers. Each entry for a server also has an `ok` field which indicates 
 whether the response from the server was handled correctly. If e.g. a server
 is down, `ok` will be set to the boolean `false`. If the server is up and 
-responded to the request the result will be `true`.
+responded to the request the result will be `true`. Callers MUST first check
+the value of this `ok` field before assuming the rest of the response is 
+available.
 
 ## Version (OpenVPN)
 Retrieve the versions of the OpenVPN instances:
@@ -169,9 +194,35 @@ Here a client was actually killed:
         ]
     }
 
-## Disable Configuration (CCD)
+## Get Disabled Configurations (CCD)
 
-TBD. API will change still slightly.
+Obtain a list of disabled CNs. Optionally you can use the query parameter 
+`user_id` to filter the returned results and show only disabled CNs for a 
+particular user.
+
+### Call
+
+    GET /ccd/disable?user_id=foo
+
+### Response
+
+This shows that no configurations are currently disabled for this user.
+
+    {
+        "disabled": [],
+        "ok": true
+    }
+
+Now, `foo_bar` is disabled:
+
+    {
+        "disabled": [
+            "foo_bar"
+        ],
+        "ok": true
+    }
+
+## Disable Configuration (CCD)
 
 Disable a configuration for a particular CN.
 
@@ -182,6 +233,13 @@ Disable a configuration for a particular CN.
 
 ### Response
 
+The response will be `true` for the `ok` field if the provided `common_name` 
+was actually disabled. It will be `false` if it was already disabled.
+
+    {
+        "ok": true
+    }
+
 ## Enable Configuration (CCD)
 
 Enable a configuration for a particular CN, this actually means the `disable`
@@ -189,21 +247,16 @@ command is removed from the CCD.
 
 ### Call
 
-    POST /ccd/enable
-        common_name=foo_bar
+    DELETE /ccd/disable?common_name=foo_bar
 
 ### Response
 
-## Get Disabled Configurations (CCD)
+The response will be `true` for the `ok` field if the provided `common_name` 
+was enabled again. It will be `false` if was not disabled.
 
-Obtain a list of disabled CNs. Optionally you can use the query parameter 
-`user_id` to filter the returned results.
-
-### Call
-
-    GET /ccd/disable?user_id=foo
-
-### Response
+    {
+        "ok": true
+    }
 
 ## Certificate Revocation List (CRL)
 
