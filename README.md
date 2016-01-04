@@ -171,6 +171,8 @@ Here a client was actually killed:
 
 ## Disable Configuration (CCD)
 
+TBD. API will change still slightly.
+
 Disable a configuration for a particular CN.
 
 ### Call
