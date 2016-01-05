@@ -27,7 +27,7 @@ class ServerApi
     /** @var string */
     private $id;
 
-    /** @var SocketInterface */
+    /** @var ServerSocketInterface */
     private $serverSocket;
 
     public function __construct($id, ServerSocketInterface $serverSocket)
