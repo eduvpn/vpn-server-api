@@ -1,7 +1,9 @@
 # The OpenVPN instances we control
 OpenVpn:
-    - { socket: 'tcp://localhost:7505', id: udp_1194 }
-    #- { socket: 'tcp://localhost:7506', id: tcp_443 }
+    - id: UDP
+      socket: 'tcp://localhost:7505'
+    #- id: TCP
+    #  socket: 'tcp://localhost:7506'
 
 # The API users
 Users:
