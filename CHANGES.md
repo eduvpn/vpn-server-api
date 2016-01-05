@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 (...)
+## 2.0.0 (2016-01-05)
 - major refactor of the code and dependencies
 - new configuration format (YAML)
 - better API
