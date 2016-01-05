@@ -7,8 +7,7 @@
 - add ability to disable common names using CCD
 - get a list of disabled common names
 - stricter input validation
-- add some unit tests
-- do not require authentication to refresh CRL
+- add more unit tests
 
 ## 1.1.0 (2015-12-22)
 - add server info API call
