@@ -61,14 +61,16 @@ class CrlFetcher
 
             if (false === @file_put_contents($tmpFile, $crlData)) {
                 // unable to write tmp file
-                return ['ok' => false, 'error' => 'unable to store CRL'];
+                return ['ok' => false, 'error' => 'unable to write CRL'];
             }
 
             if (false === @rename($tmpFile, $crlFile)) {
                 // unable to rename tmp file to crl file
-                @unlink($tmpFile);
+                if (false === @unlink($tmpFile)) {
+                    return ['ok' => false, 'error' => 'unable to delete temporary CRL'];
+                }
 
-                return ['ok' => false, 'error' => 'unable to store CRL'];
+                return ['ok' => false, 'error' => 'unable to rename temporary CRL to active CRL'];
             }
 
             // succeeded        
