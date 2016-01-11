@@ -1,0 +1,29 @@
+#!/usr/bin/php
+<?php
+
+require_once dirname(__DIR__).'/vendor/autoload.php';
+
+use Monolog\Logger;
+use Monolog\Handler\SyslogHandler;
+use Monolog\Formatter\LineFormatter;
+
+$logger = new Logger('vpn-server-api');
+$syslog = new SyslogHandler('vpn-server-api', 'user');
+$formatter = new LineFormatter();
+$syslog->setFormatter($formatter);
+$logger->pushHandler($syslog);
+
+$logData = [];
+$envKeys = [
+    'common_name',
+    'time_unix',
+    'untrusted_ip',
+    'ifconfig_pool_remote_ip',
+    'ifconfig_ipv6_remote',
+];
+
+foreach ($envKeys as $envKey) {
+    $logData[$envKey] = getenv($envKey);
+}
+
+$logger->addInfo('client-connect', $logData);

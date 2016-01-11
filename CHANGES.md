@@ -1,6 +1,10 @@
 # Changelog
 
-## 2.0.1 (2015-01-11)
+## 2.0.2 (2016-01-11)
+- add bare bones scripts to be executed by OpenVPN process on client-connect
+  and client-disconnect 
+
+## 2.0.1 (2016-01-11)
 - implement logging to syslog for API calls
 
 ## 2.0.0 (2016-01-05)
