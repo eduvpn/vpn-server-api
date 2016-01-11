@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.1 (...)
+## 2.0.1 (2015-01-11)
 - implement logging to syslog for API calls
 
 ## 2.0.0 (2016-01-05)
