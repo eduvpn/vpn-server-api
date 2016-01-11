@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.1 (...)
+- implement logging to syslog for API calls
+
 ## 2.0.0 (2016-01-05)
 - major refactor of the code and dependencies
 - new configuration format (YAML)

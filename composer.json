@@ -23,6 +23,7 @@
         "fkooman/rest-plugin-authentication": "^2.0.0",
         "fkooman/rest-plugin-authentication-basic": "^2.0.0",
         "guzzlehttp/guzzle": "^5.3",
+        "monolog/monolog": "^1.17",
         "php": ">=5.4"
     }
 }

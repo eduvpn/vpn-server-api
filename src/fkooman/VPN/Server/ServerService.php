@@ -21,6 +21,8 @@ use fkooman\Rest\Service;
 use fkooman\Http\JsonResponse;
 use fkooman\Http\Request;
 use fkooman\Http\Exception\BadRequestException;
+use Monolog\Logger;
+use fkooman\Rest\Plugin\Authentication\UserInfoInterface;
 
 /**
  * This class registers and handles routes.
@@ -36,11 +38,15 @@ class ServerService extends Service
     /** @var CrlFetcher */
     private $crlFetcher;
 
-    public function __construct(ServerManager $serverManager, CcdHandler $ccdHandler, CrlFetcher $crlFetcher)
+    /** @var \Monolog\Logger */
+    private $logger;
+
+    public function __construct(ServerManager $serverManager, CcdHandler $ccdHandler, CrlFetcher $crlFetcher, Logger $logger = null)
     {
         $this->serverManager = $serverManager;
         $this->ccdHandler = $ccdHandler;
         $this->crlFetcher = $crlFetcher;
+        $this->logger = $logger;
 
         parent::__construct();
         $this->registerRoutes();
@@ -80,9 +86,11 @@ class ServerService extends Service
 
         $this->post(
             '/kill',
-            function (Request $request) {
+            function (Request $request, UserInfoInterface $userInfo) {
                 $commonName = $request->getPostParameter('common_name');
                 Utils::validateCommonName($commonName);
+
+                $this->logInfo('killing cn', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName));
 
                 $response = new JsonResponse();
                 $response->setBody($this->serverManager->kill($commonName));
@@ -93,12 +101,14 @@ class ServerService extends Service
 
         $this->post(
             '/ccd/disable',
-            function (Request $request) {
+            function (Request $request, UserInfoInterface $userInfo) {
                 $commonName = $request->getPostParameter('common_name');
                 if (is_null($commonName)) {
                     throw new BadRequestException('missing common_name');
                 }
                 Utils::validateCommonName($commonName);
+
+                $this->logInfo('disabling cn', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName));
 
                 $response = new JsonResponse();
                 $response->setBody(
@@ -113,9 +123,11 @@ class ServerService extends Service
 
         $this->delete(
             '/ccd/disable',
-            function (Request $request) {
+            function (Request $request, UserInfoInterface $userInfo) {
                 $commonName = $request->getUrl()->getQueryParameter('common_name');
                 Utils::validateCommonName($commonName);
+
+                $this->logInfo('enabling cn', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName));
 
                 $response = new JsonResponse();
                 $response->setBody(
@@ -130,7 +142,7 @@ class ServerService extends Service
 
         $this->get(
             '/ccd/disable',
-            function (Request $request) {
+            function (Request $request, UserInfoInterface $userInfo) {
                 // we typically deal with CNs, not user IDs, but the part of 
                 // the CN before the first '_' is considered the user ID
                 $userId = $request->getUrl()->getQueryParameter('user_id');
@@ -152,12 +164,22 @@ class ServerService extends Service
 
         $this->post(
             '/crl/fetch',
-            function (Request $request) {
+            function (Request $request, UserInfoInterface $userInfo) {
+
+                $this->logInfo('fetching CRL', array('api_user' => $userInfo->getUserId()));
+
                 $response = new JsonResponse();
                 $response->setBody($this->crlFetcher->fetch());
 
                 return $response;
             }
         );
+    }
+
+    private function logInfo($m, array $context)
+    {
+        if (!is_null($this->logger)) {
+            $this->logger->addInfo($m, $context);
+        }
     }
 }

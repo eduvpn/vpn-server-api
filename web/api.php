@@ -29,6 +29,9 @@ use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\VPN\Server\CrlFetcher;
 use fkooman\VPN\Server\SimpleError;
 use fkooman\VPN\Server\CcdHandler;
+use Monolog\Logger;
+use Monolog\Handler\SyslogHandler;
+use Monolog\Formatter\LineFormatter;
 
 SimpleError::register();
 
@@ -59,8 +62,14 @@ try {
         );
     }
 
+    $logger = new Logger('vpn-server-api');
+    $syslog = new SyslogHandler('vpn-server-api', 'user');
+    $formatter = new LineFormatter();
+    $syslog->setFormatter($formatter);
+    $logger->pushHandler($syslog);
+
     // http request router
-    $service = new ServerService($serverManager, $ccdHandler, $crlFetcher);
+    $service = new ServerService($serverManager, $ccdHandler, $crlFetcher, $logger);
 
     $apiAuth = new BasicAuthentication(
         function ($userId) use ($reader) {
