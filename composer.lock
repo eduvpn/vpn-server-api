@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a6a594a7a422dbba2d427f2e9bee937e",
-    "content-hash": "bdb8d2be05ab4f1448fa3a9c0791aa13",
+    "hash": "271a72077ec8e1ce345ab3e73619c500",
+    "content-hash": "7742b4245cf57fcaaa41ddf10fe79b37",
     "packages": [
         {
             "name": "fkooman/config",
@@ -89,6 +89,45 @@
             ],
             "description": "Simple PHP library for dealing with HTTP requests and responses.",
             "time": "2015-12-22 12:27:38"
+        },
+        {
+            "name": "fkooman/io",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fkooman/php-lib-io.git",
+                "reference": "0c2d8c49b1e37b9e3593c9e8dc51f4abc0c6712a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fkooman/php-lib-io/zipball/0c2d8c49b1e37b9e3593c9e8dc51f4abc0c6712a",
+                "reference": "0c2d8c49b1e37b9e3593c9e8dc51f4abc0c6712a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-date": "*",
+                "ext-openssl": "*",
+                "ext-spl": "*",
+                "php": ">= 5.3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "fkooman\\IO\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "François Kooman",
+                    "email": "fkooman@tuxed.net"
+                }
+            ],
+            "description": "Simple IO library",
+            "time": "2015-10-03 11:35:44"
         },
         {
             "name": "fkooman/json",
@@ -621,16 +660,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.8.1",
+            "version": "v2.8.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "ac84cbb98b68a6abbc9f5149eb96ccc7b07b8966"
+                "reference": "34c8a4b51e751e7ea869b8262f883d008a2b81b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/ac84cbb98b68a6abbc9f5149eb96ccc7b07b8966",
-                "reference": "ac84cbb98b68a6abbc9f5149eb96ccc7b07b8966",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/34c8a4b51e751e7ea869b8262f883d008a2b81b8",
+                "reference": "34c8a4b51e751e7ea869b8262f883d008a2b81b8",
                 "shasum": ""
             },
             "require": {
@@ -666,7 +705,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2015-12-26 13:37:56"
+            "time": "2016-01-13 10:28:07"
         }
     ],
     "packages-dev": [],

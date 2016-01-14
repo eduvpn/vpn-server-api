@@ -6,24 +6,38 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 use Monolog\Logger;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Formatter\LineFormatter;
+use fkooman\VPN\Server\ClientConnection;
 
-$logger = new Logger('vpn-server-api');
-$syslog = new SyslogHandler('vpn-server-api', 'user');
-$formatter = new LineFormatter();
-$syslog->setFormatter($formatter);
-$logger->pushHandler($syslog);
+try {
+    $logger = new Logger('vpn-server-api');
+    $syslog = new SyslogHandler('vpn-server-api', 'user');
+    $formatter = new LineFormatter();
+    $syslog->setFormatter($formatter);
+    $logger->pushHandler($syslog);
 
-$logData = [];
-$envKeys = [
-    'common_name',
-    'time_unix',
-    'untrusted_ip',
-    'ifconfig_pool_remote_ip',
-    'ifconfig_ipv6_remote',
-];
+    $db = new PDO(
+        'sqlite:/home/fkooman/Projects/eduVPN/vpn-server-api/data/connections.sqlite'
+    );
 
-foreach ($envKeys as $envKey) {
-    $logData[$envKey] = getenv($envKey);
+    $clientConnection = new ClientConnection($db);
+    // XXX XXX XXX XXX
+    $clientConnection->initDatabase();
+
+    $logData = [];
+    $envKeys = [
+        'common_name',
+        'time_unix',
+        'ifconfig_pool_remote_ip',
+        'ifconfig_ipv6_remote',
+    ];
+
+    foreach ($envKeys as $envKey) {
+        $logData[$envKey] = getenv($envKey);
+    }
+
+    $logger->addInfo('client-connect', $logData);
+    $clientConnection->connect($logData);
+} catch (Exception $e) {
+    // we do not want the connection to fail when we cannot log the 
+    // connection
 }
-
-$logger->addInfo('client-connect', $logData);
