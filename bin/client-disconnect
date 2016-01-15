@@ -7,6 +7,8 @@ use Monolog\Logger;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Formatter\LineFormatter;
 use fkooman\VPN\Server\ClientConnection;
+use fkooman\Config\Reader;
+use fkooman\Config\YamlFile;
 
 try {
     $logger = new Logger('vpn-server-api');
@@ -15,14 +17,17 @@ try {
     $syslog->setFormatter($formatter);
     $logger->pushHandler($syslog);
 
+    $reader = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/config.yaml')
+    );
+
     $db = new PDO(
-        'sqlite:/home/fkooman/Projects/eduVPN/vpn-server-api/data/connections.sqlite'
+        $reader->v('Log', 'dsn'),
+        $reader->v('Log', 'username', false),
+        $reader->v('Log', 'password', false)
     );
 
     $clientConnection = new ClientConnection($db);
-    // XXX XXX XXX XXX
-    $clientConnection->initDatabase();
-
     $logData = [];
     $envKeys = [
         'common_name',

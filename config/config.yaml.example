@@ -17,3 +17,9 @@ Crl:
 # The Client Configuration Directory
 Ccd:
     path: /var/lib/vpn-server-api/ccd
+
+# The Connection Log Database
+Log:
+    dsn: 'sqlite:/var/lib/openvpn/log.sqlite'
+    #username: 'foo'
+    #password: 'bar'
