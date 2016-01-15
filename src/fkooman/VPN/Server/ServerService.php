@@ -183,7 +183,12 @@ class ServerService extends Service
             '/log/history',
             function (Request $request, UserInfoInterface $userInfo) {
                 $response = new JsonResponse();
-                $response->setBody($this->clientConnection->getConnectionHistory());
+                $response->setBody(
+                    array(
+                        'ok' => true,
+                        'history' => $this->clientConnection->getConnectionHistory(),
+                    )
+                );
 
                 return $response;
             }
