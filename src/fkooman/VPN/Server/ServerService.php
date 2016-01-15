@@ -38,14 +38,18 @@ class ServerService extends Service
     /** @var CrlFetcher */
     private $crlFetcher;
 
+    /** @var ClientConnection */
+    private $clientConnection;
+
     /** @var \Monolog\Logger */
     private $logger;
 
-    public function __construct(ServerManager $serverManager, CcdHandler $ccdHandler, CrlFetcher $crlFetcher, Logger $logger = null)
+    public function __construct(ServerManager $serverManager, CcdHandler $ccdHandler, CrlFetcher $crlFetcher, ClientConnection $clientConnection, Logger $logger = null)
     {
         $this->serverManager = $serverManager;
         $this->ccdHandler = $ccdHandler;
         $this->crlFetcher = $crlFetcher;
+        $this->clientConnection = $clientConnection;
         $this->logger = $logger;
 
         parent::__construct();
@@ -170,6 +174,16 @@ class ServerService extends Service
 
                 $response = new JsonResponse();
                 $response->setBody($this->crlFetcher->fetch());
+
+                return $response;
+            }
+        );
+
+        $this->get(
+            '/log/history',
+            function (Request $request, UserInfoInterface $userInfo) {
+                $response = new JsonResponse();
+                $response->setBody($this->clientConnection->getConnectionHistory());
 
                 return $response;
             }
