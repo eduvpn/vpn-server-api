@@ -16,6 +16,7 @@ It implements the following features:
   - disable a particular CN
 - trigger a CRL reload from the CA to prevent revoked client configurations 
   from being used in new connections
+- obtain a connection history log
 
 The service makes this functionality available through a HTTP API.
 
@@ -34,6 +35,7 @@ The user name here is `admin` and the password is the
 
 
 ## OpenVPN
+
 Here you configure the OpenVPN instances running on this machine. The socket
 points to the TCP management session of the particular OpenVPN instance.
 
@@ -42,6 +44,7 @@ points to the TCP management session of the particular OpenVPN instance.
         - { socket: 'tcp://localhost:7506', id: tcp_443 }
 
 ## CCD
+
 Here you configure the path where the CCD files need to be written to. This 
 needs to be writable by this service, and also the OpenVPN instances need to
 be configured to use this with `--client-config-dir`.
@@ -50,6 +53,7 @@ be configured to use this with `--client-config-dir`.
         path: /var/lib/vpn-server-api/ccd
 
 ## CRL
+
 Here you configure the URL where the CRL will be available and the path where
 the CRL will be written to. The path needs to be writable by this service and
 the OpenVPN instances need to be configured to use the CRL at this path using 
@@ -59,11 +63,25 @@ the OpenVPN instances need to be configured to use the CRL at this path using
         url: http://localhost/vpn-config-api/api.php/ca.crl
         path: /var/lib/vpn-server-api
 
+## Log
+
+Here you configure the database to read the connection log history from. This
+database is written to by the `client-connect` and `client-disconnect` scripts
+included here. The scripts need to be configured in the OpenVPN configuration
+file to run when a client connects and disconnects. This can be done with 
+`--client-connect` and `--client-disconnect` options.
+
+    Log:
+        dsn: 'sqlite:/var/lib/openvpn/log.sqlite'
+        #username: 'foo'
+        #password: 'bar'
+
 # Running
 
     php -S localhost:8080 -t web/
 
 # API
+
 Behind the section headings below the component for which the particular call
 is relevant for is listed. The calls with OpenVPN are sent to ALL configured 
 OpenVPN instances. The others are shared by all OpenVPN instances.
@@ -79,6 +97,7 @@ the value of this `ok` field before assuming the rest of the response is
 available.
 
 ## Version (OpenVPN)
+
 Retrieve the versions of the OpenVPN instances:
 
 ### Call
@@ -86,6 +105,7 @@ Retrieve the versions of the OpenVPN instances:
     GET /version
 
 ### Response
+
 Here you can see two configured servers, one with the identifier `UDP` and one
 with the identifier `TCP`. The `TCP` instance is down, or otherwise 
 unavailable. Always check the `ok` field before accessing the responses, in 
@@ -279,6 +299,33 @@ Or in case of an error:
     {
         "error": "unable to download CRL",
         "ok": false
+    }
+
+## Log
+
+This call will retrieve a connection history log from the server. NOTE that 
+this will only include connections that are in the past, so currently 
+connected clients are not included here.
+
+### Call
+
+    GET /log/history
+
+### Response
+
+    {
+        "history": [
+            {
+                "bytes_received": "2813",
+                "bytes_sent": "2831",
+                "common_name": "foo_bar",
+                "disconnect_time_unix": "1452806440",
+                "ifconfig_ipv6_remote": "fd00:4242:4242::2",
+                "ifconfig_pool_remote_ip": "10.42.42.2",
+                "time_unix": "1452806425"
+            }
+        ],
+        "ok": true
     }
 
 # License

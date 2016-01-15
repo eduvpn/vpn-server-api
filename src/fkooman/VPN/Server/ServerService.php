@@ -181,7 +181,7 @@ class ServerService extends Service
 
         $this->get(
             '/log/history',
-            function (Request $request, UserInfoInterface $userInfo) {
+            function (Request $request) {
                 $response = new JsonResponse();
                 $response->setBody(
                     array(
