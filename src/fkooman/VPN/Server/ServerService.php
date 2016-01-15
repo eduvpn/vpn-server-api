@@ -44,7 +44,7 @@ class ServerService extends Service
     /** @var \Monolog\Logger */
     private $logger;
 
-    public function __construct(ServerManager $serverManager, CcdHandler $ccdHandler, CrlFetcher $crlFetcher, ClientConnection $clientConnection, Logger $logger = null)
+    public function __construct(ServerManager $serverManager, CcdHandler $ccdHandler, CrlFetcher $crlFetcher, ClientConnection $clientConnection = null, Logger $logger = null)
     {
         $this->serverManager = $serverManager;
         $this->ccdHandler = $ccdHandler;
@@ -183,12 +183,18 @@ class ServerService extends Service
             '/log/history',
             function (Request $request) {
                 $response = new JsonResponse();
-                $response->setBody(
-                    array(
+                if (is_null($this->clientConnection)) {
+                    $responseData = array(
+                        'ok' => false,
+                        'error' => 'unable to connect to log database',
+                    );
+                } else {
+                    $responseData = array(
                         'ok' => true,
                         'history' => $this->clientConnection->getConnectionHistory(),
-                    )
-                );
+                    );
+                }
+                $response->setBody($responseData);
 
                 return $response;
             }

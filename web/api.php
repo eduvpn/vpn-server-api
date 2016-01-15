@@ -63,12 +63,19 @@ try {
         );
     }
 
-    $db = new PDO(
-        $reader->v('Log', 'dsn'),
-        $reader->v('Log', 'username', false),
-        $reader->v('Log', 'password', false)
-    );
-    $clientConnection = new ClientConnection($db);
+    // handles the connection history log
+    try {
+        $db = new PDO(
+            $reader->v('Log', 'dsn', false, 'sqlite:/var/lib/openvpn/log.sqlite'),
+            $reader->v('Log', 'username', false),
+            $reader->v('Log', 'password', false)
+        );
+        $clientConnection = new ClientConnection($db);
+    } catch (PDOException $e) {
+        // unable to connect to database, so we continue without being able
+        // to view the log
+        $clientConnection = null;
+    }
 
     $logger = new Logger('vpn-server-api');
     $syslog = new SyslogHandler('vpn-server-api', 'user');
