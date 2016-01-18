@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0 (2016-01-18)
+- update the `client-connect` and `client-disconnect` scripts to log to a 
+  database to keep track of connections to the server and expose it through the
+  API
+
 ## 2.0.2 (2016-01-11)
 - add bare bones scripts to be executed by OpenVPN process on client-connect
   and client-disconnect 
