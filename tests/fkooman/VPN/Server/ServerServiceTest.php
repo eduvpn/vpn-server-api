@@ -34,13 +34,13 @@ class ServerServiceTest extends PHPUnit_Framework_TestCase
         $m = new ServerManager();
         $serverOne = new ServerApi('one', new TestSocket(self::readFile('openvpn_23_version.txt')));
         $m->addServer($serverOne);
-        $ccd = new CcdHandler('/foo');
+        $connectionLogd = new CcdHandler('/foo');
         $crl = new CrlFetcher('http://localhost/ca.crl', '/foo');
 
-        $cc = new ClientConnection(new PDO('sqlite::memory:'));
-        $cc->initDatabase();
+        $connectionLog = new ConnectionLog(new PDO('sqlite::memory:'));
+        $connectionLog->initDatabase();
 
-        $this->service = new ServerService($m, $ccd, $crl, $cc);
+        $this->service = new ServerService($m, $connectionLogd, $crl, $connectionLog);
     }
 
     public function testVersion()

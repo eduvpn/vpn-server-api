@@ -38,18 +38,18 @@ class ServerService extends Service
     /** @var CrlFetcher */
     private $crlFetcher;
 
-    /** @var ClientConnection */
-    private $clientConnection;
+    /** @var ConnectionLog */
+    private $connectionLog;
 
     /** @var \Monolog\Logger */
     private $logger;
 
-    public function __construct(ServerManager $serverManager, CcdHandler $ccdHandler, CrlFetcher $crlFetcher, ClientConnection $clientConnection = null, Logger $logger = null)
+    public function __construct(ServerManager $serverManager, CcdHandler $ccdHandler, CrlFetcher $crlFetcher, ConnectionLog $connectionLog = null, Logger $logger = null)
     {
         $this->serverManager = $serverManager;
         $this->ccdHandler = $ccdHandler;
         $this->crlFetcher = $crlFetcher;
-        $this->clientConnection = $clientConnection;
+        $this->clientConnection = $connectionLog;
         $this->logger = $logger;
 
         parent::__construct();

@@ -20,23 +20,23 @@ namespace fkooman\VPN\Server;
 use PHPUnit_Framework_TestCase;
 use PDO;
 
-class ClientConnectionTest extends PHPUnit_Framework_TestCase
+class ConnectionLogTest extends PHPUnit_Framework_TestCase
 {
-    /** @var ClientConnection */
-    private $cc;
+    /** @var ConnectionLog */
+    private $connectionLog;
 
     public function setUp()
     {
         $io = $this->getMockBuilder('fkooman\IO\IO')->getMock();
         $io->method('getTime')->will($this->returnValue(12345678));
 
-        $this->cc = new ClientConnection(new PDO('sqlite::memory:'), $io);
-        $this->cc->initDatabase();
+        $this->connectionLog = new ConnectionLog(new PDO('sqlite::memory:'), $io);
+        $this->connectionLog->initDatabase();
     }
 
     public function testConnect()
     {
-        $this->cc->connect([
+        $this->connectionLog->connect([
             'common_name' => 'foo_vpn_ex_def',
             'time_unix' => '1452535477',
             'ifconfig_pool_remote_ip' => '10.42.42.2',
@@ -46,14 +46,14 @@ class ClientConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testConnectDisconnect()
     {
-        $this->cc->connect([
+        $this->connectionLog->connect([
             'common_name' => 'foo_vpn_ex_def',
             'time_unix' => '1452535477',
             'ifconfig_pool_remote_ip' => '10.42.42.2',
             'ifconfig_ipv6_remote' => 'fd00:4242:4242::2',
         ]);
         $this->assertTrue(
-            $this->cc->disconnect([
+            $this->connectionLog->disconnect([
                 'common_name' => 'foo_vpn_ex_def',
                 'time_unix' => '1452535477',
                 'ifconfig_pool_remote_ip' => '10.42.42.2',
@@ -67,7 +67,7 @@ class ClientConnectionTest extends PHPUnit_Framework_TestCase
     public function testDisconnectWithoutMatchingConnect()
     {
         $this->assertFalse(
-            $this->cc->disconnect([
+            $this->connectionLog->disconnect([
                 'common_name' => 'foo_vpn_ex_def',
                 'time_unix' => '1452535477',
                 'ifconfig_pool_remote_ip' => '10.42.42.2',
@@ -80,14 +80,14 @@ class ClientConnectionTest extends PHPUnit_Framework_TestCase
 
     public function testGetConnectionList()
     {
-        $this->cc->connect([
+        $this->connectionLog->connect([
             'common_name' => 'foo_vpn_ex_def',
             'time_unix' => '1452535477',
             'ifconfig_pool_remote_ip' => '10.42.42.2',
             'ifconfig_ipv6_remote' => 'fd00:4242:4242::2',
         ]);
         $this->assertTrue(
-            $this->cc->disconnect([
+            $this->connectionLog->disconnect([
                 'common_name' => 'foo_vpn_ex_def',
                 'time_unix' => '1452535477',
                 'ifconfig_pool_remote_ip' => '10.42.42.2',
@@ -108,7 +108,7 @@ class ClientConnectionTest extends PHPUnit_Framework_TestCase
                 'disconnect_time_unix' => '12345678',
                 ],
             ],
-            $this->cc->getConnectionHistory()
+            $this->connectionLog->getConnectionHistory()
         );
     }
 }

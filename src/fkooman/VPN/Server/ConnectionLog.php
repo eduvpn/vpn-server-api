@@ -10,7 +10,7 @@ use fkooman\IO\IO;
  * With this we store events from client-connect and client-disconnect
  * from the OpenVPN server.
  */
-class ClientConnection
+class ConnectionLog
 {
     /** @var PDO */
     private $db;

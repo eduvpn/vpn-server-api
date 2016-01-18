@@ -5,7 +5,7 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
-use fkooman\VPN\Server\ClientConnection;
+use fkooman\VPN\Server\ConnectionLog;
 
 try {
     $reader = new Reader(
@@ -18,8 +18,8 @@ try {
         $reader->v('Log', 'password', false)
     );
 
-    $clientConnection = new ClientConnection($db);
-    $clientConnection->initDatabase();
+    $connectionLog = new ConnectionLog($db);
+    $connectionLog->initDatabase();
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL;
     exit(1);

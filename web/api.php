@@ -22,7 +22,7 @@ use fkooman\Rest\Plugin\Authentication\Basic\BasicAuthentication;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\ServerService;
-use fkooman\VPN\Server\ClientConnection;
+use fkooman\VPN\Server\ConnectionLog;
 use fkooman\VPN\Server\ServerManager;
 use fkooman\VPN\Server\ServerApi;
 use fkooman\VPN\Server\ServerSocket;
@@ -70,11 +70,11 @@ try {
             $reader->v('Log', 'username', false),
             $reader->v('Log', 'password', false)
         );
-        $clientConnection = new ClientConnection($db);
+        $connectionLog = new ConnectionLog($db);
     } catch (PDOException $e) {
         // unable to connect to database, so we continue without being able
         // to view the log
-        $clientConnection = null;
+        $connectionLog = null;
     }
 
     $logger = new Logger('vpn-server-api');
@@ -84,7 +84,7 @@ try {
     $logger->pushHandler($syslog);
 
     // http request router
-    $service = new ServerService($serverManager, $ccdHandler, $crlFetcher, $clientConnection, $logger);
+    $service = new ServerService($serverManager, $ccdHandler, $crlFetcher, $connectionLog, $logger);
 
     $apiAuth = new BasicAuthentication(
         function ($userId) use ($reader) {

@@ -6,7 +6,7 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 use Monolog\Logger;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Formatter\LineFormatter;
-use fkooman\VPN\Server\ClientConnection;
+use fkooman\VPN\Server\ConnectionLog;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 
@@ -27,7 +27,7 @@ try {
         $reader->v('Log', 'password', false)
     );
 
-    $clientConnection = new ClientConnection($db);
+    $connectionLog = new ConnectionLog($db);
     $logData = [];
     $envKeys = [
         'common_name',
@@ -44,7 +44,7 @@ try {
     }
 
     $logger->addInfo('client-disconnect', $logData);
-    $clientConnection->disconnect($logData);
+    $connectionLog->disconnect($logData);
 } catch (Exception $e) {
     // we do not want the connection to fail when we cannot log the 
     // connection
