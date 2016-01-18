@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1 (2016-01-18)
+- use separate configuration file for connection log as the OpenVPN user is 
+  not supposed to be able to read the `vpn-server-api` configuration file
+
 ## 2.1.0 (2016-01-18)
 - update the `client-connect` and `client-disconnect` scripts to log to a 
   database to keep track of connections to the server and expose it through the

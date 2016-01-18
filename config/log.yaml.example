@@ -1,0 +1,5 @@
+# The Connection Log Database
+Log:
+    dsn: 'sqlite:/var/lib/openvpn/log.sqlite'
+    #username: 'foo'
+    #password: 'bar'

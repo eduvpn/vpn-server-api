@@ -18,7 +18,7 @@ try {
     $logger->pushHandler($syslog);
 
     $reader = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/config.yaml')
+        new YamlFile(dirname(__DIR__).'/config/log.yaml')
     );
 
     $db = new PDO(

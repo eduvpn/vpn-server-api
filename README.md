@@ -25,6 +25,9 @@ The service makes this functionality available through a HTTP API.
 You can modify the configuration in the `config/config.yaml`, see 
 `config/config.yaml.example` for the example.
 
+Also modify `config/log.yaml.example` if needed to make the connection history
+log working.
+
 ## Authentication
 
 The user name here is `admin` and the password is the 
