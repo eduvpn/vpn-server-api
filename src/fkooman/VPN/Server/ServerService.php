@@ -191,20 +191,20 @@ class ServerService extends Service
         $this->get(
             '/log/history',
             function (Request $request) {
-                $daysBack = $request->getUrl()->getQueryParameter('daysBack');
-                if(is_null($daysBack)) {
-                    $daysBack = 0;
+                $daysAgo = $request->getUrl()->getQueryParameter('daysAgo');
+                if(is_null($daysAgo)) {
+                    $daysAgo = 0;
                 }
-                if(!is_numeric($daysBack)) {
-                    $daysBack = 0;
+                if(!is_numeric($daysAgo)) {
+                    $daysAgo = 0;
                 }
-                $daysBack = intval($daysBack);
-                if($daysBack < 0 || $daysBack > 31) {
-                    $daysBack = 0;
+                $daysAgo = intval($daysAgo);
+                if($daysAgo < 0 || $daysAgo > 31) {
+                    $daysAgo = 0;
                 }
                 
-                $beginTime = strtotime(sprintf('today -%d days', $daysBack), $this->io->getTime());
-                $endTime = strtotime(sprintf('tomorrow -%d days', $daysBack), $this->io->getTime());
+                $beginTime = strtotime(sprintf('today -%d days', $daysAgo), $this->io->getTime());
+                $endTime = strtotime(sprintf('tomorrow -%d days', $daysAgo), $this->io->getTime());
 
                 $response = new JsonResponse();
                 if (is_null($this->clientConnection)) {
@@ -215,7 +215,7 @@ class ServerService extends Service
                 } else {
                     $responseData = array(
                         'ok' => true,
-                        'history' => $this->clientConnection->getConnectionHistory(),
+                        'history' => $this->clientConnection->getConnectionHistory($beginTime, $endTime),
                     );
                 }
                 $response->setBody($responseData);
