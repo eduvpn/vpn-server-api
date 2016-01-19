@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.2 (...)
+- by default only show log of the current day, allow query parameter to 
+  go back in time up to 31 days
+
 ## 2.1.1 (2016-01-18)
 - use separate configuration file for connection log as the OpenVPN user is 
   not supposed to be able to read the `vpn-server-api` configuration file

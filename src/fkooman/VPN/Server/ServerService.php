@@ -23,6 +23,7 @@ use fkooman\Http\Request;
 use fkooman\Http\Exception\BadRequestException;
 use Monolog\Logger;
 use fkooman\Rest\Plugin\Authentication\UserInfoInterface;
+use fkooman\IO\IO;
 
 /**
  * This class registers and handles routes.
@@ -44,13 +45,21 @@ class ServerService extends Service
     /** @var \Monolog\Logger */
     private $logger;
 
-    public function __construct(ServerManager $serverManager, CcdHandler $ccdHandler, CrlFetcher $crlFetcher, ConnectionLog $connectionLog = null, Logger $logger = null)
+    /** @var \fkooman\IO\IO */
+    private $io;
+
+    public function __construct(ServerManager $serverManager, CcdHandler $ccdHandler, CrlFetcher $crlFetcher, ConnectionLog $connectionLog = null, Logger $logger = null, IO $io = null)
     {
         $this->serverManager = $serverManager;
         $this->ccdHandler = $ccdHandler;
         $this->crlFetcher = $crlFetcher;
         $this->clientConnection = $connectionLog;
         $this->logger = $logger;
+
+        if(is_null($io)) {
+            $io = new IO();
+        }
+        $this->io = $io;
 
         parent::__construct();
         $this->registerRoutes();
@@ -182,6 +191,21 @@ class ServerService extends Service
         $this->get(
             '/log/history',
             function (Request $request) {
+                $daysBack = $request->getUrl()->getQueryParameter('daysBack');
+                if(is_null($daysBack)) {
+                    $daysBack = 0;
+                }
+                if(!is_numeric($daysBack)) {
+                    $daysBack = 0;
+                }
+                $daysBack = intval($daysBack);
+                if($daysBack < 0 || $daysBack > 31) {
+                    $daysBack = 0;
+                }
+                
+                $beginTime = strtotime(sprintf('today -%d days', $daysBack), $this->io->getTime());
+                $endTime = strtotime(sprintf('tomorrow -%d days', $daysBack), $this->io->getTime());
+
                 $response = new JsonResponse();
                 if (is_null($this->clientConnection)) {
                     $responseData = array(
