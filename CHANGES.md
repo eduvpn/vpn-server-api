@@ -1,8 +1,10 @@
 # Changelog
 
-## 2.1.2 (...)
+## 2.1.2 (2016-01-20)
 - by default only show log of the current day, allow query parameter to 
   go back in time up to 31 days
+- fix a bug where the wrong configuration file was used to retrieve the 
+  log DSN
 
 ## 2.1.1 (2016-01-18)
 - use separate configuration file for connection log as the OpenVPN user is 
