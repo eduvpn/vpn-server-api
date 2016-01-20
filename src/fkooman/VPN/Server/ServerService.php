@@ -53,10 +53,10 @@ class ServerService extends Service
         $this->serverManager = $serverManager;
         $this->ccdHandler = $ccdHandler;
         $this->crlFetcher = $crlFetcher;
-        $this->clientConnection = $connectionLog;
+        $this->connectionLog = $connectionLog;
         $this->logger = $logger;
 
-        if(is_null($io)) {
+        if (is_null($io)) {
             $io = new IO();
         }
         $this->io = $io;
@@ -191,23 +191,28 @@ class ServerService extends Service
         $this->get(
             '/log/history',
             function (Request $request) {
-                $daysAgo = $request->getUrl()->getQueryParameter('daysAgo');
-                if(is_null($daysAgo)) {
-                    $daysAgo = 0;
+                $showDate = $request->getUrl()->getQueryParameter('showDate');
+                if (is_null($showDate)) {
+                    $showDate = date('Y-m-d', $this->io->getTime());
                 }
-                if(!is_numeric($daysAgo)) {
-                    $daysAgo = 0;
+                if (!is_string($showDate)) {
+                    $showDate = date('Y-m-d', $this->io->getTime());
                 }
-                $daysAgo = intval($daysAgo);
-                if($daysAgo < 0 || $daysAgo > 31) {
-                    $daysAgo = 0;
+                Utils::validateDate($showDate);
+                $showDateUnix = strtotime($showDate);
+
+                $minDate = strtotime('today -31 days');
+                $maxDate = strtotime('tomorrow');
+
+                if ($showDateUnix < $minDate || $showDateUnix >= $maxDate) {
+                    throw new BadRequestException('invalid date range');
                 }
-                
-                $beginTime = strtotime(sprintf('today -%d days', $daysAgo), $this->io->getTime());
-                $endTime = strtotime(sprintf('tomorrow -%d days', $daysAgo), $this->io->getTime());
+
+                $showDateUnixMin = strtotime('today', $showDateUnix);
+                $showDateUnixMax = strtotime('tomorrow', $showDateUnix);
 
                 $response = new JsonResponse();
-                if (is_null($this->clientConnection)) {
+                if (is_null($this->connectionLog)) {
                     $responseData = array(
                         'ok' => false,
                         'error' => 'unable to connect to log database',
@@ -215,7 +220,7 @@ class ServerService extends Service
                 } else {
                     $responseData = array(
                         'ok' => true,
-                        'history' => $this->clientConnection->getConnectionHistory($beginTime, $endTime),
+                        'history' => $this->connectionLog->getConnectionHistory($showDateUnixMin, $showDateUnixMax),
                     );
                 }
                 $response->setBody($responseData);

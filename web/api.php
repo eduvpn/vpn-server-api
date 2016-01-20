@@ -37,24 +37,27 @@ use Monolog\Formatter\LineFormatter;
 SimpleError::register();
 
 try {
-    $reader = new Reader(
+    $config = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
+    );
+    $logConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/log.yaml')
     );
 
     // handles fetching the certificate revocation list
     $crlFetcher = new CrlFetcher(
-        $reader->v('Crl', 'url'),
-        $reader->v('Crl', 'path')
+        $config->v('Crl', 'url'),
+        $config->v('Crl', 'path')
     );
 
     // handles the client configuration directory
     $ccdHandler = new CcdHandler(
-        $reader->v('Ccd', 'path')
+        $config->v('Ccd', 'path')
     );
 
     // handles the connection to the various OpenVPN instances
     $serverManager = new ServerManager();
-    foreach ($reader->v('OpenVpn') as $openVpnServer) {
+    foreach ($config->v('OpenVpn') as $openVpnServer) {
         $serverManager->addServer(
             new ServerApi(
                 $openVpnServer['id'],
@@ -66,14 +69,15 @@ try {
     // handles the connection history log
     try {
         $db = new PDO(
-            $reader->v('Log', 'dsn', false, 'sqlite:/var/lib/openvpn/log.sqlite'),
-            $reader->v('Log', 'username', false),
-            $reader->v('Log', 'password', false)
+            $logConfig->v('Log', 'dsn', false, 'sqlite:/var/lib/openvpn/log.sqlite'),
+            $logConfig->v('Log', 'username', false),
+            $logConfig->v('Log', 'password', false)
         );
         $connectionLog = new ConnectionLog($db);
     } catch (PDOException $e) {
         // unable to connect to database, so we continue without being able
         // to view the log
+        error_log($e->__toString());
         $connectionLog = null;
     }
 
@@ -87,8 +91,8 @@ try {
     $service = new ServerService($serverManager, $ccdHandler, $crlFetcher, $connectionLog, $logger);
 
     $apiAuth = new BasicAuthentication(
-        function ($userId) use ($reader) {
-            $userList = $reader->v('Users');
+        function ($userId) use ($config) {
+            $userList = $config->v('Users');
             if (!array_key_exists($userId, $userList)) {
                 return false;
             }

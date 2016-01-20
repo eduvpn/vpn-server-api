@@ -104,17 +104,8 @@ class ConnectionLog
         return 1 === $stmt->rowCount();
     }
 
-    public function getConnectionHistory($beginTime = null, $endTime = null)
+    public function getConnectionHistory($minUnix, $maxUnix)
     {
-        if (is_null($beginTime) || !is_int($beginTime)) {
-            // default from start of current day
-            $beginTime = strtotime('today', $this->io->getTime());
-        }
-        if (is_null($endTime) || !is_int($endTime)) {
-            // upto now
-            $endTime = $this->io->getTime();
-        }
-
         $stmt = $this->db->prepare(
             sprintf(
                 'SELECT * 
@@ -122,15 +113,15 @@ class ConnectionLog
                  WHERE 
                     disconnect_time_unix NOT NULL
                  AND
-                    disconnect_time_unix >= :begin_time
+                    disconnect_time_unix >= :min_unix
                  AND
-                    disconnect_time_unix <= :end_time
+                    disconnect_time_unix <= :max_unix
                  ORDER BY disconnect_time_unix DESC',
                 $this->prefix.'connections'
             )
         );
-        $stmt->bindValue(':begin_time', $beginTime, PDO::PARAM_INT);
-        $stmt->bindValue(':end_time', $endTime, PDO::PARAM_INT);
+        $stmt->bindValue(':min_unix', $minUnix, PDO::PARAM_INT);
+        $stmt->bindValue(':max_unix', $maxUnix, PDO::PARAM_INT);
 
         $stmt->execute();
 

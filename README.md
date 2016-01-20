@@ -308,11 +308,21 @@ Or in case of an error:
 
 This call will retrieve a connection history log from the server. NOTE that 
 this will only include connections that are in the past, so currently 
-connected clients are not included here.
+connected clients are not included here. By default only log entries of the 
+current day are shown, i.e. connections that closed in this day. If you want
+to request the log from other days you can use the `showDate` query parameter
+with the date in the `YYYY-MM-DD` format. You can only request up to 31 days
+ago.
 
 ### Call
 
+Retrieve log from current day:
+
     GET /log/history
+
+Retrieve log from specific day:
+
+    GET /log/history?showDate=2016-01-05
 
 ### Response
 

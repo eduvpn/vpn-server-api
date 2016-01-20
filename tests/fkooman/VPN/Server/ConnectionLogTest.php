@@ -108,7 +108,10 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
                 'disconnect_time_unix' => '12345678',
                 ],
             ],
-            $this->connectionLog->getConnectionHistory()
+            $this->connectionLog->getConnectionHistory(
+                strtotime('today -31 days', 12345678),
+                strtotime('tomorrow', 12345678)
+            )
         );
     }
 }

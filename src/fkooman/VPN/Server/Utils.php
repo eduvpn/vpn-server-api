@@ -38,4 +38,16 @@ class Utils
             throw new BadRequestException('invalid characters in userId');
         }
     }
+
+    /**
+     * Validate that the date is in YYYY-MM-DD format.
+     *
+     * @param string $dateString the date in YYYY-MM-DD format
+     */
+    public static function validateDate($dateString)
+    {
+        if (!preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}/', $dateString)) {
+            throw new BadRequestException('invalid date format');
+        }
+    }
 }
