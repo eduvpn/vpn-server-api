@@ -170,16 +170,16 @@
         },
         {
             "name": "fkooman/rest",
-            "version": "1.0.6",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-lib-rest.git",
-                "reference": "17930fcdd581743528448d37d3f9c70c0fb0e63f"
+                "reference": "6c2b5ba40609a63b71f0846a1c88ee6531916ecd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-lib-rest/zipball/17930fcdd581743528448d37d3f9c70c0fb0e63f",
-                "reference": "17930fcdd581743528448d37d3f9c70c0fb0e63f",
+                "url": "https://api.github.com/repos/fkooman/php-lib-rest/zipball/6c2b5ba40609a63b71f0846a1c88ee6531916ecd",
+                "reference": "6c2b5ba40609a63b71f0846a1c88ee6531916ecd",
                 "shasum": ""
             },
             "require": {
@@ -209,20 +209,20 @@
                 }
             ],
             "description": "Simple PHP library for writing REST services.",
-            "time": "2015-12-24 23:27:13"
+            "time": "2016-01-25 14:07:35"
         },
         {
             "name": "fkooman/rest-plugin-authentication",
-            "version": "2.0.0",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-lib-rest-plugin-authentication.git",
-                "reference": "262fbdba24cf1c5b02016dafc65e9fff37fa6cd0"
+                "reference": "75fa6432b738a348fd576f352e18c616e423b5f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-lib-rest-plugin-authentication/zipball/262fbdba24cf1c5b02016dafc65e9fff37fa6cd0",
-                "reference": "262fbdba24cf1c5b02016dafc65e9fff37fa6cd0",
+                "url": "https://api.github.com/repos/fkooman/php-lib-rest-plugin-authentication/zipball/75fa6432b738a348fd576f352e18c616e423b5f5",
+                "reference": "75fa6432b738a348fd576f352e18c616e423b5f5",
                 "shasum": ""
             },
             "require": {
@@ -256,7 +256,7 @@
                 }
             ],
             "description": "Authentication plugin for fkooman/rest",
-            "time": "2015-11-19 12:28:26"
+            "time": "2016-01-21 19:55:11"
         },
         {
             "name": "fkooman/rest-plugin-authentication-basic",
