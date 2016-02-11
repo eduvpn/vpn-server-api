@@ -218,6 +218,62 @@ Here a client was actually killed:
         ]
     }
 
+## Get Static IP Addresses (CCD)
+
+Obtain the static IPv4 and IPv6 addresses configured for a CN.
+
+### Call
+
+    GET /ccd/static?common_name=foo_bar
+
+### Response
+
+If static addresses were set, you will see this:
+
+    {
+        "ok": true,
+        "static": {
+            "v4": "1.2.3.1",
+            "v6": "fd00::1"
+        }
+    }
+
+If only a static IPv6 address was set:
+
+    {
+        "ok": true,
+        "static": {
+            "v4": null,
+            "v6": "fd00::1"
+        }
+    }
+
+If also no IPv6 static address was set that field will also be `null`.
+
+## Set Static IP Addresses (CCD)
+
+Set a static IPv4 and IPv6 address for a CN.
+
+### Call
+
+The `v4` and `v6` parameters are both optional here. They reflect the NEW 
+static addresses. If you leave out either of them an existing static IP for 
+that type will be removed. To go back to dynamic leave them both out.
+
+    POST /ccd/static
+        common_name=foo_bar
+        v4=10.10.10.25
+        v6=fd00:1234::25
+
+### Response
+
+The response will be `true` for the `ok` field if the addresses were set 
+successfully.
+
+    {"ok":true}
+
+If the IPv4 or IPv6 address was invalid you will get an error.
+
 ## Get Disabled Configurations (CCD)
 
 Obtain a list of disabled CNs. Optionally you can use the query parameter 

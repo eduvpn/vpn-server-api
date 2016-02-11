@@ -196,6 +196,8 @@ class CcdHandler
         }
 
         $this->writeFile($commonName, $clientConfig);
+
+        return true;
     }
 
     private function writeFile($commonName, array $clientConfig)

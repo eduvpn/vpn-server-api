@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.0 (...)
+- implement setting/getting static IP addresses through the API
+
 ## 2.1.2 (2016-01-20)
 - by default only show log of the current day, allow query parameter to 
   go back in time up to 31 days

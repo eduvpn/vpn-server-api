@@ -112,6 +112,72 @@ class ServerService extends Service
             }
         );
 
+        $this->get(
+            '/ccd/static',
+           function (Request $request, UserInfoInterface $userInfo) {
+                $commonName = $request->getUrl()->getQueryParameter('common_name');
+                if (is_null($commonName)) {
+                    throw new BadRequestException('missing common_name');
+                }
+                Utils::validateCommonName($commonName);
+
+                // XXX we have to remove the netmask again here, ugly!
+                $static = $this->ccdHandler->getStaticAddresses($commonName);
+                if (!is_null($static['v4'])) {
+                    $static['v4'] = explode(' ', $static['v4'])[0];
+                }
+                if (!is_null($static['v6'])) {
+                    $static['v6'] = explode('/', $static['v6'])[0];
+                }
+
+                $response = new JsonResponse();
+                $response->setBody(
+                    array(
+                        'ok' => true,
+                        'static' => $static,
+                    )
+                );
+
+                return $response;
+            }
+        );
+
+        $this->post(
+            '/ccd/static',
+           function (Request $request, UserInfoInterface $userInfo) {
+                $commonName = $request->getPostParameter('common_name');
+                if (is_null($commonName)) {
+                    throw new BadRequestException('missing common_name');
+                }
+                Utils::validateCommonName($commonName);
+
+                $v4 = $request->getPostParameter('v4');
+                if (!is_null($v4)) {
+                    Utils::validateV4Address($v4);
+                    // XXX do something about hardcoded netmask!
+                    $v4 = sprintf('%s 255.255.255.0', $v4);
+                }
+
+                $v6 = $request->getPostParameter('v6');
+                if (!is_null($v6)) {
+                    Utils::validateV6Address($v6);
+                    // XXX do we also need to specify the router for v6?
+                    $v6 = sprintf('%s/64', $v6);
+                }
+
+                $this->logInfo('setting static IP', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName, 'v4' => $v4, 'v6' => $v6));
+
+                $response = new JsonResponse();
+                $response->setBody(
+                    array(
+                        'ok' => $this->ccdHandler->setStaticAddresses($commonName, $v4, $v6),
+                    )
+                );
+
+                return $response;
+            }
+        );
+
         $this->post(
             '/ccd/disable',
             function (Request $request, UserInfoInterface $userInfo) {
