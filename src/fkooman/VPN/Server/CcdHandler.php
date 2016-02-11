@@ -28,58 +28,79 @@ class CcdHandler
     /** @var string */
     private $ccdPath;
 
-    const DISABLE_REGEXP = "/^disable\n$/mS";
-
     public function __construct($ccdPath)
     {
         $this->ccdPath = $ccdPath;
+    }
+
+    private function parseCcd($commonName)
+    {
+        $commonNamePath = sprintf('%s/%s', $this->ccdPath, $commonName);
+        $clientConfig = array();
+
+        $handle = @fopen($commonNamePath, 'r');
+        if ($handle) {
+            while (false !== $line = fgets($handle, 128)) {
+                $clientConfig[] = trim($line);
+            }
+            fclose($handle);
+        }
+
+        return $clientConfig;
     }
 
     public function disableCommonName($commonName)
     {
         Utils::validateCommonName($commonName);
 
-        // we add 'disable' to the CCD for this particular common name
-        $commonNamePath = sprintf('%s/%s', $this->ccdPath, $commonName);
-        if (false === $fileContent = self::readFile($commonNamePath)) {
-            // unable to read file, write 'disable' to it
-            self::writeFile($commonNamePath, "disable\n");
-
-            return true;
+        $clientConfig = $this->parseCcd($commonName);
+        foreach ($clientConfig as $k => $v) {
+            if ('disable' === $v) {
+                // already disabled
+                return false;
+            }
         }
 
-        // check if we find 'disable' in the file
-        if (1 !== preg_match(self::DISABLE_REGEXP, $fileContent)) {
-            // not found
-            self::writeFile($commonNamePath, "disable\n");
+        // not yet disabled
+        $clientConfig[] = 'disable';
 
-            return true;
-        }
+        $this->writeFile($commonName, $clientConfig);
 
-        // found, already disabled, do nothing
-        return false;
+        return true;
     }
 
     public function enableCommonName($commonName)
     {
         Utils::validateCommonName($commonName);
 
-        // we remove 'disable' from the CCD for this particular common name
-        $commonNamePath = sprintf('%s/%s', $this->ccdPath, $commonName);
-        if (false === $fileContent = self::readFile($commonNamePath)) {
-            // unable to read file, so CN is not disabled
-            return false;
-        }
-        // check if we find 'disable' in the file
-        if (1 === preg_match(self::DISABLE_REGEXP, $fileContent)) {
-            // found
-            $fileContent = preg_replace(self::DISABLE_REGEXP, '', $fileContent);
-            self::writeFile($commonNamePath, $fileContent, false);
+        $clientConfig = $this->parseCcd($commonName);
+        foreach ($clientConfig as $k => $v) {
+            if ('disable' === $v) {
+                // it is disabled
+                unset($clientConfig[$k]);
+                $this->writeFile($commonName, $clientConfig);
 
-            return true;
+                return true;
+            }
         }
 
-        // not found, not disabled, do nothing
+        // not disabled
+        return false;
+    }
+
+    public function isDisabled($commonName)
+    {
+        Utils::validateCommonName($commonName);
+
+        $clientConfig = $this->parseCcd($commonName);
+        foreach ($clientConfig as $k => $v) {
+            if ('disable' === $v) {
+                // disabled
+                return true;
+            }
+        }
+
+        // not disabled
         return false;
     }
 
@@ -96,27 +117,34 @@ class CcdHandler
         }
 
         foreach (glob($pathFilter) as $commonNamePath) {
-            if (false !== $fileContent = self::readFile($commonNamePath)) {
-                // read the file, check if it is disabled
-                if (1 === preg_match(self::DISABLE_REGEXP, $fileContent)) {
-                    // disabled
-                    $disabledCommonNames[] = basename($commonNamePath);
-                }
+            $commonName = basename($commonNamePath);
+
+            if ($this->isDisabled($commonName)) {
+                $disabledCommonNames[] = $commonName;
             }
         }
 
         return $disabledCommonNames;
     }
 
-    private static function readFile($filePath)
+    public function getStaticIpAddress($commonName)
     {
-        return @file_get_contents($filePath);
     }
 
-    private static function writeFile($filePath, $fileContent, $appendFile = true)
+    public function setStaticIpAddress($commonName, $v4, $v6)
     {
-        $opt = $appendFile ? FILE_APPEND : 0;
-        if (false === @file_put_contents($filePath, $fileContent, $opt)) {
+        if (!is_null($v4)) {
+        }
+
+        if (!is_null($v6)) {
+        }
+    }
+
+    private function writeFile($commonName, array $clientConfig)
+    {
+        $commonNamePath = sprintf('%s/%s', $this->ccdPath, $commonName);
+
+        if (false === @file_put_contents($commonNamePath, implode(PHP_EOL, $clientConfig).PHP_EOL)) {
             throw new RuntimeException('unable to write to CCD file');
         }
     }
