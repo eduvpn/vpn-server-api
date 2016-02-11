@@ -127,17 +127,75 @@ class CcdHandler
         return $disabledCommonNames;
     }
 
-    public function getStaticIpAddress($commonName)
+    public function getStaticAddresses($commonName)
     {
+        Utils::validateCommonName($commonName);
+
+        $clientConfig = $this->parseCcd($commonName);
+
+        #--ifconfig-push local remote-netmask [alias] 
+        #--ifconfig-ipv6-push ipv6addr/bits ipv6remote 
+        $v4 = null;
+        $v6 = null;
+
+        foreach ($clientConfig as $k => $v) {
+            if (0 === strpos($v, 'ifconfig-push')) {
+                $v4 = trim(substr($v, 14));
+            }
+            if (0 === strpos($v, 'ifconfig-ipv6-push')) {
+                $v6 = trim(substr($v, 19));
+            }
+        }
+
+        return array(
+            'v4' => $v4,
+            'v6' => $v6,
+        );
     }
 
-    public function setStaticIpAddress($commonName, $v4, $v6)
+    public function setStaticAddresses($commonName, $v4, $v6)
     {
-        if (!is_null($v4)) {
+        Utils::validateCommonName($commonName);
+
+        $clientConfig = $this->parseCcd($commonName);
+        $v4Pos = null;
+        $v6Pos = null;
+
+        foreach ($clientConfig as $k => $v) {
+            if (0 === strpos($v, 'ifconfig-push')) {
+                $v4Pos = $k;
+            }
+            if (0 === strpos($v, 'ifconfig-ipv6-push')) {
+                $v6Pos = $k;
+            }
         }
 
-        if (!is_null($v6)) {
+        // XXX clean up the stuff below...
+        if (!is_null($v4Pos)) {
+            if (!is_null($v4)) {
+                $clientConfig[$v4Pos] = sprintf('ifconfig-push %s', $v4);
+            } else {
+                unset($clientConfig[$v4Pos]);
+            }
+        } else {
+            if (!is_null($v4)) {
+                $clientConfig[] = sprintf('ifconfig-push %s', $v4);
+            }
         }
+
+        if (!is_null($v6Pos)) {
+            if (!is_null($v6)) {
+                $clientConfig[$v6Pos] = sprintf('ifconfig-ipv6-push %s', $v6);
+            } else {
+                unset($clientConfig[$v6Pos]);
+            }
+        } else {
+            if (!is_null($v6)) {
+                $clientConfig[] = sprintf('ifconfig-ipv6-push %s', $v6);
+            }
+        }
+
+        $this->writeFile($commonName, $clientConfig);
     }
 
     private function writeFile($commonName, array $clientConfig)

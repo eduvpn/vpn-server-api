@@ -116,4 +116,89 @@ class CcdHandlerTest extends PHPUnit_Framework_TestCase
             $ccd->getDisabledCommonNames('userA')
         );
     }
+
+    public function testGetStaticAddresses()
+    {
+        $ccd = new CcdHandler($this->ccdPath);
+        $this->assertSame(
+            array(
+                'v4' => null,
+                'v6' => null,
+            ),
+            $ccd->getStaticAddresses('foo')
+        );
+        $ccd->setStaticAddresses(
+            'foo',
+            '10.0.0.5 255.255.255.0',
+            'fd00:1234::2/64 fd00:1234::1'
+        );
+        $this->assertSame(
+            array(
+                'v4' => '10.0.0.5 255.255.255.0',
+                'v6' => 'fd00:1234::2/64 fd00:1234::1',
+            ),
+            $ccd->getStaticAddresses('foo')
+        );
+    }
+
+    public function testSetNewStaticAddresses()
+    {
+        $ccd = new CcdHandler($this->ccdPath);
+        $ccd->setStaticAddresses(
+            'foo',
+            '10.0.0.5 255.255.255.0',
+            'fd00:1234::2/64 fd00:1234::1'
+        );
+        $ccd->setStaticAddresses(
+            'foo',
+            '10.10.0.5 255.255.255.0',
+            'fd00:4321::2/64 fd00:4321::1'
+        );
+        $this->assertSame(
+            array(
+                'v4' => '10.10.0.5 255.255.255.0',
+                'v6' => 'fd00:4321::2/64 fd00:4321::1',
+            ),
+            $ccd->getStaticAddresses('foo')
+        );
+    }
+
+    public function testSetOnlyV4()
+    {
+        $ccd = new CcdHandler($this->ccdPath);
+        $ccd->setStaticAddresses(
+            'foo',
+            '10.0.0.5 255.255.255.0',
+            null
+        );
+        $this->assertSame(
+            array(
+                'v4' => '10.0.0.5 255.255.255.0',
+                'v6' => null,
+            ),
+            $ccd->getStaticAddresses('foo')
+        );
+    }
+
+    public function testUnset()
+    {
+        $ccd = new CcdHandler($this->ccdPath);
+        $ccd->setStaticAddresses(
+            'foo',
+            '10.0.0.5 255.255.255.0',
+            'fd00:1234::2/64 fd00:1234::1'
+        );
+        $ccd->setStaticAddresses(
+            'foo',
+            null,
+            null
+        );
+        $this->assertSame(
+            array(
+                'v4' => null,
+                'v6' => null,
+            ),
+            $ccd->getStaticAddresses('foo')
+        );
+    }
 }
