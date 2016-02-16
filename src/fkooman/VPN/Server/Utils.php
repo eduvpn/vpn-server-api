@@ -17,6 +17,7 @@
 namespace fkooman\VPN\Server;
 
 use fkooman\Http\Exception\BadRequestException;
+use RuntimeException;
 
 class Utils
 {
@@ -62,6 +63,17 @@ class Utils
     {
         if (!preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}/', $dateString)) {
             throw new BadRequestException('invalid date format');
+        }
+    }
+
+    public static function exec($cmd)
+    {
+        exec($cmd, $output, $returnValue);
+
+        if (0 !== $returnValue) {
+            throw new RuntimeException(
+                sprintf('command "%s" did not complete successfully', $cmd)
+            );
         }
     }
 }

@@ -2,6 +2,7 @@
 
 ## 2.2.0 (...)
 - implement setting/getting static IP addresses through the API
+- add/del route to correct tunnel on connect/disconnect
 
 ## 2.1.2 (2016-01-20)
 - by default only show log of the current day, allow query parameter to 

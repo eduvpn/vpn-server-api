@@ -37,6 +37,7 @@ try {
         'bytes_received',
         'bytes_sent',
         'disconnect_time_unix',
+        'dev',
     ];
 
     foreach ($envKeys as $envKey) {
@@ -44,6 +45,22 @@ try {
     }
 
     $logger->addInfo('client-disconnect', $logData);
+
+    // XXX should we only add this for tun > 0 or just for all servers?
+    $cmd = sprintf(
+        '/usr/bin/sudo /sbin/ip -4 ro del %s/32 dev %s',
+        $logData['ifconfig_pool_remote_ip'],
+        $logData['dev']
+    );
+    $logger->addInfo($cmd);
+    try {
+        Utils::exec($cmd);
+    } catch (RuntimeException $e) {
+        // we were unable to del the route, this is strange, it should have
+        // worked, but nothing we can do about it, except log it
+        $logger->addWarning('error deleting route', $logData);
+    }
+
     $connectionLog->disconnect($logData);
 } catch (Exception $e) {
     // we do not want the connection to fail when we cannot log the 

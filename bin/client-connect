@@ -35,6 +35,7 @@ try {
         'time_unix',
         'ifconfig_pool_remote_ip',
         'ifconfig_ipv6_remote',
+        'dev',
     ];
 
     foreach ($envKeys as $envKey) {
@@ -42,6 +43,24 @@ try {
     }
 
     $logger->addInfo('client-connect', $logData);
+
+    // XXX should we only add this for tun > 0 or just for all servers?
+    $cmd = sprintf(
+        '/usr/bin/sudo /sbin/ip -4 ro add %s/32 dev %s',
+        $logData['ifconfig_pool_remote_ip'],
+        $logData['dev']
+    );
+    $logger->addInfo($cmd);
+    try {
+        Utils::exec($cmd);
+    } catch (RuntimeException $e) {
+        // we were unable to add the route, this is strange, it should have
+        // worked, but nothing we can do about it, except log it and drop the
+        // user
+        $logger->addError('error adding route', $logData);
+        exit(1);
+    }
+
     $connectionLog->connect($logData);
 } catch (Exception $e) {
     // we do not want the connection to fail when we cannot log the 
