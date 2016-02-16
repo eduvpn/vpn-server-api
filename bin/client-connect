@@ -9,7 +9,7 @@ use fkooman\VPN\Server\Utils;
 use fkooman\VPN\Server\AddressPool;
 
 try {
-    #    $reader = new Reader(
+#    $reader = new Reader(
 #        new YamlFile(dirname(__DIR__).'/config/log.yaml')
 #    );
 
@@ -42,17 +42,18 @@ try {
     if (file_exists($ccdFile)) {
         // ** USE STATIC **
         // XXX more robust reading!
-        $json = json_decode(file_get_contents($ccdFile));
+        $disable = false;
+        $json = json_decode(file_get_contents($ccdFile), true);
         if (array_key_exists('disable', $json) && $json['disable']) {
             $disable = true;
         }
         if (array_key_exists('v4', $json)) {
             $v4 = $json['v4'];
+        } else {
+            $v4 = '192.168.99.99';
         }
-
-        $v4 = '192.168.99.99';
         $v6 = AddressPool::getIp6($v6p, $v4);
-        $disable = false;
+
     } else {
         // ** USE POOL **
 
@@ -64,6 +65,9 @@ try {
         $v4 = AddressPool::getIp4($v4s, $v4e, $usedIpList);
         $v6 = AddressPool::getIp6($v6p, $v4);
         $disable = false;
+
+        // XXX check return value
+        touch(sprintf('%s/%s', $ipPoolDir, $v4));
     }
 
     if ($disable) {
@@ -80,8 +84,6 @@ try {
             } catch (RuntimeException $e) {
                 exit(1);
             }
-            // XXX check return value
-            touch(sprintf('%s/%s', $ipPoolDir, $v4));
         }
         if ($v6) {
             $configFileData[] = sprintf('ifconfig-ipv6-push %s/64 %s', $v6, $v6r);
