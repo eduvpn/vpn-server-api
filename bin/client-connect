@@ -9,6 +9,7 @@ use Monolog\Formatter\LineFormatter;
 use fkooman\VPN\Server\ConnectionLog;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
+use fkooman\VPN\Server\Utils;
 
 try {
     $logger = new Logger('vpn-server-api');
@@ -57,7 +58,13 @@ try {
         // we were unable to add the route, this is strange, it should have
         // worked, but nothing we can do about it, except log it and drop the
         // user
-        $logger->addError('error adding route', $logData);
+        $logger->addError(
+            sprintf(
+                'error adding route: %s',
+                $e->getMessage()
+            ),
+            $logData
+        );
         exit(1);
     }
 

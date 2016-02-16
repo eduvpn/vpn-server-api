@@ -9,6 +9,7 @@ use Monolog\Formatter\LineFormatter;
 use fkooman\VPN\Server\ConnectionLog;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
+use fkooman\VPN\Server\Utils;
 
 try {
     $logger = new Logger('vpn-server-api');
@@ -58,7 +59,13 @@ try {
     } catch (RuntimeException $e) {
         // we were unable to del the route, this is strange, it should have
         // worked, but nothing we can do about it, except log it
-        $logger->addWarning('error deleting route', $logData);
+        $logger->addWarning(
+            sprintf(
+                'error deleting route: %s',
+                $e->getMessage()
+            ),
+            $logData
+        );
     }
 
     $connectionLog->disconnect($logData);
