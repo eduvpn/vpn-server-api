@@ -17,7 +17,7 @@ try {
     $syslog->setFormatter($formatter);
     $logger->pushHandler($syslog);
 
-    $reader = new Reader(
+    $config = new Reader(
         new YamlFile(dirname(__DIR__).'/config/client.yaml')
     );
 
@@ -44,7 +44,6 @@ try {
 
     if ($v4) {
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro del %s/32 dev %s', $v4, $envData['dev']);
-        $logger->addInfo($cmd);
         try {
             Utils::exec($cmd);
         } catch (RuntimeException $e) {
@@ -53,7 +52,6 @@ try {
     }
     if ($v6) {
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro del %s/128 dev %s', $v6, $envData['dev']);
-        $logger->addInfo($cmd);
         try {
             Utils::exec($cmd);
         } catch (RuntimeException $e) {
@@ -61,8 +59,8 @@ try {
         }
     }
 
-    // XXX check return value
     // remove IP lock file
+    // XXX check return value
     @unlink(sprintf('%s/%s', $ipPoolDir, $v4));
 
     $logger->addInfo(
