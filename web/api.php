@@ -29,7 +29,7 @@ use fkooman\VPN\Server\ServerSocket;
 use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\VPN\Server\CrlFetcher;
 use fkooman\VPN\Server\SimpleError;
-use fkooman\VPN\Server\CcdHandler;
+use fkooman\VPN\Server\StaticConfig;
 use Monolog\Logger;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Formatter\LineFormatter;
@@ -40,8 +40,8 @@ try {
     $config = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
-    $logConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/log.yaml')
+    $clientConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/client.yaml')
     );
 
     // handles fetching the certificate revocation list
@@ -51,8 +51,8 @@ try {
     );
 
     // handles the client configuration directory
-    $ccdHandler = new CcdHandler(
-        $config->v('Ccd', 'path')
+    $staticConfig = new StaticConfig(
+        $clientConfig->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__)));
     );
 
     // handles the connection to the various OpenVPN instances
@@ -88,7 +88,7 @@ try {
     $logger->pushHandler($syslog);
 
     // http request router
-    $service = new ServerService($serverManager, $ccdHandler, $crlFetcher, $connectionLog, $logger);
+    $service = new ServerService($serverManager, $staticConfig, $crlFetcher, $connectionLog, $logger);
 
     $apiAuth = new BasicAuthentication(
         function ($userId) use ($config) {

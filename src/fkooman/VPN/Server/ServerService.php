@@ -33,8 +33,8 @@ class ServerService extends Service
     /** @var ServerManager */
     private $serverManager;
 
-    /** @var CcdHandler */
-    private $ccdHandler;
+    /** @var StaticConfig */
+    private $staticConfig;
 
     /** @var CrlFetcher */
     private $crlFetcher;
@@ -48,10 +48,10 @@ class ServerService extends Service
     /** @var \fkooman\IO\IO */
     private $io;
 
-    public function __construct(ServerManager $serverManager, CcdHandler $ccdHandler, CrlFetcher $crlFetcher, ConnectionLog $connectionLog = null, Logger $logger = null, IO $io = null)
+    public function __construct(ServerManager $serverManager, StaticConfig $staticConfig, CrlFetcher $crlFetcher, ConnectionLog $connectionLog = null, Logger $logger = null, IO $io = null)
     {
         $this->serverManager = $serverManager;
-        $this->ccdHandler = $ccdHandler;
+        $this->staticConfig = $staticConfig;
         $this->crlFetcher = $crlFetcher;
         $this->connectionLog = $connectionLog;
         $this->logger = $logger;
@@ -121,14 +121,7 @@ class ServerService extends Service
                 }
                 Utils::validateCommonName($commonName);
 
-                // XXX we have to remove the netmask again here, ugly!
-                $static = $this->ccdHandler->getStaticAddresses($commonName);
-                if (!is_null($static['v4'])) {
-                    $static['v4'] = explode(' ', $static['v4'])[0];
-                }
-                if (!is_null($static['v6'])) {
-                    $static['v6'] = explode('/', $static['v6'])[0];
-                }
+                $static = $this->staticConfig->getStaticAddresses($commonName);
 
                 $response = new JsonResponse();
                 $response->setBody(
@@ -154,15 +147,11 @@ class ServerService extends Service
                 $v4 = $request->getPostParameter('v4');
                 if (!is_null($v4)) {
                     Utils::validateV4Address($v4);
-                    // XXX do something about hardcoded netmask!
-                    $v4 = sprintf('%s 255.255.255.0', $v4);
                 }
 
                 $v6 = $request->getPostParameter('v6');
                 if (!is_null($v6)) {
                     Utils::validateV6Address($v6);
-                    // XXX do we also need to specify the router for v6?
-                    $v6 = sprintf('%s/64', $v6);
                 }
 
                 $this->logInfo('setting static IP', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName, 'v4' => $v4, 'v6' => $v6));
@@ -170,7 +159,7 @@ class ServerService extends Service
                 $response = new JsonResponse();
                 $response->setBody(
                     array(
-                        'ok' => $this->ccdHandler->setStaticAddresses($commonName, $v4, $v6),
+                        'ok' => $this->staticConfig->setStaticAddresses($commonName, $v4, $v6),
                     )
                 );
 
@@ -192,7 +181,7 @@ class ServerService extends Service
                 $response = new JsonResponse();
                 $response->setBody(
                     array(
-                        'ok' => $this->ccdHandler->disableCommonName($commonName),
+                        'ok' => $this->staticConfig->disableCommonName($commonName),
                     )
                 );
 
@@ -211,7 +200,7 @@ class ServerService extends Service
                 $response = new JsonResponse();
                 $response->setBody(
                     array(
-                        'ok' => $this->ccdHandler->enableCommonName($commonName),
+                        'ok' => $this->staticConfig->enableCommonName($commonName),
                     )
                 );
 
@@ -233,7 +222,7 @@ class ServerService extends Service
                 $response->setBody(
                     array(
                         'ok' => true,
-                        'disabled' => $this->ccdHandler->getDisabledCommonNames($userId),
+                        'disabled' => $this->staticConfig->getDisabledCommonNames($userId),
                     )
                 );
 

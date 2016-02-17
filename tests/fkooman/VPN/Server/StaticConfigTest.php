@@ -19,77 +19,77 @@ namespace fkooman\VPN\Server;
 
 use PHPUnit_Framework_TestCase;
 
-class CcdHandlerTest extends PHPUnit_Framework_TestCase
+class StaticConfigTest extends PHPUnit_Framework_TestCase
 {
-    private $ccdPath;
+    private $staticConfigDir;
 
     public function setUp()
     {
         // get a directory to play with
-        $tempDirName = tempnam(sys_get_temp_dir(), 'ccd');
+        $tempDirName = tempnam(sys_get_temp_dir(), 'static');
         if (file_exists($tempDirName)) {
             @unlink($tempDirName);
         }
         @mkdir($tempDirName);
 
         // a not disabled commonName
-        @file_put_contents($tempDirName.'/bar', "foo\nbar\n# disable\n# i am not disabled\ndisabled\n");
+        @file_put_contents($tempDirName.'/bar', '{}');
 
         // a disabled commonName
-        @file_put_contents($tempDirName.'/foobar', "foo\nbar\n# disable\n# i am not disabled\ndisabled\ndisable\n");
+        @file_put_contents($tempDirName.'/foobar', '{"disable": true}');
 
-        $this->ccdPath = $tempDirName;
+        $this->staticConfigDir = $tempDirName;
     }
 
     public function testDisableNonExistingFile()
     {
-        $ccd = new CcdHandler($this->ccdPath);
-        $this->assertTrue($ccd->disableCommonName('foo'));
-        $this->assertFileEquals(__DIR__.'/data/ccd/disabled', $this->ccdPath.'/foo');
+        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $this->assertTrue($staticConfig->disableCommonName('foo'));
+        $this->assertTrue($staticConfig->isDisabled('foo'));
     }
 
     public function testDisableExistingFile()
     {
-        $ccd = new CcdHandler($this->ccdPath);
-        $this->assertTrue($ccd->disableCommonName('bar'));
-        $this->assertFileEquals(__DIR__.'/data/ccd/existing_disabled', $this->ccdPath.'/bar');
+        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $this->assertTrue($staticConfig->disableCommonName('bar'));
+        $this->assertTrue($staticConfig->isDisabled('bar'));
     }
 
     public function testDisableAlreadyDisabled()
     {
-        $ccd = new CcdHandler($this->ccdPath);
-        $this->assertFalse($ccd->disableCommonName('foobar'));
-        $this->assertFileEquals(__DIR__.'/data/ccd/existing_disabled', $this->ccdPath.'/foobar');
+        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $this->assertFalse($staticConfig->disableCommonName('foobar'));
+        $this->assertTrue($staticConfig->isDisabled('foobar'));
     }
 
     public function testEnableExistingFile()
     {
-        $ccd = new CcdHandler($this->ccdPath);
-        $this->assertFalse($ccd->enableCommonName('bar'));
-        $this->assertFileEquals(__DIR__.'/data/ccd/existing_enabled', $this->ccdPath.'/bar');
+        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $this->assertFalse($staticConfig->enableCommonName('bar'));
+        $this->assertFalse($staticConfig->isDisabled('bar'));
     }
 
     public function testEnableDisabledFile()
     {
-        $ccd = new CcdHandler($this->ccdPath);
-        $this->assertTrue($ccd->enableCommonName('foobar'));
-        $this->assertFileEquals(__DIR__.'/data/ccd/existing_enabled', $this->ccdPath.'/foobar');
+        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $this->assertTrue($staticConfig->enableCommonName('foobar'));
+        $this->assertFalse($staticConfig->isDisabled('foobar'));
     }
 
     public function testEnableNonExistingFile()
     {
-        $ccd = new CcdHandler($this->ccdPath);
-        $this->assertFalse($ccd->enableCommonName('foo'));
-        $this->assertFileNotExists($this->ccdPath.'/foo');
+        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $this->assertFalse($staticConfig->enableCommonName('foo'));
+        $this->assertFileNotExists($this->staticConfigDir.'/foo');
     }
 
     public function testGetDisabledCommonNames()
     {
-        $ccd = new CcdHandler($this->ccdPath);
-        $ccd->disableCommonName('a');
-        $ccd->disableCommonName('b');
-        $ccd->enableCommonName('b');
-        $ccd->disableCommonName('c');
+        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig->disableCommonName('a');
+        $staticConfig->disableCommonName('b');
+        $staticConfig->enableCommonName('b');
+        $staticConfig->disableCommonName('c');
 
         $this->assertSame(
             array(
@@ -97,37 +97,37 @@ class CcdHandlerTest extends PHPUnit_Framework_TestCase
                 'c',
                 'foobar',
             ),
-            $ccd->getDisabledCommonNames()
+            $staticConfig->getDisabledCommonNames()
         );
     }
 
     public function testGetDisabledCommonNamesByUser()
     {
-        $ccd = new CcdHandler($this->ccdPath);
-        $ccd->disableCommonName('userA_foo');
-        $ccd->disableCommonName('userA_bar');
-        $ccd->disableCommonName('userB_xyz');
+        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig->disableCommonName('userA_foo');
+        $staticConfig->disableCommonName('userA_bar');
+        $staticConfig->disableCommonName('userB_xyz');
 
         $this->assertSame(
             array(
                 'userA_bar',
                 'userA_foo',
             ),
-            $ccd->getDisabledCommonNames('userA')
+            $staticConfig->getDisabledCommonNames('userA')
         );
     }
 
     public function testGetStaticAddresses()
     {
-        $ccd = new CcdHandler($this->ccdPath);
+        $staticConfig = new StaticConfig($this->staticConfigDir);
         $this->assertSame(
             array(
                 'v4' => null,
                 'v6' => null,
             ),
-            $ccd->getStaticAddresses('foo')
+            $staticConfig->getStaticAddresses('foo')
         );
-        $ccd->setStaticAddresses(
+        $staticConfig->setStaticAddresses(
             'foo',
             '10.0.0.5 255.255.255.0',
             'fd00:1234::2/64 fd00:1234::1'
@@ -137,19 +137,19 @@ class CcdHandlerTest extends PHPUnit_Framework_TestCase
                 'v4' => '10.0.0.5 255.255.255.0',
                 'v6' => 'fd00:1234::2/64 fd00:1234::1',
             ),
-            $ccd->getStaticAddresses('foo')
+            $staticConfig->getStaticAddresses('foo')
         );
     }
 
     public function testSetNewStaticAddresses()
     {
-        $ccd = new CcdHandler($this->ccdPath);
-        $ccd->setStaticAddresses(
+        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig->setStaticAddresses(
             'foo',
             '10.0.0.5 255.255.255.0',
             'fd00:1234::2/64 fd00:1234::1'
         );
-        $ccd->setStaticAddresses(
+        $staticConfig->setStaticAddresses(
             'foo',
             '10.10.0.5 255.255.255.0',
             'fd00:4321::2/64 fd00:4321::1'
@@ -159,14 +159,14 @@ class CcdHandlerTest extends PHPUnit_Framework_TestCase
                 'v4' => '10.10.0.5 255.255.255.0',
                 'v6' => 'fd00:4321::2/64 fd00:4321::1',
             ),
-            $ccd->getStaticAddresses('foo')
+            $staticConfig->getStaticAddresses('foo')
         );
     }
 
     public function testSetOnlyV4()
     {
-        $ccd = new CcdHandler($this->ccdPath);
-        $ccd->setStaticAddresses(
+        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig->setStaticAddresses(
             'foo',
             '10.0.0.5 255.255.255.0',
             null
@@ -176,19 +176,19 @@ class CcdHandlerTest extends PHPUnit_Framework_TestCase
                 'v4' => '10.0.0.5 255.255.255.0',
                 'v6' => null,
             ),
-            $ccd->getStaticAddresses('foo')
+            $staticConfig->getStaticAddresses('foo')
         );
     }
 
     public function testUnset()
     {
-        $ccd = new CcdHandler($this->ccdPath);
-        $ccd->setStaticAddresses(
+        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig->setStaticAddresses(
             'foo',
             '10.0.0.5 255.255.255.0',
             'fd00:1234::2/64 fd00:1234::1'
         );
-        $ccd->setStaticAddresses(
+        $staticConfig->setStaticAddresses(
             'foo',
             null,
             null
@@ -198,7 +198,7 @@ class CcdHandlerTest extends PHPUnit_Framework_TestCase
                 'v4' => null,
                 'v6' => null,
             ),
-            $ccd->getStaticAddresses('foo')
+            $staticConfig->getStaticAddresses('foo')
         );
     }
 }
