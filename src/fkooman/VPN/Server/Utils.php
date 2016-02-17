@@ -40,7 +40,7 @@ class Utils
         }
     }
 
-    public static function validateV4Address($ipAddress)
+    public static function validateAddress($ipAddress)
     {
         if (false === filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             throw new BadRequestException('invalid v4 address');

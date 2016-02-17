@@ -153,9 +153,11 @@ class StaticConfig
     public function setStaticAddresses($commonName, $v4)
     {
         Utils::validateCommonName($commonName);
+        if (!is_null($v4)) {
+            Utils::validateAddress($v4);
+        }
 
         $clientConfig = $this->parseConfig($commonName);
-
         $clientConfig['v4'] = $v4;
         $this->writeFile($commonName, $clientConfig);
 

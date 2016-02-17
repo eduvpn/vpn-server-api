@@ -154,15 +154,9 @@ class ServerService extends Service
                 Utils::validateCommonName($commonName);
 
                 $v4 = $request->getPostParameter('v4');
-                if (empty($v)) {
+                if (empty($v4)) {
                     $v4 = null;
                 }
-
-                if (!is_null($v4)) {
-                    Utils::validateV4Address($v4);
-                }
-
-                $this->logInfo('setting static IP', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName, 'v4' => $v4));
 
                 $response = new JsonResponse();
                 $response->setBody(
@@ -170,6 +164,8 @@ class ServerService extends Service
                         'ok' => $this->staticConfig->setStaticAddresses($commonName, $v4),
                     )
                 );
+
+                $this->logInfo('setting static IP', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName, 'v4' => $v4));
 
                 return $response;
             }

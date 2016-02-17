@@ -128,12 +128,11 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
         );
         $staticConfig->setStaticAddresses(
             'foo',
-            '10.0.0.5 255.255.255.0',
-            'fd00:1234::2/64 fd00:1234::1'
+            '10.0.0.5'
         );
         $this->assertSame(
             array(
-                'v4' => '10.0.0.5 255.255.255.0',
+                'v4' => '10.0.0.5'
             ),
             $staticConfig->getStaticAddress('foo')
         );
@@ -144,17 +143,15 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
         $staticConfig = new StaticConfig($this->staticConfigDir);
         $staticConfig->setStaticAddresses(
             'foo',
-            '10.0.0.5 255.255.255.0',
-            'fd00:1234::2/64 fd00:1234::1'
+            '10.0.0.5'
         );
         $staticConfig->setStaticAddresses(
             'foo',
-            '10.10.0.5 255.255.255.0',
-            'fd00:4321::2/64 fd00:4321::1'
+            '10.10.0.5'
         );
         $this->assertSame(
             array(
-                'v4' => '10.10.0.5 255.255.255.0',
+                'v4' => '10.10.0.5',
             ),
             $staticConfig->getStaticAddress('foo')
         );
@@ -165,12 +162,11 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
         $staticConfig = new StaticConfig($this->staticConfigDir);
         $staticConfig->setStaticAddresses(
             'foo',
-            '10.0.0.5 255.255.255.0',
-            null
+            '10.0.0.5'
         );
         $this->assertSame(
             array(
-                'v4' => '10.0.0.5 255.255.255.0',
+                'v4' => '10.0.0.5',
             ),
             $staticConfig->getStaticAddress('foo')
         );
@@ -181,12 +177,10 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
         $staticConfig = new StaticConfig($this->staticConfigDir);
         $staticConfig->setStaticAddresses(
             'foo',
-            '10.0.0.5 255.255.255.0',
-            'fd00:1234::2/64 fd00:1234::1'
+            '10.0.0.5'
         );
         $staticConfig->setStaticAddresses(
             'foo',
-            null,
             null
         );
         $this->assertSame(
