@@ -40,6 +40,9 @@ try {
     $config = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
+    $logConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/log.yaml')
+    );
     $clientConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/client.yaml')
     );
@@ -52,7 +55,7 @@ try {
 
     // handles the client configuration directory
     $staticConfig = new StaticConfig(
-        $clientConfig->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__)));
+        $clientConfig->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__)))
     );
 
     // handles the connection to the various OpenVPN instances
