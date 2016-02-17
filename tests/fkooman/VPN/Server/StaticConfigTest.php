@@ -123,9 +123,8 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             array(
                 'v4' => null,
-                'v6' => null,
             ),
-            $staticConfig->getStaticAddresses('foo')
+            $staticConfig->getStaticAddress('foo')
         );
         $staticConfig->setStaticAddresses(
             'foo',
@@ -135,9 +134,8 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             array(
                 'v4' => '10.0.0.5 255.255.255.0',
-                'v6' => 'fd00:1234::2/64 fd00:1234::1',
             ),
-            $staticConfig->getStaticAddresses('foo')
+            $staticConfig->getStaticAddress('foo')
         );
     }
 
@@ -157,9 +155,8 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             array(
                 'v4' => '10.10.0.5 255.255.255.0',
-                'v6' => 'fd00:4321::2/64 fd00:4321::1',
             ),
-            $staticConfig->getStaticAddresses('foo')
+            $staticConfig->getStaticAddress('foo')
         );
     }
 
@@ -174,9 +171,8 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             array(
                 'v4' => '10.0.0.5 255.255.255.0',
-                'v6' => null,
             ),
-            $staticConfig->getStaticAddresses('foo')
+            $staticConfig->getStaticAddress('foo')
         );
     }
 
@@ -196,9 +192,8 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             array(
                 'v4' => null,
-                'v6' => null,
             ),
-            $staticConfig->getStaticAddresses('foo')
+            $staticConfig->getStaticAddress('foo')
         );
     }
 }

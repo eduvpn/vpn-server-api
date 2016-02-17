@@ -47,13 +47,6 @@ class Utils
         }
     }
 
-    public static function validateV6Address($ipAddress)
-    {
-        if (false === filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-            throw new BadRequestException('invalid v6 address');
-        }
-    }
-
     /**
      * Validate that the date is in YYYY-MM-DD format.
      *

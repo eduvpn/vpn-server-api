@@ -111,7 +111,7 @@ class StaticConfig
         return $disabledCommonNames;
     }
 
-    public function getAllStaticAddresses($userId = null)
+    public function getStaticAddresses($userId = null)
     {
         if (!is_null($userId)) {
             Utils::validateUserId($userId);
@@ -125,13 +125,16 @@ class StaticConfig
 
         foreach (glob($pathFilter) as $commonNamePath) {
             $commonName = basename($commonNamePath);
-            $staticAddresses[$commonName] = $this->getStaticAddresses($commonName);
+            $ip = $this->getStaticAddress($commonName);
+            if (!is_null($ip['v4'])) {
+                $staticAddresses[$commonName] = $ip;
+            }
         }
 
         return $staticAddresses;
     }
 
-    public function getStaticAddresses($commonName)
+    public function getStaticAddress($commonName)
     {
         Utils::validateCommonName($commonName);
 
@@ -141,25 +144,19 @@ class StaticConfig
         if (array_key_exists('v4', $clientConfig)) {
             $v4 = $clientConfig['v4'];
         }
-        $v6 = null;
-        if (array_key_exists('v6', $clientConfig)) {
-            $v6 = $clientConfig['v6'];
-        }
 
         return array(
             'v4' => $v4,
-            'v6' => $v6,
         );
     }
 
-    public function setStaticAddresses($commonName, $v4, $v6)
+    public function setStaticAddresses($commonName, $v4)
     {
         Utils::validateCommonName($commonName);
 
         $clientConfig = $this->parseConfig($commonName);
 
         $clientConfig['v4'] = $v4;
-        $clientConfig['v6'] = $v6;
         $this->writeFile($commonName, $clientConfig);
 
         return true;

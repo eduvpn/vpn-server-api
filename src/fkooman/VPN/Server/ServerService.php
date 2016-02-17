@@ -113,43 +113,30 @@ class ServerService extends Service
         );
 
         $this->get(
-            '/ccd/all-static',
+            '/static/ip',
            function (Request $request, UserInfoInterface $userInfo) {
                 // we typically deal with CNs, not user IDs, but the part of 
                 // the CN before the first '_' is considered the user ID
                 $userId = $request->getUrl()->getQueryParameter('user_id');
-                if (!is_null($userId)) {
-                    Utils::validateUserId($userId);
-                }
-
-                $response = new JsonResponse();
-                $response->setBody(
-                    array(
-                        'ok' => true,
-                        'static' => $this->staticConfig->getAllStaticAddresses($userId),
-                    )
-                );
-
-                return $response;
-            }
-        );
-
-        $this->get(
-            '/ccd/static',
-           function (Request $request, UserInfoInterface $userInfo) {
                 $commonName = $request->getUrl()->getQueryParameter('common_name');
-                if (is_null($commonName)) {
-                    throw new BadRequestException('missing common_name');
+                if (!is_null($userId)) {
+                    // per user
+                    Utils::validateUserId($userId);
+                    $ipConfig = $this->staticConfig->getStaticAddresses($userId);
+                } elseif (!is_null($commonName)) {
+                    // per CN
+                    Utils::validateCommonName($commonName);
+                    $ipConfig = $this->staticConfig->getStaticAddress($commonName);
+                } else {
+                    // all
+                    $ipConfig = $this->staticConfig->getStaticAddresses();
                 }
-                Utils::validateCommonName($commonName);
-
-                $static = $this->staticConfig->getStaticAddresses($commonName);
 
                 $response = new JsonResponse();
                 $response->setBody(
                     array(
                         'ok' => true,
-                        'static' => $static,
+                        'ip' => $ipConfig,
                     )
                 );
 
@@ -158,7 +145,7 @@ class ServerService extends Service
         );
 
         $this->post(
-            '/ccd/static',
+            '/static/ip',
            function (Request $request, UserInfoInterface $userInfo) {
                 $commonName = $request->getPostParameter('common_name');
                 if (is_null($commonName)) {
@@ -167,21 +154,20 @@ class ServerService extends Service
                 Utils::validateCommonName($commonName);
 
                 $v4 = $request->getPostParameter('v4');
+                if (empty($v)) {
+                    $v4 = null;
+                }
+
                 if (!is_null($v4)) {
                     Utils::validateV4Address($v4);
                 }
 
-                $v6 = $request->getPostParameter('v6');
-                if (!is_null($v6)) {
-                    Utils::validateV6Address($v6);
-                }
-
-                $this->logInfo('setting static IP', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName, 'v4' => $v4, 'v6' => $v6));
+                $this->logInfo('setting static IP', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName, 'v4' => $v4));
 
                 $response = new JsonResponse();
                 $response->setBody(
                     array(
-                        'ok' => $this->staticConfig->setStaticAddresses($commonName, $v4, $v6),
+                        'ok' => $this->staticConfig->setStaticAddresses($commonName, $v4),
                     )
                 );
 

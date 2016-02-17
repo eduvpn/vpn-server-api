@@ -12,8 +12,9 @@ It implements the following features:
   - get current load statistics
   - get connection status (list currently connected clients)
   - kill active connections
-- provision a client specific configuration (CCD):
+- provision a client specific configuration (Static):
   - disable a particular CN
+  - set a static IP address for a particular CN
 - trigger a CRL reload from the CA to prevent revoked client configurations 
   from being used in new connections
 - obtain a connection history log
@@ -22,11 +23,12 @@ The service makes this functionality available through a HTTP API.
 
 # Configuration
 
-You can modify the configuration in the `config/config.yaml`, see 
-`config/config.yaml.example` for the example.
+There are currently three configuration files:
 
-Also modify `config/log.yaml.example` if needed to make the connection history
-log working.
+- `config/config.yaml` for HTTP service configuration;
+- `config/client.yaml` for more detailed client configuration and logging;
+
+See the `config/config.yaml.example` and `config/client.yaml` for a template.
 
 ## Authentication
 
@@ -46,15 +48,6 @@ points to the TCP management session of the particular OpenVPN instance.
         - { socket: 'tcp://localhost:7505', id: udp_1194 }
         - { socket: 'tcp://localhost:7506', id: tcp_443 }
 
-## CCD
-
-Here you configure the path where the CCD files need to be written to. This 
-needs to be writable by this service, and also the OpenVPN instances need to
-be configured to use this with `--client-config-dir`.
-
-    Ccd:
-        path: /var/lib/vpn-server-api/ccd
-
 ## CRL
 
 Here you configure the URL where the CRL will be available and the path where
@@ -66,18 +59,13 @@ the OpenVPN instances need to be configured to use the CRL at this path using
         url: http://localhost/vpn-config-api/api.php/ca.crl
         path: /var/lib/vpn-server-api
 
-## Log
+## Client
 
-Here you configure the database to read the connection log history from. This
-database is written to by the `client-connect` and `client-disconnect` scripts
-included here. The scripts need to be configured in the OpenVPN configuration
-file to run when a client connects and disconnects. This can be done with 
-`--client-connect` and `--client-disconnect` options.
+TBD. (static info) 
 
-    Log:
-        dsn: 'sqlite:/var/lib/openvpn/log.sqlite'
-        #username: 'foo'
-        #password: 'bar'
+## Logging
+
+TBD. (logging stuff)
 
 # Running
 
@@ -218,52 +206,69 @@ Here a client was actually killed:
         ]
     }
 
-## Get Static IP Addresses (CCD)
+## Get Static IP Addresses
 
-Obtain the static IPv4 and IPv6 addresses configured for a CN.
+Obtain the static IPv4 address configured.
 
 ### Call
 
-    GET /ccd/static?common_name=foo_bar
+For a CN:
+
+    GET /static/ip?common_name=foo_bar
+
+For a particular user:
+
+    GET /static/ip?user_id=foo
+
+For all users, for all CNs:
+
+    GET /static/ip 
 
 ### Response
 
-If static addresses were set, you will see this:
+If static addresses were set, you will see this, for a CN:
 
     {
         "ok": true,
         "static": {
             "v4": "1.2.3.1",
-            "v6": "fd00::1"
         }
     }
 
-If only a static IPv6 address was set:
+If no static address was set the `v4` field will have the `null` value.
+
+For a particular user, note that CNs that have no static IPv4 address are 
+NOT shown here, even if they would return `null` if you query the CN directly:
 
     {
-        "ok": true,
-        "static": {
-            "v4": null,
-            "v6": "fd00::1"
-        }
+        "ip": {
+            "foo_phone": {
+                "v4": "10.10.10.25"
+            },
+            "foo_laptop": {
+                "v4": "10.10.10.30"
+            }
+        },
+        "ok": true
     }
 
-If also no IPv6 static address was set that field will also be `null`.
+For all users, for all CNs the format is the same as for a particular user. If
+no static IP configuration are available for a certain user, or none in case
+you query them all the `ip` field will have an empty list value.
 
-## Set Static IP Addresses (CCD)
+## Set Static IP Address
 
-Set a static IPv4 and IPv6 address for a CN.
+Set a static IPv4 address for a CN.
 
 ### Call
 
-The `v4` and `v6` parameters are both optional here. They reflect the NEW 
-static addresses. If you leave out either of them an existing static IP for 
-that type will be removed. To go back to dynamic leave them both out.
+The `v4` parameter is optional. It reflects the NEW static address that should
+be set for this CN. If you leave the parameter out, or make it empty the static
+IP will be removed.
 
-    POST /ccd/static
+    POST /static/ip
         common_name=foo_bar
         v4=10.10.10.25
-        v6=fd00:1234::25
 
 ### Response
 
@@ -272,9 +277,9 @@ successfully.
 
     {"ok":true}
 
-If the IPv4 or IPv6 address was invalid you will get an error.
+If the IPv4 address was invalid you will get an error.
 
-## Get Disabled Configurations (CCD)
+## Get Disabled Configurations
 
 Obtain a list of disabled CNs. Optionally you can use the query parameter 
 `user_id` to filter the returned results and show only disabled CNs for a 
@@ -282,7 +287,7 @@ particular user.
 
 ### Call
 
-    GET /ccd/disable?user_id=foo
+    GET /static/disable?user_id=foo
 
 ### Response
 
@@ -302,13 +307,13 @@ Now, `foo_bar` is disabled:
         "ok": true
     }
 
-## Disable Configuration (CCD)
+## Disable Configuration
 
 Disable a configuration for a particular CN.
 
 ### Call
 
-    POST /ccd/disable
+    POST /static/disable
         common_name=foo_bar
 
 ### Response
@@ -320,14 +325,13 @@ was actually disabled. It will be `false` if it was already disabled.
         "ok": true
     }
 
-## Enable Configuration (CCD)
+## Enable Configuration
 
-Enable a configuration for a particular CN, this actually means the `disable`
-command is removed from the CCD.
+Enable a configuration for a particular CN.
 
 ### Call
 
-    DELETE /ccd/disable?common_name=foo_bar
+    DELETE /static/disable?common_name=foo_bar
 
 ### Response
 
