@@ -113,6 +113,28 @@ class ServerService extends Service
         );
 
         $this->get(
+            '/ccd/all-static',
+           function (Request $request, UserInfoInterface $userInfo) {
+                // we typically deal with CNs, not user IDs, but the part of 
+                // the CN before the first '_' is considered the user ID
+                $userId = $request->getUrl()->getQueryParameter('user_id');
+                if (!is_null($userId)) {
+                    Utils::validateUserId($userId);
+                }
+
+                $response = new JsonResponse();
+                $response->setBody(
+                    array(
+                        'ok' => true,
+                        'static' => $this->staticConfig->getAllStaticAddresses($userId),
+                    )
+                );
+
+                return $response;
+            }
+        );
+
+        $this->get(
             '/ccd/static',
            function (Request $request, UserInfoInterface $userInfo) {
                 $commonName = $request->getUrl()->getQueryParameter('common_name');

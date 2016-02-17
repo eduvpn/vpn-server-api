@@ -111,6 +111,26 @@ class StaticConfig
         return $disabledCommonNames;
     }
 
+    public function getAllStaticAddresses($userId = null)
+    {
+        if (!is_null($userId)) {
+            Utils::validateUserId($userId);
+        }
+
+        $staticAddresses = array();
+        $pathFilter = sprintf('%s/*', $this->staticConfigDir);
+        if (!is_null($userId)) {
+            $pathFilter = sprintf('%s/%s_*', $this->staticConfigDir, $userId);
+        }
+
+        foreach (glob($pathFilter) as $commonNamePath) {
+            $commonName = basename($commonNamePath);
+            $staticAddresses[$commonName] = $this->getStaticAddresses($commonName);
+        }
+
+        return $staticAddresses;
+    }
+
     public function getStaticAddresses($commonName)
     {
         Utils::validateCommonName($commonName);
