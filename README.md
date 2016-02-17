@@ -208,7 +208,9 @@ Here a client was actually killed:
 
 ## Get Static IP Addresses
 
-Obtain the static IPv4 address configured.
+Obtain the static IPv4 address configured. This service uses a convention where
+the IPv6 address that is provided to the client is based on the IPv4 address, 
+the IPv4 address is encoded in the IPv6 address (in the last 64 bits).
 
 ### Call
 
