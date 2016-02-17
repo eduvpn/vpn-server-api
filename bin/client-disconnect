@@ -44,6 +44,7 @@ try {
 
     if ($v4) {
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro del %s/32 dev %s', $v4, $envData['dev']);
+        $logger->addInfo($cmd);
         try {
             Utils::exec($cmd);
         } catch (RuntimeException $e) {
@@ -52,6 +53,7 @@ try {
     }
     if ($v6) {
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro del %s/128 dev %s', $v6, $envData['dev']);
+        $logger->addInfo($cmd);
         try {
             Utils::exec($cmd);
         } catch (RuntimeException $e) {
@@ -61,7 +63,7 @@ try {
 
     // XXX check return value
     // remove IP lock file
-    unlink(sprintf('%s/%s', $ipPoolDir, $v4));
+    @unlink(sprintf('%s/%s', $ipPoolDir, $v4));
 
     $logger->addInfo(
         'client-disconnect',
