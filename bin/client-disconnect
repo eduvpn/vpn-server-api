@@ -6,7 +6,6 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 use Monolog\Logger;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Formatter\LineFormatter;
-use fkooman\VPN\Server\ConnectionLog;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\Utils;
@@ -19,17 +18,10 @@ try {
     $logger->pushHandler($syslog);
 
     $reader = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/log.yaml')
+        new YamlFile(dirname(__DIR__).'/config/client.yaml')
     );
 
-    $db = new PDO(
-        $reader->v('Log', 'dsn'),
-        $reader->v('Log', 'username', false),
-        $reader->v('Log', 'password', false)
-    );
-
-    $connectionLog = new ConnectionLog($db);
-    $logData = [];
+    $envData = [];
     $envKeys = [
         'common_name',
         'time_unix',
@@ -42,33 +34,41 @@ try {
     ];
 
     foreach ($envKeys as $envKey) {
-        $logData[$envKey] = getenv($envKey);
+        $envData[$envKey] = getenv($envKey);
     }
 
-    $logger->addInfo('client-disconnect', $logData);
+    $v4 = $envData['ifconfig_pool_remote_ip'];
+    $v6 = $envData['ifconfig_ipv6_remote'];
 
-    // XXX should we only add this for tun > 0 or just for all servers?
-    $cmd = sprintf(
-        '/usr/bin/sudo /sbin/ip -4 ro del %s/32 dev %s',
-        $logData['ifconfig_pool_remote_ip'],
-        $logData['dev']
+    if ($v4) {
+        $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro del %s/32 dev %s', $v4, $envData['dev']);
+        try {
+            Utils::exec($cmd);
+        } catch (RuntimeException $e) {
+            exit(1);
+        }
+    }
+    if ($v6) {
+        $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro del %s/128 dev %s', $v6, $envData['dev']);
+        try {
+            Utils::exec($cmd);
+        } catch (RuntimeException $e) {
+            exit(1);
+        }
+    }
+
+    $logger->addInfo(
+        'client-disconnect',
+        array(
+            'common_name' => $envData['common_name'],
+            'v4' => $v4,
+            'v6' => $v6,
+            'time_unix' => $envData['time_unix'],
+            'disconnect_time_unix' => $envData['disconnect_time_unix'],
+            'bytes_received' => $envData['bytes_received'],
+            'bytes_sent' => $envData['bytes_sent'],
+        )
     );
-    $logger->addInfo($cmd);
-    try {
-        Utils::exec($cmd);
-    } catch (RuntimeException $e) {
-        // we were unable to del the route, this is strange, it should have
-        // worked, but nothing we can do about it, except log it
-        $logger->addWarning(
-            sprintf(
-                'error deleting route: %s',
-                $e->getMessage()
-            ),
-            $logData
-        );
-    }
-
-    $connectionLog->disconnect($logData);
 } catch (Exception $e) {
     // we do not want the connection to fail when we cannot log the 
     // connection

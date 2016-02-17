@@ -1,0 +1,11 @@
+# VPN Client Configuration
+
+IPv4:
+    poolStart: 10.42.42.129
+    poolEnd: 10.42.42.254
+    netmask: 255.255.255.0
+    ipPoolDir: /var/lib/openvpn/pool
+    staticConfigDir: /var/lib/vpn-server-api/static
+
+IPv6: 
+    prefix: 'fd00:4242:4242:4242'

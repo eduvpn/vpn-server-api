@@ -3,29 +3,41 @@
 
 require_once dirname(__DIR__).'/vendor/autoload.php';
 
-use fkooman\Config\Reader;
+use Monolog\Logger;
+use Monolog\Handler\SyslogHandler;
+use Monolog\Formatter\LineFormatter;
 use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\Utils;
+use fkooman\Config\Reader;
 use fkooman\VPN\Server\AddressPool;
 
 try {
-#    $reader = new Reader(
-#        new YamlFile(dirname(__DIR__).'/config/log.yaml')
-#    );
+    $logger = new Logger('vpn-server-api');
+    $syslog = new SyslogHandler('vpn-server-api', 'user');
+    $formatter = new LineFormatter();
+    $syslog->setFormatter($formatter);
+    $logger->pushHandler($syslog);
 
-    // XXX get this from config
-    $v6p = 'fd00:4242:4242:4242'; // IPv6 prefix
-    $v6r = 'fd00:4242:4242:4242::1'; // IPv6 router
-    $v4s = '10.42.42.129'; // start of IPv4 pool
-    $v4e = '10.42.42.254'; // end of IPv4 pool
-    $v4n = '255.255.255.0'; // IPv4 netmask
-    $ipPoolDir = '/var/lib/openvpn/pool';
-    $clientConfigDir = sprintf('%s/data/ccd', dirname(__DIR__));
+    $config = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/client.yaml')
+    );
+
+    // IPv6
+    $v6p = $config->v('IPv6', 'prefix', false, 'fd00:1234:1234:1234');
+    $v6r = sprintf('%s::1', $v6p);
+
+    // IPv4
+    $v4s = $config->v('IPv4', 'poolStart', false, '10.10.10.5');
+    $v4e = $config->v('IPv4', 'poolEnd', false, '10.10.10.50');
+    $v4n = $config->v('IPv4', 'netmask', false, '255.255.255.0');
+
+    $ipPoolDir = $config->v('IPv4', 'ipPoolDir', false, '/var/lib/openvpn/pool');
+    $staticConfigDir = $config->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__)));
 
     $envData = [];
     $envKeys = [
         'common_name',
-        //'time_unix',
+        'time_unix',
         //'ifconfig_pool_remote_ip',
         //'ifconfig_ipv6_remote',
         'dev',
@@ -33,16 +45,19 @@ try {
     foreach ($envKeys as $envKey) {
         $envData[$envKey] = getenv($envKey);
     }
+    // XXX make sure the envKeys are not empty!
 
     // tmp configuration file used for clientConfig (provided by OpenVPN)
     $tmpConfig = $argv[1];
 
     // check if CN as file is available in CCD
     $ccdFile = sprintf('%s/%s', $clientConfigDir, $envData['common_name']);
+    $disable = false;
+
     if (file_exists($ccdFile)) {
         // ** USE STATIC **
-        // XXX more robust reading!
-        $disable = false;
+        // XXX more robust file reading!
+
         $json = json_decode(file_get_contents($ccdFile), true);
         if (array_key_exists('disable', $json) && $json['disable']) {
             $disable = true;
@@ -53,7 +68,6 @@ try {
             $v4 = '192.168.99.99';
         }
         $v6 = AddressPool::getIp6($v6p, $v4);
-
     } else {
         // ** USE POOL **
 
@@ -78,7 +92,6 @@ try {
         if ($v4) {
             $configFileData[] = sprintf('ifconfig-push %s %s', $v4, $v4n);
             $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro add %s/32 dev %s', $v4, $envData['dev']);
-#            echo $cmd.PHP_EOL;
             try {
                 Utils::exec($cmd);
             } catch (RuntimeException $e) {
@@ -88,7 +101,6 @@ try {
         if ($v6) {
             $configFileData[] = sprintf('ifconfig-ipv6-push %s/64 %s', $v6, $v6r);
             $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro add %s/128 dev %s', $v6, $envData['dev']);
-#            echo $cmd.PHP_EOL;
             try {
                 Utils::exec($cmd);
             } catch (RuntimeException $e) {
@@ -99,6 +111,16 @@ try {
 
     // XXX check return value
     file_put_contents($tmpConfig, implode(PHP_EOL, $configFileData));
+
+    $logger->addInfo(
+        'client-connect',
+        array(
+            'common_name' => $envData['common_name'],
+            'v4' => $v4,
+            'v6' => $v6,
+            'time_unix' => $envData['time_unix'],
+        )
+    );
 } catch (Exception $e) {
     // we do not want the connection to fail when we cannot log the 
     // connection
