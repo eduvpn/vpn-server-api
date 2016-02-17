@@ -50,15 +50,14 @@ try {
     // tmp configuration file used for clientConfig (provided by OpenVPN)
     $tmpConfig = $argv[1];
 
-    // check if CN as file is available in CCD
-    $ccdFile = sprintf('%s/%s', $clientConfigDir, $envData['common_name']);
+    $staticConfigFile = sprintf('%s/%s', $staticConfigDir, $envData['common_name']);
     $disable = false;
 
-    if (file_exists($ccdFile)) {
+    if (file_exists($staticConfigFile)) {
         // ** USE STATIC **
         // XXX more robust file reading!
 
-        $json = json_decode(file_get_contents($ccdFile), true);
+        $json = json_decode(file_get_contents($staticConfigFile), true);
         if (array_key_exists('disable', $json) && $json['disable']) {
             $disable = true;
         }
