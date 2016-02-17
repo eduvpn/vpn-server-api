@@ -21,12 +21,14 @@ try {
         new YamlFile(dirname(__DIR__).'/config/client.yaml')
     );
 
+    $ipPoolDir = $config->v('IPv4', 'ipPoolDir', false, '/var/lib/openvpn/pool');
+
     $envData = [];
     $envKeys = [
         'common_name',
         'time_unix',
         'ifconfig_pool_remote_ip',
-        'ifconfig_ipv6_remote',
+        'ifconfig_pool_remote_ip6',
         'bytes_received',
         'bytes_sent',
         'disconnect_time_unix',
@@ -38,7 +40,7 @@ try {
     }
 
     $v4 = $envData['ifconfig_pool_remote_ip'];
-    $v6 = $envData['ifconfig_ipv6_remote'];
+    $v6 = $envData['ifconfig_pool_remote_ip6'];
 
     if ($v4) {
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro del %s/32 dev %s', $v4, $envData['dev']);
@@ -56,6 +58,10 @@ try {
             exit(1);
         }
     }
+
+    // XXX check return value
+    // remove IP lock file
+    unlink(sprintf('%s/%s', $ipPoolDir, $v4));
 
     $logger->addInfo(
         'client-disconnect',
