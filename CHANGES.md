@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.1 (...)
+## 2.2.1 (2016-02-18)
 - more defensive connect and disconnect script
 
 ## 2.2.0 (2016-02-18)
