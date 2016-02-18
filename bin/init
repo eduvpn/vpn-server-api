@@ -9,7 +9,7 @@ use fkooman\VPN\Server\ConnectionLog;
 
 try {
     $reader = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/log.yaml')
+        new YamlFile(dirname(__DIR__).'/config/client.yaml')
     );
 
     $db = new PDO(

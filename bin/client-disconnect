@@ -9,6 +9,7 @@ use Monolog\Formatter\LineFormatter;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\Utils;
+use fkooman\VPN\Server\ConnectionLog;
 
 try {
     $logger = new Logger('vpn-server-api');
@@ -31,12 +32,15 @@ try {
         'ifconfig_pool_remote_ip6',
         'bytes_received',
         'bytes_sent',
-        'disconnect_time_unix',
         'dev',
     ];
 
     foreach ($envKeys as $envKey) {
-        $envData[$envKey] = getenv($envKey);
+        $envValue = getenv($envKey);
+        if (empty($envValue)) {
+            throw new RuntimeException(sprintf('environment variable "%s" is not set', $envKey));
+        }
+        $envData[$envKey] = $envValue;
     }
 
     $v4 = $envData['ifconfig_pool_remote_ip'];
@@ -44,38 +48,37 @@ try {
 
     if ($v4) {
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro del %s/32 dev %s', $v4, $envData['dev']);
-        try {
-            Utils::exec($cmd);
-        } catch (RuntimeException $e) {
-            exit(1);
-        }
+        Utils::exec($cmd);
     }
     if ($v6) {
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro del %s/128 dev %s', $v6, $envData['dev']);
-        try {
-            Utils::exec($cmd);
-        } catch (RuntimeException $e) {
-            exit(1);
-        }
+        Utils::exec($cmd);
     }
 
-    // remove IP lock file
-    // XXX check return value
-    @unlink(sprintf('%s/%s', $ipPoolDir, $v4));
+    // XXX should only remove if it was from the pool, not from a static assignment
+    if (false === @unlink(sprintf('%s/%s', $ipPoolDir, $v4))) {
+        //throw new RuntimeException('unable to unreserve IP address');
+    }
 
-    $logger->addInfo(
-        'client-disconnect',
-        array(
-            'common_name' => $envData['common_name'],
-            'v4' => $v4,
-            'v6' => $v6,
-            'time_unix' => $envData['time_unix'],
-            'disconnect_time_unix' => $envData['disconnect_time_unix'],
-            'bytes_received' => $envData['bytes_received'],
-            'bytes_sent' => $envData['bytes_sent'],
-        )
+    $logData = array(
+        'common_name' => $envData['common_name'],
+        'v4' => $v4,
+        'v6' => $v6,
+        'time_unix' => $envData['time_unix'],
+        'bytes_received' => $envData['bytes_received'],
+        'bytes_sent' => $envData['bytes_sent'],
     );
+
+    $logger->addInfo('client-disconnect', $logData);
+
+    $db = new PDO(
+        $config->v('Log', 'dsn'),
+        $config->v('Log', 'username', false),
+        $config->v('Log', 'password', false)
+    );
+    $connectionLog = new ConnectionLog($db);
+    $connectionLog->disconnect($logData);
 } catch (Exception $e) {
-    // we do not want the connection to fail when we cannot log the 
-    // connection
+    error_log($e->getMessage());
+    exit(66);
 }

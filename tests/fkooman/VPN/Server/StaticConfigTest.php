@@ -132,7 +132,7 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
         );
         $this->assertSame(
             array(
-                'v4' => '10.0.0.5'
+                'v4' => '10.0.0.5',
             ),
             $staticConfig->getStaticAddress('foo')
         );

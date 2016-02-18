@@ -9,3 +9,9 @@ IPv4:
 
 IPv6: 
     prefix: 'fd00:4242:4242:4242'
+
+# The Connection Log Database
+Log:
+    dsn: 'sqlite:/var/lib/openvpn/log.sqlite'
+    #username: 'foo'
+    #password: 'bar'

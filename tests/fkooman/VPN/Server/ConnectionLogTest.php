@@ -39,8 +39,8 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
         $this->connectionLog->connect([
             'common_name' => 'foo_vpn_ex_def',
             'time_unix' => '1452535477',
-            'ifconfig_pool_remote_ip' => '10.42.42.2',
-            'ifconfig_ipv6_remote' => 'fd00:4242:4242::2',
+            'v4' => '10.42.42.2',
+            'v6' => 'fd00:4242:4242::2',
         ]);
     }
 
@@ -49,15 +49,15 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
         $this->connectionLog->connect([
             'common_name' => 'foo_vpn_ex_def',
             'time_unix' => '1452535477',
-            'ifconfig_pool_remote_ip' => '10.42.42.2',
-            'ifconfig_ipv6_remote' => 'fd00:4242:4242::2',
+            'v4' => '10.42.42.2',
+            'v6' => 'fd00:4242:4242::2',
         ]);
         $this->assertTrue(
             $this->connectionLog->disconnect([
                 'common_name' => 'foo_vpn_ex_def',
                 'time_unix' => '1452535477',
-                'ifconfig_pool_remote_ip' => '10.42.42.2',
-                'ifconfig_ipv6_remote' => 'fd00:4242:4242::2',
+                'v4' => '10.42.42.2',
+                'v6' => 'fd00:4242:4242::2',
                 'bytes_received' => '4843',
                 'bytes_sent' => '5317',
             ])
@@ -70,8 +70,8 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
             $this->connectionLog->disconnect([
                 'common_name' => 'foo_vpn_ex_def',
                 'time_unix' => '1452535477',
-                'ifconfig_pool_remote_ip' => '10.42.42.2',
-                'ifconfig_ipv6_remote' => 'fd00:4242:4242::2',
+                'v4' => '10.42.42.2',
+                'v6' => 'fd00:4242:4242::2',
                 'bytes_received' => '4843',
                 'bytes_sent' => '5317',
             ])
@@ -83,15 +83,15 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
         $this->connectionLog->connect([
             'common_name' => 'foo_vpn_ex_def',
             'time_unix' => '1452535477',
-            'ifconfig_pool_remote_ip' => '10.42.42.2',
-            'ifconfig_ipv6_remote' => 'fd00:4242:4242::2',
+            'v4' => '10.42.42.2',
+            'v6' => 'fd00:4242:4242::2',
         ]);
         $this->assertTrue(
             $this->connectionLog->disconnect([
                 'common_name' => 'foo_vpn_ex_def',
                 'time_unix' => '1452535477',
-                'ifconfig_pool_remote_ip' => '10.42.42.2',
-                'ifconfig_ipv6_remote' => 'fd00:4242:4242::2',
+                'v4' => '10.42.42.2',
+                'v6' => 'fd00:4242:4242::2',
                 'bytes_received' => '4843',
                 'bytes_sent' => '5317',
             ])
@@ -101,8 +101,8 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
                 [
                 'common_name' => 'foo_vpn_ex_def',
                 'time_unix' => '1452535477',
-                'ifconfig_pool_remote_ip' => '10.42.42.2',
-                'ifconfig_ipv6_remote' => 'fd00:4242:4242::2',
+                'v4' => '10.42.42.2',
+                'v6' => 'fd00:4242:4242::2',
                 'bytes_received' => '4843',
                 'bytes_sent' => '5317',
                 'disconnect_time_unix' => '12345678',

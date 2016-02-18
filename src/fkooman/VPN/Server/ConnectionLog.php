@@ -46,14 +46,14 @@ class ConnectionLog
                 'INSERT INTO %s (
                     common_name,
                     time_unix,
-                    ifconfig_pool_remote_ip,
-                    ifconfig_ipv6_remote
+                    v4,
+                    v6
                  ) 
                  VALUES(
                     :common_name, 
                     :time_unix, 
-                    :ifconfig_pool_remote_ip, 
-                    :ifconfig_ipv6_remote
+                    :v4, 
+                    :v6
                  )',
                 $this->prefix.'connections'
             )
@@ -61,8 +61,8 @@ class ConnectionLog
 
         $stmt->bindValue(':common_name', $v['common_name'], PDO::PARAM_STR);
         $stmt->bindValue(':time_unix', intval($v['time_unix']), PDO::PARAM_INT);
-        $stmt->bindValue(':ifconfig_pool_remote_ip', $v['ifconfig_pool_remote_ip'], PDO::PARAM_STR);
-        $stmt->bindValue(':ifconfig_ipv6_remote', $v['ifconfig_ipv6_remote'], PDO::PARAM_STR);
+        $stmt->bindValue(':v4', $v['v4'], PDO::PARAM_STR);
+        $stmt->bindValue(':v6', $v['v6'], PDO::PARAM_STR);
         $stmt->execute();
 
         if (1 !== $stmt->rowCount()) {
@@ -86,16 +86,16 @@ class ConnectionLog
                     SET bytes_received = :bytes_received, bytes_sent = :bytes_sent, disconnect_time_unix = :disconnect_time_unix
                     WHERE common_name = :common_name 
                         AND time_unix = :time_unix
-                        AND ifconfig_pool_remote_ip = :ifconfig_pool_remote_ip
-                        AND ifconfig_ipv6_remote = :ifconfig_ipv6_remote',
+                        AND v4 = :v4
+                        AND v6 = :v6',
                 $this->prefix.'connections'
             )
         );
 
         $stmt->bindValue(':common_name', $v['common_name'], PDO::PARAM_STR);
         $stmt->bindValue(':time_unix', intval($v['time_unix']), PDO::PARAM_INT);
-        $stmt->bindValue(':ifconfig_pool_remote_ip', $v['ifconfig_pool_remote_ip'], PDO::PARAM_STR);
-        $stmt->bindValue(':ifconfig_ipv6_remote', $v['ifconfig_ipv6_remote'], PDO::PARAM_STR);
+        $stmt->bindValue(':v4', $v['v4'], PDO::PARAM_STR);
+        $stmt->bindValue(':v6', $v['v6'], PDO::PARAM_STR);
         $stmt->bindValue(':bytes_received', intval($v['bytes_received']), PDO::PARAM_INT);
         $stmt->bindValue(':bytes_sent', intval($v['bytes_sent']), PDO::PARAM_INT);
         $stmt->bindValue(':disconnect_time_unix', $this->io->getTime(), PDO::PARAM_INT);
@@ -135,8 +135,8 @@ class ConnectionLog
                 'CREATE TABLE IF NOT EXISTS %s (
                     common_name VARCHAR(255) NOT NULL,
                     time_unix INTEGER NOT NULL,
-                    ifconfig_pool_remote_ip VARCHAR(255) NOT NULL,
-                    ifconfig_ipv6_remote VARCHAR(255) NOT NULL,
+                    v4 VARCHAR(255) NOT NULL,
+                    v6 VARCHAR(255) NOT NULL,
                     bytes_received INTEGER DEFAULT NULL,
                     bytes_sent INTEGER DEFAULT NULL,
                     disconnect_time_unix INTEGER DEFAULT NULL

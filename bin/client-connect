@@ -10,6 +10,8 @@ use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\Utils;
 use fkooman\Config\Reader;
 use fkooman\VPN\Server\AddressPool;
+use fkooman\VPN\Server\ConnectionLog;
+use fkooman\Json\Json;
 
 try {
     $logger = new Logger('vpn-server-api');
@@ -38,16 +40,20 @@ try {
     $envKeys = [
         'common_name',
         'time_unix',
-        //'ifconfig_pool_remote_ip',
-        //'ifconfig_ipv6_remote',
         'dev',
     ];
-    foreach ($envKeys as $envKey) {
-        $envData[$envKey] = getenv($envKey);
-    }
-    // XXX make sure the envKeys are not empty!
 
-    // tmp configuration file used for clientConfig (provided by OpenVPN)
+    foreach ($envKeys as $envKey) {
+        $envValue = getenv($envKey);
+        if (empty($envValue)) {
+            throw new RuntimeException(sprintf('environment variable "%s" is not set', $envKey));
+        }
+        $envData[$envKey] = $envValue;
+    }
+
+    if ($argc < 2) {
+        throw new RuntimeException('temporary client configuration file not specified');
+    }
     $tmpConfig = $argv[1];
 
     $staticConfigFile = sprintf('%s/%s', $staticConfigDir, $envData['common_name']);
@@ -55,17 +61,18 @@ try {
 
     if (file_exists($staticConfigFile)) {
         // ** USE STATIC **
-        // XXX more robust file reading!
 
-        $json = json_decode(file_get_contents($staticConfigFile), true);
-        if (array_key_exists('disable', $json) && $json['disable']) {
+        $jsonData = Json::decodeFile($staticConfigFile);
+        if (array_key_exists('disable', $jsonData) && $jsonData['disable']) {
             $disable = true;
         }
-        if (array_key_exists('v4', $json)) {
-            $v4 = $json['v4'];
+        if (array_key_exists('v4', $jsonData)) {
+            $v4 = $jsonData['v4'];
         } else {
+            // XXX should fall back to pool?
             $v4 = '192.168.99.99';
         }
+        // XXX what if value in file is null?!!!
         $v6 = AddressPool::getIp6($v6p, $v4);
     } else {
         // ** USE POOL **
@@ -79,8 +86,9 @@ try {
         $v6 = AddressPool::getIp6($v6p, $v4);
         $disable = false;
 
-        // XXX check return value
-        touch(sprintf('%s/%s', $ipPoolDir, $v4));
+        if (false === @touch(sprintf('%s/%s', $ipPoolDir, $v4))) {
+            throw new RuntimeException('unable to reserve IP address');
+        }
     }
 
     if ($disable) {
@@ -91,36 +99,38 @@ try {
         if ($v4) {
             $configFileData[] = sprintf('ifconfig-push %s %s', $v4, $v4n);
             $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro add %s/32 dev %s', $v4, $envData['dev']);
-            try {
-                Utils::exec($cmd);
-            } catch (RuntimeException $e) {
-                exit(1);
-            }
+            Utils::exec($cmd);
         }
         if ($v6) {
             $configFileData[] = sprintf('ifconfig-ipv6-push %s/64 %s', $v6, $v6r);
             $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro add %s/128 dev %s', $v6, $envData['dev']);
-            try {
-                Utils::exec($cmd);
-            } catch (RuntimeException $e) {
-                exit(1);
-            }
+            Utils::exec($cmd);
         }
     }
 
-    // XXX check return value
-    file_put_contents($tmpConfig, implode(PHP_EOL, $configFileData));
+    if (false === @file_put_contents($tmpConfig, implode(PHP_EOL, $configFileData))) {
+        throw new RuntimeException('unable to write temporary config file');
+    }
 
-    $logger->addInfo(
-        'client-connect',
-        array(
-            'common_name' => $envData['common_name'],
-            'v4' => $v4,
-            'v6' => $v6,
-            'time_unix' => $envData['time_unix'],
-        )
+    $logData = array(
+        'common_name' => $envData['common_name'],
+        'v4' => $v4,
+        'v6' => $v6,
+        'time_unix' => $envData['time_unix'],
+        'dev' => $envData['dev'],
     );
+
+    $logger->addInfo('client-connect', $logData);
+
+    $db = new PDO(
+        $config->v('Log', 'dsn'),
+        $config->v('Log', 'username', false),
+        $config->v('Log', 'password', false)
+    );
+
+    $connectionLog = new ConnectionLog($db);
+    $connectionLog->connect($logData);
 } catch (Exception $e) {
-    // we do not want the connection to fail when we cannot log the 
-    // connection
+    error_log($e->getMessage());
+    exit(66);
 }
