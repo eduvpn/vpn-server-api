@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.1 (...)
+- more defensive connect and disconnect script
+
 ## 2.2.0 (2016-02-18)
 - implement setting/getting static IP addresses through the API
 - add/del route to correct tunnel on connect/disconnect

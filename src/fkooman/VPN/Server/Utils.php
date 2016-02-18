@@ -69,4 +69,53 @@ class Utils
             );
         }
     }
+
+    public static function writeTempConfig($tmpConfig, array $configFileData)
+    {
+        if (false === @file_put_contents($tmpConfig, implode(PHP_EOL, $configFileData))) {
+            throw new RuntimeException('unable to write temporary config file');
+        }
+    }
+
+    public static function getUsedIpList($ipPoolDir)
+    {
+        $usedIpList = [];
+        foreach (glob(sprintf('%s/*', $ipPoolDir)) as $ipFile) {
+            $usedIpList[] = basename($ipFile);
+        }
+
+        return $usedIpList;
+    }
+
+    public static function addRoute4($v4, $dev)
+    {
+        $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro add %s/32 dev %s', $v4, $dev);
+        self::exec($cmd);
+    }
+
+    public static function addRoute6($v6, $dev)
+    {
+        $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro add %s/128 dev %s', $v6, $dev);
+        self::exec($cmd);
+    }
+
+    public static function delRoute4($v4, $dev)
+    {
+        try {
+            $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro del %s/32 dev %s', $v4, $dev);
+            self::exec($cmd);
+        } catch (RuntimeException $e) {
+            // not the end of the world if the route cannot be deleted
+        }
+    }
+
+    public static function delRoute6($v6, $dev)
+    {
+        try {
+            $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro del %s/128 dev %s', $v6, $dev);
+            self::exec($cmd);
+        } catch (RuntimeException $e) {
+            // not the end of the world if the route cannot be deleted
+        }
+    }
 }

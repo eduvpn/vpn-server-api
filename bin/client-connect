@@ -58,59 +58,55 @@ try {
 
     $staticConfigFile = sprintf('%s/%s', $staticConfigDir, $envData['common_name']);
 
-    // defaults
-    $disable = false;
-    $v4 = null;
-    $v6 = null;
-
-    // ** STATIC **
+    // read static config if it exists
     if (file_exists($staticConfigFile)) {
-        $jsonData = Json::decodeFile($staticConfigFile);
-        if (array_key_exists('disable', $jsonData) && $jsonData['disable']) {
-            $disable = true;
-        }
-        if (array_key_exists('v4', $jsonData) && !is_null($jsonData['v4'])) {
-            $v4 = $jsonData['v4'];
-            $v6 = AddressPool::getIp6($v6p, $v4);
-        }
+        $staticConfig = Json::decodeFile($staticConfigFile);
+    } else {
+        $staticConfig = array();
     }
 
-    // ** NOT STATIC **
-    if (is_null($v4)) {
-        // find a free IP address
-        $usedIpList = [];
-        foreach (glob(sprintf('%s/*', $ipPoolDir)) as $ipFile) {
-            $usedIpList[] = basename($ipFile);
-        }
+    // check if CN is disabled
+    if (array_key_exists('disable', $staticConfig) && $staticConfig['disable']) {
+        // yes, disabled
+        Utils::writeTempConfig($tmpConfig, array('disable'));
+        exit(0);
+    }
+
+    // XXX if the static IP address is already in use, bail
+
+    // check if it has a static IPv4 address
+    if (array_key_exists('v4', $staticConfig) && !is_null($staticConfig['v4'])) {
+        // has static 
+        $v4 = $staticConfig['v4'];
+        $v6 = AddressPool::getIp6($v6p, $v4);
+    } else {
+        // no static, use pool
+        $usedIpList = Utils::getUsedIpList($ipPoolDir);
         $v4 = AddressPool::getIp4($v4s, $v4e, $usedIpList);
         $v6 = AddressPool::getIp6($v6p, $v4);
-
-        if (false === @touch(sprintf('%s/%s', $ipPoolDir, $v4))) {
-            throw new RuntimeException('unable to reserve IP address');
-        }
     }
 
-    if ($disable) {
-        /* DISABLED **/
-        $configFileData[] = 'disable';
-    } else {
-        // ** NOT DISABLED **
-        if ($v4) {
-            $configFileData[] = sprintf('ifconfig-push %s %s', $v4, $v4n);
-            $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro add %s/32 dev %s', $v4, $envData['dev']);
-            Utils::exec($cmd);
-        }
-        if ($v6) {
-            $configFileData[] = sprintf('ifconfig-ipv6-push %s/64 %s', $v6, $v6r);
-            $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro add %s/128 dev %s', $v6, $envData['dev']);
-            Utils::exec($cmd);
-        }
+    // mark the IP address as used    
+    if (false === @touch(sprintf('%s/%s', $ipPoolDir, $v4))) {
+        throw new RuntimeException(sprintf('unable to claim IP address "%s"', $v4));
     }
 
-    if (false === @file_put_contents($tmpConfig, implode(PHP_EOL, $configFileData))) {
-        throw new RuntimeException('unable to write temporary config file');
-    }
+    // try to delete routes first, maybe there are stale leftovers somehow
+    Utils::delRoute4($v4, $envData['dev']);
+    Utils::delRoute6($v6, $envData['dev']);
 
+    // add routes
+    Utils::addRoute4($v4, $envData['dev']);
+    Utils::addRoute6($v6, $envData['dev']);
+
+    // create temporary client config
+    $configFileData = array(
+        sprintf('ifconfig-push %s %s', $v4, $v4n),
+        sprintf('ifconfig-ipv6-push %s/64 %s', $v6, $v6r),
+    );
+    Utils::writeTempConfig($tmpConfig, $configFileData);
+
+    // log stuff
     $logData = array(
         'common_name' => $envData['common_name'],
         'v4' => $v4,
@@ -118,7 +114,6 @@ try {
         'time_unix' => $envData['time_unix'],
         'dev' => $envData['dev'],
     );
-
     $logger->addInfo('client-connect', $logData);
 
     $db = new PDO(
