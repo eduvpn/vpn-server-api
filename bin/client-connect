@@ -98,12 +98,12 @@ try {
         if ($v4) {
             $configFileData[] = sprintf('ifconfig-push %s %s', $v4, $v4n);
             $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro add %s/32 dev %s', $v4, $envData['dev']);
-            //Utils::exec($cmd);
+            Utils::exec($cmd);
         }
         if ($v6) {
             $configFileData[] = sprintf('ifconfig-ipv6-push %s/64 %s', $v6, $v6r);
             $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro add %s/128 dev %s', $v6, $envData['dev']);
-            //Utils::exec($cmd);
+            Utils::exec($cmd);
         }
     }
 
