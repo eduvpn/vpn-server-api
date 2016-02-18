@@ -16,6 +16,8 @@
  */
 namespace fkooman\VPN\Server;
 
+use InvalidArgumentException;
+
 class AddressPool
 {
     /**

@@ -57,26 +57,26 @@ try {
     $tmpConfig = $argv[1];
 
     $staticConfigFile = sprintf('%s/%s', $staticConfigDir, $envData['common_name']);
+
+    // defaults
     $disable = false;
+    $v4 = null;
+    $v6 = null;
 
+    // ** STATIC **
     if (file_exists($staticConfigFile)) {
-        // ** USE STATIC **
-
         $jsonData = Json::decodeFile($staticConfigFile);
         if (array_key_exists('disable', $jsonData) && $jsonData['disable']) {
             $disable = true;
         }
-        if (array_key_exists('v4', $jsonData)) {
+        if (array_key_exists('v4', $jsonData) && !is_null($jsonData['v4'])) {
             $v4 = $jsonData['v4'];
-        } else {
-            // XXX should fall back to pool?
-            $v4 = '192.168.99.99';
+            $v6 = AddressPool::getIp6($v6p, $v4);
         }
-        // XXX what if value in file is null?!!!
-        $v6 = AddressPool::getIp6($v6p, $v4);
-    } else {
-        // ** USE POOL **
+    }
 
+    // ** NOT STATIC **
+    if (is_null($v4)) {
         // find a free IP address
         $usedIpList = [];
         foreach (glob(sprintf('%s/*', $ipPoolDir)) as $ipFile) {
@@ -84,7 +84,6 @@ try {
         }
         $v4 = AddressPool::getIp4($v4s, $v4e, $usedIpList);
         $v6 = AddressPool::getIp6($v6p, $v4);
-        $disable = false;
 
         if (false === @touch(sprintf('%s/%s', $ipPoolDir, $v4))) {
             throw new RuntimeException('unable to reserve IP address');
@@ -99,12 +98,12 @@ try {
         if ($v4) {
             $configFileData[] = sprintf('ifconfig-push %s %s', $v4, $v4n);
             $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro add %s/32 dev %s', $v4, $envData['dev']);
-            Utils::exec($cmd);
+            //Utils::exec($cmd);
         }
         if ($v6) {
             $configFileData[] = sprintf('ifconfig-ipv6-push %s/64 %s', $v6, $v6r);
             $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro add %s/128 dev %s', $v6, $envData['dev']);
-            Utils::exec($cmd);
+            //Utils::exec($cmd);
         }
     }
 
