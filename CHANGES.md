@@ -1,8 +1,12 @@
 # Changelog
 
-## 2.2.0 (...)
+## 2.2.0 (2016-02-18)
 - implement setting/getting static IP addresses through the API
 - add/del route to correct tunnel on connect/disconnect
+- refactor disable API
+- use new JSON format to store static configuration instead of generating 
+  OpenVPN config snippets (**BREAKING**)
+- remove `log.yaml` config file, use `client.yaml` instead (**BREAKING**)
 
 ## 2.1.2 (2016-01-20)
 - by default only show log of the current day, allow query parameter to 
