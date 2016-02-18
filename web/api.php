@@ -40,9 +40,6 @@ try {
     $config = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
-    $logConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/log.yaml')
-    );
     $clientConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/client.yaml')
     );
@@ -72,9 +69,9 @@ try {
     // handles the connection history log
     try {
         $db = new PDO(
-            $logConfig->v('Log', 'dsn', false, 'sqlite:/var/lib/openvpn/log.sqlite'),
-            $logConfig->v('Log', 'username', false),
-            $logConfig->v('Log', 'password', false)
+            $clientConfig->v('Log', 'dsn', false, 'sqlite:/var/lib/openvpn/log.sqlite'),
+            $clientConfig->v('Log', 'username', false),
+            $clientConfig->v('Log', 'password', false)
         );
         $connectionLog = new ConnectionLog($db);
     } catch (PDOException $e) {
