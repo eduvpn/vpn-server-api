@@ -46,8 +46,8 @@ try {
     $v4 = $envData['ifconfig_pool_remote_ip'];
     $v6 = $envData['ifconfig_pool_remote_ip6'];
 
-    Utils::delRoute4($v4, $envData['dev']);
-    Utils::delRoute6($v6, $envData['dev']);
+    Utils::delRoute4($v4);
+    Utils::delRoute6($v6);
 
     if (false === @unlink(sprintf('%s/%s', $ipPoolDir, $v4))) {
         throw new RuntimeException(sprintf('unable to release IP address "%s"', $v4));

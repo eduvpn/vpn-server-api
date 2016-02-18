@@ -92,8 +92,8 @@ try {
     }
 
     // try to delete routes first, maybe there are stale leftovers somehow
-    Utils::delRoute4($v4, $envData['dev']);
-    Utils::delRoute6($v6, $envData['dev']);
+    Utils::delRoute4($v4);
+    Utils::delRoute6($v6);
 
     // add routes
     Utils::addRoute4($v4, $envData['dev']);
