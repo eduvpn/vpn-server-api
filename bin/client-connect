@@ -130,6 +130,6 @@ try {
     $connectionLog = new ConnectionLog($db);
     $connectionLog->connect($logData);
 } catch (Exception $e) {
-    error_log($e->getMessage());
+    syslog(LOG_ERR, $e->getMessage());
     exit(66);
 }
