@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.3.0 (...)
+## 2.3.0 (2016-02-19)
 - delete routes without specifying `dev`
 - use `ipRange` and `poolRange` in `client.yaml` now (**BREAKING**)
 - check if specified IP through API can be used for static
