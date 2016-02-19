@@ -12,6 +12,7 @@ use fkooman\Config\Reader;
 use fkooman\VPN\Server\AddressPool;
 use fkooman\VPN\Server\ConnectionLog;
 use fkooman\Json\Json;
+use fkooman\VPN\Server\IP;
 
 try {
     $logger = new Logger('vpn-server-api');
@@ -29,9 +30,12 @@ try {
     $v6r = sprintf('%s::1', $v6p);
 
     // IPv4
-    $v4s = $config->v('IPv4', 'poolStart', false, '10.10.10.5');
-    $v4e = $config->v('IPv4', 'poolEnd', false, '10.10.10.50');
-    $v4n = $config->v('IPv4', 'netmask', false, '255.255.255.0');
+    $ipRange = new IP($config->v('IPv4', 'ipRange', false, '10.10.10.0/24'));
+    $poolRange = new IP($config->v('IPv4', 'poolRange', false, '10.10.10.128/25'));
+
+    $v4s = $poolRange->getFirstHost();
+    $v4e = $poolRange->getLastHost();
+    $v4n = $ipRange->getNetmask();
 
     $ipPoolDir = $config->v('IPv4', 'ipPoolDir', false, '/var/lib/openvpn/pool');
     $staticConfigDir = $config->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__)));
