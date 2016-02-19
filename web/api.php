@@ -33,6 +33,7 @@ use fkooman\VPN\Server\StaticConfig;
 use Monolog\Logger;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Formatter\LineFormatter;
+use fkooman\VPN\Server\IP;
 
 SimpleError::register();
 
@@ -50,9 +51,14 @@ try {
         $config->v('Crl', 'path')
     );
 
+    $ipRange = new IP($clientConfig->v('IPv4', 'ipRange', false, '10.10.10.0/24'));
+    $poolRange = new IP($clientConfig->v('IPv4', 'poolRange', false, '10.10.10.128/25'));
+
     // handles the client configuration directory
     $staticConfig = new StaticConfig(
-        $clientConfig->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__)))
+        $clientConfig->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__))),
+        $ipRange,
+        $poolRange
     );
 
     // handles the connection to the various OpenVPN instances

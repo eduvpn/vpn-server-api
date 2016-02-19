@@ -34,7 +34,7 @@ class ServerServiceTest extends PHPUnit_Framework_TestCase
         $m = new ServerManager();
         $serverOne = new ServerApi('one', new TestSocket(self::readFile('openvpn_23_version.txt')));
         $m->addServer($serverOne);
-        $staticConfig = new StaticConfig('/foo');
+        $staticConfig = new StaticConfig('/foo', new IP('10.42.42.0/24'), new IP('10.42.42.128/25'));
         $crl = new CrlFetcher('http://localhost/ca.crl', '/foo');
 
         $connectionLog = new ConnectionLog(new PDO('sqlite::memory:'));

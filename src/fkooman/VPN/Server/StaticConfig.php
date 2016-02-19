@@ -30,9 +30,17 @@ class StaticConfig
     /** @var string */
     private $staticConfigDir;
 
-    public function __construct($staticConfigDir)
+    /** @var IP */
+    private $ipRange;
+
+    /** @var IP */
+    private $poolRange;
+
+    public function __construct($staticConfigDir, IP $ipRange, IP $poolRange)
     {
         $this->staticConfigDir = $staticConfigDir;
+        $this->ipRange = $ipRange;
+        $this->poolRange = $poolRange;
     }
 
     private function parseConfig($commonName)
@@ -155,8 +163,30 @@ class StaticConfig
         Utils::validateCommonName($commonName);
         if (!is_null($v4)) {
             Utils::validateAddress($v4);
-        }
 
+            // IP MUST be in ipRange
+            if (!$this->ipRange->inRange($v4)) {
+                throw new RuntimeException('IP is out of range');
+            }
+
+            // IP MUST NOT be in poolRange
+            if ($this->poolRange->inRange($v4)) {
+                throw new RuntimeException('IP cannot be in poolRange');
+            }
+
+            // cannot be server IP (we assume for now firstHost is server IP
+            if ($v4 === $this->ipRange->getFirstHost()) {
+                throw new RuntimeException('IP cannot be server IP');
+            }
+
+            // cannot be network address of poolRange
+            if ($v4 === $this->poolRange->getNetwork()) {
+                throw new RuntimeException('IP cannot be network address of poolRange');
+            }
+
+            // XXX make sure it is not already in use by another config, it is
+            // okay if it is this config!
+        }
         $clientConfig = $this->parseConfig($commonName);
         $clientConfig['v4'] = $v4;
         $this->writeFile($commonName, $clientConfig);

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.0 (...)
+- delete routes without specifying `dev`
+- use `ipRange` and `poolRange` in `client.yaml` now (**BREAKING**)
+- check if specified IP through API can be used for static
+  assignment, i.e.: not part of the pool
+ 
 ## 2.2.1 (2016-02-18)
 - more defensive connect and disconnect script
 

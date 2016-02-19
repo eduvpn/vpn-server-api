@@ -23,6 +23,10 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
 {
     private $staticConfigDir;
 
+    private $ipRange;
+
+    private $poolRange;
+
     public function setUp()
     {
         // get a directory to play with
@@ -39,53 +43,56 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
         @file_put_contents($tempDirName.'/foobar', '{"disable": true}');
 
         $this->staticConfigDir = $tempDirName;
+
+        $this->ipRange = new IP('10.42.42.0/24');
+        $this->poolRange = new IP('10.42.42.128/25');
     }
 
     public function testDisableNonExistingFile()
     {
-        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
         $this->assertTrue($staticConfig->disableCommonName('foo'));
         $this->assertTrue($staticConfig->isDisabled('foo'));
     }
 
     public function testDisableExistingFile()
     {
-        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
         $this->assertTrue($staticConfig->disableCommonName('bar'));
         $this->assertTrue($staticConfig->isDisabled('bar'));
     }
 
     public function testDisableAlreadyDisabled()
     {
-        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
         $this->assertFalse($staticConfig->disableCommonName('foobar'));
         $this->assertTrue($staticConfig->isDisabled('foobar'));
     }
 
     public function testEnableExistingFile()
     {
-        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
         $this->assertFalse($staticConfig->enableCommonName('bar'));
         $this->assertFalse($staticConfig->isDisabled('bar'));
     }
 
     public function testEnableDisabledFile()
     {
-        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
         $this->assertTrue($staticConfig->enableCommonName('foobar'));
         $this->assertFalse($staticConfig->isDisabled('foobar'));
     }
 
     public function testEnableNonExistingFile()
     {
-        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
         $this->assertFalse($staticConfig->enableCommonName('foo'));
         $this->assertFileNotExists($this->staticConfigDir.'/foo');
     }
 
     public function testGetDisabledCommonNames()
     {
-        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
         $staticConfig->disableCommonName('a');
         $staticConfig->disableCommonName('b');
         $staticConfig->enableCommonName('b');
@@ -103,7 +110,7 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
 
     public function testGetDisabledCommonNamesByUser()
     {
-        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
         $staticConfig->disableCommonName('userA_foo');
         $staticConfig->disableCommonName('userA_bar');
         $staticConfig->disableCommonName('userB_xyz');
@@ -119,7 +126,7 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
 
     public function testGetStaticAddresses()
     {
-        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
         $this->assertSame(
             array(
                 'v4' => null,
@@ -128,11 +135,11 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
         );
         $staticConfig->setStaticAddresses(
             'foo',
-            '10.0.0.5'
+            '10.42.42.5'
         );
         $this->assertSame(
             array(
-                'v4' => '10.0.0.5',
+                'v4' => '10.42.42.5',
             ),
             $staticConfig->getStaticAddress('foo')
         );
@@ -140,18 +147,18 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
 
     public function testSetNewStaticAddresses()
     {
-        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
         $staticConfig->setStaticAddresses(
             'foo',
-            '10.0.0.5'
+            '10.42.42.5'
         );
         $staticConfig->setStaticAddresses(
             'foo',
-            '10.10.0.5'
+            '10.42.42.6'
         );
         $this->assertSame(
             array(
-                'v4' => '10.10.0.5',
+                'v4' => '10.42.42.6',
             ),
             $staticConfig->getStaticAddress('foo')
         );
@@ -159,14 +166,14 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
 
     public function testSetOnlyV4()
     {
-        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
         $staticConfig->setStaticAddresses(
             'foo',
-            '10.0.0.5'
+            '10.42.42.5'
         );
         $this->assertSame(
             array(
-                'v4' => '10.0.0.5',
+                'v4' => '10.42.42.5',
             ),
             $staticConfig->getStaticAddress('foo')
         );
@@ -174,10 +181,10 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
 
     public function testUnset()
     {
-        $staticConfig = new StaticConfig($this->staticConfigDir);
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
         $staticConfig->setStaticAddresses(
             'foo',
-            '10.0.0.5'
+            '10.42.42.5'
         );
         $staticConfig->setStaticAddresses(
             'foo',
