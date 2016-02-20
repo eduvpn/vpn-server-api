@@ -126,4 +126,13 @@ class IPTest extends PHPUnit_Framework_TestCase
         $this->assertSame('10.42.42.1', $i->getFirstHost());
         $this->assertSame('10.42.42.126', $i->getLastHost());
     }
+
+    public function testInRangeNetworkBroadcast()
+    {
+        $i = new IP('10.42.42.128/25');
+        $this->assertTrue($i->inRange('10.42.42.128', true));
+        $this->assertTrue($i->inRange('10.42.42.255', true));
+        $this->assertFalse($i->inRange('10.42.42.128', false));
+        $this->assertFalse($i->inRange('10.42.42.255', false));
+    }
 }

@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.3.1 (...)
+- static IP can also not be network and broadcast of `poolRange`
+
 ## 2.3.0 (2016-02-19)
 - delete routes without specifying `dev`
 - use `ipRange` and `poolRange` in `client.yaml` now (**BREAKING**)

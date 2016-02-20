@@ -74,15 +74,23 @@ class IP
     }
 
     /**
-     * network and broadcast addresses are not allowed.
+     * Check if a given IP address is in the range of the network.
+     *
+     * @param string $ip                      the IP address to check
+     * @param bool   $includeNetworkBroadcast whether or not to consider the
+     *                                        network and broadcast address of the network also part of the range
      */
-    public function inRange($ip)
+    public function inRange($ip, $includeNetworkBroadcast = false)
     {
         self::validateIP($ip);
 
         $longIp = ip2long($ip);
         $startIp = ip2long($this->getNetwork());
         $endIp = ip2long($this->getBroadcast());
+
+        if ($includeNetworkBroadcast) {
+            return $longIp >= $startIp && $longIp <= $endIp;
+        }
 
         return $longIp > $startIp && $longIp < $endIp;
     }

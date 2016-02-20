@@ -169,19 +169,14 @@ class StaticConfig
                 throw new RuntimeException('IP is out of range');
             }
 
-            // IP MUST NOT be in poolRange
-            if ($this->poolRange->inRange($v4)) {
+            // IP MUST NOT be in poolRange (including network and broadcast
+            if ($this->poolRange->inRange($v4, true)) {
                 throw new RuntimeException('IP cannot be in poolRange');
             }
 
             // cannot be server IP (we assume for now firstHost is server IP
             if ($v4 === $this->ipRange->getFirstHost()) {
                 throw new RuntimeException('IP cannot be server IP');
-            }
-
-            // cannot be network address of poolRange
-            if ($v4 === $this->poolRange->getNetwork()) {
-                throw new RuntimeException('IP cannot be network address of poolRange');
             }
 
             // XXX make sure it is not already in use by another config, it is
