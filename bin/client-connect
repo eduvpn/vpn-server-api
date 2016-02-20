@@ -3,9 +3,6 @@
 
 require_once dirname(__DIR__).'/vendor/autoload.php';
 
-use Monolog\Logger;
-use Monolog\Handler\SyslogHandler;
-use Monolog\Formatter\LineFormatter;
 use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\Utils;
 use fkooman\Config\Reader;
@@ -14,13 +11,13 @@ use fkooman\VPN\Server\ConnectionLog;
 use fkooman\Json\Json;
 use fkooman\VPN\Server\IP;
 
-try {
-    $logger = new Logger('vpn-server-api');
-    $syslog = new SyslogHandler('vpn-server-api', 'user');
-    $formatter = new LineFormatter();
-    $syslog->setFormatter($formatter);
-    $logger->pushHandler($syslog);
+openlog(
+    basename($argv[0]),
+    LOG_PERROR,
+    LOG_USER
+);
 
+try {
     $config = new Reader(
         new YamlFile(dirname(__DIR__).'/config/client.yaml')
     );
@@ -118,7 +115,7 @@ try {
         'time_unix' => $envData['time_unix'],
         'dev' => $envData['dev'],
     );
-    $logger->addInfo('client-connect', $logData);
+    syslog(LOG_INFO, json_encode($logData));
 
     $db = new PDO(
         $config->v('Log', 'dsn'),
