@@ -28,14 +28,11 @@ use fkooman\VPN\Server\ServerApi;
 use fkooman\VPN\Server\ServerSocket;
 use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\VPN\Server\CrlFetcher;
-use fkooman\VPN\Server\SimpleError;
 use fkooman\VPN\Server\StaticConfig;
 use Monolog\Logger;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Formatter\LineFormatter;
 use fkooman\VPN\Server\IP;
-
-SimpleError::register();
 
 try {
     $config = new Reader(

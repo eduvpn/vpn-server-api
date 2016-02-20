@@ -204,7 +204,7 @@ class StaticConfig
                     throw new RuntimeException(sprintf('IP address already in use by "%s"', $cn));
                 }
             }
-        }   
+        }
         $clientConfig = $this->parseConfig($commonName);
         $clientConfig['v4'] = $v4;
         $this->writeFile($commonName, $clientConfig);
