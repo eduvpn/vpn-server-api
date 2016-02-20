@@ -46,6 +46,11 @@ class IP
         $this->prefix = intval($prefix);
     }
 
+    public function getRange()
+    {
+        return sprintf('%s/%d', $this->ip, $this->prefix);
+    }
+
     public function getNetmask()
     {
         return long2ip(-1 << (32 - $this->prefix));

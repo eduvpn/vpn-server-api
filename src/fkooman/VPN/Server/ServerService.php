@@ -137,6 +137,8 @@ class ServerService extends Service
                     array(
                         'ok' => true,
                         'ip' => $ipConfig,
+                        'ipRange' => $this->staticConfig->getIpRange()->getRange(),
+                        'poolRange' => $this->staticConfig->getPoolRange()->getRange(),
                     )
                 );
 

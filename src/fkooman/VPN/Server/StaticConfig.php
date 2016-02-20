@@ -43,6 +43,16 @@ class StaticConfig
         $this->poolRange = $poolRange;
     }
 
+    public function getIpRange()
+    {
+        return $this->ipRange;
+    }
+
+    public function getPoolRange()
+    {
+        return $this->poolRange;
+    }
+
     private function parseConfig($commonName)
     {
         $commonNamePath = sprintf('%s/%s', $this->staticConfigDir, $commonName);

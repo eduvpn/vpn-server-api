@@ -3,6 +3,7 @@
 ## 2.3.1 (...)
 - static IP can also not be network and broadcast of `poolRange`
 - do not allow to set static IP addresses already in use
+- make IP ranges available through API for edit page
 
 ## 2.3.0 (2016-02-19)
 - delete routes without specifying `dev`
