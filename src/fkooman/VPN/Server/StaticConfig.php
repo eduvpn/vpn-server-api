@@ -181,7 +181,20 @@ class StaticConfig
 
             // XXX make sure it is not already in use by another config, it is
             // okay if it is this config!
-        }
+            $staticAddresses = $this->getStaticAddresses();
+            foreach ($staticAddresses as $cn => $c) {
+                if ($c['v4'] === $v4) {
+                    if ($commonName === $cn) {
+                        // the commonName is allowed to have the same address,
+                        // i.e. when setting the same IPv4 address that was 
+                        // already assigned to that CN
+                        continue;
+                    }
+
+                    throw new RuntimeException(sprintf('IP address already in use by "%s"', $cn));
+                }
+            }
+        }   
         $clientConfig = $this->parseConfig($commonName);
         $clientConfig['v4'] = $v4;
         $this->writeFile($commonName, $clientConfig);

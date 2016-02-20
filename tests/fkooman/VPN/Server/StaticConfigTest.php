@@ -197,4 +197,34 @@ class StaticConfigTest extends PHPUnit_Framework_TestCase
             $staticConfig->getStaticAddress('foo')
         );
     }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage IP address already in use by "foo"
+     */
+    public function testSetAlreadyExisting()
+    {
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
+        $staticConfig->setStaticAddresses(
+            'foo',
+            '10.42.42.5'
+        );
+        $staticConfig->setStaticAddresses(
+            'bar',
+            '10.42.42.5'
+        );
+    }
+
+    public function testSetStaticAddressSameCn()
+    {
+        $staticConfig = new StaticConfig($this->staticConfigDir, $this->ipRange, $this->poolRange);
+        $staticConfig->setStaticAddresses(
+            'foo',
+            '10.42.42.5'
+        );
+        $staticConfig->setStaticAddresses(
+            'foo',
+            '10.42.42.5'
+        );
+    }
 }
