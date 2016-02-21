@@ -4,7 +4,6 @@ namespace fkooman\VPN\Server;
 
 use PDO;
 use RuntimeException;
-use fkooman\IO\IO;
 
 /**
  * With this we store events from client-connect and client-disconnect
@@ -15,20 +14,13 @@ class ConnectionLog
     /** @var PDO */
     private $db;
 
-    /** @var \fkooman\IO\IO */
-    private $io;
-
     /** @var string */
     private $prefix;
 
-    public function __construct(PDO $db, IO $io = null, $prefix = '')
+    public function __construct(PDO $db, $prefix = '')
     {
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->db = $db;
-        if (is_null($io)) {
-            $io = new IO();
-        }
-        $this->io = $io;
         $this->prefix = $prefix;
     }
 
@@ -98,7 +90,7 @@ class ConnectionLog
         $stmt->bindValue(':v6', $v['v6'], PDO::PARAM_STR);
         $stmt->bindValue(':bytes_received', intval($v['bytes_received']), PDO::PARAM_INT);
         $stmt->bindValue(':bytes_sent', intval($v['bytes_sent']), PDO::PARAM_INT);
-        $stmt->bindValue(':disconnect_time_unix', $this->io->getTime(), PDO::PARAM_INT);
+        $stmt->bindValue(':disconnect_time_unix', intval($v['disconnect_time_unix']), PDO::PARAM_INT);
         $stmt->execute();
 
         return 1 === $stmt->rowCount();

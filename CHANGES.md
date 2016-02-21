@@ -3,6 +3,8 @@
 ## 2.3.2 (...)
 - remove `SimpleError` class
 - do not use Monolog for connect and disconnect scripts
+- determine `disconnect_time_unix` in the disconnect script
+  and not in the database class
 
 ## 2.3.1 (2016-02-20)
 - static IP can also not be network and broadcast of `poolRange`

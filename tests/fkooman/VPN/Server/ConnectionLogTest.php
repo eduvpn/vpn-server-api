@@ -27,10 +27,7 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $io = $this->getMockBuilder('fkooman\IO\IO')->getMock();
-        $io->method('getTime')->will($this->returnValue(12345678));
-
-        $this->connectionLog = new ConnectionLog(new PDO('sqlite::memory:'), $io);
+        $this->connectionLog = new ConnectionLog(new PDO('sqlite::memory:'));
         $this->connectionLog->initDatabase();
     }
 
@@ -56,6 +53,7 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
             $this->connectionLog->disconnect([
                 'common_name' => 'foo_vpn_ex_def',
                 'time_unix' => '1452535477',
+                'disconnect_time_unix' => '1452535488',
                 'v4' => '10.42.42.2',
                 'v6' => 'fd00:4242:4242::2',
                 'bytes_received' => '4843',
@@ -70,6 +68,7 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
             $this->connectionLog->disconnect([
                 'common_name' => 'foo_vpn_ex_def',
                 'time_unix' => '1452535477',
+                'disconnect_time_unix' => '1452535488',
                 'v4' => '10.42.42.2',
                 'v6' => 'fd00:4242:4242::2',
                 'bytes_received' => '4843',
@@ -90,6 +89,7 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
             $this->connectionLog->disconnect([
                 'common_name' => 'foo_vpn_ex_def',
                 'time_unix' => '1452535477',
+                'disconnect_time_unix' => '1452535488',
                 'v4' => '10.42.42.2',
                 'v6' => 'fd00:4242:4242::2',
                 'bytes_received' => '4843',
@@ -105,12 +105,12 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
                 'v6' => 'fd00:4242:4242::2',
                 'bytes_received' => '4843',
                 'bytes_sent' => '5317',
-                'disconnect_time_unix' => '12345678',
+                'disconnect_time_unix' => '1452535488',
                 ],
             ],
             $this->connectionLog->getConnectionHistory(
-                strtotime('today -31 days', 12345678),
-                strtotime('tomorrow', 12345678)
+                strtotime('today -31 days', 1452535488),
+                strtotime('tomorrow', 1452535488)
             )
         );
     }

@@ -55,6 +55,7 @@ try {
         'v4' => $v4,
         'v6' => $v6,
         'time_unix' => $envData['time_unix'],
+        'disconnect_time_unix' => time(),
         'bytes_received' => $envData['bytes_received'],
         'bytes_sent' => $envData['bytes_sent'],
     );
