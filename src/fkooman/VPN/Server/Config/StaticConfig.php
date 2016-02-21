@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace fkooman\VPN\Server;
+namespace fkooman\VPN\Server\Config;
 
 use fkooman\Json\Json;
 use RuntimeException;
+use fkooman\VPN\Server\Utils;
 
 /**
  * Manage static configuration for configurations.

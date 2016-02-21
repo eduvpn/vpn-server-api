@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright 2015 François Kooman <fkooman@tuxed.net>.
  *
@@ -15,104 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace fkooman\VPN\Server;
+namespace fkooman\VPN\Server\Config;
 
-use fkooman\Rest\Service;
-use fkooman\Http\JsonResponse;
 use fkooman\Http\Request;
-use fkooman\Http\Exception\BadRequestException;
-use Monolog\Logger;
+use fkooman\Rest\Service;
+use fkooman\Rest\ServiceModuleInterface;
+use fkooman\VPN\Server\Utils;
 use fkooman\Rest\Plugin\Authentication\UserInfoInterface;
-use fkooman\IO\IO;
+use fkooman\Http\JsonResponse;
+use fkooman\Http\Exception\BadRequestException;
 
-/**
- * This class registers and handles routes.
- */
-class ServerService extends Service
+class ConfigModule implements ServiceModuleInterface
 {
-    /** @var ServerManager */
-    private $serverManager;
-
     /** @var StaticConfig */
     private $staticConfig;
 
-    /** @var CrlFetcher */
-    private $crlFetcher;
-
-    /** @var ConnectionLog */
-    private $connectionLog;
-
-    /** @var \Monolog\Logger */
-    private $logger;
-
-    /** @var \fkooman\IO\IO */
-    private $io;
-
-    public function __construct(ServerManager $serverManager, StaticConfig $staticConfig, CrlFetcher $crlFetcher, ConnectionLog $connectionLog = null, Logger $logger = null, IO $io = null)
+    public function __construct(StaticConfig $staticConfig)
     {
-        $this->serverManager = $serverManager;
         $this->staticConfig = $staticConfig;
-        $this->crlFetcher = $crlFetcher;
-        $this->connectionLog = $connectionLog;
-        $this->logger = $logger;
-
-        if (is_null($io)) {
-            $io = new IO();
-        }
-        $this->io = $io;
-
-        parent::__construct();
-        $this->registerRoutes();
     }
 
-    private function registerRoutes()
+    public function init(Service $service)
     {
-        $this->get(
-            '/status',
-            function (Request $request) {
-                $response = new JsonResponse();
-                $response->setBody($this->serverManager->status());
-
-                return $response;
-            }
-        );
-
-        $this->get(
-            '/load-stats',
-            function (Request $request) {
-                $response = new JsonResponse();
-                $response->setBody($this->serverManager->loadStats());
-
-                return $response;
-            }
-        );
-
-        $this->get(
-            '/version',
-            function (Request $request) {
-                $response = new JsonResponse();
-                $response->setBody($this->serverManager->version());
-
-                return $response;
-            }
-        );
-
-        $this->post(
-            '/kill',
-            function (Request $request, UserInfoInterface $userInfo) {
-                $commonName = $request->getPostParameter('common_name');
-                Utils::validateCommonName($commonName);
-
-                $this->logInfo('killing cn', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName));
-
-                $response = new JsonResponse();
-                $response->setBody($this->serverManager->kill($commonName));
-
-                return $response;
-            }
-        );
-
-        $this->get(
+        $service->get(
             '/static/ip',
            function (Request $request, UserInfoInterface $userInfo) {
                 // we typically deal with CNs, not user IDs, but the part of 
@@ -146,7 +70,7 @@ class ServerService extends Service
             }
         );
 
-        $this->post(
+        $service->post(
             '/static/ip',
            function (Request $request, UserInfoInterface $userInfo) {
                 $commonName = $request->getPostParameter('common_name');
@@ -167,13 +91,13 @@ class ServerService extends Service
                     )
                 );
 
-                $this->logInfo('setting static IP', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName, 'v4' => $v4));
+                // $this->logInfo('setting static IP', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName, 'v4' => $v4));
 
                 return $response;
             }
         );
 
-        $this->post(
+        $service->post(
             '/ccd/disable',
             function (Request $request, UserInfoInterface $userInfo) {
                 $commonName = $request->getPostParameter('common_name');
@@ -182,7 +106,7 @@ class ServerService extends Service
                 }
                 Utils::validateCommonName($commonName);
 
-                $this->logInfo('disabling cn', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName));
+                // $this->logInfo('disabling cn', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName));
 
                 $response = new JsonResponse();
                 $response->setBody(
@@ -195,13 +119,13 @@ class ServerService extends Service
             }
         );
 
-        $this->delete(
+        $service->delete(
             '/ccd/disable',
             function (Request $request, UserInfoInterface $userInfo) {
                 $commonName = $request->getUrl()->getQueryParameter('common_name');
                 Utils::validateCommonName($commonName);
 
-                $this->logInfo('enabling cn', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName));
+                // $this->logInfo('enabling cn', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName));
 
                 $response = new JsonResponse();
                 $response->setBody(
@@ -214,7 +138,7 @@ class ServerService extends Service
             }
         );
 
-        $this->get(
+        $service->get(
             '/ccd/disable',
             function (Request $request, UserInfoInterface $userInfo) {
                 // we typically deal with CNs, not user IDs, but the part of 
@@ -235,66 +159,5 @@ class ServerService extends Service
                 return $response;
             }
         );
-
-        $this->post(
-            '/crl/fetch',
-            function (Request $request, UserInfoInterface $userInfo) {
-
-                $this->logInfo('fetching CRL', array('api_user' => $userInfo->getUserId()));
-
-                $response = new JsonResponse();
-                $response->setBody($this->crlFetcher->fetch());
-
-                return $response;
-            }
-        );
-
-        $this->get(
-            '/log/history',
-            function (Request $request) {
-                $showDate = $request->getUrl()->getQueryParameter('showDate');
-                if (is_null($showDate)) {
-                    $showDate = date('Y-m-d', $this->io->getTime());
-                }
-                if (!is_string($showDate)) {
-                    $showDate = date('Y-m-d', $this->io->getTime());
-                }
-                Utils::validateDate($showDate);
-                $showDateUnix = strtotime($showDate);
-
-                $minDate = strtotime('today -31 days');
-                $maxDate = strtotime('tomorrow');
-
-                if ($showDateUnix < $minDate || $showDateUnix >= $maxDate) {
-                    throw new BadRequestException('invalid date range');
-                }
-
-                $showDateUnixMin = strtotime('today', $showDateUnix);
-                $showDateUnixMax = strtotime('tomorrow', $showDateUnix);
-
-                $response = new JsonResponse();
-                if (is_null($this->connectionLog)) {
-                    $responseData = array(
-                        'ok' => false,
-                        'error' => 'unable to connect to log database',
-                    );
-                } else {
-                    $responseData = array(
-                        'ok' => true,
-                        'history' => $this->connectionLog->getConnectionHistory($showDateUnixMin, $showDateUnixMax),
-                    );
-                }
-                $response->setBody($responseData);
-
-                return $response;
-            }
-        );
-    }
-
-    private function logInfo($m, array $context)
-    {
-        if (!is_null($this->logger)) {
-            $this->logger->addInfo($m, $context);
-        }
     }
 }

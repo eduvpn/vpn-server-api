@@ -17,50 +17,63 @@
  */
 require_once dirname(__DIR__).'/vendor/autoload.php';
 
-use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
-use fkooman\Rest\Plugin\Authentication\Basic\BasicAuthentication;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
-use fkooman\VPN\Server\ServerService;
-use fkooman\VPN\Server\ConnectionLog;
-use fkooman\VPN\Server\ServerManager;
-use fkooman\VPN\Server\ServerApi;
-use fkooman\VPN\Server\ServerSocket;
 use fkooman\Http\Exception\InternalServerErrorException;
-use fkooman\VPN\Server\CrlFetcher;
-use fkooman\VPN\Server\StaticConfig;
-use Monolog\Logger;
-use Monolog\Handler\SyslogHandler;
+use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
+use fkooman\Rest\Plugin\Authentication\Basic\BasicAuthentication;
+use fkooman\Rest\Service;
+use fkooman\VPN\Server\Ca\CaModule;
+use fkooman\VPN\Server\Ca\CrlFetcher;
+use fkooman\VPN\Server\Config\ConfigModule;
+use fkooman\VPN\Server\Config\StaticConfig;
+use fkooman\VPN\Server\Config\IP;
+use fkooman\VPN\Server\Log\ConnectionLog;
+use fkooman\VPN\Server\Log\LogModule;
+use fkooman\VPN\Server\OpenVpn\OpenVpnModule;
+use fkooman\VPN\Server\OpenVpn\ServerApi;
+use fkooman\VPN\Server\OpenVpn\ServerManager;
+use fkooman\VPN\Server\OpenVpn\ServerSocket;
 use Monolog\Formatter\LineFormatter;
-use fkooman\VPN\Server\IP;
+use Monolog\Handler\SyslogHandler;
+use Monolog\Logger;
 
 try {
-    $config = new Reader(
+    $caReader = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
-    $clientConfig = new Reader(
+
+    $openVpnReader = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/config.yaml')
+    );
+
+    $configReader = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/client.yaml')
+    );
+
+    $logReader = new Reader(
         new YamlFile(dirname(__DIR__).'/config/client.yaml')
     );
 
     // handles fetching the certificate revocation list
     $crlFetcher = new CrlFetcher(
-        $config->v('Crl', 'url'),
-        $config->v('Crl', 'path')
+        $caReader->v('Crl', 'url'),
+        $caReader->v('Crl', 'path')
     );
 
-    $ipRange = new IP($clientConfig->v('IPv4', 'ipRange', false, '10.10.10.0/24'));
-    $poolRange = new IP($clientConfig->v('IPv4', 'poolRange', false, '10.10.10.128/25'));
+    $ipRange = new IP($configReader->v('IPv4', 'ipRange', false, '10.10.10.0/24'));
+    $poolRange = new IP($configReader->v('IPv4', 'poolRange', false, '10.10.10.128/25'));
 
     // handles the client configuration directory
     $staticConfig = new StaticConfig(
-        $clientConfig->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__))),
+        $configReader->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__))),
         $ipRange,
         $poolRange
     );
 
     // handles the connection to the various OpenVPN instances
     $serverManager = new ServerManager();
-    foreach ($config->v('OpenVpn') as $openVpnServer) {
+    foreach ($openVpnReader->v('OpenVpn') as $openVpnServer) {
         $serverManager->addServer(
             new ServerApi(
                 $openVpnServer['id'],
@@ -72,9 +85,9 @@ try {
     // handles the connection history log
     try {
         $db = new PDO(
-            $clientConfig->v('Log', 'dsn', false, 'sqlite:/var/lib/openvpn/log.sqlite'),
-            $clientConfig->v('Log', 'username', false),
-            $clientConfig->v('Log', 'password', false)
+            $logReader->v('Log', 'dsn', false, 'sqlite:/var/lib/openvpn/log.sqlite'),
+            $logReader->v('Log', 'username', false),
+            $logReader->v('Log', 'password', false)
         );
         $connectionLog = new ConnectionLog($db);
     } catch (PDOException $e) {
@@ -91,11 +104,11 @@ try {
     $logger->pushHandler($syslog);
 
     // http request router
-    $service = new ServerService($serverManager, $staticConfig, $crlFetcher, $connectionLog, $logger);
+    $service = new Service();
 
     $apiAuth = new BasicAuthentication(
-        function ($userId) use ($config) {
-            $userList = $config->v('Users');
+        function ($userId) use ($openVpnReader) {
+            $userList = $openVpnReader->v('Users');
             if (!array_key_exists($userId, $userList)) {
                 return false;
             }
@@ -108,6 +121,10 @@ try {
     $authenticationPlugin = new AuthenticationPlugin();
     $authenticationPlugin->register($apiAuth, 'api');
     $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
+    $service->addModule(new LogModule($connectionLog));
+    $service->addModule(new OpenVpnModule($serverManager));
+    $service->addModule(new ConfigModule($staticConfig));
+    $service->addModule(new CaModule($crlFetcher));
     $service->run()->send();
 } catch (Exception $e) {
     // internal server error

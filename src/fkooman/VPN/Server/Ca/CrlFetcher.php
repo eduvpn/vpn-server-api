@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace fkooman\VPN\Server;
+namespace fkooman\VPN\Server\Ca;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;

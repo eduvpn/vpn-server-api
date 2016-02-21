@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace fkooman\VPN\Server;
+namespace fkooman\VPN\Server\OpenVpn;
 
 /**
  * Manage all OpenVPN servers controlled by this service using each instance's

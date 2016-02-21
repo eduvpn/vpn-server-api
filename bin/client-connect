@@ -6,10 +6,10 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\Utils;
 use fkooman\Config\Reader;
-use fkooman\VPN\Server\AddressPool;
-use fkooman\VPN\Server\ConnectionLog;
+use fkooman\VPN\Server\Config\AddressPool;
+use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\Json\Json;
-use fkooman\VPN\Server\IP;
+use fkooman\VPN\Server\Config\IP;
 
 openlog(
     basename($argv[0]),

@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace fkooman\VPN\Server;
+namespace fkooman\VPN\Server\OpenVpn;
 
 require_once __DIR__.'/Test/TestSocket.php';
 
 use PHPUnit_Framework_TestCase;
-use fkooman\VPN\Server\Test\TestSocket;
+use fkooman\VPN\Server\OpenVpn\Test\TestSocket;
 
 class ServerManagerTest extends PHPUnit_Framework_TestCase
 {

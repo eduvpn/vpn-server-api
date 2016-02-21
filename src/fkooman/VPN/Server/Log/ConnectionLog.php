@@ -1,6 +1,6 @@
 <?php
 
-namespace fkooman\VPN\Server;
+namespace fkooman\VPN\Server\Log;
 
 use PDO;
 use RuntimeException;

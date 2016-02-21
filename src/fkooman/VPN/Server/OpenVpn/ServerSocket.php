@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace fkooman\VPN\Server;
+namespace fkooman\VPN\Server\OpenVpn;
 
-use fkooman\VPN\Server\Exception\ServerSocketException;
+use fkooman\VPN\Server\OpenVpn\Exception\ServerSocketException;
 
 /**
  * Abstraction to use the OpenVPN management interface using a socket 
