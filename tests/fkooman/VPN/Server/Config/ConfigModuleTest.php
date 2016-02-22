@@ -132,7 +132,7 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'error' => 'missing common_name',
+                'error' => 'invalid value for "common_name"',
             ],
             $this->makeRequest('POST', '/static/ip', ['v4' => '10.42.42.44'])
         );
@@ -142,7 +142,7 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'error' => 'invalid characters in common_name',
+                'error' => 'invalid value for "common_name"',
             ],
             $this->makeRequest('POST', '/static/ip', ['common_name' => 'foo+bar', 'v4' => '10.42.42.44'])
         );
@@ -182,7 +182,7 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'error' => 'missing common_name',
+                'error' => 'invalid value for "common_name"',
             ],
             $this->makeRequest('POST', '/ccd/disable')
         );

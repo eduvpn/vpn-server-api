@@ -18,7 +18,6 @@ namespace fkooman\VPN\Server\Config;
 
 use fkooman\Json\Json;
 use RuntimeException;
-use fkooman\VPN\Server\Utils;
 
 /**
  * Manage static configuration for configurations.
@@ -67,8 +66,6 @@ class StaticConfig
 
     public function disableCommonName($commonName)
     {
-        Utils::validateCommonName($commonName);
-
         $clientConfig = $this->parseConfig($commonName);
         if (array_key_exists('disable', $clientConfig) && $clientConfig['disable']) {
             // already disabled
@@ -83,8 +80,6 @@ class StaticConfig
 
     public function enableCommonName($commonName)
     {
-        Utils::validateCommonName($commonName);
-
         $clientConfig = $this->parseConfig($commonName);
         if (array_key_exists('disable', $clientConfig) && $clientConfig['disable']) {
             // it is disabled, enable it
@@ -100,8 +95,6 @@ class StaticConfig
 
     public function isDisabled($commonName)
     {
-        Utils::validateCommonName($commonName);
-
         $clientConfig = $this->parseConfig($commonName);
 
         return array_key_exists('disable', $clientConfig) && $clientConfig['disable'];
@@ -109,10 +102,6 @@ class StaticConfig
 
     public function getDisabledCommonNames($userId = null)
     {
-        if (!is_null($userId)) {
-            Utils::validateUserId($userId);
-        }
-
         $disabledCommonNames = array();
         $pathFilter = sprintf('%s/*', $this->staticConfigDir);
         if (!is_null($userId)) {
@@ -132,10 +121,6 @@ class StaticConfig
 
     public function getStaticAddresses($userId = null)
     {
-        if (!is_null($userId)) {
-            Utils::validateUserId($userId);
-        }
-
         $staticAddresses = array();
         $pathFilter = sprintf('%s/*', $this->staticConfigDir);
         if (!is_null($userId)) {
@@ -155,8 +140,6 @@ class StaticConfig
 
     public function getStaticAddress($commonName)
     {
-        Utils::validateCommonName($commonName);
-
         $clientConfig = $this->parseConfig($commonName);
 
         $v4 = null;
@@ -171,9 +154,7 @@ class StaticConfig
 
     public function setStaticAddresses($commonName, $v4)
     {
-        Utils::validateCommonName($commonName);
         if (!is_null($v4)) {
-            Utils::validateAddress($v4);
 
             // IP MUST be in ipRange
             if (!$this->ipRange->inRange($v4)) {

@@ -16,56 +16,10 @@
  */
 namespace fkooman\VPN\Server;
 
-use fkooman\Http\Exception\BadRequestException;
 use RuntimeException;
 
 class Utils
 {
-    public static function validateCommonName($commonName)
-    {
-        if (0 === preg_match('/^[a-zA-Z0-9-_.@]+$/', $commonName)) {
-            throw new BadRequestException('invalid characters in common_name');
-        }
-
-        // MUST NOT be '..'
-        if ('..' === $commonName) {
-            throw new BadRequestException('common name cannot be ".."');
-        }
-    }
-
-    public static function validateUserId($userId)
-    {
-        if (0 === preg_match('/^[a-zA-Z0-9-_.@]+$/', $userId)) {
-            throw new BadRequestException('invalid characters in userId');
-        }
-    }
-
-    public static function validateAddress($ipAddress)
-    {
-        if (false === filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            throw new BadRequestException('invalid v4 address');
-        }
-    }
-
-    public static function validate6Address($ipAddress)
-    {
-        if (false === filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-            throw new BadRequestException('invalid v6 address');
-        }
-    }
-
-    /**
-     * Validate that the date is in YYYY-MM-DD format.
-     *
-     * @param string $dateString the date in YYYY-MM-DD format
-     */
-    public static function validateDate($dateString)
-    {
-        if (!preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}/', $dateString)) {
-            throw new BadRequestException('invalid date format');
-        }
-    }
-
     public static function exec($cmd)
     {
         exec($cmd, $output, $returnValue);

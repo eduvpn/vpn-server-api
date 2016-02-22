@@ -5,10 +5,10 @@ namespace fkooman\VPN\Server\Log;
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
-use fkooman\VPN\Server\Utils;
 use fkooman\Http\Exception\BadRequestException;
 use fkooman\IO\IO;
 use fkooman\Http\JsonResponse;
+use fkooman\VPN\Server\InputValidation;
 
 class LogModule implements ServiceModuleInterface
 {
@@ -32,11 +32,14 @@ class LogModule implements ServiceModuleInterface
         $service->get(
             '/log/history',
             function (Request $request) {
-                $showDate = $request->getUrl()->getQueryParameter('showDate');
+                $showDate = InputValidation::date(
+                    $request->getUrl()->getQueryParameter('showDate'),
+                    false // OPTIONAL
+                );
+
                 if (is_null($showDate)) {
                     $showDate = date('Y-m-d', $this->io->getTime());
                 }
-                Utils::validateDate($showDate);
                 $showDateUnix = strtotime($showDate);
 
                 $minDate = strtotime('today -31 days', $this->io->getTime());

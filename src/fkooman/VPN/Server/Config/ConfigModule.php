@@ -19,10 +19,9 @@ namespace fkooman\VPN\Server\Config;
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
-use fkooman\VPN\Server\Utils;
 use fkooman\Http\JsonResponse;
-use fkooman\Http\Exception\BadRequestException;
 use Psr\Log\LoggerInterface;
+use fkooman\VPN\Server\InputValidation;
 
 class ConfigModule implements ServiceModuleInterface
 {
@@ -45,15 +44,20 @@ class ConfigModule implements ServiceModuleInterface
            function (Request $request) {
                 // we typically deal with CNs, not user IDs, but the part of 
                 // the CN before the first '_' is considered the user ID
-                $userId = $request->getUrl()->getQueryParameter('user_id');
-                $commonName = $request->getUrl()->getQueryParameter('common_name');
+                $userId = InputValidation::userId(
+                    $request->getUrl()->getQueryParameter('user_id'),
+                    false // OPTIONAL
+                );
+                $commonName = InputValidation::commonName(
+                    $request->getUrl()->getQueryParameter('common_name'),
+                    false // OPTIONAL
+                );
+
                 if (!is_null($userId)) {
                     // per user
-                    Utils::validateUserId($userId);
                     $ipConfig = $this->staticConfig->getStaticAddresses($userId);
                 } elseif (!is_null($commonName)) {
                     // per CN
-                    Utils::validateCommonName($commonName);
                     $ipConfig = $this->staticConfig->getStaticAddress($commonName);
                 } else {
                     // all
@@ -77,16 +81,14 @@ class ConfigModule implements ServiceModuleInterface
         $service->post(
             '/static/ip',
            function (Request $request) {
-                $commonName = $request->getPostParameter('common_name');
-                if (is_null($commonName)) {
-                    throw new BadRequestException('missing common_name');
-                }
-                Utils::validateCommonName($commonName);
-
-                $v4 = $request->getPostParameter('v4');
-                if (empty($v4)) {
-                    $v4 = null;
-                }
+                $commonName = InputValidation::commonName(
+                    $request->getPostParameter('common_name'),
+                    true // REQUIRED
+                );
+                $v4 = InputValidation::v4(
+                    $request->getPostParameter('v4'),
+                    false // OPTIONAL
+                );
 
                 $response = new JsonResponse();
                 $response->setBody(
@@ -104,11 +106,10 @@ class ConfigModule implements ServiceModuleInterface
         $service->post(
             '/ccd/disable',
             function (Request $request) {
-                $commonName = $request->getPostParameter('common_name');
-                if (is_null($commonName)) {
-                    throw new BadRequestException('missing common_name');
-                }
-                Utils::validateCommonName($commonName);
+                $commonName = InputValidation::commonName(
+                    $request->getPostParameter('common_name'),
+                    true // REQUIRED
+                );
 
                 $this->logger->info('disabling cn', array('cn' => $commonName));
 
@@ -126,8 +127,10 @@ class ConfigModule implements ServiceModuleInterface
         $service->delete(
             '/ccd/disable',
             function (Request $request) {
-                $commonName = $request->getUrl()->getQueryParameter('common_name');
-                Utils::validateCommonName($commonName);
+                $commonName = InputValidation::commonName(
+                    $request->getUrl()->getQueryParameter('common_name'),
+                    true // REQUIRED
+                );
 
                 $this->logger->info('enabling cn', array('cn' => $commonName));
 
@@ -147,10 +150,10 @@ class ConfigModule implements ServiceModuleInterface
             function (Request $request) {
                 // we typically deal with CNs, not user IDs, but the part of 
                 // the CN before the first '_' is considered the user ID
-                $userId = $request->getUrl()->getQueryParameter('user_id');
-                if (!is_null($userId)) {
-                    Utils::validateUserId($userId);
-                }
+                $userId = InputValidation::userId(
+                    $request->getUrl()->getQueryParameter('user_id'),
+                    false // OPTIONAL
+                );
 
                 $response = new JsonResponse();
                 $response->setBody(

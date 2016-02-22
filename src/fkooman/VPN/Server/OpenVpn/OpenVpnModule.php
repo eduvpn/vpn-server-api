@@ -19,9 +19,9 @@ namespace fkooman\VPN\Server\OpenVpn;
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
-use fkooman\VPN\Server\Utils;
 use fkooman\Http\JsonResponse;
 use Psr\Log\LoggerInterface;
+use fkooman\VPN\Server\InputValidation;
 
 class OpenVpnModule implements ServiceModuleInterface
 {
@@ -72,8 +72,10 @@ class OpenVpnModule implements ServiceModuleInterface
         $service->post(
             '/kill',
             function (Request $request) {
-                $commonName = $request->getPostParameter('common_name');
-                Utils::validateCommonName($commonName);
+                $commonName = InputValidation::commonName(
+                    $request->getPostParameter('common_name'),
+                    true   // REQUIRED
+                );
 
                 $this->logger->info('killing cn', array('cn' => $commonName));
 
