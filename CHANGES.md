@@ -2,6 +2,7 @@
 
 ## 2.4.1 (...)
 - restore logging
+- add some missing dependencies to `composer.json`
 
 ## 2.4.0 (2016-02-22)
 - remove `SimpleError` class
