@@ -21,6 +21,7 @@ require_once __DIR__.'/Test/TestSocket.php';
 
 use PHPUnit_Framework_TestCase;
 use fkooman\VPN\Server\OpenVpn\Test\TestSocket;
+use fkooman\Json\Json;
 
 class ServerManagerTest extends PHPUnit_Framework_TestCase
 {
@@ -95,7 +96,7 @@ class ServerManagerTest extends PHPUnit_Framework_TestCase
         $m->addServer($serverTwo);
         $this->assertSame(
             '{"items":[{"id":"one","ok":true,"status":[{"common_name":"fkooman_samsung_i9300","real_address":"91.64.87.183:43103","bytes_in":18301,"bytes_out":30009,"connected_since":1451323167,"virtual_address":["fd00:4242:4242::1003","10.42.42.5"]}]},{"id":"two","ok":true,"status":[{"common_name":"fkooman_ziptest","real_address":"::ffff:91.64.87.183","bytes_in":127707,"bytes_out":127903,"connected_since":1450874955,"virtual_address":["10.42.42.2","fd00:4242:4242::1000"]},{"common_name":"sebas_tuxed_SGS6","real_address":"::ffff:83.83.194.107","bytes_in":127229,"bytes_out":180419,"connected_since":1450872328,"virtual_address":["fd00:4242:4242::1001","10.42.42.3"]}]}]}',
-            json_encode($m->status())
+            Json::encode($m->status())
         );
     }
 
@@ -111,7 +112,7 @@ class ServerManagerTest extends PHPUnit_Framework_TestCase
         $m->addServer($serverThree);
         $this->assertSame(
             '{"items":[{"id":"one","ok":true,"kill":true},{"id":"two","ok":true,"kill":false},{"id":"three","ok":true,"kill":false}]}',
-            json_encode($m->kill('foo'))
+            Json::encode($m->kill('foo'))
         );
     }
 

@@ -21,6 +21,7 @@ use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Utils;
+use fkooman\Json\Json;
 
 openlog(
     basename($argv[0]),
@@ -72,7 +73,7 @@ try {
         'bytes_sent' => $envData['bytes_sent'],
     );
 
-    syslog(LOG_INFO, json_encode($logData));
+    syslog(LOG_INFO, Json::encode($logData));
 
     $db = new PDO(
         $config->v('Log', 'dsn'),

@@ -137,7 +137,7 @@ try {
         'time_unix' => $envData['time_unix'],
         'dev' => $envData['dev'],
     );
-    syslog(LOG_INFO, json_encode($logData));
+    syslog(LOG_INFO, Json::encode($logData));
 
     $db = new PDO(
         $config->v('Log', 'dsn'),

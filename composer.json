@@ -15,7 +15,10 @@
     "license": "Apache-2.0",
     "name": "eduVPN/vpn-server-api",
     "require": {
+        "ext-date": "*",
+        "ext-filter": "*",
         "ext-pcre": "*",
+        "ext-pdo": "*",
         "ext-spl": "*",
         "fkooman/config": "^1.0.0",
         "fkooman/http": "^1.6.0",
