@@ -120,7 +120,7 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'ok' => true
+                'ok' => true,
             ],
             $this->makeRequest('POST', '/static/ip', ['common_name' => 'foo_bar', 'v4' => '10.42.42.44'])
         );
@@ -150,7 +150,7 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'ok' => true
+                'ok' => true,
             ],
             $this->makeRequest('POST', '/static/ip', ['common_name' => 'foo_bar'])
         );
@@ -160,15 +160,71 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'ok' => true
+                'ok' => true,
             ],
             $this->makeRequest('POST', '/static/ip', ['common_name' => 'foo_bar', 'v4' => ''])
         );
     }
 
+    public function testDisableCommonName()
+    {
+        $this->assertSame(
+            [
+                'ok' => true,
+            ],
+            $this->makeRequest('POST', '/ccd/disable', ['common_name' => 'foo_bar'])
+        );
+    }
+
+    public function testDisableCommonNameNoCommonName()
+    {
+        $this->assertSame(
+            [
+                'error' => 'missing common_name',
+            ],
+            $this->makeRequest('POST', '/ccd/disable')
+        );
+    }
+
+    public function testEnableCommonName()
+    {
+        $this->assertSame(
+            [
+                'ok' => true,
+            ],
+            $this->makeRequest('DELETE', '/ccd/disable', ['common_name' => 'foo_baz'])
+        );
+    }
+
+    public function testGetDisabledCommonNames()
+    {
+        $this->assertSame(
+            [
+                'ok' => true,
+                'disabled' => [
+                    'foo_baz',
+                ],
+            ],
+            $this->makeRequest('GET', '/ccd/disable')
+        );
+    }
+
+    public function testGetDisabledCommonNamesForUserId()
+    {
+        $this->assertSame(
+            [
+                'ok' => true,
+                'disabled' => [
+                    'foo_baz',
+                ],
+            ],
+            $this->makeRequest('GET', '/ccd/disable', ['user_id' => 'foo'])
+        );
+    }
+
     private function makeRequest($requestMethod, $requestUri, array $queryBody = [])
     {
-        if('GET' === $requestMethod) {
+        if ('GET' === $requestMethod || 'DELETE' === $requestMethod) {
             return $this->service->run(
                 new Request(
                     array(
