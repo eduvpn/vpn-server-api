@@ -87,7 +87,7 @@ class StatusParser
             $parsedClient = str_getcsv($clientList[$i]);
             $commonName = $parsedClient[1];
             if (array_key_exists($commonName, $parsedClientList)) {
-                error_log('duplicate common name, possibly --duplicate-cn enabled in server configuration');
+                //syslog(LOG_ERR('duplicate common name, possibly --duplicate-cn enabled in server configuration'));
             }
             $parsedClientList[$commonName] = array(
                 'common_name' => $commonName,

@@ -93,7 +93,7 @@ try {
     } catch (PDOException $e) {
         // unable to connect to database, so we continue without being able
         // to view the log
-        error_log($e->__toString());
+        syslog(LOG_ERR, $e->__toString());
         $connectionLog = null;
     }
 
@@ -128,7 +128,7 @@ try {
     $service->run()->send();
 } catch (Exception $e) {
     // internal server error
-    error_log($e->__toString());
+    syslog(LOG_ERR, $e->__toString());
     $e = new InternalServerErrorException($e->getMessage());
     $e->getJsonResponse()->send();
 }
