@@ -24,7 +24,7 @@ class Utils
     public static function validateCommonName($commonName)
     {
         if (0 === preg_match('/^[a-zA-Z0-9-_.@]+$/', $commonName)) {
-            throw new BadRequestException('invalid characters in common name');
+            throw new BadRequestException('invalid characters in common_name');
         }
 
         // MUST NOT be '..'
