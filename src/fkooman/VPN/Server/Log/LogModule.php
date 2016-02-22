@@ -17,6 +17,7 @@ class LogModule implements ServiceModuleInterface
 
     /** @var fkooman\IO\IO */
     private $io;
+
     public function __construct(ConnectionLog $connectionLog, IO $io = null)
     {
         $this->connectionLog = $connectionLog;
@@ -35,14 +36,11 @@ class LogModule implements ServiceModuleInterface
                 if (is_null($showDate)) {
                     $showDate = date('Y-m-d', $this->io->getTime());
                 }
-                if (!is_string($showDate)) {
-                    $showDate = date('Y-m-d', $this->io->getTime());
-                }
                 Utils::validateDate($showDate);
                 $showDateUnix = strtotime($showDate);
 
-                $minDate = strtotime('today -31 days');
-                $maxDate = strtotime('tomorrow');
+                $minDate = strtotime('today -31 days', $this->io->getTime());
+                $maxDate = strtotime('tomorrow', $this->io->getTime());
 
                 if ($showDateUnix < $minDate || $showDateUnix >= $maxDate) {
                     throw new BadRequestException('invalid date range');
