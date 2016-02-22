@@ -59,6 +59,10 @@ class CrlFetcher
             $response = $this->client->get($this->crlUrl);
             $crlData = $response->getBody();
 
+            if (!is_dir($this->crlPath)) {
+                @mkdir($this->crlPath);
+            }
+
             if (false === @file_put_contents($tmpFile, $crlData)) {
                 // unable to write tmp file
                 return ['ok' => false, 'error' => 'unable to write CRL'];
