@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.2 (2016-02-22)
+- redo input validation, fix some small bugs and only do input validation 
+  in the modules
+
 ## 2.4.1 (2016-02-22)
 - restore logging
 - add some missing dependencies to `composer.json`
