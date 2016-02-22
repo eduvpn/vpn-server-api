@@ -15,7 +15,7 @@ class LogModule implements ServiceModuleInterface
     /** @var ConnectionLog */
     private $connectionLog;
 
-    /** @var fkooman\IO\IO */
+    /** @var \fkooman\IO\IO */
     private $io;
 
     public function __construct(ConnectionLog $connectionLog, IO $io = null)
