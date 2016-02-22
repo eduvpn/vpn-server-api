@@ -73,8 +73,6 @@ try {
         exit(0);
     }
 
-    // XXX if the static IP address is already in use, bail
-
     // check if it has a static IPv4 address
     if (array_key_exists('v4', $staticConfig) && !is_null($staticConfig['v4'])) {
         // has static 
@@ -87,18 +85,28 @@ try {
         $v6 = AddressPool::getIp6($v6p, $v4);
     }
 
-    // mark the IP address as used    
-    if (false === @touch(sprintf('%s/%s', $ipPoolDir, $v4))) {
-        throw new RuntimeException(sprintf('unable to claim IP address "%s"', $v4));
+    // try to delete routes first, maybe there are stale leftovers somehow, 
+    // but if it fails it is okay, as they may not have been set if the 
+    // previous connection was cleaned up nicely
+    try {
+        Utils::delRoute4($v4);
+    } catch (RuntimeException $e) {
+        syslog(LOG_WARN, sprintf('unable to delete route for "%s"', $v4));
     }
-
-    // try to delete routes first, maybe there are stale leftovers somehow
-    Utils::delRoute4($v4);
-    Utils::delRoute6($v6);
+    try {
+        Utils::delRoute6($v6);
+    } catch (RuntimeException $e) {
+        syslog(LOG_WARN, sprintf('unable to delete route for "%s"', $v6));
+    }
 
     // add routes
     Utils::addRoute4($v4, $envData['dev']);
     Utils::addRoute6($v6, $envData['dev']);
+
+    // mark the IP address as used    
+    if (false === @touch(sprintf('%s/%s', $ipPoolDir, $v4))) {
+        throw new RuntimeException(sprintf('unable to claim IP address "%s"', $v4));
+    }
 
     // create temporary client config
     $configFileData = array(

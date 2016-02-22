@@ -1,10 +1,14 @@
 # Changelog
 
-## 2.3.2 (...)
+## 3.0.0 (...)
 - remove `SimpleError` class
 - do not use Monolog for connect and disconnect scripts
 - determine `disconnect_time_unix` in the disconnect script
   and not in the database class
+- major refactor of the code to make it better testable and
+  add lots of tests
+- restructure connect and disconnect scripts again to make
+  them more robust
 
 ## 2.3.1 (2016-02-20)
 - static IP can also not be network and broadcast of `poolRange`

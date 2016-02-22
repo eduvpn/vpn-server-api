@@ -47,6 +47,13 @@ class Utils
         }
     }
 
+    public static function validate6Address($ipAddress)
+    {
+        if (false === filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            throw new BadRequestException('invalid v6 address');
+        }
+    }
+
     /**
      * Validate that the date is in YYYY-MM-DD format.
      *
@@ -101,21 +108,13 @@ class Utils
 
     public static function delRoute4($v4)
     {
-        try {
-            $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro del %s/32', $v4);
-            self::exec($cmd);
-        } catch (RuntimeException $e) {
-            // not the end of the world if the route cannot be deleted
-        }
+        $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro del %s/32', $v4);
+        self::exec($cmd);
     }
 
     public static function delRoute6($v6)
     {
-        try {
-            $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro del %s/128', $v6);
-            self::exec($cmd);
-        } catch (RuntimeException $e) {
-            // not the end of the world if the route cannot be deleted
-        }
+        $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro del %s/128', $v6);
+        self::exec($cmd);
     }
 }

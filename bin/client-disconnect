@@ -40,11 +40,9 @@ try {
         $envData[$envKey] = $envValue;
     }
 
+    // XXX validate the environment variables
     $v4 = $envData['ifconfig_pool_remote_ip'];
     $v6 = $envData['ifconfig_pool_remote_ip6'];
-
-    Utils::delRoute4($v4);
-    Utils::delRoute6($v6);
 
     if (false === @unlink(sprintf('%s/%s', $ipPoolDir, $v4))) {
         throw new RuntimeException(sprintf('unable to release IP address "%s"', $v4));
@@ -69,6 +67,17 @@ try {
     );
     $connectionLog = new ConnectionLog($db);
     $connectionLog->disconnect($logData);
+
+    try {
+        Utils::delRoute4($v4);
+    } catch (RuntimeException $e) {
+        syslog(LOG_WARN, sprintf('unable to delete route for "%s"', $v4));
+    }
+    try {
+        Utils::delRoute6($v6);
+    } catch (RuntimeException $e) {
+        syslog(LOG_WARN, sprintf('unable to delete route for "%s"', $v6));
+    }
 } catch (Exception $e) {
     syslog(LOG_ERR, $e->getMessage());
     exit(66);
