@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.4.0 (...)
+## 2.4.0 (2016-02-22)
 - remove `SimpleError` class
 - do not use Monolog for connect and disconnect scripts
 - determine `disconnect_time_unix` in the disconnect script
