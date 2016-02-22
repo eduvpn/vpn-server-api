@@ -20,25 +20,29 @@ use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
 use fkooman\VPN\Server\Utils;
-use fkooman\Rest\Plugin\Authentication\UserInfoInterface;
 use fkooman\Http\JsonResponse;
 use fkooman\Http\Exception\BadRequestException;
+use Psr\Log\LoggerInterface;
 
 class ConfigModule implements ServiceModuleInterface
 {
     /** @var StaticConfig */
     private $staticConfig;
 
-    public function __construct(StaticConfig $staticConfig)
+    /** @var \Psr\Log\LoggerInterface */
+    private $logger;
+
+    public function __construct(StaticConfig $staticConfig, LoggerInterface $logger)
     {
         $this->staticConfig = $staticConfig;
+        $this->logger = $logger;
     }
 
     public function init(Service $service)
     {
         $service->get(
             '/static/ip',
-           function (Request $request, UserInfoInterface $userInfo) {
+           function (Request $request) {
                 // we typically deal with CNs, not user IDs, but the part of 
                 // the CN before the first '_' is considered the user ID
                 $userId = $request->getUrl()->getQueryParameter('user_id');
@@ -72,7 +76,7 @@ class ConfigModule implements ServiceModuleInterface
 
         $service->post(
             '/static/ip',
-           function (Request $request, UserInfoInterface $userInfo) {
+           function (Request $request) {
                 $commonName = $request->getPostParameter('common_name');
                 if (is_null($commonName)) {
                     throw new BadRequestException('missing common_name');
@@ -91,7 +95,7 @@ class ConfigModule implements ServiceModuleInterface
                     )
                 );
 
-                // $this->logInfo('setting static IP', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName, 'v4' => $v4));
+                $this->logger->info('setting static IP', array('cn' => $commonName, 'v4' => $v4));
 
                 return $response;
             }
@@ -99,14 +103,14 @@ class ConfigModule implements ServiceModuleInterface
 
         $service->post(
             '/ccd/disable',
-            function (Request $request, UserInfoInterface $userInfo) {
+            function (Request $request) {
                 $commonName = $request->getPostParameter('common_name');
                 if (is_null($commonName)) {
                     throw new BadRequestException('missing common_name');
                 }
                 Utils::validateCommonName($commonName);
 
-                // $this->logInfo('disabling cn', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName));
+                $this->logger->info('disabling cn', array('cn' => $commonName));
 
                 $response = new JsonResponse();
                 $response->setBody(
@@ -121,11 +125,11 @@ class ConfigModule implements ServiceModuleInterface
 
         $service->delete(
             '/ccd/disable',
-            function (Request $request, UserInfoInterface $userInfo) {
+            function (Request $request) {
                 $commonName = $request->getUrl()->getQueryParameter('common_name');
                 Utils::validateCommonName($commonName);
 
-                // $this->logInfo('enabling cn', array('api_user' => $userInfo->getUserId(), 'cn' => $commonName));
+                $this->logger->info('enabling cn', array('cn' => $commonName));
 
                 $response = new JsonResponse();
                 $response->setBody(
@@ -140,7 +144,7 @@ class ConfigModule implements ServiceModuleInterface
 
         $service->get(
             '/ccd/disable',
-            function (Request $request, UserInfoInterface $userInfo) {
+            function (Request $request) {
                 // we typically deal with CNs, not user IDs, but the part of 
                 // the CN before the first '_' is considered the user ID
                 $userId = $request->getUrl()->getQueryParameter('user_id');

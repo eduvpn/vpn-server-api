@@ -122,9 +122,9 @@ try {
     $authenticationPlugin->register($apiAuth, 'api');
     $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     $service->addModule(new LogModule($connectionLog));
-    $service->addModule(new OpenVpnModule($serverManager));
-    $service->addModule(new ConfigModule($staticConfig));
-    $service->addModule(new CaModule($crlFetcher));
+    $service->addModule(new OpenVpnModule($serverManager, $logger));
+    $service->addModule(new ConfigModule($staticConfig, $logger));
+    $service->addModule(new CaModule($crlFetcher, $logger));
     $service->run()->send();
 } catch (Exception $e) {
     // internal server error

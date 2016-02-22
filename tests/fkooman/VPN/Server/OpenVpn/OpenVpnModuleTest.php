@@ -25,6 +25,7 @@ use fkooman\Http\Request;
 use fkooman\Rest\Plugin\Authentication\Dummy\DummyAuthentication;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
 use fkooman\VPN\Server\OpenVpn\Test\TestSocket;
+use Psr\Log\NullLogger;
 
 class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -177,7 +178,8 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
         );
         $this->service->addModule(
             new OpenVpnModule(
-                $serverManager
+                $serverManager,
+                new NullLogger()
             )
         );
     }

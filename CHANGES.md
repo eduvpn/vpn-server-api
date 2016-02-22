@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.4.1 (...)
+- restore logging
+
 ## 2.4.0 (2016-02-22)
 - remove `SimpleError` class
 - do not use Monolog for connect and disconnect scripts

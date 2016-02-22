@@ -19,26 +19,30 @@ namespace fkooman\VPN\Server\Ca;
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
-use fkooman\Rest\Plugin\Authentication\UserInfoInterface;
 use fkooman\Http\JsonResponse;
+use Psr\Log\LoggerInterface;
 
 class CaModule implements ServiceModuleInterface
 {
     /** @var CrlFetcher */
     private $crlFetcher;
 
-    public function __construct(CrlFetcher $crlFetcher)
+    /** @var \Psr\Log\LoggerInterface */
+    private $logger;
+
+    public function __construct(CrlFetcher $crlFetcher, LoggerInterface $logger)
     {
         $this->crlFetcher = $crlFetcher;
+        $this->logger = $logger;
     }
 
     public function init(Service $service)
     {
         $service->post(
             '/crl/fetch',
-            function (Request $request, UserInfoInterface $userInfo) {
+            function (Request $request) {
 
-                //$this->logInfo('fetching CRL', array('api_user' => $userInfo->getUserId()));
+                $this->logger->info('fetching CRL');
 
                 $response = new JsonResponse();
                 $response->setBody($this->crlFetcher->fetch());

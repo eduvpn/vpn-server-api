@@ -26,6 +26,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Subscriber\Mock;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
+use Psr\Log\NullLogger;
 
 class CaModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -49,7 +50,7 @@ class CaModuleTest extends PHPUnit_Framework_TestCase
         $client->getEmitter()->attach($mock);
 
         $crlFetcher = new CrlFetcher('http://example.org/ca.crt', sprintf('%s/%s', sys_get_temp_dir(), 'crl'), $client);
-        $caModule = new CaModule($crlFetcher);
+        $caModule = new CaModule($crlFetcher, new NullLogger());
 
         $this->service = new Service();
         $this->service->addModule($caModule);

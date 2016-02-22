@@ -22,6 +22,7 @@ use PHPUnit_Framework_TestCase;
 use fkooman\Http\Request;
 use fkooman\Rest\Plugin\Authentication\Dummy\DummyAuthentication;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
+use Psr\Log\NullLogger;
 
 class ConfigModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -55,7 +56,8 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
                     $tempDirName,
                     new IP('10.42.42.0/24'),
                      new IP('10.42.42.128/25')
-                )
+                ),
+                new NullLogger()
             )
         );
         $dummyAuth = new DummyAuthentication('foo');
