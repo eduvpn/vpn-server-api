@@ -93,5 +93,4 @@ class InputValidationTest extends PHPUnit_Framework_TestCase
     {
         InputValidation::v4('10.42.42.', true);
     }
-
 }
