@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.5.0 (...)
+## 2.5.0 (2016-02-24)
 - switch to Bearer authentication from Basic Authentication to improve
   performance (*BREAKING CONFIG*)
 
