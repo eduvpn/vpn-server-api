@@ -21,8 +21,9 @@ use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
-use fkooman\Rest\Plugin\Authentication\Basic\BasicAuthentication;
 use fkooman\Rest\Service;
+use fkooman\VPN\Server\BearerValidator;
+use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\VPN\Server\Ca\CaModule;
 use fkooman\VPN\Server\Ca\CrlFetcher;
 use fkooman\VPN\Server\Config\ConfigModule;
@@ -106,16 +107,13 @@ try {
     // http request router
     $service = new Service();
 
-    $apiAuth = new BasicAuthentication(
-        function ($userId) use ($openVpnReader) {
-            $userList = $openVpnReader->v('Users');
-            if (!array_key_exists($userId, $userList)) {
-                return false;
-            }
-
-            return $userList[$userId];
-        },
-        array('realm' => 'VPN Server API')
+    // API authentication
+    // XXX move BearerValidator to fkooman/rest-plugin-authentication-bearer
+    $apiAuth = new BearerAuthentication(
+        new BearerValidator(
+            $openVpnReader->v('Api')
+        ),
+        ['realm' => 'VPN Server API']
     );
 
     $authenticationPlugin = new AuthenticationPlugin();
