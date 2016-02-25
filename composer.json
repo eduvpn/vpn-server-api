@@ -26,7 +26,7 @@
         "fkooman/json": "^1.0.0",
         "fkooman/rest": "^1.0.0",
         "fkooman/rest-plugin-authentication": "^2.0.0",
-        "fkooman/rest-plugin-authentication-bearer": "^2.1.0",
+        "fkooman/rest-plugin-authentication-bearer": "^2.2.0",
         "guzzlehttp/guzzle": "^5.3",
         "monolog/monolog": "^1.17",
         "php": ">=5.4",

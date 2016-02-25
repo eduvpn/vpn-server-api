@@ -22,7 +22,7 @@ use fkooman\Config\YamlFile;
 use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
 use fkooman\Rest\Service;
-use fkooman\VPN\Server\BearerValidator;
+use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
 use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\VPN\Server\Ca\CaModule;
 use fkooman\VPN\Server\Ca\CrlFetcher;
@@ -108,9 +108,8 @@ try {
     $service = new Service();
 
     // API authentication
-    // XXX move BearerValidator to fkooman/rest-plugin-authentication-bearer
     $apiAuth = new BearerAuthentication(
-        new BearerValidator(
+        new ArrayBearerValidator(
             $openVpnReader->v('Api')
         ),
         ['realm' => 'VPN Server API']

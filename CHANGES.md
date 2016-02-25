@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.5.2 (2016-02-25)
+- use external ArrayBearerValidator
+
 ## 2.5.1 (2016-02-25)
 - add `housekeeping` script to remove older log entries
 
