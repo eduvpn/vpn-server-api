@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.5.1 (...)
+## 2.5.1 (2016-02-25)
 - add `housekeeping` script to remove older log entries
 
 ## 2.5.0 (2016-02-24)
