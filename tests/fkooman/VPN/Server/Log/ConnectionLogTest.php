@@ -114,4 +114,25 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
             )
         );
     }
+
+    public function testRemoveLog()
+    {
+        $this->connectionLog->connect([
+            'common_name' => 'foo_vpn_ex_def',
+            'time_unix' => '1452535477',
+            'v4' => '10.42.42.2',
+            'v6' => 'fd00:4242:4242::2',
+        ]);
+        $this->connectionLog->disconnect([
+            'common_name' => 'foo_vpn_ex_def',
+            'time_unix' => '1452535477',
+            'disconnect_time_unix' => '1452535488',
+            'v4' => '10.42.42.2',
+            'v6' => 'fd00:4242:4242::2',
+            'bytes_received' => '4843',
+            'bytes_sent' => '5317',
+        ]);
+        $this->assertSame(0, $this->connectionLog->removeLogBefore(1452535466));
+        $this->assertSame(1, $this->connectionLog->removeLogBefore(1452535499));
+    }
 }

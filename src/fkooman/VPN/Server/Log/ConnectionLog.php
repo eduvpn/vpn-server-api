@@ -140,6 +140,27 @@ class ConnectionLog
         return $query;
     }
 
+    /**
+     * Remove all log entries older than provided timestamp.
+     *
+     * @param int $timeStamp the unix timestamp before which to remove all log entries
+     */
+    public function removeLogBefore($timeStamp)
+    {
+        $stmt = $this->db->prepare(
+            sprintf(
+                'DELETE FROM %s 
+                    WHERE disconnect_time_unix < :time_stamp',
+                $this->prefix.'connections'
+            )
+        );
+
+        $stmt->bindValue(':time_stamp', $timeStamp, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->rowCount();
+    }
+
     public function initDatabase()
     {
         $queries = self::createTableQueries($this->prefix);

@@ -33,7 +33,9 @@ try {
     );
 
     $connectionLog = new ConnectionLog($db);
-    $connectionLog->initDatabase();
+
+    // remove all log entries that are older than 1 month
+    $connectionLog->removeLogBefore(strtotime('today -31 days'));
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL;
     exit(1);
