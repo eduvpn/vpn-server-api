@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.5.3 (...)
+- flush routes after modifying route table
+
 ## 2.5.2 (2016-02-25)
 - use external ArrayBearerValidator
 

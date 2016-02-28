@@ -71,4 +71,16 @@ class Utils
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro del %s/128', $v6);
         self::exec($cmd);
     }
+
+    public static function flushRouteCache4()
+    {
+        $cmd = '/usr/bin/sudo /sbin/ip -4 ro flush cache';
+        self::exec($cmd);
+    }
+
+    public static function flushRouteCache6()
+    {
+        $cmd = '/usr/bin/sudo /sbin/ip -6 ro flush cache';
+        self::exec($cmd);
+    }
 }

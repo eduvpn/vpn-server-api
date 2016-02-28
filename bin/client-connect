@@ -104,18 +104,22 @@ try {
     // previous connection was cleaned up nicely
     try {
         Utils::delRoute4($v4);
+        Utils::flushRouteCache4();
     } catch (RuntimeException $e) {
         syslog(LOG_WARN, sprintf('unable to delete route for "%s"', $v4));
     }
     try {
         Utils::delRoute6($v6);
+        Utils::flushRouteCache6();
     } catch (RuntimeException $e) {
         syslog(LOG_WARN, sprintf('unable to delete route for "%s"', $v6));
     }
 
     // add routes
     Utils::addRoute4($v4, $envData['dev']);
+    Utils::flushRouteCache4();
     Utils::addRoute6($v6, $envData['dev']);
+    Utils::flushRouteCache6();
 
     // mark the IP address as used    
     if (false === @touch(sprintf('%s/%s', $ipPoolDir, $v4))) {
