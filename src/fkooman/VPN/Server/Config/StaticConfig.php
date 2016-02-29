@@ -49,10 +49,7 @@ class StaticConfig
         }
         foreach (glob($pathFilter) as $commonNamePath) {
             $commonName = basename($commonNamePath);
-            $configArray[] = array_merge(
-                $this->getConfig($commonName)->toArray(),
-                ['common_name' => $commonName]
-            );
+            $configArray[$commonName] = $this->getConfig($commonName)->toArray();
         }
 
         return $configArray;
