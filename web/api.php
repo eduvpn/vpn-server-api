@@ -62,16 +62,11 @@ try {
         $caReader->v('Crl', 'path')
     );
 
-    $ipRange = new IP($configReader->v('IPv4', 'ipRange', false, '10.10.10.0/24'));
-    $poolRange = new IP($configReader->v('IPv4', 'poolRange', false, '10.10.10.128/25'));
-
     // handles the client configuration directory
     $staticConfig = new StaticConfig(
-        $configReader->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__))),
-        $ipRange,
-        $poolRange
+        $configReader->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__)))
     );
-
+ 
     // handles the connection to the various OpenVPN instances
     $serverManager = new ServerManager();
     foreach ($openVpnReader->v('OpenVpn') as $openVpnServer) {
