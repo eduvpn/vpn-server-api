@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace fkooman\VPN\Server\Config;
 
 use InvalidArgumentException;
@@ -99,4 +100,3 @@ class AddressPool
 #    echo $e->getMessage().PHP_EOL;
 #    exit(1);
 #}
-

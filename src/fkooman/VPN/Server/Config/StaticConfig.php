@@ -14,191 +14,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace fkooman\VPN\Server\Config;
 
 use fkooman\Json\Json;
 use RuntimeException;
 
-/**
- * Manage static configuration for configurations.
- * Features:
- * - disable a configuration based on CN
- * - set static IPv4/IPv6 address for a CN.
- */
 class StaticConfig
 {
     /** @var string */
     private $staticConfigDir;
 
-    /** @var IP */
-    private $ipRange;
-
-    /** @var IP */
-    private $poolRange;
-
-    public function __construct($staticConfigDir, IP $ipRange, IP $poolRange)
+    public function __construct($staticConfigDir)
     {
         $this->staticConfigDir = $staticConfigDir;
-        $this->ipRange = $ipRange;
-        $this->poolRange = $poolRange;
     }
 
-    public function getIpRange()
-    {
-        return $this->ipRange;
-    }
-
-    public function getPoolRange()
-    {
-        return $this->poolRange;
-    }
-
-    private function parseConfig($commonName)
+    public function getConfig($commonName)
     {
         $commonNamePath = sprintf('%s/%s', $this->staticConfigDir, $commonName);
-        // XXX do something if file does not exist
         try {
-            return Json::decodeFile($commonNamePath);
+            return new Config(Json::decodeFile($commonNamePath));
         } catch (RuntimeException $e) {
-            return [];
+            return new Config([]);
         }
     }
 
-    public function disableCommonName($commonName)
+    public function getAllConfig($userId)
     {
-        $clientConfig = $this->parseConfig($commonName);
-        if (array_key_exists('disable', $clientConfig) && $clientConfig['disable']) {
-            // already disabled
-            return false;
-        }
-
-        $clientConfig['disable'] = true;
-        $this->writeFile($commonName, $clientConfig);
-
-        return true;
-    }
-
-    public function enableCommonName($commonName)
-    {
-        $clientConfig = $this->parseConfig($commonName);
-        if (array_key_exists('disable', $clientConfig) && $clientConfig['disable']) {
-            // it is disabled, enable it
-            $clientConfig['disable'] = false;
-            $this->writeFile($commonName, $clientConfig);
-
-            return true;
-        }
-
-        // it is not disabled
-        return false;
-    }
-
-    public function isDisabled($commonName)
-    {
-        $clientConfig = $this->parseConfig($commonName);
-
-        return array_key_exists('disable', $clientConfig) && $clientConfig['disable'];
-    }
-
-    public function getDisabledCommonNames($userId = null)
-    {
-        $disabledCommonNames = array();
+        $configArray = [];
         $pathFilter = sprintf('%s/*', $this->staticConfigDir);
         if (!is_null($userId)) {
             $pathFilter = sprintf('%s/%s_*', $this->staticConfigDir, $userId);
         }
-
         foreach (glob($pathFilter) as $commonNamePath) {
             $commonName = basename($commonNamePath);
-
-            if ($this->isDisabled($commonName)) {
-                $disabledCommonNames[] = $commonName;
-            }
+            $configArray[] = array_merge(
+                $this->getConfig($commonName)->toArray(),
+                ['common_name' => $commonName]
+            );
         }
 
-        return $disabledCommonNames;
+        return $configArray;
     }
 
-    public function getStaticAddresses($userId = null)
-    {
-        $staticAddresses = array();
-        $pathFilter = sprintf('%s/*', $this->staticConfigDir);
-        if (!is_null($userId)) {
-            $pathFilter = sprintf('%s/%s_*', $this->staticConfigDir, $userId);
-        }
-
-        foreach (glob($pathFilter) as $commonNamePath) {
-            $commonName = basename($commonNamePath);
-            $ip = $this->getStaticAddress($commonName);
-            if (!is_null($ip['v4'])) {
-                $staticAddresses[$commonName] = $ip;
-            }
-        }
-
-        return $staticAddresses;
-    }
-
-    public function getStaticAddress($commonName)
-    {
-        $clientConfig = $this->parseConfig($commonName);
-
-        $v4 = null;
-        if (array_key_exists('v4', $clientConfig)) {
-            $v4 = $clientConfig['v4'];
-        }
-
-        return array(
-            'v4' => $v4,
-        );
-    }
-
-    public function setStaticAddresses($commonName, $v4)
-    {
-        if (!is_null($v4)) {
-
-            // IP MUST be in ipRange
-            if (!$this->ipRange->inRange($v4)) {
-                throw new RuntimeException('IP is out of range');
-            }
-
-            // IP MUST NOT be in poolRange (including network and broadcast
-            if ($this->poolRange->inRange($v4, true)) {
-                throw new RuntimeException('IP cannot be in poolRange');
-            }
-
-            // cannot be server IP (we assume for now firstHost is server IP
-            if ($v4 === $this->ipRange->getFirstHost()) {
-                throw new RuntimeException('IP cannot be server IP');
-            }
-
-            // XXX make sure it is not already in use by another config, it is
-            // okay if it is this config!
-            $staticAddresses = $this->getStaticAddresses();
-            foreach ($staticAddresses as $cn => $c) {
-                if ($c['v4'] === $v4) {
-                    if ($commonName === $cn) {
-                        // the commonName is allowed to have the same address,
-                        // i.e. when setting the same IPv4 address that was 
-                        // already assigned to that CN
-                        continue;
-                    }
-
-                    throw new RuntimeException(sprintf('IP address already in use by "%s"', $cn));
-                }
-            }
-        }
-        $clientConfig = $this->parseConfig($commonName);
-        $clientConfig['v4'] = $v4;
-        $this->writeFile($commonName, $clientConfig);
-
-        return true;
-    }
-
-    private function writeFile($commonName, array $clientConfig)
+    public function setConfig($commonName, Config $config)
     {
         $commonNamePath = sprintf('%s/%s', $this->staticConfigDir, $commonName);
 
-        if (false === @file_put_contents($commonNamePath, Json::encode($clientConfig))) {
+        if (false === @file_put_contents($commonNamePath, Json::encode($config->toArray()))) {
             throw new RuntimeException('unable to write to static configuration file');
         }
     }
