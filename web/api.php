@@ -28,7 +28,6 @@ use fkooman\VPN\Server\Ca\CaModule;
 use fkooman\VPN\Server\Ca\CrlFetcher;
 use fkooman\VPN\Server\Config\ConfigModule;
 use fkooman\VPN\Server\Config\StaticConfig;
-use fkooman\VPN\Server\Config\IP;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Log\LogModule;
 use fkooman\VPN\Server\OpenVpn\OpenVpnModule;
@@ -66,7 +65,7 @@ try {
     $staticConfig = new StaticConfig(
         $configReader->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__)))
     );
- 
+
     // handles the connection to the various OpenVPN instances
     $serverManager = new ServerManager();
     foreach ($openVpnReader->v('OpenVpn') as $openVpnServer) {

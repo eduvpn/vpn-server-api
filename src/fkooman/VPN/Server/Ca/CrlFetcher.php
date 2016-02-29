@@ -18,7 +18,7 @@
 namespace fkooman\VPN\Server\Ca;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
+use RuntimeException;
 
 /**
  * Fetch and store the CRL used by OpenVPN.
@@ -56,33 +56,25 @@ class CrlFetcher
         $crlFile = sprintf('%s/ca.crl', $this->crlPath);
         $tmpFile = sprintf('%s.tmp', $crlFile);
 
-        try {
-            $response = $this->client->get($this->crlUrl);
-            $crlData = $response->getBody();
+        $response = $this->client->get($this->crlUrl);
+        $crlData = $response->getBody();
 
-            if (!is_dir($this->crlPath)) {
-                @mkdir($this->crlPath);
+        if (!is_dir($this->crlPath)) {
+            @mkdir($this->crlPath);
+        }
+
+        if (false === @file_put_contents($tmpFile, $crlData)) {
+            // unable to write tmp file
+            throw new RuntimeException('unable to write CRL');
+        }
+
+        if (false === @rename($tmpFile, $crlFile)) {
+            // unable to rename tmp file to crl file
+            if (false === @unlink($tmpFile)) {
+                throw new RuntimeException('unable to delete temporary CRL');
             }
 
-            if (false === @file_put_contents($tmpFile, $crlData)) {
-                // unable to write tmp file
-                return ['ok' => false, 'error' => 'unable to write CRL'];
-            }
-
-            if (false === @rename($tmpFile, $crlFile)) {
-                // unable to rename tmp file to crl file
-                if (false === @unlink($tmpFile)) {
-                    return ['ok' => false, 'error' => 'unable to delete temporary CRL'];
-                }
-
-                return ['ok' => false, 'error' => 'unable to rename temporary CRL to active CRL'];
-            }
-
-            // succeeded        
-            return ['ok' => true];
-        } catch (TransferException $e) {
-            // Guzzle catch all exception
-            return ['ok' => false, 'error' => 'unable to download CRL'];
+            throw new RuntimeException('unable to rename temporary CRL to active CRL');
         }
     }
 }

@@ -67,7 +67,7 @@ class CaModuleTest extends PHPUnit_Framework_TestCase
             [
                 'ok' => true,
             ],
-            $this->makeRequest('POST', '/crl/fetch', [])
+            $this->makeRequest('POST', '/ca/crl/fetch', [])
         );
     }
 

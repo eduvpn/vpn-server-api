@@ -40,13 +40,16 @@ class CaModule implements ServiceModuleInterface
     public function init(Service $service)
     {
         $service->post(
-            '/crl/fetch',
+            '/ca/crl/fetch',
             function (Request $request) {
-
                 $this->logger->info('fetching CRL');
 
+                $this->crlFetcher->fetch();
+
                 $response = new JsonResponse();
-                $response->setBody($this->crlFetcher->fetch());
+                $response->setBody(
+                    ['ok' => true]
+                );
 
                 return $response;
             }
