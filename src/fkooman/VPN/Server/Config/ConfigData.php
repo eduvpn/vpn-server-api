@@ -17,9 +17,9 @@
 
 namespace fkooman\VPN\Server\Config;
 
-use fkooman\Http\Exception\BadRequestException;
+use fkooman\VPN\Server\InputValidation;
 
-class Config
+class ConfigData
 {
     /** @var string */
     private $pool;
@@ -27,27 +27,14 @@ class Config
     /** @var bool */
     private $disable;
 
-    public function __construct(array $config)
+    public function __construct(array $configData)
     {
-        // pool
-        $pool = 'default';
-        if (array_key_exists('pool', $config)) {
-            // XXX consider mb_string
-            if (!is_string($config['pool']) || 1 > strlen($config['pool'])) {
-                throw new BadRequestException('"pool" must be non-empty string');
-            }
-            $pool = $config['pool'];
-        }
-        $this->pool = $pool;
+        $pool = array_key_exists('pool', $configData) ? $configData['pool'] : 'default';
+        InputValidation::pool($pool);
+        $disable = array_key_exists('disable', $configData) ? $configData['disable'] : false;
+        InputValidation::disable($disable);
 
-        // disable
-        $disable = false;
-        if (array_key_exists('disable', $config)) {
-            if (!is_bool($config['disable'])) {
-                throw new BadRequestException('"disable" must be boolean');
-            }
-            $disable = $config['disable'];
-        }
+        $this->pool = $pool;
         $this->disable = $disable;
     }
 

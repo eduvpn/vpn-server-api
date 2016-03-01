@@ -39,40 +39,55 @@ use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
 
 try {
-    $caReader = new Reader(
+    $config = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
 
-    $openVpnReader = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/config.yaml')
+    $ipConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/ip.yaml')
     );
 
-    $configReader = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/client.yaml')
+    $logConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/log.yaml')
     );
 
-    $logReader = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/client.yaml')
+    $client = new Client(
+        [
+            'defaults' => [
+                'headers' => [
+                    'Authorization' => sprintf(
+                        'Bearer %s',
+                        $config->v(
+                            'remote-credentials',
+                            'vpn-config-api',
+                            'token'
+                        )
+                    ),
+                ],
+            ],
+        ]
     );
 
     // handles fetching the certificate revocation list
     $crlFetcher = new CrlFetcher(
-        $caReader->v('Crl', 'url'),
-        $caReader->v('Crl', 'path')
+        $config->v('crl', 'uri'),
+        $config->v('crl', 'path'),
+        $client
     );
 
     // handles the client configuration directory
     $staticConfig = new StaticConfig(
-        $configReader->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__)))
+        $ipConfig->v('configDir'),
+        array_keys($ipConfig->v('v4', 'pools'))
     );
 
     // handles the connection to the various OpenVPN instances
     $serverManager = new ServerManager();
-    foreach ($openVpnReader->v('OpenVpn') as $openVpnServer) {
+    foreach ($config->v('openVpn') as $id => $socket) {
         $serverManager->addServer(
             new ServerApi(
-                $openVpnServer['id'],
-                new ServerSocket($openVpnServer['socket'])
+                $id,
+                new ServerSocket($socket)
             )
         );
     }
@@ -80,9 +95,9 @@ try {
     // handles the connection history log
     try {
         $db = new PDO(
-            $logReader->v('Log', 'dsn', false, 'sqlite:/var/lib/openvpn/log.sqlite'),
-            $logReader->v('Log', 'username', false),
-            $logReader->v('Log', 'password', false)
+            $logConfig->v('log', 'dsn'),
+            $logConfig->v('log', 'username', false),
+            $logConfig->v('log', 'password', false)
         );
         $connectionLog = new ConnectionLog($db);
     } catch (PDOException $e) {
@@ -104,10 +119,10 @@ try {
     // API authentication
     $apiAuth = new BearerAuthentication(
         new ArrayBearerValidator(
-            $openVpnReader->v('Api')
+            $config->v('credentials')
         ),
         ['realm' => 'VPN Server API']
-    );
+     );
 
     $authenticationPlugin = new AuthenticationPlugin();
     $authenticationPlugin->register($apiAuth, 'api');

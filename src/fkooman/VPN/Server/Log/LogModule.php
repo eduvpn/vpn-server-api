@@ -30,18 +30,11 @@ class LogModule implements ServiceModuleInterface
     public function init(Service $service)
     {
         $service->get(
-            '/log/history',
-            function (Request $request) {
-                $showDate = InputValidation::date(
-                    $request->getUrl()->getQueryParameter('showDate'),
-                    false // OPTIONAL
-                );
+            '/log/:showDate',
+            function (Request $request, $showDate) {
+                InputValidation::date($showDate);
 
-                if (is_null($showDate)) {
-                    $showDate = date('Y-m-d', $this->io->getTime());
-                }
                 $showDateUnix = strtotime($showDate);
-
                 $minDate = strtotime('today -31 days', $this->io->getTime());
                 $maxDate = strtotime('tomorrow', $this->io->getTime());
 

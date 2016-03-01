@@ -1,15 +1,24 @@
-# The OpenVPN instances we control
-OpenVpn:
-    - id: UDP
-      socket: 'tcp://localhost:7505'
-    #- id: TCP
-    #  socket: 'tcp://localhost:7506'
+# OpenVPN management sockets
+openVpn:
+    udp: 'tcp://localhost:7505'
+    tcp: 'tcp://localhost:7506'
+
+# CRL
+crl:
+    uri: 'http://localhost:8008/api.php/ca/crl/fetch'
+    path: /var/lib/vpn-server-api
 
 # API credentials
-Api:
-    - 11223344556677889900
+credentials:
+    vpn-user-portal:
+        scope: list_user
+        token: uvwxyz
+    vpn-admin-portal:
+        scope: list_all update_config
+        token: uuvvww
 
-# The Certificate Revocation List
-Crl:
-    url: http://localhost/vpn-config-api/api.php/ca.crl
-    path: /var/lib/vpn-server-api
+# API credentials for access to remote services
+remote-credentials:
+    # required to fetch the CRL
+    vpn-config-api:
+        token: aabbcc

@@ -85,7 +85,7 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
-            $this->makeRequest('GET', '/log/history', [])
+            $this->makeRequest('GET', sprintf('/log/%s', date('Y-m-d', 1000010001)))
         );
     }
 
@@ -97,7 +97,7 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
                 'history' => [
                 ],
             ],
-            $this->makeRequest('GET', '/log/history', ['showDate' => date('Y-m-d', 999888888)])
+            $this->makeRequest('GET', sprintf('/log/%s', date('Y-m-d', 999888888)))
         );
     }
 
@@ -107,7 +107,7 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
             [
                 'error' => 'invalid date range',
             ],
-            $this->makeRequest('GET', '/log/history', ['showDate' => date('Y-m-d', 1234567890)])
+            $this->makeRequest('GET', sprintf('/log/%s', date('Y-m-d', 1234567890)))
         );
     }
 

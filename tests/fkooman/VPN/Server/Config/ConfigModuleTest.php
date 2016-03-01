@@ -18,11 +18,14 @@
 
 namespace fkooman\VPN\Server\Config;
 
+require_once __DIR__.'/Test/TestConfigStorage.php';
+
 use fkooman\Rest\Service;
 use PHPUnit_Framework_TestCase;
 use fkooman\Http\Request;
 use fkooman\Rest\Plugin\Authentication\Dummy\DummyAuthentication;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
+use fkooman\VPN\Server\Config\Test\TestConfigStorage;
 use Psr\Log\NullLogger;
 
 class ConfigModuleTest extends PHPUnit_Framework_TestCase
@@ -32,24 +35,9 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $tempDirName = tempnam(sys_get_temp_dir(), 'static');
-        if (file_exists($tempDirName)) {
-            @unlink($tempDirName);
-        }
-        @mkdir($tempDirName);
-
-#        @file_put_contents($tempDirName.'/bar_foo', '{"pool": "default", "disable": false}');
-        // a not disabled commonName
-#        @file_put_contents($tempDirName.'/bar_baz', '{}');
-#        // a disabled commonName
-#        @file_put_contents($tempDirName.'/foo_baz', '{"disable": true}');
-
-        $staticConfig = new StaticConfig($tempDirName);
-
-#        $staticConfig->setConfig('foo_bar', ['disable' => false, 'pool' => 'default']);
-
         $configModule = new ConfigModule(
-            $staticConfig,
+            new TestConfigStorage(),
+            ['default', 'v6'],
             new NullLogger()
         );
 
@@ -65,7 +53,7 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'pool' => 'default',
+                'pool' => 'v6',
                 'disable' => false,
             ],
             $this->makeRequest('GET', '/config/foo_bar')
@@ -78,14 +66,7 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
             [
                 'ok' => true,
             ],
-            $this->makeRequest('PUT', '/config/foo_bar', [], '{"pool": "admin"}')
-        );
-        $this->assertSame(
-            [
-                'pool' => 'admin',
-                'disable' => false,
-            ],
-            $this->makeRequest('GET', '/config/foo_bar')
+            $this->makeRequest('PUT', '/config/foo_bar', [], '{"pool": "v6"}')
         );
     }
 
@@ -93,22 +74,14 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'items' => [],
-            ],
-            $this->makeRequest('GET', '/config/')
-        );
-        $this->assertSame(
-            [
-                'ok' => true,
-            ],
-            $this->makeRequest('PUT', '/config/foo_bar', [], '{"pool": "admin"}')
-        );
-        $this->assertSame(
-            [
                 'items' => [
                     'foo_bar' => [
-                        'pool' => 'admin',
+                        'pool' => 'v6',
                         'disable' => false,
+                    ],
+                    'bar_foo' => [
+                        'pool' => 'default',
+                        'disable' => true,
                     ],
                 ],
             ],
@@ -120,32 +93,14 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'items' => [],
-            ],
-            $this->makeRequest('GET', '/config/', ['user_id' => 'foo'])
-        );
-        $this->assertSame(
-            [
-                'ok' => true,
-            ],
-            $this->makeRequest('PUT', '/config/foo_bar', [], '{"pool": "admin"}')
-        );
-        $this->assertSame(
-            [
                 'items' => [
                     'foo_bar' => [
-                        'pool' => 'admin',
+                        'pool' => 'v6',
                         'disable' => false,
                     ],
                 ],
             ],
             $this->makeRequest('GET', '/config/', ['user_id' => 'foo'])
-        );
-        $this->assertSame(
-            [
-                'items' => [],
-            ],
-            $this->makeRequest('GET', '/config/', ['user_id' => 'bar'])
         );
     }
 

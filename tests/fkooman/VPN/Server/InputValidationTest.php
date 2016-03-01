@@ -25,9 +25,6 @@ class InputValidationTest extends PHPUnit_Framework_TestCase
     public function testCommonName()
     {
         InputValidation::commonName('foo_bar', true);
-        InputValidation::commonName(null, false);
-        InputValidation::commonName('', false);
-        InputValidation::commonName('foo', false);
         InputValidation::commonName('foo', true);
     }
 
@@ -49,24 +46,6 @@ class InputValidationTest extends PHPUnit_Framework_TestCase
         InputValidation::commonName('', true);
     }
 
-    /**
-     * @expectedException fkooman\Http\Exception\BadRequestException
-     * @expectedExceptionMessage invalid value for "common_name"
-     */
-    public function testInvalidCommonNameSymbol()
-    {
-        InputValidation::commonName('!', false);
-    }
-
-    /**
-     * @expectedException fkooman\Http\Exception\BadRequestException
-     * @expectedExceptionMessage "common_name" cannot be ".."
-     */
-    public function testInvalidCommonNameDots()
-    {
-        InputValidation::commonName('..', false);
-    }
-
     public function testDate()
     {
         InputValidation::date('2015-01-01', true);
@@ -79,19 +58,5 @@ class InputValidationTest extends PHPUnit_Framework_TestCase
     public function testInvalidDate()
     {
         InputValidation::date('a2015-01-01', true);
-    }
-
-    public function testIp()
-    {
-        InputValidation::v4('10.42.42.10', true);
-    }
-
-    /**
-     * @expectedException fkooman\Http\Exception\BadRequestException
-     * @expectedExceptionMessage "v4" is invalid
-     */
-    public function testInvalidIp()
-    {
-        InputValidation::v4('10.42.42.', true);
     }
 }

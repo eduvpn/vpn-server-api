@@ -21,66 +21,49 @@ use fkooman\Http\Exception\BadRequestException;
 
 class InputValidation
 {
-    // XXX dot matches any char?
     const COMMON_NAME_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
     const USER_ID_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
     const DATE_PATTERN = '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/';
 
-    public static function commonName($commonName, $isRequired)
+    public static function commonName($commonName)
     {
-        $commonName = !empty($commonName) ? $commonName : null;
-        if (!$isRequired && is_null($commonName)) {
-            return;
-        }
         if (0 === preg_match(self::COMMON_NAME_PATTERN, $commonName)) {
             throw new BadRequestException('invalid value for "common_name"');
         }
         if ('..' === $commonName) {
             throw new BadRequestException('"common_name" cannot be ".."');
         }
-
-        return $commonName;
     }
 
-    public static function userId($userId, $isRequired)
+    public static function userId($userId)
     {
-        $userId = !empty($userId) ? $userId : null;
-        if (!$isRequired && is_null($userId)) {
-            return;
-        }
         if (0 === preg_match(self::USER_ID_PATTERN, $userId)) {
             throw new BadRequestException('invalid value for "user_id"');
         }
         if ('..' === $userId) {
             throw new BadRequestException('"user_id" cannot be ".."');
         }
-
-        return $userId;
     }
 
-    public static function date($date, $isRequired)
+    public static function date($date)
     {
-        $date = !empty($date) ? $date : null;
-        if (!$isRequired && is_null($date)) {
-            return;
-        }
         if (0 === preg_match(self::DATE_PATTERN, $date)) {
             throw new BadRequestException('invalid value for "date"');
         }
-
-        return $date;
     }
 
-    public static function v4($v4, $isRequired)
+    public static function pool($pool)
     {
-        $v4 = !empty($v4) ? $v4 : null;
-        if (!$isRequired && is_null($v4)) {
-            return;
+        if (!is_string($pool)) {
+            throw new BadRequestException('"pool" must be string');
         }
-        if (false === filter_var($v4, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            throw new BadRequestException('"v4" is invalid');
-        }
+        // XXX length
+    }
 
-        return $v4;
+    public static function disable($disable)
+    {
+        if (!is_bool($disable)) {
+            throw new BadRequestException('"disable" must be boolean');
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace fkooman\VPN\Server\Config;
 use fkooman\Json\Json;
 use RuntimeException;
 
-class StaticConfig
+class FileConfigStorage implements ConfigStorageInterface
 {
     /** @var string */
     private $staticConfigDir;
@@ -34,9 +34,9 @@ class StaticConfig
     {
         $commonNamePath = sprintf('%s/%s', $this->staticConfigDir, $commonName);
         try {
-            return new Config(Json::decodeFile($commonNamePath));
+            return new ConfigData(Json::decodeFile($commonNamePath));
         } catch (RuntimeException $e) {
-            return new Config([]);
+            return new ConfigData('default', false);
         }
     }
 
@@ -55,7 +55,7 @@ class StaticConfig
         return $configArray;
     }
 
-    public function setConfig($commonName, Config $config)
+    public function setConfig($commonName, ConfigData $config)
     {
         $commonNamePath = sprintf('%s/%s', $this->staticConfigDir, $commonName);
 

@@ -1,0 +1,31 @@
+# IP address configuration
+
+# stores IP addresses currently in use 
+leaseDir: /var/lib/openvpn/pool
+
+# contains the configurations of the CN
+configDir: /var/lib/vpn-server-api/config
+
+v4:
+    # the range containing all the subsequent ranges mentioned below
+    range: 10.42.42.0/24
+
+    pools:
+        default:
+            # full access
+            name: Default
+            range: 10.42.42.32/27
+
+        v6:
+            # only provide IPv6 access, block all IPv4 traffic
+            name: IPv6-only
+            range: 10.42.42.64/27
+
+        https:
+            # block all connections except DNS and HTTPS
+            name: HTTPS-only
+            range: 10.42.42.96/27
+
+v6:
+    # the IPv6 prefix (the first 64 bits)
+    prefix: 'fd00:4242:4242:1194'

@@ -24,18 +24,23 @@ use fkooman\Http\JsonResponse;
 use Psr\Log\LoggerInterface;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Json\Json;
+use fkooman\Http\Exception\BadRequestException;
 
 class ConfigModule implements ServiceModuleInterface
 {
-    /** @var StaticConfig */
-    private $staticConfig;
+    /** @var ConfigStorageInterface */
+    private $configStorage;
+
+    /** @var array */
+    private $allowedPools;
 
     /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
-    public function __construct(StaticConfig $staticConfig, LoggerInterface $logger)
+    public function __construct(ConfigStorageInterface $configStorage, array $allowedPools, LoggerInterface $logger)
     {
-        $this->staticConfig = $staticConfig;
+        $this->configStorage = $configStorage;
+        $this->allowedPools = $allowedPools;
         $this->logger = $logger;
     }
 
@@ -45,14 +50,14 @@ class ConfigModule implements ServiceModuleInterface
         $service->get(
             '/config/',
             function (Request $request) {
-                $userId = InputValidation::userId(
-                    $request->getUrl()->getQueryParameter('user_id'),
-                    false // OPTIONAL
-                );
+                $userId = $request->getUrl()->getQueryParameter('user_id');
+                if (!is_null($userId)) {
+                    InputValidation::userId($userId);
+                }
                 $response = new JsonResponse();
                 $response->setBody(
                     [
-                        'items' => $this->staticConfig->getAllConfig($userId),
+                        'items' => $this->configStorage->getAllConfig($userId),
                     ]
                 );
 
@@ -64,14 +69,11 @@ class ConfigModule implements ServiceModuleInterface
         $service->get(
             '/config/:commonName',
             function (Request $request, $commonName) {
-                $commonName = InputValidation::commonName(
-                    $commonName,
-                    true // REQUIRED
-                );
+                InputValidation::commonName($commonName);
 
                 $response = new JsonResponse();
                 $response->setBody(
-                    $this->staticConfig->getConfig($commonName)->toArray()
+                    $this->configStorage->getConfig($commonName)->toArray()
                 );
 
                 return $response;
@@ -83,14 +85,14 @@ class ConfigModule implements ServiceModuleInterface
             '/config/:commonName',
             function (Request $request, $commonName) {
                 // XXX check content type
-                $commonName = InputValidation::commonName(
-                    $commonName,
-                    true // REQUIRED
-                );
 
-                // XXX: Config object validates input (move this?!)
-                $config = new Config(Json::decode($request->getBody()));
-                $this->staticConfig->setConfig($commonName, $config);
+                InputValidation::commonName($commonName);
+
+                $configData = new ConfigData(Json::decode($request->getBody()));
+                if (!in_array($configData->getPool(), $this->allowedPools)) {
+                    throw new BadRequestException('invalid "pool"');
+                }
+                $this->configStorage->setConfig($commonName, $configData);
 
                 $response = new JsonResponse();
                 $response->setBody(
