@@ -73,10 +73,8 @@ class OpenVpnModule implements ServiceModuleInterface
         $service->post(
             '/kill',
             function (Request $request) {
-                $commonName = InputValidation::commonName(
-                    $request->getPostParameter('common_name'),
-                    true   // REQUIRED
-                );
+                $commonName = $request->getPostParameter('common_name');
+                InputValidation::commonName($commonName);
 
                 $this->logger->info('killing cn', array('cn' => $commonName));
 
