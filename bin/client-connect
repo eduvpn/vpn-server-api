@@ -130,9 +130,9 @@ try {
     syslog(LOG_INFO, Json::encode($logData));
 
     $db = new PDO(
-        $config->v('Log', 'dsn'),
-        $config->v('Log', 'username', false),
-        $config->v('Log', 'password', false)
+        $logConfig->v('log', 'dsn'),
+        $logConfig->v('log', 'username', false),
+        $logConfig->v('log', 'password', false)
     );
 
     $connectionLog = new ConnectionLog($db);
