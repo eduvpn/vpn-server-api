@@ -260,16 +260,16 @@
         },
         {
             "name": "fkooman/rest-plugin-authentication-bearer",
-            "version": "2.2.0",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-lib-rest-plugin-authentication-bearer.git",
-                "reference": "f0abf30d3835a8dd39fb86899073128543067d61"
+                "reference": "08c97721f98d4a74a021325da6b543934cb23bb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-lib-rest-plugin-authentication-bearer/zipball/f0abf30d3835a8dd39fb86899073128543067d61",
-                "reference": "f0abf30d3835a8dd39fb86899073128543067d61",
+                "url": "https://api.github.com/repos/fkooman/php-lib-rest-plugin-authentication-bearer/zipball/08c97721f98d4a74a021325da6b543934cb23bb4",
+                "reference": "08c97721f98d4a74a021325da6b543934cb23bb4",
                 "shasum": ""
             },
             "require": {
@@ -299,7 +299,7 @@
                 }
             ],
             "description": "Bearer (OAuth) Authentication plugin for fkooman/rest-plugin-authentication",
-            "time": "2016-02-25 12:13:52"
+            "time": "2016-02-26 17:37:24"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -577,16 +577,16 @@
         },
         {
             "name": "react/promise",
-            "version": "v2.2.1",
+            "version": "v2.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise.git",
-                "reference": "3b6fca09c7d56321057fa8867c8dbe1abf648627"
+                "reference": "3aacad8bf10c7d83e6fa2089d413529888c2bedf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/3b6fca09c7d56321057fa8867c8dbe1abf648627",
-                "reference": "3b6fca09c7d56321057fa8867c8dbe1abf648627",
+                "url": "https://api.github.com/repos/reactphp/promise/zipball/3aacad8bf10c7d83e6fa2089d413529888c2bedf",
+                "reference": "3aacad8bf10c7d83e6fa2089d413529888c2bedf",
                 "shasum": ""
             },
             "require": {
@@ -617,20 +617,20 @@
                 }
             ],
             "description": "A lightweight implementation of CommonJS Promises/A for PHP",
-            "time": "2015-07-03 13:48:55"
+            "time": "2016-02-26 19:09:02"
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.8.2",
+            "version": "v2.8.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "34c8a4b51e751e7ea869b8262f883d008a2b81b8"
+                "reference": "2a4ee40acb880c56f29fb1b8886e7ffe94f3b995"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/34c8a4b51e751e7ea869b8262f883d008a2b81b8",
-                "reference": "34c8a4b51e751e7ea869b8262f883d008a2b81b8",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/2a4ee40acb880c56f29fb1b8886e7ffe94f3b995",
+                "reference": "2a4ee40acb880c56f29fb1b8886e7ffe94f3b995",
                 "shasum": ""
             },
             "require": {
@@ -666,7 +666,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2016-01-13 10:28:07"
+            "time": "2016-02-23 07:41:20"
         }
     ],
     "packages-dev": [],

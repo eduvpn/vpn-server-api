@@ -27,7 +27,7 @@ use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\VPN\Server\Ca\CaModule;
 use fkooman\VPN\Server\Ca\CrlFetcher;
 use fkooman\VPN\Server\Config\ConfigModule;
-use fkooman\VPN\Server\Config\StaticConfig;
+use fkooman\VPN\Server\Config\FileConfigStorage;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Log\LogModule;
 use fkooman\VPN\Server\OpenVpn\OpenVpnModule;
@@ -37,6 +37,7 @@ use fkooman\VPN\Server\OpenVpn\ServerSocket;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
+use GuzzleHttp\Client;
 
 try {
     $config = new Reader(
@@ -58,7 +59,7 @@ try {
                     'Authorization' => sprintf(
                         'Bearer %s',
                         $config->v(
-                            'remote-credentials',
+                            'remoteCredentials',
                             'vpn-config-api',
                             'token'
                         )
@@ -76,9 +77,8 @@ try {
     );
 
     // handles the client configuration directory
-    $staticConfig = new StaticConfig(
-        $ipConfig->v('configDir'),
-        array_keys($ipConfig->v('v4', 'pools'))
+    $staticConfig = new FileConfigStorage(
+        $ipConfig->v('configDir')
     );
 
     // handles the connection to the various OpenVPN instances
@@ -129,7 +129,7 @@ try {
     $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     $service->addModule(new LogModule($connectionLog));
     $service->addModule(new OpenVpnModule($serverManager, $logger));
-    $service->addModule(new ConfigModule($staticConfig, $logger));
+    $service->addModule(new ConfigModule($staticConfig, array_keys($ipConfig->v('v4', 'pools')), $logger));
     $service->addModule(new CaModule($crlFetcher, $logger));
     $service->run()->send();
 } catch (Exception $e) {
