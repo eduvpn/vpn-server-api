@@ -43,7 +43,7 @@ class OpenVpnModule implements ServiceModuleInterface
     public function init(Service $service)
     {
         $service->get(
-            '/status',
+            '/openvpn/status',
             function (Request $request, TokenInfo $tokenInfo) {
                 self::requireScope($tokenInfo, 'openvpn_info');
 
@@ -55,7 +55,7 @@ class OpenVpnModule implements ServiceModuleInterface
         );
 
         $service->get(
-            '/load-stats',
+            '/openvpn/load-stats',
             function (Request $request, TokenInfo $tokenInfo) {
                 self::requireScope($tokenInfo, 'openvpn_info');
 
@@ -67,7 +67,7 @@ class OpenVpnModule implements ServiceModuleInterface
         );
 
         $service->get(
-            '/version',
+            '/openvpn/version',
             function (Request $request, TokenInfo $tokenInfo) {
                 self::requireScope($tokenInfo, 'openvpn_info');
 
@@ -79,7 +79,7 @@ class OpenVpnModule implements ServiceModuleInterface
         );
 
         $service->post(
-            '/kill',
+            '/openvpn/kill',
             function (Request $request, TokenInfo $tokenInfo) {
                 self::requireScope($tokenInfo, 'openvpn_kill');
 

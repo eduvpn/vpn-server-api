@@ -59,7 +59,7 @@ try {
                     'Authorization' => sprintf(
                         'Bearer %s',
                         $config->v(
-                            'remoteCredentials',
+                            'remoteApi',
                             'vpn-config-api',
                             'token'
                         )
@@ -71,7 +71,7 @@ try {
 
     // handles fetching the certificate revocation list
     $crlFetcher = new CrlFetcher(
-        $config->v('crl', 'uri'),
+        sprintf('%s/ca.crl', $config->v('remoteApi', 'vpn-config-api', 'uri')),
         $config->v('crl', 'path'),
         $client
     );
@@ -119,7 +119,7 @@ try {
     // API authentication
     $apiAuth = new BearerAuthentication(
         new ArrayBearerValidator(
-            $config->v('credentials')
+            $config->v('api')
         ),
         ['realm' => 'VPN Server API']
      );

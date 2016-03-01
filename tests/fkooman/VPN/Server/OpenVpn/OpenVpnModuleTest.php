@@ -78,7 +78,7 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
-            $this->makeRequest('GET', '/status', [])
+            $this->makeRequest('GET', '/openvpn/status', [])
         );
     }
 
@@ -99,7 +99,7 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
-            $this->makeRequest('GET', '/load-stats', [])
+            $this->makeRequest('GET', '/openvpn/load-stats', [])
         );
     }
 
@@ -116,7 +116,7 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
-            $this->makeRequest('GET', '/version', [])
+            $this->makeRequest('GET', '/openvpn/version', [])
         );
     }
 
@@ -133,7 +133,7 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
-            $this->makeRequest('POST', '/kill', ['common_name' => 'xyz'])
+            $this->makeRequest('POST', '/openvpn/kill', ['common_name' => 'xyz'])
         );
     }
 

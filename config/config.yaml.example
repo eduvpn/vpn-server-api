@@ -5,11 +5,10 @@ openVpn:
 
 # CRL
 crl:
-    uri: 'http://localhost:8008/api.php/ca/crl/fetch'
     path: /var/lib/vpn-server-api
 
 # API credentials
-credentials:
+api:
     vpn-user-portal:
         scope: config_get_user openvpn_kill ca_crl_fetch
         token: uvwxyz
@@ -18,7 +17,8 @@ credentials:
         token: uuvvww
 
 # API credentials for access to remote services
-remote-credentials:
+remoteApi:
     # required to fetch the CRL
     vpn-config-api:
+        uri: 'http://localhost:8008/api.php'
         token: aabbcc

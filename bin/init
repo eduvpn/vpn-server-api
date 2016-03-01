@@ -23,13 +23,13 @@ use fkooman\VPN\Server\Log\ConnectionLog;
 
 try {
     $config = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/client.yaml')
+        new YamlFile(dirname(__DIR__).'/config/log.yaml')
     );
 
     $db = new PDO(
-        $config->v('Log', 'dsn'),
-        $config->v('Log', 'username', false),
-        $config->v('Log', 'password', false)
+        $config->v('log', 'dsn'),
+        $config->v('log', 'username', false),
+        $config->v('log', 'password', false)
     );
 
     $connectionLog = new ConnectionLog($db);
