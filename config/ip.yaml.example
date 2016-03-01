@@ -12,17 +12,14 @@ v4:
 
     pools:
         default:
-            # full access
             name: Default
             range: 10.42.42.32/27
 
         v6:
-            # only provide IPv6 access, block all IPv4 traffic
             name: IPv6-only
             range: 10.42.42.64/27
 
         https:
-            # block all connections except DNS and HTTPS
             name: HTTPS-only
             range: 10.42.42.96/27
 
