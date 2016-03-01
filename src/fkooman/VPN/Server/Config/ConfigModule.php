@@ -25,6 +25,8 @@ use Psr\Log\LoggerInterface;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Json\Json;
 use fkooman\Http\Exception\BadRequestException;
+use fkooman\Http\Exception\ForbiddenException;
+use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 
 class ConfigModule implements ServiceModuleInterface
 {
@@ -49,11 +51,15 @@ class ConfigModule implements ServiceModuleInterface
         // get all configurations
         $service->get(
             '/config/',
-            function (Request $request) {
+            function (Request $request, TokenInfo $tokenInfo) {
                 $userId = $request->getUrl()->getQueryParameter('user_id');
                 if (!is_null($userId)) {
+                    self::requireScope($tokenInfo, ['config_get', 'config_get_user']);
                     InputValidation::userId($userId);
+                } else {
+                    self::requireScope($tokenInfo, ['config_get']);
                 }
+
                 $response = new JsonResponse();
                 $response->setBody(
                     [
@@ -68,7 +74,9 @@ class ConfigModule implements ServiceModuleInterface
         // get configuration for a particular common_name
         $service->get(
             '/config/:commonName',
-            function (Request $request, $commonName) {
+            function (Request $request, TokenInfo $tokenInfo, $commonName) {
+                self::requireScope($tokenInfo, ['config_get']);
+
                 InputValidation::commonName($commonName);
 
                 $response = new JsonResponse();
@@ -83,7 +91,9 @@ class ConfigModule implements ServiceModuleInterface
         // set configuration for a particular common_name
         $service->put(
             '/config/:commonName',
-            function (Request $request, $commonName) {
+            function (Request $request, TokenInfo $tokenInfo, $commonName) {
+                self::requireScope($tokenInfo, ['config_update']);
+
                 // XXX check content type
 
                 InputValidation::commonName($commonName);
@@ -102,5 +112,16 @@ class ConfigModule implements ServiceModuleInterface
                 return $response;
             }
         );
+    }
+
+    private static function requireScope(TokenInfo $tokenInfo, array $requiredScope)
+    {
+        foreach ($requiredScope as $s) {
+            if ($tokenInfo->getScope()->hasScope($s)) {
+                return;
+            }
+        }
+
+        throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', implode(',', $requiredScope)));
     }
 }

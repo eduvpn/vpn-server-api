@@ -19,9 +19,9 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
+use fkooman\Json\Json;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Utils;
-use fkooman\Json\Json;
 
 openlog(
     basename($argv[0]),
@@ -30,11 +30,14 @@ openlog(
 );
 
 try {
-    $config = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/client.yaml')
+    // read configuration
+    $ipConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/ip.yaml')
     );
 
-    $ipPoolDir = $config->v('IPv4', 'ipPoolDir', false, '/var/lib/openvpn/pool');
+    $logConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/log.yaml')
+    );
 
     $envData = [];
     $envKeys = [
@@ -55,13 +58,18 @@ try {
         $envData[$envKey] = $envValue;
     }
 
+    $leaseDir = $ipConfig->v('leaseDir');
+
     // XXX validate the environment variables
     $v4 = $envData['ifconfig_pool_remote_ip'];
     $v6 = $envData['ifconfig_pool_remote_ip6'];
 
-    if (false === @unlink(sprintf('%s/%s', $ipPoolDir, $v4))) {
-        throw new RuntimeException(sprintf('unable to release IP address "%s"', $v4));
-    }
+    // try to remove the leaseFile
+    @unlink(sprintf('%s/%s', $leaseDir, $v4));
+
+    // try to remove the routes
+    Utils::delRoute4($v4, false);
+    Utils::delRoute6($v6, false);
 
     $logData = array(
         'common_name' => $envData['common_name'],
@@ -76,25 +84,12 @@ try {
     syslog(LOG_INFO, Json::encode($logData));
 
     $db = new PDO(
-        $config->v('Log', 'dsn'),
-        $config->v('Log', 'username', false),
-        $config->v('Log', 'password', false)
+        $logConfig->v('log', 'dsn'),
+        $logConfig->v('log', 'username', false),
+        $logConfig->v('log', 'password', false)
     );
     $connectionLog = new ConnectionLog($db);
     $connectionLog->disconnect($logData);
-
-    try {
-        Utils::delRoute4($v4);
-        Utils::flushRouteCache4();
-    } catch (RuntimeException $e) {
-        syslog(LOG_WARN, sprintf('unable to delete route for "%s"', $v4));
-    }
-    try {
-        Utils::delRoute6($v6);
-        Utils::flushRouteCache6();
-    } catch (RuntimeException $e) {
-        syslog(LOG_WARN, sprintf('unable to delete route for "%s"', $v6));
-    }
 } catch (Exception $e) {
     syslog(LOG_ERR, $e->getMessage());
     exit(66);

@@ -9,6 +9,8 @@ use fkooman\Http\Exception\BadRequestException;
 use fkooman\IO\IO;
 use fkooman\Http\JsonResponse;
 use fkooman\VPN\Server\InputValidation;
+use fkooman\Http\Exception\ForbiddenException;
+use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 
 class LogModule implements ServiceModuleInterface
 {
@@ -31,7 +33,9 @@ class LogModule implements ServiceModuleInterface
     {
         $service->get(
             '/log/:showDate',
-            function (Request $request, $showDate) {
+            function (Request $request, TokenInfo $tokenInfo, $showDate) {
+                self::requireScope($tokenInfo, 'log_get');
+
                 InputValidation::date($showDate);
 
                 $showDateUnix = strtotime($showDate);
@@ -62,5 +66,12 @@ class LogModule implements ServiceModuleInterface
                 return $response;
             }
         );
+    }
+
+    private static function requireScope(TokenInfo $tokenInfo, $requiredScope)
+    {
+        if (!$tokenInfo->getScope()->hasScope($requiredScope)) {
+            throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', $requiredScope));
+        }
     }
 }

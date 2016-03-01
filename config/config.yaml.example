@@ -11,10 +11,10 @@ crl:
 # API credentials
 credentials:
     vpn-user-portal:
-        scope: list_user
+        scope: config_get_user openvpn_kill ca_crl_fetch
         token: uvwxyz
     vpn-admin-portal:
-        scope: list_all update_config
+        scope: config_get config_update log_get openvpn_kill openvpn_info
         token: uuvvww
 
 # API credentials for access to remote services

@@ -36,7 +36,7 @@ class FileConfigStorage implements ConfigStorageInterface
         try {
             return new ConfigData(Json::decodeFile($commonNamePath));
         } catch (RuntimeException $e) {
-            return new ConfigData('default', false);
+            return new ConfigData([]);
         }
     }
 

@@ -21,14 +21,16 @@ use RuntimeException;
 
 class Utils
 {
-    public static function exec($cmd)
+    public static function exec($cmd, $throwExceptionOnFailure = true)
     {
         exec($cmd, $output, $returnValue);
 
         if (0 !== $returnValue) {
-            throw new RuntimeException(
-                sprintf('command "%s" did not complete successfully (%d)', $cmd, $returnValue)
-            );
+            if($throwExceptionOnFailure) {
+                throw new RuntimeException(
+                    sprintf('command "%s" did not complete successfully (%d)', $cmd, $returnValue)
+                );
+            }
         }
     }
 
@@ -39,49 +41,55 @@ class Utils
         }
     }
 
-    public static function getUsedIpList($ipPoolDir)
+    public static function getActiveLeases($leaseDir)
     {
-        $usedIpList = [];
-        foreach (glob(sprintf('%s/*', $ipPoolDir)) as $ipFile) {
-            $usedIpList[] = basename($ipFile);
+        $activeLeases = [];
+        foreach (glob(sprintf('%s/*', $leaseDir)) as $leaseFile) {
+            $activeLeases[] = basename($leaseFile);
         }
 
-        return $usedIpList;
+        return $activeLeases;
     }
 
     public static function addRoute4($v4, $dev)
     {
+        self::delRoute4($v4, false);
+        self::flushRouteCache4();
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro add %s/32 dev %s', $v4, $dev);
         self::exec($cmd);
     }
 
     public static function addRoute6($v6, $dev)
     {
+        self::delRoute6($v6, false);
+        self::flushRouteCache6();      
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro add %s/128 dev %s', $v6, $dev);
         self::exec($cmd);
     }
 
-    public static function delRoute4($v4)
+    public static function delRoute4($v4, $throwExceptionOnFailure = true)
     {
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -4 ro del %s/32', $v4);
-        self::exec($cmd);
+        self::exec($cmd, $throwExceptionOnFailure);
+        self::flushRouteCache4();
     }
 
-    public static function delRoute6($v6)
+    public static function delRoute6($v6, $throwExceptionOnFailure = true)
     {
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro del %s/128', $v6);
-        self::exec($cmd);
+        self::exec($cmd, $throwExceptionOnFailure);
+        self::flushRouteCache6();
     }
 
-    public static function flushRouteCache4()
+    private static function flushRouteCache4()
     {
         $cmd = '/usr/bin/sudo /sbin/ip -4 ro flush cache';
-        self::exec($cmd);
+        self::exec($cmd, false);
     }
 
-    public static function flushRouteCache6()
+    private static function flushRouteCache6()
     {
         $cmd = '/usr/bin/sudo /sbin/ip -6 ro flush cache';
-        self::exec($cmd);
+        self::exec($cmd, false);
     }
 }

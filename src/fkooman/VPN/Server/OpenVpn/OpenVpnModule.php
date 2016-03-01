@@ -23,6 +23,8 @@ use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\JsonResponse;
 use Psr\Log\LoggerInterface;
 use fkooman\VPN\Server\InputValidation;
+use fkooman\Http\Exception\ForbiddenException;
+use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 
 class OpenVpnModule implements ServiceModuleInterface
 {
@@ -42,7 +44,9 @@ class OpenVpnModule implements ServiceModuleInterface
     {
         $service->get(
             '/status',
-            function (Request $request) {
+            function (Request $request, TokenInfo $tokenInfo) {
+                self::requireScope($tokenInfo, 'openvpn_info');
+
                 $response = new JsonResponse();
                 $response->setBody($this->serverManager->status());
 
@@ -52,7 +56,9 @@ class OpenVpnModule implements ServiceModuleInterface
 
         $service->get(
             '/load-stats',
-            function (Request $request) {
+            function (Request $request, TokenInfo $tokenInfo) {
+                self::requireScope($tokenInfo, 'openvpn_info');
+
                 $response = new JsonResponse();
                 $response->setBody($this->serverManager->loadStats());
 
@@ -62,7 +68,9 @@ class OpenVpnModule implements ServiceModuleInterface
 
         $service->get(
             '/version',
-            function (Request $request) {
+            function (Request $request, TokenInfo $tokenInfo) {
+                self::requireScope($tokenInfo, 'openvpn_info');
+
                 $response = new JsonResponse();
                 $response->setBody($this->serverManager->version());
 
@@ -72,7 +80,9 @@ class OpenVpnModule implements ServiceModuleInterface
 
         $service->post(
             '/kill',
-            function (Request $request) {
+            function (Request $request, TokenInfo $tokenInfo) {
+                self::requireScope($tokenInfo, 'openvpn_kill');
+
                 $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);
 
@@ -84,5 +94,12 @@ class OpenVpnModule implements ServiceModuleInterface
                 return $response;
             }
         );
+    }
+
+    private static function requireScope(TokenInfo $tokenInfo, $requiredScope)
+    {
+        if (!$tokenInfo->getScope()->hasScope($requiredScope)) {
+            throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', $requiredScope));
+        }
     }
 }

@@ -22,6 +22,8 @@ use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\JsonResponse;
 use Psr\Log\LoggerInterface;
+use fkooman\Http\Exception\ForbiddenException;
+use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 
 class CaModule implements ServiceModuleInterface
 {
@@ -41,7 +43,9 @@ class CaModule implements ServiceModuleInterface
     {
         $service->post(
             '/ca/crl/fetch',
-            function (Request $request) {
+            function (Request $request, TokenInfo $tokenInfo) {
+                self::requireScope($tokenInfo, 'ca_crl_fetch');
+
                 $this->logger->info('fetching CRL');
 
                 $this->crlFetcher->fetch();
@@ -54,5 +58,12 @@ class CaModule implements ServiceModuleInterface
                 return $response;
             }
         );
+    }
+
+    private static function requireScope(TokenInfo $tokenInfo, $requiredScope)
+    {
+        if (!$tokenInfo->getScope()->hasScope($requiredScope)) {
+            throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', $requiredScope));
+        }
     }
 }

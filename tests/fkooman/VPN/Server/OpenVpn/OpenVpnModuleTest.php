@@ -23,10 +23,11 @@ require_once __DIR__.'/Test/TestSocket.php';
 use fkooman\Rest\Service;
 use PHPUnit_Framework_TestCase;
 use fkooman\Http\Request;
-use fkooman\Rest\Plugin\Authentication\Dummy\DummyAuthentication;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
 use fkooman\VPN\Server\OpenVpn\Test\TestSocket;
 use Psr\Log\NullLogger;
+use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
+use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
 
 class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -36,9 +37,19 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->service = new Service();
-        $dummyAuth = new DummyAuthentication('foo');
         $authenticationPlugin = new AuthenticationPlugin();
-        $authenticationPlugin->register($dummyAuth, 'api');
+        $authenticationPlugin->register(
+            new BearerAuthentication(
+                new ArrayBearerValidator(
+                    [
+                        'vpn-user-portal' => [
+                            'token' => 'aabbcc',
+                            'scope' => 'openvpn_info openvpn_kill',
+                        ],
+                    ]
+                )
+            ),
+            'api');
         $this->service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     }
 
@@ -138,6 +149,7 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                         'REQUEST_URI' => sprintf('%s?%s', $requestUri, http_build_query($queryBody)),
                         'PATH_INFO' => $requestUri,
                         'QUERY_STRING' => http_build_query($queryBody),
+                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', 'aabbcc'),
                     )
                 )
             )->getBody();
@@ -152,6 +164,7 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                         'REQUEST_URI' => $requestUri,
                         'PATH_INFO' => $requestUri,
                         'QUERY_STRING' => '',
+                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', 'aabbcc'),
                     ),
                     $queryBody
                 )

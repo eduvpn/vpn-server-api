@@ -21,9 +21,10 @@ namespace fkooman\VPN\Server\Log;
 use fkooman\Rest\Service;
 use PHPUnit_Framework_TestCase;
 use fkooman\Http\Request;
-use fkooman\Rest\Plugin\Authentication\Dummy\DummyAuthentication;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
 use PDO;
+use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
+use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
 
 class LogModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -62,9 +63,19 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
 
         $this->service = new Service();
         $this->service->addModule($logModule);
-        $dummyAuth = new DummyAuthentication('foo');
         $authenticationPlugin = new AuthenticationPlugin();
-        $authenticationPlugin->register($dummyAuth, 'api');
+        $authenticationPlugin->register(
+            new BearerAuthentication(
+                new ArrayBearerValidator(
+                    [
+                        'vpn-user-portal' => [
+                            'token' => 'aabbcc',
+                            'scope' => 'log_get',
+                        ],
+                    ]
+                )
+            ),
+            'api');
         $this->service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     }
 
@@ -123,6 +134,7 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
                         'REQUEST_URI' => sprintf('%s?%s', $requestUri, http_build_query($queryBody)),
                         'PATH_INFO' => $requestUri,
                         'QUERY_STRING' => http_build_query($queryBody),
+                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', 'aabbcc'),
                     )
                 )
             )->getBody();
@@ -137,6 +149,7 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
                         'REQUEST_URI' => $requestUri,
                         'PATH_INFO' => $requestUri,
                         'QUERY_STRING' => '',
+                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', 'aabbcc'),
                     ),
                     $queryBody
                 )

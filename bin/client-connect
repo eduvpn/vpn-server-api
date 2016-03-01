@@ -21,6 +21,7 @@ use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\Json\Json;
 use fkooman\VPN\Server\Config\AddressPool;
+use fkooman\VPN\Server\Config\FileConfigStorage;
 use fkooman\VPN\Server\Config\IP;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Utils;
@@ -31,25 +32,18 @@ openlog(
     LOG_USER
 );
 
+# global, we need those for cleanup if something goes wrong
+$v4 = null;
+$v6 = null;
+$leaseDir = null;
+
 try {
-    $config = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/client.yaml')
-    );
-
-    // IPv6
-    $v6p = $config->v('IPv6', 'prefix', false, 'fd00:1234:1234:1234');
-    $v6r = sprintf('%s::1', $v6p);
-
-    // IPv4
-    $ipRange = new IP($config->v('IPv4', 'ipRange', false, '10.10.10.0/24'));
-    $poolRange = new IP($config->v('IPv4', 'poolRange', false, '10.10.10.128/25'));
-
-    $v4s = $poolRange->getFirstHost();
-    $v4e = $poolRange->getLastHost();
-    $v4n = $ipRange->getNetmask();
-
-    $ipPoolDir = $config->v('IPv4', 'ipPoolDir', false, '/var/lib/openvpn/pool');
-    $staticConfigDir = $config->v('IPv4', 'staticConfigDir', false, sprintf('%s/data/static', dirname(__DIR__)));
+    // OpenVPN specifies a temporary file to write a configuration for that 
+    // particular CN to
+    if ($argc < 2) {
+        throw new RuntimeException('temporary CN configuration file not specified');
+    }
+    $cnConfigFile = $argv[1];
 
     $envData = [];
     $envKeys = [
@@ -58,6 +52,7 @@ try {
         'dev',
     ];
 
+    // read environment variables
     foreach ($envKeys as $envKey) {
         $envValue = getenv($envKey);
         if (empty($envValue)) {
@@ -66,63 +61,54 @@ try {
         $envData[$envKey] = $envValue;
     }
 
-    if ($argc < 2) {
-        throw new RuntimeException('temporary client configuration file not specified');
-    }
-    $tmpConfig = $argv[1];
+    // read configuration
+    $ipConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/ip.yaml')
+    );
 
-    $staticConfigFile = sprintf('%s/%s', $staticConfigDir, $envData['common_name']);
+    $logConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/log.yaml')
+    );
 
-    // read static config if it exists
-    if (file_exists($staticConfigFile)) {
-        $staticConfig = Json::decodeFile($staticConfigFile);
-    } else {
-        $staticConfig = array();
-    }
+    // read the CN configuration
+    $configDir = $ipConfig->v('configDir');
+    $configStorage = new FileConfigStorage($configDir);
+    $cnConfig = $configStorage->getConfig($envData['common_name']);
 
-    // check if CN is disabled
-    if (array_key_exists('disable', $staticConfig) && $staticConfig['disable']) {
-        // yes, disabled
-        Utils::writeTempConfig($tmpConfig, array('disable'));
-        exit(0);
-    }
-
-    // check if it has a static IPv4 address
-    if (array_key_exists('v4', $staticConfig) && !is_null($staticConfig['v4'])) {
-        // has static 
-        $v4 = $staticConfig['v4'];
-        $v6 = AddressPool::getIp6($v6p, $v4);
-    } else {
-        // no static, use pool
-        $usedIpList = Utils::getUsedIpList($ipPoolDir);
-        $v4 = AddressPool::getIp4($v4s, $v4e, $usedIpList);
-        $v6 = AddressPool::getIp6($v6p, $v4);
+    // is the CN disabled?
+    if ($cnConfig->getDisable()) {
+        syslog(LOG_INFO, sprintf('"%s" not allowed, disabled by administrator', $envData['common_name']));
+        exit(1);
     }
 
-    // try to delete routes first, maybe there are stale leftovers somehow, 
-    // but if it fails it is okay, as they may not have been set if the 
-    // previous connection was cleaned up nicely
-    try {
-        Utils::delRoute4($v4);
-        Utils::flushRouteCache4();
-    } catch (RuntimeException $e) {
-        syslog(LOG_WARN, sprintf('unable to delete route for "%s"', $v4));
-    }
-    try {
-        Utils::delRoute6($v6);
-        Utils::flushRouteCache6();
-    } catch (RuntimeException $e) {
-        syslog(LOG_WARN, sprintf('unable to delete route for "%s"', $v6));
-    }
+    // get the pool
+    $cnPool = $cnConfig->getPool();
 
-    // add routes
+    // the full client IP range
+    $ipRange = new IP($ipConfig->v('v4', 'range'));
+
+    // the pool IP range
+    $poolConfig = $ipConfig->v('v4', 'pools', $cnPool);
+    syslog(LOG_INFO, sprintf('"%s" connecting to pool "%s"', $envData['common_name'], $poolConfig['name']));
+    $poolRange = new IP($poolConfig['range']);
+
+    $v4s = $poolRange->getFirstHost();
+    $v4e = $poolRange->getLastHost();
+    $v4n = $ipRange->getNetmask();
+    $v6p = $ipConfig->v('v6', 'prefix');
+    $v6r = sprintf('%s::1', $v6p);
+
+    $leaseDir = $ipConfig->v('leaseDir');
+
+    $activeLeases = Utils::getActiveLeases($leaseDir);
+    $v4 = AddressPool::getIp4($v4s, $v4e, $activeLeases);
+    $v6 = AddressPool::getIp6($v6p, $v4);
+
     Utils::addRoute4($v4, $envData['dev']);
-    Utils::flushRouteCache4();
     Utils::addRoute6($v6, $envData['dev']);
-    Utils::flushRouteCache6();
 
     // mark the IP address as used    
-    if (false === @touch(sprintf('%s/%s', $ipPoolDir, $v4))) {
+    if (false === @touch(sprintf('%s/%s', $leaseDir, $v4))) {
         throw new RuntimeException(sprintf('unable to claim IP address "%s"', $v4));
     }
 
@@ -131,7 +117,7 @@ try {
         sprintf('ifconfig-push %s %s', $v4, $v4n),
         sprintf('ifconfig-ipv6-push %s/64 %s', $v6, $v6r),
     );
-    Utils::writeTempConfig($tmpConfig, $configFileData);
+    Utils::writeTempConfig($cnConfigFile, $configFileData);
 
     // log stuff
     $logData = array(
@@ -153,5 +139,22 @@ try {
     $connectionLog->connect($logData);
 } catch (Exception $e) {
     syslog(LOG_ERR, $e->getMessage());
+
+    // remove the lease file if it was created
+    if (!is_null($leaseDir) && !is_null($v4)) {
+        $leaseFile = sprintf('%s/%s', $leaseDir, $v4);
+        if (@file_exists($leaseFile)) {
+            @unlink($leaseFile);
+        }
+    }
+
+    // remove routes if they exist
+    if (!is_null($v4)) {
+        Utils::delRoute4($v4, false);
+    }
+    if (!is_null($v6)) {
+        Utils::delRoute6($v6, false);
+    }
+
     exit(66);
 }
