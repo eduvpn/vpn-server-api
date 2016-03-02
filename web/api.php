@@ -28,6 +28,7 @@ use fkooman\VPN\Server\Ca\CaModule;
 use fkooman\VPN\Server\Ca\CrlFetcher;
 use fkooman\VPN\Server\Config\ConfigModule;
 use fkooman\VPN\Server\Config\FileConfigStorage;
+use fkooman\VPN\Server\Info\InfoModule;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Log\LogModule;
 use fkooman\VPN\Server\OpenVpn\OpenVpnModule;
@@ -131,6 +132,7 @@ try {
     $service->addModule(new OpenVpnModule($serverManager, $logger));
     $service->addModule(new ConfigModule($staticConfig, array_keys($ipConfig->v('v4', 'pools')), $logger));
     $service->addModule(new CaModule($crlFetcher, $logger));
+    $service->addModule(new InfoModule($ipConfig->v('v4'), $ipConfig->v('v6')));
     $service->run()->send();
 } catch (Exception $e) {
     // internal server error

@@ -95,6 +95,7 @@ class ConfigModule implements ServiceModuleInterface
                 self::requireScope($tokenInfo, ['config_update']);
 
                 // XXX check content type
+                // XXX allow for disconnect as well when updating config
 
                 InputValidation::commonName($commonName);
 

@@ -26,7 +26,7 @@ class Utils
         exec($cmd, $output, $returnValue);
 
         if (0 !== $returnValue) {
-            if($throwExceptionOnFailure) {
+            if ($throwExceptionOnFailure) {
                 throw new RuntimeException(
                     sprintf('command "%s" did not complete successfully (%d)', $cmd, $returnValue)
                 );
@@ -62,7 +62,7 @@ class Utils
     public static function addRoute6($v6, $dev)
     {
         self::delRoute6($v6, false);
-        self::flushRouteCache6();      
+        self::flushRouteCache6();
         $cmd = sprintf('/usr/bin/sudo /sbin/ip -6 ro add %s/128 dev %s', $v6, $dev);
         self::exec($cmd);
     }
