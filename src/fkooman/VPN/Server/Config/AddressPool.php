@@ -17,8 +17,6 @@
 
 namespace fkooman\VPN\Server\Config;
 
-use InvalidArgumentException;
-
 class AddressPool
 {
     /**
@@ -50,53 +48,16 @@ class AddressPool
     /**
      * Give a matching IPv6 address for the obtained IPv4 address.
      *
-     * @param string $v6 the expanded first 64 bits of an IPv6 address 
-     *                   (network), e.g. "fd00:4242:4242:4242"
-     * @param string $v4 the IPv4 address to use in the IPv6 address
+     * @param string $v6p the expanded first 64 bits of an IPv6 address 
+     *                    (network), e.g. "fd00:4242:4242:4242"
+     * @param string $v4  the IPv4 address to use in the IPv6 address
      *
      * @return string the IPv6 address containing the IPv4 address
      */
-    public static function getIp6($v6, $v4)
+    public static function getIp6($v6p, $v4)
     {
-        if (3 !== substr_count($v6, ':')) {
-            throw new InvalidArgumentException('specify the expanded network part of a /64 IPv6 address');
-        }
-        if (3 !== substr_count($v4, '.')) {
-            throw new InvalidArgumentException('invalid IPv4 address');
-        }
+        $v4e = str_split(bin2hex(inet_pton($v4)), 4);
 
-        $v6e = explode(':', $v6);
-        $v4e = explode('.', $v4);
-
-        $v4v6 = sprintf(
-            '%s:%s:%s:%s:%s:%s:%s:%s', $v6e[0], $v6e[1], $v6e[2], $v6e[3], $v4e[0], $v4e[1], $v4e[2], $v4e[3]
-        );
-
-        return $v4v6;
+        return sprintf('%s::ffff:%s:%s', $v6p, $v4e[0], $v4e[1]);
     }
 }
-
-#try {
-#    $ip4 = AddressPool::getIp4(
-#        '10.42.42.128',
-#        '10.42.42.132',
-#        array(
-#            '10.42.42.128',
-#            '10.42.42.129',
-#            '10.42.42.130',
-#            '10.42.42.131',
-#            //'10.42.42.132',
-#        )
-#    );
-
-#    $ip6 = AddressPool::getIp6(
-#        'fd00:4242:4242:4242',
-#        $ip4
-#    );
-
-#    echo sprintf('IPv4: %s', $ip4).PHP_EOL;
-#    echo sprintf('IPv6: %s', $ip6).PHP_EOL;
-#} catch (Exception $e) {
-#    echo $e->getMessage().PHP_EOL;
-#    exit(1);
-#}
