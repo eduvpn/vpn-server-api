@@ -43,13 +43,13 @@ try {
         [
             'defaults' => [
                 'headers' => [
-                    'Authorization' => sprintf('Bearer %s', $mainConfig->v('remoteApi', 'vpn-config-api', 'token')),
+                    'Authorization' => sprintf('Bearer %s', $mainConfig->v('remoteApi', 'vpn-ca-api', 'token')),
                 ],
             ],
         ]
     );
 
-    $requestUri = $mainConfig->v('remoteApi', 'vpn-config-api', 'uri');
+    $requestUri = $mainConfig->v('remoteApi', 'vpn-ca-api', 'uri');
 
     $configData = $client->post(
         $requestUri.'/certificate/',

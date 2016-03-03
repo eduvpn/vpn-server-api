@@ -61,7 +61,7 @@ try {
                         'Bearer %s',
                         $config->v(
                             'remoteApi',
-                            'vpn-config-api',
+                            'vpn-ca-api',
                             'token'
                         )
                     ),
@@ -72,7 +72,7 @@ try {
 
     // handles fetching the certificate revocation list
     $crlFetcher = new CrlFetcher(
-        sprintf('%s/ca.crl', $config->v('remoteApi', 'vpn-config-api', 'uri')),
+        sprintf('%s/ca.crl', $config->v('remoteApi', 'vpn-ca-api', 'uri')),
         $config->v('crl', 'path'),
         $client
     );
