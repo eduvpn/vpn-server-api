@@ -29,20 +29,20 @@ class AddressPool
      * @return string|false the assigned IPv4 address or false when no address
      *                      is available
      */
-    public static function getIp4($startIp, $endIp, $usedIp = array())
+    public static function getIp4($startIp, $endIp, $usedIp = [])
     {
         $s = ip2long($startIp);
         $e = ip2long($endIp);
 
-        $search = $s;
-        while (in_array(long2ip($search), $usedIp)) {
-            ++$search;
-            if ($search > $e) {
-                return false;
+        for ($i = $s; $i < $e; ++$i) {
+            if (in_array(long2ip($i), $usedIp)) {
+                continue;
             }
+
+            return long2ip($i);
         }
 
-        return long2ip($search);
+        return false;
     }
 
     /**

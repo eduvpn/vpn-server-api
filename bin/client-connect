@@ -101,7 +101,10 @@ try {
     $leaseDir = $ipConfig->v('leaseDir');
 
     $activeLeases = Utils::getActiveLeases($leaseDir);
-    $v4 = AddressPool::getIp4($v4s, $v4e, $activeLeases);
+    if (false === $v4 = AddressPool::getIp4($v4s, $v4e, $activeLeases)) {
+        syslog(LOG_WARN, sprintf('"%s" could not connect, ran out of IP space', $envData['common_name']));
+        exit(33);
+    }
     $v6 = AddressPool::getIp6($v6p, $v4);
 
     Utils::addRoute4($v4, $envData['dev']);
