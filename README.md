@@ -6,402 +6,46 @@
 This service runs on the same server as the OpenVPN instance(s) and is able to
 control them.
 
-It implements the following features:
-- access the OpenVPN management interface:
-  - get version information
-  - get current load statistics
-  - get connection status (list currently connected clients)
-  - kill active connections
-- provision a client specific configuration (Static):
-  - disable a particular CN
-  - set a static IP address for a particular CN
-- trigger a CRL reload from the CA to prevent revoked client configurations 
-  from being used in new connections
-- obtain a connection history log
+# Features
 
-The service makes this functionality available through a HTTP API.
+- Manage various OpenVPN instances running on the same machine, e.g. UDP/TCP 
+  instances
+- Get a list of currently connected clients
+- Disconnect a client
+- Access to connection log
+- Manage IPv4 and IPv6 addresses
 
-# Configuration
+# Deployment
 
-There are currently three configuration files:
+See the [documentation](https://github.com/eduvpn/documentation) repository.
 
-- `config/config.yaml` for HTTP service configuration;
-- `config/client.yaml` for more detailed client configuration and logging;
+# Development
 
-See the `config/config.yaml.example` and `config/client.yaml` for a template.
+    $ composer install
+    $ cp config/config.yaml.example config/config.yaml
 
-## Authentication
+Point `crl/path` to a writable directory, e.g. `data/` under the current 
+directory. The defaults in this file, and in the other files are for the 
+production deployment setup and will not work well for development.
 
-The user name here is `admin` and the password is the 
-[password_hash](https://secure.php.net/password_hash) of `s3cr3t`.
+    $ cp config/ip.yaml.example config/ip.yaml
 
-    Users:
-        admin: $2y$10$uA77iLeDLaU.a.KRuhUYKuziuZacuWzodpqLok2XBQLXvig6UaB9a
+Point `leaseDir` and `configDir` to a writable directory, and optionally modify
+the IP pools.
 
+    $ cp config/log.yaml.example config/log.yaml
 
-## OpenVPN
+Point `log/dsn` to a writable file.
 
-Here you configure the OpenVPN instances running on this machine. The socket
-points to the TCP management session of the particular OpenVPN instance.
+    $ mkdir data
+    $ php bin/init
+    $ php -S localhost:8009 -t web/
 
-    OpenVpn:
-        - { socket: 'tcp://localhost:7505', id: udp_1194 }
-        - { socket: 'tcp://localhost:7506', id: tcp_443 }
+# Authentication
 
-## CRL
-
-Here you configure the URL where the CRL will be available and the path where
-the CRL will be written to. The path needs to be writable by this service and
-the OpenVPN instances need to be configured to use the CRL at this path using 
-`--crl-verify`.
-
-    Crl:
-        url: http://localhost/vpn-config-api/api.php/ca.crl
-        path: /var/lib/vpn-server-api
-
-## Client
-
-TBD. (static info) 
-
-## Logging
-
-TBD. (logging stuff)
-
-# Running
-
-    php -S localhost:8080 -t web/
-
-# API
-
-Behind the section headings below the component for which the particular call
-is relevant for is listed. The calls with OpenVPN are sent to ALL configured 
-OpenVPN instances. The others are shared by all OpenVPN instances.
-
-The OpenVPN calls return the response for the API request from all OpenVPN 
-servers. The response is in the JSON format. The response is wrapped in an
-`items` object that contain an array with responses from each of the OpenVPN 
-servers. Each entry for a server also has an `ok` field which indicates 
-whether the response from the server was handled correctly. If e.g. a server
-is down, `ok` will be set to the boolean `false`. If the server is up and 
-responded to the request the result will be `true`. Callers MUST first check
-the value of this `ok` field before assuming the rest of the response is 
-available.
-
-## Version (OpenVPN)
-
-Retrieve the versions of the OpenVPN instances:
-
-### Call
-
-    GET /version
-
-### Response
-
-Here you can see two configured servers, one with the identifier `UDP` and one
-with the identifier `TCP`. The `TCP` instance is down, or otherwise 
-unavailable. Always check the `ok` field before accessing the responses, in 
-this case in the `version` field.
-
-    {
-        "items": [
-            {
-                "id": "UDP",
-                "ok": true,
-                "version": "OpenVPN 2.3.8 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Aug  4 2015"
-            },
-            {
-                "id": "TCP",
-                "ok": false
-            }
-        ]
-    }
-
-## Load Statistics (OpenVPN)
-
-### Call
-
-    GET /load-stats
-
-### Response
-
-    {
-        "items": [
-            {
-                "id": "UDP",
-                "load-stats": {
-                    "bytes_in": 3051316,
-                    "bytes_out": 7112958,
-                    "number_of_clients": 1
-                },
-                "ok": true
-            }
-        ]
-    }
-
-## Connection Status (OpenVPN)
-
-### Call
-
-    GET /status
-
-### Response
-
-    {
-        "items": [
-            {
-                "id": "UDP",
-                "ok": true,
-                "status": [
-                    {
-                        "bytes_in": 60937,
-                        "bytes_out": 63493,
-                        "common_name": "fkooman_samsung_i9300",
-                        "connected_since": 1451489134,
-                        "real_address": "10.64.87.183:51565",
-                        "virtual_address": [
-                            "fd00:4242:4242::1003",
-                            "10.42.42.5"
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
-
-## Kill Connection (OpenVPN)
-
-The kill command will go to all OpenVPN instances, and you can see whether or
-not a client was killed.
-
-### Call
-
-    POST /kill
-        common_name=fkooman_samsung_i9300
-
-### Response
-
-Here no client was killed, note that the response is still `ok`, but it just
-was not able to kill this particular client. The `kill` field here shows 
-whether or not a client was killed:
-
-    {
-        "items": [
-            {
-                "id": "UDP",
-                "kill": false,
-                "ok": true
-            }
-        ]
-    }
-
-Here a client was actually killed:
-
-    {
-        "items": [
-            {
-                "id": "UDP",
-                "kill": true,
-                "ok": true
-            }
-        ]
-    }
-
-## Get Static IP Addresses
-
-Obtain the static IPv4 address configured. This service uses a convention where
-the IPv6 address that is provided to the client is based on the IPv4 address, 
-the IPv4 address is encoded in the IPv6 address (in the last 64 bits).
-
-### Call
-
-For a CN:
-
-    GET /static/ip?common_name=foo_bar
-
-For a particular user:
-
-    GET /static/ip?user_id=foo
-
-For all users, for all CNs:
-
-    GET /static/ip 
-
-### Response
-
-If static addresses were set, you will see this, for a CN:
-
-    {
-        "ok": true,
-        "static": {
-            "v4": "1.2.3.1",
-        }
-    }
-
-If no static address was set the `v4` field will have the `null` value.
-
-For a particular user, note that CNs that have no static IPv4 address are 
-NOT shown here, even if they would return `null` if you query the CN directly:
-
-    {
-        "ip": {
-            "foo_phone": {
-                "v4": "10.10.10.25"
-            },
-            "foo_laptop": {
-                "v4": "10.10.10.30"
-            }
-        },
-        "ok": true
-    }
-
-For all users, for all CNs the format is the same as for a particular user. If
-no static IP configuration are available for a certain user, or none in case
-you query them all the `ip` field will have an empty list value.
-
-## Set Static IP Address
-
-Set a static IPv4 address for a CN.
-
-### Call
-
-The `v4` parameter is optional. It reflects the NEW static address that should
-be set for this CN. If you leave the parameter out, or make it empty the static
-IP will be removed.
-
-    POST /static/ip
-        common_name=foo_bar
-        v4=10.10.10.25
-
-### Response
-
-The response will be `true` for the `ok` field if the addresses were set 
-successfully.
-
-    {"ok":true}
-
-If the IPv4 address was invalid you will get an error.
-
-## Get Disabled Configurations
-
-Obtain a list of disabled CNs. Optionally you can use the query parameter 
-`user_id` to filter the returned results and show only disabled CNs for a 
-particular user.
-
-### Call
-
-    GET /static/disable?user_id=foo
-
-### Response
-
-This shows that no configurations are currently disabled for this user.
-
-    {
-        "disabled": [],
-        "ok": true
-    }
-
-Now, `foo_bar` is disabled:
-
-    {
-        "disabled": [
-            "foo_bar"
-        ],
-        "ok": true
-    }
-
-## Disable Configuration
-
-Disable a configuration for a particular CN.
-
-### Call
-
-    POST /static/disable
-        common_name=foo_bar
-
-### Response
-
-The response will be `true` for the `ok` field if the provided `common_name` 
-was actually disabled. It will be `false` if it was already disabled.
-
-    {
-        "ok": true
-    }
-
-## Enable Configuration
-
-Enable a configuration for a particular CN.
-
-### Call
-
-    DELETE /static/disable?common_name=foo_bar
-
-### Response
-
-The response will be `true` for the `ok` field if the provided `common_name` 
-was enabled again. It will be `false` if was not disabled.
-
-    {
-        "ok": true
-    }
-
-## Certificate Revocation List (CRL)
-
-This will fetch the CRL from a configured endpoint. This needs to be triggered
-whenever a configuration is revoked.
-
-### Call
-
-    POST /crl/fetch
-
-### Response
-
-    {
-        "ok": true
-    }
-
-Or in case of an error:
-
-    {
-        "error": "unable to download CRL",
-        "ok": false
-    }
-
-## Log
-
-This call will retrieve a connection history log from the server. NOTE that 
-this will only include connections that are in the past, so currently 
-connected clients are not included here. By default only log entries of the 
-current day are shown, i.e. connections that closed in this day. If you want
-to request the log from other days you can use the `showDate` query parameter
-with the date in the `YYYY-MM-DD` format. You can only request up to 31 days
-ago.
-
-### Call
-
-Retrieve log from current day:
-
-    GET /log/history
-
-Retrieve log from specific day:
-
-    GET /log/history?showDate=2016-01-05
-
-### Response
-
-    {
-        "history": [
-            {
-                "bytes_received": "2813",
-                "bytes_sent": "2831",
-                "common_name": "foo_bar",
-                "disconnect_time_unix": "1452806440",
-                "ifconfig_ipv6_remote": "fd00:4242:4242::2",
-                "ifconfig_pool_remote_ip": "10.42.42.2",
-                "time_unix": "1452806425"
-            }
-        ],
-        "ok": true
-    }
+The API is protected using Bearer tokens. There are various "clients" 
+configured as can be seen in the configuration file together with their 
+permissions. See `config/config.yaml` for the defaults.
 
 # License
 Licensed under the Apache License, Version 2.0;
