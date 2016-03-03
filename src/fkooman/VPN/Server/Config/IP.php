@@ -62,6 +62,14 @@ class IP
         return long2ip(ip2long($this->ip) & ip2long($this->getNetmask()));
     }
 
+    public function getFirstHostAs6()
+    {
+        $firstHost = $this->getFirstHost();
+        $firstHost6 = str_split(bin2hex(inet_pton($firstHost)), 4);
+
+        return sprintf('::ffff:%s:%s', $firstHost6[0], $firstHost6[1]);
+    }
+
     public function getFirstHost()
     {
         return long2ip(ip2long($this->getNetwork()) + 1);

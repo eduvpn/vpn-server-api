@@ -1,0 +1,110 @@
+# OpenVPN Server Configuration for {{ cn|e }}
+# Valid From: {{ valid_from|e|date('Y-m-d H:i:s') }} ({{ date()|date('T') }})
+# Valid To  : {{ valid_to|e|date('Y-m-d H:i:s') }} ({{ date()|date('T') }})
+
+dev tun-udp
+
+# UDP6 (works also for UDP)
+proto udp6
+port 1194
+
+# TCP
+#proto tcp-server
+#port 1194
+
+# IPv4
+server {{ network|e }} {{ netmask|e }} nopool
+push "redirect-gateway def1 bypass-dhcp"
+
+# for Windows clients we need this extra route to mark the TAP adapter as 
+# trusted and as having "Internet" access to allow the user to set it to 
+# "Home" or "Work" to allow accessing file shares and printers
+push "route 0.0.0.0 0.0.0.0"
+
+# IPv6
+ifconfig-ipv6 {{ v6_network|e }} {{ v6_gw|e }}
+tun-ipv6
+push "tun-ipv6"
+
+# for iOS we need this OpenVPN 2.4 "ipv6" flag to redirect-gateway
+# See https://docs.openvpn.net/docs/openvpn-connect/openvpn-connect-ios-faq.html
+push "redirect-gateway ipv6"
+# we use 2000::/3 instead of ::/0 because it seems to break on native IPv6 
+# networks where the ::/0 default router already exists
+push "route-ipv6 2000::/3"
+#push "route-ipv6 ::/0"
+
+topology subnet
+# enable comp-lzo
+comp-lzo yes
+push "comp-lzo yes"
+persist-key
+persist-tun
+verb 3
+max-clients 100
+keepalive 10 60
+user openvpn
+group openvpn
+remote-cert-tls client
+
+# CRYPTO
+#
+# See RFC 7525 for TLS configuration recommendations
+# See https://bettercrypto.org for more OpenVPN configuration guidelines
+# OpenVPN does not support ECDHE (https://community.openvpn.net/openvpn/wiki/Hardening)
+
+auth SHA256
+cipher AES-256-CBC
+tls-version-min 1.2
+
+# to support iOS OpenVPN Connect 1.0.5 in the default configuration with 
+# "Force AES-CBC ciphersuites" enabled, we also need to accept an additional 
+# cipher "TLS_DHE_RSA_WITH_AES_256_CBC_SHA", in that case add the previous to 
+# the below tls-cipher directive
+tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-GCM-SHA384
+
+script-security 2
+#client-connect /usr/bin/vpn-server-api-client-connect
+#client-disconnect /usr/bin/vpn-server-api-client-disconnect
+
+# Certificate Revocation List
+crl-verify /var/lib/vpn-server-api/ca.crl
+
+# ask client to tell us on disconnect
+push "explicit-exit-notify 3"
+
+# Use Google Public DNS by default
+# https://developers.google.com/speed/public-dns/
+push "dhcp-option DNS 8.8.8.8"
+push "dhcp-option DNS 8.8.4.4"
+#push "dhcp-option DNS 2001:4860:4860::8888"
+#push "dhcp-option DNS 2001:4860:4860::8844"
+
+# disable "netbios", i.e. Windows file sharing over TCP/IP
+#push "dhcp-option DISABLE-NBT"
+
+# also send a NTP server
+#push "dhcp-option NTP time.example.org"
+
+# allow client-to-client communication, see openvpn(8)
+#client-to-client
+
+# need to allow 7505 also with SELinux
+management localhost 7505
+
+<ca>
+{{ ca|e }}
+</ca>
+<cert>
+{{ cert|e }}
+</cert>
+<key>
+{{ key|e }}
+</key>
+<dh>
+{{ dh|e }}
+</dh>
+key-direction 0
+<tls-auth>
+{{ ta|e }}
+</tls-auth>

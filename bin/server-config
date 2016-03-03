@@ -1,0 +1,88 @@
+#!/usr/bin/php
+<?php
+
+/**
+ * Copyright 2015 François Kooman <fkooman@tuxed.net>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+require_once dirname(__DIR__).'/vendor/autoload.php';
+
+use fkooman\Config\Reader;
+use fkooman\Config\YamlFile;
+use fkooman\Tpl\Twig\TwigTemplateManager;
+use GuzzleHttp\Client;
+use fkooman\VPN\Server\Config\IP;
+
+try {
+    // get common name from first parameter
+    if (2 > $argc) {
+        throw new Exception(sprintf('Syntax: %s [CN]', $argv[0]));
+    }
+    $commonName = $argv[1];
+
+    $mainConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/config.yaml')
+    );
+
+    $ipConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/ip.yaml')
+    );
+
+    $client = new Client(
+        [
+            'defaults' => [
+                'headers' => [
+                    'Authorization' => sprintf('Bearer %s', $mainConfig->v('remoteApi', 'vpn-config-api', 'token')),
+                ],
+            ],
+        ]
+    );
+
+    $requestUri = $mainConfig->v('remoteApi', 'vpn-config-api', 'uri');
+
+    $configData = $client->post(
+        $requestUri.'/certificate/',
+        [
+            'headers' => [
+                'Accept' => 'application/json',
+            ],
+            'body' => [
+                'common_name' => $commonName,
+                'cert_type' => 'server',
+            ],
+        ]
+    )->json();
+
+    $ip = new IP($ipConfig->v('v4', 'range'));
+    $v6_gw = $ipConfig->v('v6', 'prefix').$ip->getFirstHostAs6();
+    $v6_net = $v6_gw.'/96';
+
+    $ipConfig = [
+        'network' => $ip->getNetwork(),
+        'netmask' => $ip->getNetmask(),
+        'v6_network' => $v6_net,
+        'v6_gw' => $v6_gw,
+    ];
+
+    $templateManager = new TwigTemplateManager(
+        array(
+            dirname(__DIR__).'/views',
+            dirname(__DIR__).'/config/views',
+        )
+    );
+    echo $templateManager->render('server', array_merge($ipConfig, $configData['certificate']));
+} catch (Exception $e) {
+    echo $e->getMessage().PHP_EOL;
+    exit(1);
+}
