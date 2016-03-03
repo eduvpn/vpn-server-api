@@ -13,7 +13,7 @@
     },
     "description": "REST service to control OpenVPN instances",
     "license": "Apache-2.0",
-    "name": "eduVPN/vpn-server-api",
+    "name": "eduvpn/vpn-server-api",
     "require": {
         "ext-date": "*",
         "ext-filter": "*",
