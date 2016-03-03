@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.0 (2016-03-03)
+- major refactor and update
+- support multiple IP pools and assignments to CNs
+- fix CRL fetching
+- support multiple API consumers with different permissions
+- update unit tests
+
 ## 2.5.3 (2016-02-29)
 - flush routes after modifying route table
 
