@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.1.0 (2016-03-04)
+- generate DH locally in server-config script
+
 ## 3.0.0 (2016-03-03)
 - major refactor and update
 - support multiple IP pools and assignments to CNs
