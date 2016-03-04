@@ -74,7 +74,7 @@ try {
     $logData = array(
         'common_name' => $envData['common_name'],
         'v4' => $v4,
-        'v6' => $v6,
+        'v6' => Utils::normalizeIP($v6),
         'time_unix' => $envData['time_unix'],
         'disconnect_time_unix' => time(),
         'bytes_received' => $envData['bytes_received'],

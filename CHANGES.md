@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.1.1 (2016-03-04)
+- fix logging, IPv6 address is now normalized first
+
 ## 3.1.0 (2016-03-04)
 - generate DH locally in server-config script
 

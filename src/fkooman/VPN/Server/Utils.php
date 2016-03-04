@@ -41,6 +41,11 @@ class Utils
         }
     }
 
+    public static function normalizeIP($ipAddress)
+    {
+        return inet_ntop(inet_pton($ipAddress));
+    }
+
     public static function getActiveLeases($leaseDir)
     {
         $activeLeases = [];
