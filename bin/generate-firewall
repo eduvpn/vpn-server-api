@@ -1,0 +1,99 @@
+#!/usr/bin/php
+<?php
+/**
+ * Copyright 2015 François Kooman <fkooman@tuxed.net>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+require_once dirname(__DIR__).'/vendor/autoload.php';
+
+use fkooman\Config\Reader;
+use fkooman\Config\YamlFile;
+use fkooman\VPN\Server\Utils;
+
+try {
+    // read configuration
+    $ipConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/ip.yaml')
+    );
+
+    // get the pools
+    $ipPools = $ipConfig->v('v4', 'pools');
+    $prefix6 = $ipConfig->v('v6', 'prefix');
+
+    $v4 = [];
+    $v6 = [];
+
+    $v4[] = '-N vpn';
+    $v4[] = '-A FORWARD -i tun+ -o eth0 -j vpn';
+    $v4[] = sprintf('-A vpn -m udp -p udp --dport 53 -j ACCEPT');
+    $v4[] = sprintf('-A vpn -m tcp -p tcp --dport 53 -j ACCEPT');
+
+    $v6[] = '-N vpn';
+    $v6[] = '-A FORWARD -i tun+ -o eth0 -j vpn';
+    $v6[] = sprintf('-A vpn -m udp -p udp --dport 53 -j ACCEPT');
+    $v6[] = sprintf('-A vpn -m tcp -p tcp --dport 53 -j ACCEPT');
+
+    foreach ($ipPools as $poolId => $ipPool) {
+        $poolId = sprintf('vpn_%s', $poolId);
+
+        $srcNet = $ipPool['range'];
+        $srcNet6 = Utils::convert4to6($prefix6, $srcNet);
+
+        $v4[] = sprintf('-N %s', $poolId);
+        $v4[] = sprintf('-A vpn -s %s -j %s', $srcNet, $poolId);
+        $v6[] = sprintf('-N %s', $poolId);
+        $v6[] = sprintf('-A vpn -s %s -j %s', $srcNet6, $poolId);
+
+        if (!array_key_exists('firewall', $ipPool)) {
+            $ipPool['firewall']['dst_net'] = ['0.0.0.0/0', '::/0'];
+        }
+
+        if (!array_key_exists('dst_net', $ipPool['firewall'])) {
+            $ipPool['firewall']['dst_net'] = ['0.0.0.0/0', '::/0'];
+        }
+
+        foreach ($ipPool['firewall']['dst_net'] as $dstNet) {
+            $is6 = false !== strpos($dstNet, ':');
+            if (array_key_exists('dst_port', $ipPool['firewall'])) {
+                foreach ($ipPool['firewall']['dst_port'] as $dstPort) {
+                    list($protocol, $port) = explode('/', $dstPort);
+                    if (!$is6) {
+                        $v4[] = sprintf('-A %s -d %s -m %s -p %s --dport %d -j ACCEPT', $poolId, $dstNet, $protocol, $protocol, $port);
+                    } else {
+                        $v6[] = sprintf('-A %s -d %s -m %s -p %s --dport %d -j ACCEPT', $poolId, $dstNet, $protocol, $protocol, $port);
+                    }
+                }
+            } else {
+                // allow all ports
+                if (!$is6) {
+                    $v4[] = sprintf('-A %s -d %s -j ACCEPT', $poolId, $dstNet);
+                } else {
+                    $v6[] = sprintf('-A %s -d %s -j ACCEPT', $poolId, $dstNet);
+                }
+            }
+        }
+    }
+    echo '##########################################'.PHP_EOL;
+    echo '### IPv4'.PHP_EOL;
+    echo '##########################################'.PHP_EOL;
+    echo implode(PHP_EOL, $v4).PHP_EOL;
+
+    echo '##########################################'.PHP_EOL;
+    echo '### IPv6 ###'.PHP_EOL;
+    echo '##########################################'.PHP_EOL;
+    echo implode(PHP_EOL, $v6).PHP_EOL;
+} catch (Exception $e) {
+    echo $e->getMessage().PHP_EOL;
+    exit(1);
+}

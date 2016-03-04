@@ -18,10 +18,16 @@ v4:
         v6:
             name: IPv6-only
             range: 10.42.42.64/27
+            firewall:
+                dst_net:
+                    - '::/0'
 
         https:
             name: HTTPS-only
             range: 10.42.42.96/27
+            firewall:
+                dst_port:
+                    - tcp/443
 
 v6:
     # the IPv6 prefix (the first 64 bits)
