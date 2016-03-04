@@ -23,8 +23,11 @@ use fkooman\Config\YamlFile;
 use fkooman\Tpl\Twig\TwigTemplateManager;
 use GuzzleHttp\Client;
 use fkooman\VPN\Server\Config\IP;
+use fkooman\VPN\Server\Utils;
 
 try {
+    $dhLength = 2048;
+
     // get common name from first parameter
     if (2 > $argc) {
         throw new Exception(sprintf('Syntax: %s [CN]', $argv[0]));
@@ -75,13 +78,26 @@ try {
         'v6_gw' => $v6_gw,
     ];
 
+    $dhFile = tempnam(sys_get_temp_dir(), 'dh_');
+    Utils::exec(sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength));
+
+    if (false === $dhContent = @file_get_contents($dhFile)) {
+        throw new Exception('unable to read DH file');
+    }
+
+    $dhParam = ['dh' => trim($dhContent)];
+    @unlink($dhFile); // we don't care if this fails
+
     $templateManager = new TwigTemplateManager(
         array(
             dirname(__DIR__).'/views',
             dirname(__DIR__).'/config/views',
         )
     );
-    echo $templateManager->render('server', array_merge($ipConfig, $configData['certificate']));
+    echo $templateManager->render(
+        'server',
+        array_merge($dhParam, $ipConfig, $configData['certificate'])
+    );
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL;
     exit(1);
