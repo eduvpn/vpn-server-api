@@ -20,8 +20,24 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\Utils;
+use fkooman\VPN\Server\Firewall;
 
 try {
+    $useNat = false;
+    $extIf = 'eth0';
+    $installFw = false;
+
+    for ($i = 1; $i < $argc; ++$i) {
+        if ('--nat' === $argv[$i]) {
+            $useNat = true;
+        }
+        if ('--install' === $argv[$i]) {
+            $installFw = true;
+        }
+
+        $extIf = $argv[$i];
+    }
+
     // read configuration
     $ipConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/ip.yaml')
@@ -31,68 +47,47 @@ try {
     $ipPools = $ipConfig->v('v4', 'pools');
     $prefix6 = $ipConfig->v('v6', 'prefix');
 
-    $v4 = [];
-    $v6 = [];
-
-    $v4[] = '-N vpn';
-    $v4[] = '-A FORWARD -i tun+ -o eth0 -j vpn';
-    $v4[] = sprintf('-A vpn -m udp -p udp --dport 53 -j ACCEPT');
-    $v4[] = sprintf('-A vpn -m tcp -p tcp --dport 53 -j ACCEPT');
-
-    $v6[] = '-N vpn';
-    $v6[] = '-A FORWARD -i tun+ -o eth0 -j vpn';
-    $v6[] = sprintf('-A vpn -m udp -p udp --dport 53 -j ACCEPT');
-    $v6[] = sprintf('-A vpn -m tcp -p tcp --dport 53 -j ACCEPT');
+    $f4 = new Firewall(4, $extIf, $useNat);
+    $f4->addInputPorts(['tcp/22', 'tcp/80', 'tcp/443', 'udp/1194']);
+    $f6 = new Firewall(6, $extIf, $useNat);
+    $f6->addInputPorts(['tcp/22', 'tcp/80', 'tcp/443', 'udp/1194']);
 
     foreach ($ipPools as $poolId => $ipPool) {
         $poolId = sprintf('vpn_%s', $poolId);
-
         $srcNet = $ipPool['range'];
         $srcNet6 = Utils::convert4to6($prefix6, $srcNet);
 
-        $v4[] = sprintf('-N %s', $poolId);
-        $v4[] = sprintf('-A vpn -s %s -j %s', $srcNet, $poolId);
-        $v6[] = sprintf('-N %s', $poolId);
-        $v6[] = sprintf('-A vpn -s %s -j %s', $srcNet6, $poolId);
-
-        if (!array_key_exists('firewall', $ipPool)) {
+        if (!array_key_exists('firewall', $ipPool) || !array_key_exists('dst_net', $ipPool['firewall'])) {
             $ipPool['firewall']['dst_net'] = ['0.0.0.0/0', '::/0'];
         }
 
-        if (!array_key_exists('dst_net', $ipPool['firewall'])) {
-            $ipPool['firewall']['dst_net'] = ['0.0.0.0/0', '::/0'];
+        if (!array_key_exists('dst_port', $ipPool['firewall'])) {
+            $ipPool['firewall']['dst_port'] = [];
         }
 
-        foreach ($ipPool['firewall']['dst_net'] as $dstNet) {
-            $is6 = false !== strpos($dstNet, ':');
-            if (array_key_exists('dst_port', $ipPool['firewall'])) {
-                foreach ($ipPool['firewall']['dst_port'] as $dstPort) {
-                    list($protocol, $port) = explode('/', $dstPort);
-                    if (!$is6) {
-                        $v4[] = sprintf('-A %s -d %s -m %s -p %s --dport %d -j ACCEPT', $poolId, $dstNet, strtolower($protocol), strtolower($protocol), $port);
-                    } else {
-                        $v6[] = sprintf('-A %s -d %s -m %s -p %s --dport %d -j ACCEPT', $poolId, $dstNet, strtolower($protocol), strtolower($protocol), $port);
-                    }
-                }
-            } else {
-                // allow all ports
-                if (!$is6) {
-                    $v4[] = sprintf('-A %s -d %s -j ACCEPT', $poolId, $dstNet);
-                } else {
-                    $v6[] = sprintf('-A %s -d %s -j ACCEPT', $poolId, $dstNet);
-                }
-            }
-        }
+        $f4->addPool($poolId, $srcNet, $ipPool['firewall']['dst_net'], $ipPool['firewall']['dst_port']);
+        $f6->addPool($poolId, $srcNet6, $ipPool['firewall']['dst_net'], $ipPool['firewall']['dst_port']);
     }
-    echo '##########################################'.PHP_EOL;
-    echo '### IPv4'.PHP_EOL;
-    echo '##########################################'.PHP_EOL;
-    echo implode(PHP_EOL, $v4).PHP_EOL;
 
-    echo '##########################################'.PHP_EOL;
-    echo '### IPv6 ###'.PHP_EOL;
-    echo '##########################################'.PHP_EOL;
-    echo implode(PHP_EOL, $v6).PHP_EOL;
+    if ($installFw) {
+        if (false === @file_put_contents('/etc/sysconfig/iptables', $f4->getFirewall())) {
+            throw new Exception('unable to write /etc/sysconfig/iptables');
+        }
+
+        if (false === @file_put_contents('/etc/sysconfig/ip6tables', $f6->getFirewall())) {
+            throw new Exception('unable to write /etc/sysconfig/ip6tables');
+        }
+    } else {
+        echo '##########################################'.PHP_EOL;
+        echo '# IPv4'.PHP_EOL;
+        echo '##########################################'.PHP_EOL;
+        echo $f4->getFirewall().PHP_EOL;
+
+        echo '##########################################'.PHP_EOL;
+        echo '# IPv6'.PHP_EOL;
+        echo '##########################################'.PHP_EOL;
+        echo $f6->getFirewall().PHP_EOL;
+    }
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL;
     exit(1);

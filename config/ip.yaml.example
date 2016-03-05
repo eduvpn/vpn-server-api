@@ -13,18 +13,18 @@ v4:
     pools:
         default:
             name: Default
-            range: 10.42.42.32/27
+            range: 10.42.42.0/27
 
         v6:
             name: IPv6-only
-            range: 10.42.42.64/27
+            range: 10.42.42.32/27
             firewall:
                 dst_net:
                     - '::/0'
 
         https:
             name: HTTPS-only
-            range: 10.42.42.96/27
+            range: 10.42.42.64/27
             firewall:
                 dst_port:
                     - TCP/443

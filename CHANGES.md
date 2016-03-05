@@ -1,8 +1,12 @@
 # Changelog
 
-## 3.1.2 (...)
-- initial script to generate firewall based on IP config file
+## 3.2.0 (...)
+- script to generate firewall based on IP config file
 - cleanup the `info/net` API call
+- fix for allowing the use of the full IP range for client IP 
+  assignments, e.g. if you only have a small public IPv4 space 
+  and want only 1 'pool'
+- make it possible to install the firewall in the system
 
 ## 3.1.1 (2016-03-04)
 - fix logging, IPv6 address is now normalized first
