@@ -27,7 +27,7 @@ v4:
             range: 10.42.42.96/27
             firewall:
                 dst_port:
-                    - tcp/443
+                    - TCP/443
 
 v6:
     # the IPv6 prefix (the first 64 bits)
