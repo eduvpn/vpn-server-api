@@ -69,9 +69,9 @@ try {
                 foreach ($ipPool['firewall']['dst_port'] as $dstPort) {
                     list($protocol, $port) = explode('/', $dstPort);
                     if (!$is6) {
-                        $v4[] = sprintf('-A %s -d %s -m %s -p %s --dport %d -j ACCEPT', $poolId, $dstNet, $protocol, $protocol, $port);
+                        $v4[] = sprintf('-A %s -d %s -m %s -p %s --dport %d -j ACCEPT', $poolId, $dstNet, strtolower($protocol), strtolower($protocol), $port);
                     } else {
-                        $v6[] = sprintf('-A %s -d %s -m %s -p %s --dport %d -j ACCEPT', $poolId, $dstNet, $protocol, $protocol, $port);
+                        $v6[] = sprintf('-A %s -d %s -m %s -p %s --dport %d -j ACCEPT', $poolId, $dstNet, strtolower($protocol), strtolower($protocol), $port);
                     }
                 }
             } else {
