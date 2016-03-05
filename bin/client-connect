@@ -100,7 +100,10 @@ try {
 
     $leaseDir = $ipConfig->v('leaseDir');
 
-    $activeLeases = Utils::getActiveLeases($leaseDir);
+    $activeLeases = array_merge(
+        [$ipRange->getFirstHost()], // the IP address of the VPN server cannot be used 
+        Utils::getActiveLeases($leaseDir)
+    );
     if (false === $v4 = AddressPool::getIp4($v4s, $v4e, $activeLeases)) {
         syslog(LOG_WARN, sprintf('"%s" could not connect, ran out of IP space', $envData['common_name']));
         exit(33);
