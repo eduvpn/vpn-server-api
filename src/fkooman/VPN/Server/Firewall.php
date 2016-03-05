@@ -40,7 +40,7 @@ class Firewall
             ':PREROUTING ACCEPT [0:0]',
             ':OUTPUT ACCEPT [0:0]',
             ':POSTROUTING ACCEPT [0:0]',
-            sprintf('-A POSTROUTING -i tun+ -o %s -j MASQUERADE', $this->externalIf),
+            sprintf('-A POSTROUTING -o %s -j MASQUERADE', $this->externalIf),
             'COMMIT',
         ];
     }
