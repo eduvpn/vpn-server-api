@@ -2,6 +2,7 @@
 
 ## 3.1.2 (...)
 - initial script to generate firewall based on IP config file
+- cleanup the `info/net` API call
 
 ## 3.1.1 (2016-03-04)
 - fix logging, IPv6 address is now normalized first
