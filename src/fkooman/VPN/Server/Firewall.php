@@ -77,9 +77,9 @@ class Firewall
     {
         $forward = [
             '-N vpn',
+            '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
             sprintf('-A FORWARD -i tun+ -o %s -j vpn', $this->externalIf),
             sprintf('-A vpn -p %s -j ACCEPT', 4 === $this->ipVersion ? 'icmp' : 'ipv6-icmp'),
-            '-A vpn -m state --state ESTABLISHED,RELATED -j ACCEPT',
             '-A vpn -m udp -p udp --dport 53 -j ACCEPT',
             '-A vpn -m tcp -p tcp --dport 53 -j ACCEPT',
         ];
@@ -136,6 +136,6 @@ class Firewall
         }
         $firewall = array_merge($firewall, $this->getFilter());
 
-        return implode(PHP_EOL, $firewall) . PHP_EOL;
+        return implode(PHP_EOL, $firewall).PHP_EOL;
     }
 }

@@ -81,12 +81,12 @@ try {
         echo '##########################################'.PHP_EOL;
         echo '# IPv4'.PHP_EOL;
         echo '##########################################'.PHP_EOL;
-        echo $f4->getFirewall().PHP_EOL;
+        echo $f4->getFirewall();
 
         echo '##########################################'.PHP_EOL;
         echo '# IPv6'.PHP_EOL;
         echo '##########################################'.PHP_EOL;
-        echo $f6->getFirewall().PHP_EOL;
+        echo $f6->getFirewall();
     }
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL;
