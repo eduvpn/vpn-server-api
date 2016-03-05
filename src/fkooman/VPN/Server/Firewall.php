@@ -136,6 +136,6 @@ class Firewall
         }
         $firewall = array_merge($firewall, $this->getFilter());
 
-        return implode(PHP_EOL, $firewall);
+        return implode(PHP_EOL, $firewall) . PHP_EOL;
     }
 }
