@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.2.0 (...)
+## 3.2.0 (2016-03-07)
 - script to generate firewall based on IP config file
 - cleanup the `info/net` API call
 - fix for allowing the use of the full IP range for client IP 
