@@ -46,6 +46,14 @@ class IPTest extends PHPUnit_Framework_TestCase
         $this->assertSame('10.42.43.255', $i->getBroadcast());
     }
 
+    public function test32()
+    {
+        $i = new IP('10.42.42.42/32');
+        $this->assertSame('255.255.255.255', $i->getNetmask());
+        $this->assertSame('10.42.42.42', $i->getNetwork());
+        $this->assertSame('10.42.42.42', $i->getBroadcast());
+    }
+
     public function testNonNullStart()
     {
         $i = new IP('10.42.43.12/23');
