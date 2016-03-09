@@ -23,6 +23,7 @@ use fkooman\Json\Json;
 use fkooman\VPN\Server\Config\AddressPool;
 use fkooman\VPN\Server\Config\FileConfigStorage;
 use fkooman\VPN\Server\Config\IP;
+use fkooman\VPN\Server\Config\PoolConfig;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Utils;
 
@@ -88,9 +89,10 @@ try {
     $ipRange = new IP($ipConfig->v('v4', 'range'));
 
     // the pool IP range
-    $poolConfig = $ipConfig->v('v4', 'pools', $cnPool);
-    syslog(LOG_INFO, sprintf('"%s" connecting to pool "%s"', $envData['common_name'], $poolConfig['name']));
-    $poolRange = new IP($poolConfig['range']);
+    $poolConfig = new PoolConfig($cnPool, $ipConfig->v('v4', 'pools', $cnPool));
+
+    syslog(LOG_INFO, sprintf('"%s" connecting to pool "%s"', $envData['common_name'], $poolConfig->getName()));
+    $poolRange = new IP($poolConfig->getRange());
 
     $v4s = $poolRange->getFirstHost();
     $v4e = $poolRange->getLastHost();
@@ -118,11 +120,35 @@ try {
         throw new RuntimeException(sprintf('unable to claim IP address "%s"', $v4));
     }
 
+    // XXX refactor this in a class so we can actually test the config file
+    // generation
+
     // create temporary client config
     $configFileData = array(
         sprintf('ifconfig-push %s %s', $v4, $v4n),
         sprintf('ifconfig-ipv6-push %s/64 %s', $v6, $v6r),
     );
+
+    if ($poolConfig->useDefaultGateway()) {
+        // push both v6 and v4 default gw + DNS
+        // this is the default, so do nothing here
+#        $configFileData[] = 'push "redirect-gateway def1 bypass-dhcp"';
+#        $configFileData[] = 'push "route 0.0.0.0 0.0.0.0"';
+#        $configFileData[] = 'push "redirect-gateway ipv6"';
+#        $configFileData[] = 'push "route-ipv6 2000::/3"';
+#        // XXX also push DNS
+    } else {
+        $dstNet4 = $poolConfig->getDstNet4();
+        foreach ($dstNet4 as $net4) {
+            $ip4 = new IP($net4);
+            $configFileData[] = sprintf('push "route %s %s"', $ip4->getNetwork(), $ip4->getNetmask());
+        }
+        $dstNet6 = $poolConfig->getDstNet6();
+        foreach ($dstNet6 as $net6) {
+            $configFileData[] = sprintf('push "route-ipv6 %s"', $net6);
+        }
+    }
+
     Utils::writeTempConfig($cnConfigFile, $configFileData);
 
     // log stuff
