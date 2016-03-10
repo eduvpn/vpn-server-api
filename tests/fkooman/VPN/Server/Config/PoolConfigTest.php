@@ -25,16 +25,15 @@ class PoolConfigTest extends PHPUnit_Framework_TestCase
     public function testDefault()
     {
         $p = new PoolConfig(
-            'default',
             [
                 'range' => '10.42.42.0/27',
                 'name' => 'Default',
             ]
         );
 
-        $this->assertSame('default', $p->getId());
         $this->assertSame('Default', $p->getName());
-        $this->assertSame('10.42.42.0/27', $p->getRange());
+        $this->assertSame('10.42.42.0', $p->getRange()->getNetwork());
+        $this->assertSame('255.255.255.224', $p->getRange()->getNetmask());
         $this->assertSame(['0.0.0.0/0'], $p->getDstNet4());
         $this->assertSame(['::/0'], $p->getDstNet6());
         $this->assertTrue($p->useDefaultGateway());
@@ -43,7 +42,6 @@ class PoolConfigTest extends PHPUnit_Framework_TestCase
     public function testV6()
     {
         $p = new PoolConfig(
-            'v6',
             [
                 'range' => '10.42.42.32/27',
                 'name' => 'IPv6-only',
@@ -60,7 +58,6 @@ class PoolConfigTest extends PHPUnit_Framework_TestCase
     public function testHttps()
     {
         $p = new PoolConfig(
-            'https',
             [
                 'range' => '10.42.42.64/27',
                 'name' => 'HTTPS-only',
@@ -76,7 +73,6 @@ class PoolConfigTest extends PHPUnit_Framework_TestCase
     public function testCustomRoutes()
     {
         $p = new PoolConfig(
-            'foo',
             [
                 'range' => '10.10.10.0/24',
                 'name' => 'Foo',

@@ -30,6 +30,7 @@ class TestConfigStorage implements ConfigStorageInterface
         $this->configData = [
             'foo_bar' => new ConfigData(['pool' => 'v6']),
             'bar_foo' => new ConfigData(['disable' => true]),
+            'admin_xyz' => new ConfigData(['pool' => 'admin']),
         ];
     }
 

@@ -22,12 +22,9 @@ use InvalidArgumentException;
 class PoolConfig
 {
     /** @var string */
-    private $id;
-
-    /** @var string */
     private $name;
 
-    /** @var string */
+    /** @var IP */
     private $range;
 
     /** @var array */
@@ -39,10 +36,8 @@ class PoolConfig
     /** @var array */
     private $dstPort;
 
-    public function __construct($id, array $c)
+    public function __construct(array $c)
     {
-        $this->id = $id;
-
         if (!array_key_exists('name', $c)) {
             throw new InvalidArgumentException('missing "name"');
         }
@@ -52,7 +47,7 @@ class PoolConfig
             throw new InvalidArgumentException('missing "range"');
         }
         // XXX validate range
-        $this->range = $c['range'];
+        $this->range = new IP($c['range']);
 
         // default values
         if (!array_key_exists('firewall', $c)) {
@@ -78,11 +73,6 @@ class PoolConfig
         }
 
         $this->dstPort = $c['firewall']['dst_port'];
-    }
-
-    public function getId()
-    {
-        return $this->id;
     }
 
     public function getName()

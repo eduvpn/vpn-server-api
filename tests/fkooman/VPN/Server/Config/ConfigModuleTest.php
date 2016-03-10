@@ -94,6 +94,10 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
                         'pool' => 'default',
                         'disable' => true,
                     ],
+                    'admin_xyz' => [
+                        'pool' => 'admin',
+                        'disable' => false,
+                    ],
                 ],
             ],
             $this->makeRequest('GET', '/config/')

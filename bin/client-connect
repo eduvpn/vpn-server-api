@@ -20,10 +20,8 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\Json\Json;
-use fkooman\VPN\Server\Config\AddressPool;
 use fkooman\VPN\Server\Config\FileConfigStorage;
 use fkooman\VPN\Server\Config\IP;
-use fkooman\VPN\Server\Config\PoolConfig;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Utils;
 
@@ -71,46 +69,16 @@ try {
         new YamlFile(dirname(__DIR__).'/config/log.yaml')
     );
 
-    // read the CN configuration
-    $configDir = $ipConfig->v('configDir');
-    $configStorage = new FileConfigStorage($configDir);
-    $cnConfig = $configStorage->getConfig($envData['common_name']);
+    $configStorage = new FileConfigStorage($ipConfig->v('configDir'));
 
-    // is the CN disabled?
-    if ($cnConfig->getDisable()) {
-        syslog(LOG_INFO, sprintf('"%s" not allowed, disabled by administrator', $envData['common_name']));
-        exit(1);
-    }
-
-    // get the pool
-    $cnPool = $cnConfig->getPool();
-
-    // the full client IP range
-    $ipRange = new IP($ipConfig->v('v4', 'range'));
-
-    // the pool IP range
-    $poolConfig = new PoolConfig($cnPool, $ipConfig->v('v4', 'pools', $cnPool));
-
-    syslog(LOG_INFO, sprintf('"%s" connecting to pool "%s"', $envData['common_name'], $poolConfig->getName()));
-    $poolRange = new IP($poolConfig->getRange());
-
-    $v4s = $poolRange->getFirstHost();
-    $v4e = $poolRange->getLastHost();
-    $v4n = $ipRange->getNetmask();
-    $v6p = $ipConfig->v('v6', 'prefix');
-    $v6r = sprintf('%s::1', $v6p);
-
-    $leaseDir = $ipConfig->v('leaseDir');
-
-    $activeLeases = array_merge(
-        [$ipRange->getFirstHost()], // the IP address of the VPN server cannot be used 
-        Utils::getActiveLeases($leaseDir)
+    $clientConfig = new ClientConfig(
+        $ipConfig->toArray(),
+        $configStorage
     );
-    if (false === $v4 = AddressPool::getIp4($v4s, $v4e, $activeLeases)) {
-        syslog(LOG_WARN, sprintf('"%s" could not connect, ran out of IP space', $envData['common_name']));
-        exit(33);
-    }
-    $v6 = AddressPool::getIp6($v6p, $v4);
+
+    $configData = $clientConfig->get($envData['common_name']);
+    $v4 = $configData['v4'];
+    $v6 = $configData['v6'];
 
     Utils::addRoute4($v4, $envData['dev']);
     Utils::addRoute6($v6, $envData['dev']);
@@ -120,36 +88,7 @@ try {
         throw new RuntimeException(sprintf('unable to claim IP address "%s"', $v4));
     }
 
-    // XXX refactor this in a class so we can actually test the config file
-    // generation
-
-    // create temporary client config
-    $configFileData = array(
-        sprintf('ifconfig-push %s %s', $v4, $v4n),
-        sprintf('ifconfig-ipv6-push %s/64 %s', $v6, $v6r),
-    );
-
-    if ($poolConfig->useDefaultGateway()) {
-        // push both v6 and v4 default gw + DNS
-        // this is the default, so do nothing here
-#        $configFileData[] = 'push "redirect-gateway def1 bypass-dhcp"';
-#        $configFileData[] = 'push "route 0.0.0.0 0.0.0.0"';
-#        $configFileData[] = 'push "redirect-gateway ipv6"';
-#        $configFileData[] = 'push "route-ipv6 2000::/3"';
-#        // XXX also push DNS
-    } else {
-        $dstNet4 = $poolConfig->getDstNet4();
-        foreach ($dstNet4 as $net4) {
-            $ip4 = new IP($net4);
-            $configFileData[] = sprintf('push "route %s %s"', $ip4->getNetwork(), $ip4->getNetmask());
-        }
-        $dstNet6 = $poolConfig->getDstNet6();
-        foreach ($dstNet6 as $net6) {
-            $configFileData[] = sprintf('push "route-ipv6 %s"', $net6);
-        }
-    }
-
-    Utils::writeTempConfig($cnConfigFile, $configFileData);
+    Utils::writeTempConfig($cnConfigFile, ClientConfig::configDataToFile($configData));
 
     // log stuff
     $logData = array(
