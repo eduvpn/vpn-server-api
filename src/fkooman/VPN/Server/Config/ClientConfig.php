@@ -96,38 +96,6 @@ class ClientConfig
         return $configData;
     }
 
-    public static function configDataToFile($configData)
-    {
-        if (false === $configData) {
-            return ['disable'];
-        }
-
-        $configDataArray = [
-            sprintf('ifconfig-push %s %s', $configData['v4'], $configData['v4_netmask']),
-            sprintf('ifconfig-ipv6-push %s/64 %s', $configData['v6'], $configData['v6_gw']),
-        ];
-
-        if ($configData['default_gw']) {
-            $configDataArray[] = 'push "redirect-gateway def1 bypass-dhcp"';
-            $configDataArray[] = 'push "route 0.0.0.0 0.0.0.0"';
-            $configDataArray[] = 'push "redirect-gateway ipv6"';
-            $configDataArray[] = 'push "route-ipv6 2000::/3"';
-            foreach ($configData['dns'] as $dnsAddress) {
-                $configDataArray[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress);
-            }
-        } else {
-            foreach ($configData['dst_net4'] as $dstNet4) {
-                $net4 = new IP($dstNet4);
-                $configDataArray[] = sprintf('push "route %s %s"', $net4->getNetwork(), $net4->getNetmask());
-            }
-            foreach ($configData['dst_net6'] as $dstNet6) {
-                $configDataArray[] = sprintf('push "route-ipv6 %s"', $dstNet6);
-            }
-        }
-
-        return $configDataArray;
-    }
-
     /**
      * Parse and validate the configuration and set default values if they
      * are missing from the configuration file.

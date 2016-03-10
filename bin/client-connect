@@ -24,6 +24,7 @@ use fkooman\VPN\Server\Config\FileConfigStorage;
 use fkooman\VPN\Server\Config\IP;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Utils;
+use fkooman\VPN\Server\Config\OpenVpnClientConfig;
 
 openlog(
     basename($argv[0]),
@@ -71,7 +72,7 @@ try {
 
     $configStorage = new FileConfigStorage($ipConfig->v('configDir'));
 
-    $clientConfig = new ClientConfig(
+    $clientConfig = new OpenVpnClientConfig(
         $ipConfig->toArray(),
         $configStorage
     );
