@@ -34,8 +34,18 @@ class OpenVpnClientConfig extends ClientConfig
 
         if ($configData['default_gw']) {
             $configDataArray[] = 'push "redirect-gateway def1 bypass-dhcp"';
+
+            # for Windows clients we need this extra route to mark the TAP adapter as 
+            # trusted and as having "Internet" access to allow the user to set it to 
+            # "Home" or "Work" to allow accessing file shares and printers
             $configDataArray[] = 'push "route 0.0.0.0 0.0.0.0"';
+
+            # for iOS we need this OpenVPN 2.4 "ipv6" flag to redirect-gateway
+            # See https://docs.openvpn.net/docs/openvpn-connect/openvpn-connect-ios-faq.html
             $configDataArray[] = 'push "redirect-gateway ipv6"';
+
+            # we use 2000::/3 instead of ::/0 because it seems to break on native IPv6 
+            # networks where the ::/0 default router already exists
             $configDataArray[] = 'push "route-ipv6 2000::/3"';
             foreach ($configData['dns'] as $dnsAddress) {
                 $configDataArray[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress);

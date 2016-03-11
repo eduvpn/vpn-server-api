@@ -14,25 +14,11 @@ port 1194
 
 # IPv4
 server {{ network|e }} {{ netmask|e }} nopool
-push "redirect-gateway def1 bypass-dhcp"
-
-# for Windows clients we need this extra route to mark the TAP adapter as 
-# trusted and as having "Internet" access to allow the user to set it to 
-# "Home" or "Work" to allow accessing file shares and printers
-push "route 0.0.0.0 0.0.0.0"
 
 # IPv6
 ifconfig-ipv6 {{ v6_network|e }} {{ v6_gw|e }}
 tun-ipv6
 push "tun-ipv6"
-
-# for iOS we need this OpenVPN 2.4 "ipv6" flag to redirect-gateway
-# See https://docs.openvpn.net/docs/openvpn-connect/openvpn-connect-ios-faq.html
-push "redirect-gateway ipv6"
-# we use 2000::/3 instead of ::/0 because it seems to break on native IPv6 
-# networks where the ::/0 default router already exists
-push "route-ipv6 2000::/3"
-#push "route-ipv6 ::/0"
 
 topology subnet
 # enable comp-lzo
@@ -64,21 +50,14 @@ tls-version-min 1.2
 tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-GCM-SHA384
 
 script-security 2
-#client-connect /usr/bin/vpn-server-api-client-connect
-#client-disconnect /usr/bin/vpn-server-api-client-disconnect
+client-connect /usr/bin/vpn-server-api-client-connect
+client-disconnect /usr/bin/vpn-server-api-client-disconnect
 
 # Certificate Revocation List
 crl-verify /var/lib/vpn-server-api/ca.crl
 
 # ask client to tell us on disconnect
 push "explicit-exit-notify 3"
-
-# Use Google Public DNS by default
-# https://developers.google.com/speed/public-dns/
-push "dhcp-option DNS 8.8.8.8"
-push "dhcp-option DNS 8.8.4.4"
-#push "dhcp-option DNS 2001:4860:4860::8888"
-#push "dhcp-option DNS 2001:4860:4860::8844"
 
 # disable "netbios", i.e. Windows file sharing over TCP/IP
 #push "dhcp-option DISABLE-NBT"
