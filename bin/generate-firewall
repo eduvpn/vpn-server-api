@@ -44,8 +44,8 @@ try {
     );
 
     // get the pools
-    $ipPools = $ipConfig->v('v4', 'pools');
-    $prefix6 = $ipConfig->v('v6', 'prefix');
+    $ipPools = $ipConfig->v('net', 'pools');
+    $range6 = $ipConfig->v('net', 'range6');
 
     $f4 = new Firewall(4, $extIf, $useNat);
     $f4->addInputPorts(['tcp/22', 'tcp/80', 'tcp/443', 'udp/1194']);
@@ -55,7 +55,7 @@ try {
     foreach ($ipPools as $poolId => $ipPool) {
         $poolId = sprintf('vpn_%s', $poolId);
         $srcNet = $ipPool['range'];
-        $srcNet6 = Utils::convert4to6($prefix6, $srcNet);
+        $srcNet6 = Utils::convert4to6($range6, $srcNet);
 
         if (!array_key_exists('firewall', $ipPool) || !array_key_exists('dst_net', $ipPool['firewall'])) {
             $ipPool['firewall']['dst_net'] = ['0.0.0.0/0', '::/0'];

@@ -6,14 +6,16 @@ leaseDir: /var/lib/openvpn/pool
 # contains the configurations of the CN
 configDir: /var/lib/vpn-server-api/config
 
-v4:
+dns:
+    - 8.8.8.8
+    - 8.8.4.4
+    - '2001:4860:4860::8888'
+    - '2001:4860:4860::8844'
+
+net:
     # the range containing all the subsequent ranges mentioned below
     range: 10.42.42.0/24
-
-    # IPv4 DNS servers
-    dns:
-        - 8.8.8.8
-        - 8.8.4.4
+    range6: 'fd00:4242:4242:1194/64'
 
     pools:
         default:
@@ -33,12 +35,3 @@ v4:
             firewall:
                 dst_port:
                     - TCP/443
-
-v6:
-    # the IPv6 prefix (the first 64 bits)
-    prefix: 'fd00:4242:4242:1194'
-
-    # IPv6 DNS servers
-    dns:
-        - '2001:4860:4860::8888'
-        - '2001:4860:4860::8844'

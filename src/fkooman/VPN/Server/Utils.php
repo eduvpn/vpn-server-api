@@ -50,22 +50,28 @@ class Utils
      * Convert IPv4 CIDR address to IPv6 address with prefix containing the
      * IPv4 address with the same prefix.
      *
-     * @param string $v6p the IPv6 prefix, e.g.: fd00:4242:4242:1194
-     * @param string $v4c the IPv4 CIDR, e.g. 10.42.42.0/24
+     * @param string $v6n the IPv6 network, e.g.: fd00:4242:4242:1194/64
+     * @param string $v4n the IPv4 network, e.g. 10.42.42.0/24
      *
      * @return string the IPv6 address range containing the IPv4 CIDR, e.g.:
      *                fd00:4242:4242:1194:0:ffff:0a2a:2a00/120
      */
-    public static function convert4to6($v6p, $v4c)
+    public static function convert4to6($v6n, $v4n)
     {
-        list($net4, $prefix4) = explode('/', $v4c);
+        list($net4, $prefix4) = explode('/', $v4n);
+        list($net6, $prefix6) = explode('/', $v6n);
+
+        if ('64' !== $prefix6) {
+            throw new RuntimeException('invalid IPv6 prefix, must be 64');
+        }
+
         $prefix6 = 128 - (32 - $prefix4);
         $v4e = str_split(bin2hex(inet_pton($net4)), 4);
 
         return sprintf(
             '%s/%d',
             self::normalizeIP(
-                sprintf('%s::ffff:%s:%s', $v6p, $v4e[0], $v4e[1])
+                sprintf('%s::ffff:%s:%s', $net6, $v4e[0], $v4e[1])
             ),
             $prefix6
         );

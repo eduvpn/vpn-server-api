@@ -13,15 +13,15 @@ use fkooman\VPN\Server\Utils;
 class InfoModule implements ServiceModuleInterface
 {
     /** @var array */
-    private $v4;
+    private $dns;
 
     /** @var array */
-    private $v6;
+    private $net;
 
-    public function __construct(array $v4, array $v6)
+    public function __construct(array $dns, array $net)
     {
-        $this->v4 = $v4;
-        $this->v6 = $v6;
+        $this->dns = $dns;
+        $this->net = $net;
     }
 
     public function init(Service $service)
@@ -38,19 +38,20 @@ class InfoModule implements ServiceModuleInterface
 
     private function getInfo()
     {
-        $prefix6 = $this->v6['prefix'];
-        $net4 = $this->v4['range'];
+        $net6 = $this->net['range6'];
+        $net4 = $this->net['range'];
 
         $responseData = [];
         $responseData['range'] = $net4;
-        $responseData['range6'] = Utils::convert4to6($prefix6, $net4);
+        $responseData['range6'] = Utils::convert4to6($net6, $net4); // XXX fix convert4to6
         $responseData['pools'] = [];
+        $responseData['dns'] = $this->dns;
 
-        foreach ($this->v4['pools'] as $id => $pool) {
+        foreach ($this->net['pools'] as $id => $pool) {
             $poolInfo = [
                 'name' => $pool['name'],
                 'range' => $pool['range'],
-                'range6' => Utils::convert4to6($prefix6, $pool['range']),
+                'range6' => Utils::convert4to6($net6, $pool['range']),
             ];
             if (!array_key_exists('firewall', $pool)) {
                 $pool['firewall'] = [];
