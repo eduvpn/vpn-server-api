@@ -71,6 +71,7 @@ try {
     );
 
     $configStorage = new FileConfigStorage($ipConfig->v('configDir'));
+    $leaseDir = $ipConfig->v('leaseDir');
 
     $clientConfig = new ClientConfig(
         $ipConfig->getConfig(),
@@ -83,15 +84,14 @@ try {
 
     $openVpnConfigData = Utils::configDataToOpenVpn($configData);
 
-    Utils::addRoute4($v4, $envData['dev']);
-    Utils::addRoute6($v6, $envData['dev']);
-
     // mark the IP address as used    
     if (false === @touch(sprintf('%s/%s', $leaseDir, $v4))) {
         throw new RuntimeException(sprintf('unable to claim IP address "%s"', $v4));
     }
-
     Utils::writeTempConfig($cnConfigFile, $openVpnConfigData);
+
+    Utils::addRoute4($v4, $envData['dev']);
+    Utils::addRoute6($v6, $envData['dev']);
 
     // log stuff
     $logData = array(
