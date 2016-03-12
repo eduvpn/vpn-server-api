@@ -40,7 +40,7 @@ class InfoModule implements ServiceModuleInterface
     {
         $prefix6 = $this->v6['prefix'];
         $net4 = $this->v4['range'];
-        
+
         $responseData = [];
         $responseData['range'] = $net4;
         $responseData['range6'] = Utils::convert4to6($prefix6, $net4);
