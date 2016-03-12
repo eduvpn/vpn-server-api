@@ -24,7 +24,7 @@ use fkooman\VPN\Server\Config\FileConfigStorage;
 use fkooman\VPN\Server\Config\IP;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Utils;
-use fkooman\VPN\Server\Config\OpenVpnClientConfig;
+use fkooman\VPN\Server\Config\ClientConfig;
 
 openlog(
     basename($argv[0]),
@@ -72,14 +72,16 @@ try {
 
     $configStorage = new FileConfigStorage($ipConfig->v('configDir'));
 
-    $clientConfig = new OpenVpnClientConfig(
-        $ipConfig->toArray(),
+    $clientConfig = new ClientConfig(
+        $ipConfig->getConfig(),
         $configStorage
     );
 
     $configData = $clientConfig->get($envData['common_name']);
     $v4 = $configData['v4'];
     $v6 = $configData['v6'];
+
+    $openVpnConfigData = Utils::configDataToOpenVpn($configData);
 
     Utils::addRoute4($v4, $envData['dev']);
     Utils::addRoute6($v6, $envData['dev']);
@@ -89,7 +91,7 @@ try {
         throw new RuntimeException(sprintf('unable to claim IP address "%s"', $v4));
     }
 
-    Utils::writeTempConfig($cnConfigFile, ClientConfig::configDataToFile($configData));
+    Utils::writeTempConfig($cnConfigFile, ClientConfig::configDataToFile($openVpnConfigData));
 
     // log stuff
     $logData = array(
