@@ -18,6 +18,7 @@
 namespace fkooman\VPN\Server;
 
 use RuntimeException;
+use fkooman\VPN\Server\Config\IP;
 
 class Utils
 {
@@ -129,7 +130,7 @@ class Utils
         self::exec($cmd, false);
     }
 
-    public static function configDataToOpenVpn(array $configData)
+    public static function configDataToOpenVpn($configData)
     {
         if (false === $configData) {
             return ['disable'];
