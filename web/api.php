@@ -130,9 +130,9 @@ try {
     $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     $service->addModule(new LogModule($connectionLog));
     $service->addModule(new OpenVpnModule($serverManager, $logger));
-    $service->addModule(new ConfigModule($staticConfig, array_keys($ipConfig->v('net', 'pools')), $logger));
+    $service->addModule(new ConfigModule($staticConfig, array_keys($ipConfig->v('v4', 'pools')), $logger));
     $service->addModule(new CaModule($crlFetcher, $logger));
-    $service->addModule(new InfoModule($ipConfig->v('dns'), $ipConfig->v('net')));
+    $service->addModule(new InfoModule($ipConfig->v('v4'), $ipConfig->v('v6')));
     $service->run()->send();
 } catch (Exception $e) {
     // internal server error
