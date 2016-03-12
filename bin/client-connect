@@ -91,7 +91,7 @@ try {
         throw new RuntimeException(sprintf('unable to claim IP address "%s"', $v4));
     }
 
-    Utils::writeTempConfig($cnConfigFile, ClientConfig::configDataToFile($openVpnConfigData));
+    Utils::writeTempConfig($cnConfigFile, $openVpnConfigData);
 
     // log stuff
     $logData = array(
