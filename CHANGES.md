@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.3.0 (2016-03-14)
+- only push specific destination network routes instead of always the default 
+  gateway
+- only push DNS servers in 'default gateway' situation
+- refactor code to reduce size of `client-connect` script and improve testing
+- allow configuration of DNS addresses in `ip.yaml`
+- remove 'default gateways' and DNS push from the `server.twig` template
+- enable `client-connect` by default
+
 ## 3.2.0 (2016-03-07)
 - script to generate firewall based on IP config file
 - cleanup the `info/net` API call
