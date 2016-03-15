@@ -1,7 +1,13 @@
 # OpenVPN management sockets
 openVpn:
-    udp: 'tcp://localhost:7505'
-    tcp: 'tcp://localhost:7506'
+    udp:
+        proto: udp
+        port: 1194
+        managementPort: 7505
+    tcp:
+        proto: tcp
+        port: 1194
+        managementPort: 7506
 
 # CRL
 crl:

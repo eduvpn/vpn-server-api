@@ -92,16 +92,20 @@ try {
     $dhParam = ['dh' => trim($dhContent)];
     @unlink($dhFile); // we don't care if this fails
 
-    $other = [
-        'dev' => 'tun-udp',
-        'proto' => 'udp6',
-        'port' => 1194,
-        'management_port' => 7505,
-    ];
-
     $serverConfig = new ServerConfig();
-
-    echo implode(PHP_EOL, $serverConfig->get(array_merge($other, $dhParam, $ipConfig, $configData['certificate'])));
+    foreach ($mainConfig->v('openVpn') as $k => $v) {
+        $instanceConfig = [];
+        $instanceConfig['dev'] = sprintf('tun-%s', $k);
+        if ('udp' === $v['proto']) {
+            $instanceConfig['proto'] = 'udp6';
+        } else {
+            $instanceConfig['proto'] = 'tcp-server';
+        }
+        $instanceConfig['port'] = $v['port'];
+        $instanceConfig['management_port'] = $v['managementPort'];
+        $vpnConfig = implode(PHP_EOL, $serverConfig->get(array_merge($instanceConfig, $dhParam, $ipConfig, $configData['certificate'])));
+        file_put_contents(sprintf('/etc/openvpn/server-%s.conf', $k), $vpnConfig);
+    }
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL;
     exit(1);

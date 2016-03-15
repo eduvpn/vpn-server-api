@@ -84,10 +84,11 @@ try {
 
     // handles the connection to the various OpenVPN instances
     $serverManager = new ServerManager();
-    foreach ($config->v('openVpn') as $id => $socket) {
+    foreach ($config->v('openVpn') as $k => $v) {
+        $socket = sprintf('tcp://localhost:%d', $v['managementPort']);
         $serverManager->addServer(
             new ServerApi(
-                $id,
+                $k,
                 new ServerSocket($socket)
             )
         );
