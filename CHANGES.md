@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.4.0 (...)
+- remove dependency on Twig for generating server configuration file
+
 ## 3.3.0 (2016-03-14)
 - only push specific destination network routes instead of always the default 
   gateway

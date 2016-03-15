@@ -18,9 +18,9 @@
  */
 require_once dirname(__DIR__).'/vendor/autoload.php';
 
+use fkooman\VPN\Server\Config\ServerConfig;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
-use fkooman\Tpl\Twig\TwigTemplateManager;
 use GuzzleHttp\Client;
 use fkooman\VPN\Server\Config\IP;
 use fkooman\VPN\Server\Utils;
@@ -30,7 +30,11 @@ try {
 
     // get common name from first parameter
     if (2 > $argc) {
-        throw new Exception(sprintf('Syntax: %s [CN]', $argv[0]));
+        $syntaxMessage = [
+            sprintf('syntax: %s [cn]', $argv[0]),
+        ];
+
+        throw new Exception(implode(PHP_EOL, $syntaxMessage));
     }
     $commonName = $argv[1];
 
@@ -68,14 +72,14 @@ try {
     )->json();
 
     $ip = new IP($ipConfig->v('v4', 'range'));
-    $v6_gw = $ipConfig->v('v6', 'prefix').$ip->getFirstHostAs6();
-    $v6_net = $v6_gw.'/96';
+    $v6_gateway = $ipConfig->v('v6', 'prefix').$ip->getFirstHostAs6();
+    $v6_net = $v6_gateway.'/96';
 
     $ipConfig = [
-        'network' => $ip->getNetwork(),
-        'netmask' => $ip->getNetmask(),
+        'v4_network' => $ip->getNetwork(),
+        'v4_netmask' => $ip->getNetmask(),
         'v6_network' => $v6_net,
-        'v6_gw' => $v6_gw,
+        'v6_gateway' => $v6_gateway,
     ];
 
     $dhFile = tempnam(sys_get_temp_dir(), 'dh_');
@@ -88,16 +92,16 @@ try {
     $dhParam = ['dh' => trim($dhContent)];
     @unlink($dhFile); // we don't care if this fails
 
-    $templateManager = new TwigTemplateManager(
-        array(
-            dirname(__DIR__).'/views',
-            dirname(__DIR__).'/config/views',
-        )
-    );
-    echo $templateManager->render(
-        'server',
-        array_merge($dhParam, $ipConfig, $configData['certificate'])
-    );
+    $other = [
+        'dev' => 'tun-udp',
+        'proto' => 'udp6',
+        'port' => 1194,
+        'management_port' => 7505,
+    ];
+
+    $serverConfig = new ServerConfig();
+
+    echo implode(PHP_EOL, $serverConfig->get(array_merge($other, $dhParam, $ipConfig, $configData['certificate'])));
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL;
     exit(1);
