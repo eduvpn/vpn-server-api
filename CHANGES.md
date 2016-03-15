@@ -1,10 +1,10 @@
 # Changelog
 
-## 3.4.0 (...)
+## 3.4.0 (2016-03-15)
 - remove dependency on Twig for generating server configuration file
 - configure the OpenVPN instances now more detailed in the config file 
   so the OpenVPN config files can be generated directly for all instances
-  as well as installed
+  as well as installed at the same time
 
 ## 3.3.0 (2016-03-14)
 - only push specific destination network routes instead of always the default 
