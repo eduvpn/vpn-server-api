@@ -83,21 +83,20 @@ class ServerConfig
             'group openvpn',
             'remote-cert-tls client',
 
-            # CRYPTO
-            #
-            # See RFC 7525 for TLS configuration recommendations
-            # See https://bettercrypto.org for more OpenVPN configuration guidelines
-            # OpenVPN does not support ECDHE (https://community.openvpn.net/openvpn/wiki/Hardening)
-
+            # CRYPTO (DATA CHANNEL)
             'auth SHA256',
             'cipher AES-256-CBC',
+
+            # CRYPTO (CONTROL CHANNEL)
+            # @see RFC 7525  
+            # @see https://bettercrypto.org
+            # @see https://community.openvpn.net/openvpn/wiki/Hardening
             'tls-version-min 1.2',
 
-            # to support iOS OpenVPN Connect 1.0.5 in the default configuration with 
-            # "Force AES-CBC ciphersuites" enabled, we also need to accept an additional 
-            # cipher "TLS_DHE_RSA_WITH_AES_256_CBC_SHA", in that case add the previous to 
-            # the below tls-cipher directive
-            'tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-GCM-SHA384',
+            # To work with default configuration in iOS OpenVPN with
+            # "Force AES-CBC ciphersuites" enabled, we need to accept an 
+            # additional cipher "TLS_DHE_RSA_WITH_AES_256_CBC_SHA"
+            'tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS_DHE_RSA_WITH_AES_256_CBC_SHA',
 
             'script-security 2',
             'client-connect /usr/bin/vpn-server-api-client-connect',
