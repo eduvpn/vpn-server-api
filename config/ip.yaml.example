@@ -7,9 +7,6 @@ leaseDir: /var/lib/openvpn/pool
 configDir: /var/lib/vpn-server-api/config
 
 v4:
-    # the range containing all the subsequent ranges mentioned below
-    range: 10.42.42.0/24
-
     dns:
         - 8.8.8.8
         - 8.8.4.4
@@ -17,18 +14,18 @@ v4:
     pools:
         default:
             name: Default
-            range: 10.42.42.0/27
+            range: 10.42.42.0/25
 
         v6:
             name: IPv6-only
-            range: 10.42.42.32/27
+            range: 10.42.42.128/26
             firewall:
                 dst_net:
                     - '::/0'
 
         https:
             name: HTTPS-only
-            range: 10.42.42.64/27
+            range: 10.42.42.192/26
             firewall:
                 dst_port:
                     - TCP/443
