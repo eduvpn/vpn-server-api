@@ -82,6 +82,7 @@ class ClientConfig
         }
         $v6 = AddressPool::getIp6($v6p, $v4);
 
+        $configData['pool'] = $cnPool;
         $configData['v4'] = $v4;
         $configData['v4_netmask'] = $v4n;
         $configData['v4_gw'] = $this->v4->getRange()->getFirstHost();

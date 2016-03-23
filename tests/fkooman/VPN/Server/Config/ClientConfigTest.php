@@ -69,6 +69,7 @@ class ClientConfigTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
+                'pool' => 'v6',
                 'v4' => '10.42.42.129',
                 'v4_netmask' => '255.255.255.0',
                 'v4_gw' => '10.42.42.1',
@@ -93,6 +94,7 @@ class ClientConfigTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
+                'pool' => 'admin',
                 'v4' => '10.42.42.2',
                 'v4_netmask' => '255.255.255.0',
                 'v4_gw' => '10.42.42.1',

@@ -90,8 +90,10 @@ try {
     }
     Utils::writeTempConfig($cnConfigFile, $openVpnConfigData);
 
-    Utils::addRoute4($v4, $envData['dev']);
-    Utils::addRoute6($v6, $envData['dev']);
+    if ('default' !== $configData['pool']) {
+        Utils::addRoute4($v4, $envData['dev']);
+        Utils::addRoute6($v6, $envData['dev']);
+    }
 
     // log stuff
     $logData = array(
