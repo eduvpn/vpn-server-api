@@ -74,7 +74,7 @@ try {
 #    $ip = new IP($ipConfig->v('v4', 'range'));
 
     $dhFile = tempnam(sys_get_temp_dir(), 'dh_');
-    #Utils::exec(sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength));
+    Utils::exec(sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength));
 
     if (false === $dhContent = @file_get_contents($dhFile)) {
         throw new Exception('unable to read DH file');
