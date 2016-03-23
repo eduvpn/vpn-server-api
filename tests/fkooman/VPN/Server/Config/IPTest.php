@@ -150,4 +150,12 @@ class IPTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($i->inRange('10.42.42.128', false));
         $this->assertFalse($i->inRange('10.42.42.255', false));
     }
+
+    public function testSplitRange()
+    {
+        $i = new IP('10.42.42.0/24');
+        $this->assertSame(['10.42.42.0/25', '10.42.42.128/25'], $i->splitRange());
+        $i = new IP('10.42.42.0/27');
+        $this->assertSame(['10.42.42.0/28', '10.42.42.16/28'], $i->splitRange());
+    }
 }

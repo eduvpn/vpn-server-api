@@ -109,6 +109,19 @@ class IP
         return $longIp > $startIp && $longIp < $endIp;
     }
 
+    /**
+     * Split the provided range in two equal sized CIDRs.
+     */
+    public function splitRange()
+    {
+        // XXX not all ranges can be split
+        $prefix = $this->prefix + 1;
+        $i = new self($this->ip.'/'.$prefix);
+        $j = new self(long2ip(ip2long($i->getBroadcast()) + 1).'/'.$prefix);
+
+        return [$i->getRange(), $j->getRange()];
+    }
+
     private static function validateIP($ip)
     {
         if (false === filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
