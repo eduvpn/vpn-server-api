@@ -71,9 +71,9 @@ class ServerConfig
             'push "tun-ipv6"',
 
             'topology subnet',
-            # enable comp-lzo
-            'comp-lzo yes',
-            'push "comp-lzo yes"',
+            # disable compression
+            'comp-lzo no',
+            'push "comp-lzo no"',
             'persist-key',
             'persist-tun',
             'verb 3',
