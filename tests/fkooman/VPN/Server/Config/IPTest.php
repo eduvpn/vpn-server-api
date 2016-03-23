@@ -154,8 +154,24 @@ class IPTest extends PHPUnit_Framework_TestCase
     public function testSplitRange()
     {
         $i = new IP('10.42.42.0/24');
-        $this->assertSame(['10.42.42.0/25', '10.42.42.128/25'], $i->splitRange());
+        $this->assertSame(['10.42.42.0/24'], $i->splitRange(1));
+
+        $i = new IP('10.42.42.0/24');
+        $this->assertSame(['10.42.42.0/25', '10.42.42.128/25'], $i->splitRange(2));
+
         $i = new IP('10.42.42.0/27');
-        $this->assertSame(['10.42.42.0/28', '10.42.42.16/28'], $i->splitRange());
+        $this->assertSame(['10.42.42.0/28', '10.42.42.16/28'], $i->splitRange(2));
+
+        $i = new IP('10.42.42.0/24');
+        $this->assertSame(['10.42.42.0/26', '10.42.42.64/26', '10.42.42.128/26'], $i->splitRange(3));
+
+        $i = new IP('10.42.42.0/24');
+        $this->assertSame(['10.42.42.0/26', '10.42.42.64/26', '10.42.42.128/26', '10.42.42.192/26'], $i->splitRange(4));
+
+        $i = new IP('10.42.42.0/25');
+        $this->assertSame(['10.42.42.0/26', '10.42.42.64/26'], $i->splitRange(2));
+
+        $i = new IP('10.42.42.0/26');
+        $this->assertSame(['10.42.42.0/28', '10.42.42.16/28', '10.42.42.32/28', '10.42.42.48/28'], $i->splitRange(4));
     }
 }

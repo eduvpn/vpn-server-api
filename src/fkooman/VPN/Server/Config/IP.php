@@ -110,16 +110,30 @@ class IP
     }
 
     /**
-     * Split the provided range in two equal sized CIDRs.
+     * Split the provided range in $no equal sized CIDRs.
      */
-    public function splitRange()
+    public function splitRange($no)
     {
-        // XXX not all ranges can be split
-        $prefix = $this->prefix + 1;
-        $i = new self($this->ip.'/'.$prefix);
-        $j = new self(long2ip(ip2long($i->getBroadcast()) + 1).'/'.$prefix);
+        if (1 === $no) {
+            $prefixNo = 1;
+        } elseif (2 === $no) {
+            $prefixNo = 2;
+        } elseif (3 === $no || 4 === $no) {
+            $prefixNo = 4;
+        } else {
+            throw new InvalidArgumentException('too many instances, only 1,2,3 or 4 allowed');
+        }
 
-        return [$i->getRange(), $j->getRange()];
+        $prefix = $this->prefix + floor($prefixNo / 2);
+        $ranges = [];
+        for ($i = 0; $i < $no; ++$i) {
+            $noHosts = pow(2, 32 - $prefix);
+            $networkAddress = long2ip($i * $noHosts + ip2long($this->ip));
+            $ip = new self($networkAddress.'/'.$prefix);
+            $ranges[] = $ip->getRange();
+        }
+
+        return $ranges;
     }
 
     private static function validateIP($ip)
