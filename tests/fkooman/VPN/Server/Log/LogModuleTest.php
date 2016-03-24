@@ -57,9 +57,9 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
             ]
         );
 
-        $ioStub = $this->getMockBuilder('fkooman\IO\IO')->getMock();
-        $ioStub->method('getTime')->will($this->returnValue(1000020000));
-        $logModule = new LogModule($connectionLog, $ioStub);
+        $dateTime = $this->getMockBuilder('DateTime')->getMock();
+        $dateTime->method('getTimeStamp')->will($this->returnValue(1000020000));
+        $logModule = new LogModule($connectionLog, $dateTime);
 
         $this->service = new Service();
         $this->service->addModule($logModule);

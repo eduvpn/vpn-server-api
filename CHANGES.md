@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.1 (2016-03-24)
+- remove `fkooman/io` dependency by directly using DateTime object instead
+  of beating around the bush
+
 ## 3.4.0 (2016-03-15)
 - remove dependency on Twig for generating server configuration file
 - configure the OpenVPN instances now more detailed in the config file 

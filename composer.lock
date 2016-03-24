@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "50e2f1b95dbbc59ba236c49158f47b37",
-    "content-hash": "46705932dee8c2427cb70fb1967e7f20",
+    "hash": "49e386d80f208f6619319acf902a8f54",
+    "content-hash": "ba716f5ca7011fa5b25043c02c3daf8c",
     "packages": [
         {
             "name": "fkooman/config",
@@ -89,45 +89,6 @@
             ],
             "description": "Simple PHP library for dealing with HTTP requests and responses.",
             "time": "2016-02-22 00:05:41"
-        },
-        {
-            "name": "fkooman/io",
-            "version": "1.0.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/fkooman/php-lib-io.git",
-                "reference": "0c2d8c49b1e37b9e3593c9e8dc51f4abc0c6712a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-lib-io/zipball/0c2d8c49b1e37b9e3593c9e8dc51f4abc0c6712a",
-                "reference": "0c2d8c49b1e37b9e3593c9e8dc51f4abc0c6712a",
-                "shasum": ""
-            },
-            "require": {
-                "ext-date": "*",
-                "ext-openssl": "*",
-                "ext-spl": "*",
-                "php": ">= 5.3.3"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "fkooman\\IO\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "François Kooman",
-                    "email": "fkooman@tuxed.net"
-                }
-            ],
-            "description": "Simple IO library",
-            "time": "2015-10-03 11:35:44"
         },
         {
             "name": "fkooman/json",
@@ -578,16 +539,16 @@
         },
         {
             "name": "react/promise",
-            "version": "v2.2.2",
+            "version": "v2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/promise.git",
-                "reference": "3aacad8bf10c7d83e6fa2089d413529888c2bedf"
+                "reference": "8ffacee1171e33a1c129f424bf1ec36e062eba82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/promise/zipball/3aacad8bf10c7d83e6fa2089d413529888c2bedf",
-                "reference": "3aacad8bf10c7d83e6fa2089d413529888c2bedf",
+                "url": "https://api.github.com/repos/reactphp/promise/zipball/8ffacee1171e33a1c129f424bf1ec36e062eba82",
+                "reference": "8ffacee1171e33a1c129f424bf1ec36e062eba82",
                 "shasum": ""
             },
             "require": {
@@ -618,7 +579,7 @@
                 }
             ],
             "description": "A lightweight implementation of CommonJS Promises/A for PHP",
-            "time": "2016-02-26 19:09:02"
+            "time": "2016-03-24 21:20:22"
         },
         {
             "name": "symfony/yaml",

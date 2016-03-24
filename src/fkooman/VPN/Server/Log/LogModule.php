@@ -11,22 +11,23 @@ use fkooman\Http\JsonResponse;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Http\Exception\ForbiddenException;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
+use DateTime;
 
 class LogModule implements ServiceModuleInterface
 {
     /** @var ConnectionLog */
     private $connectionLog;
 
-    /** @var \fkooman\IO\IO */
-    private $io;
+    /** @var \DateTime */
+    private $dateTime;
 
-    public function __construct(ConnectionLog $connectionLog, IO $io = null)
+    public function __construct(ConnectionLog $connectionLog, DateTime $dateTime = null)
     {
         $this->connectionLog = $connectionLog;
-        if (is_null($io)) {
-            $io = new IO();
+        if(null === $dateTime) {
+            $dateTime = new DateTime();
         }
-        $this->io = $io;
+        $this->dateTime = $dateTime;
     }
 
     public function init(Service $service)
@@ -39,8 +40,8 @@ class LogModule implements ServiceModuleInterface
                 InputValidation::date($showDate);
 
                 $showDateUnix = strtotime($showDate);
-                $minDate = strtotime('today -31 days', $this->io->getTime());
-                $maxDate = strtotime('tomorrow', $this->io->getTime());
+                $minDate = strtotime('today -31 days', $this->dateTime->getTimeStamp());
+                $maxDate = strtotime('tomorrow', $this->dateTime->getTimeStamp());
 
                 if ($showDateUnix < $minDate || $showDateUnix >= $maxDate) {
                     throw new BadRequestException('invalid date range');
