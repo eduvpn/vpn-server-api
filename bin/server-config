@@ -71,7 +71,16 @@ try {
         ]
     )->json();
 
-#    $ip = new IP($ipConfig->v('v4', 'range'));
+    $ip = new IP($ipConfig->v('v4', 'range'));
+    $v6_gateway = $ipConfig->v('v6', 'prefix').$ip->getFirstHostAs6();
+    $v6_net = $v6_gateway.'/96';
+
+    $ipConfig = [
+        'v4_network' => $ip->getNetwork(),
+        'v4_netmask' => $ip->getNetmask(),
+        'v6_network' => $v6_net,
+        'v6_gateway' => $v6_gateway,
+    ];
 
     $dhFile = tempnam(sys_get_temp_dir(), 'dh_');
     Utils::exec(sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength));
@@ -83,22 +92,8 @@ try {
     $dhParam = ['dh' => trim($dhContent)];
     @unlink($dhFile); // we don't care if this fails
 
-    $openVpnConfig = $mainConfig->v('openVpn');
-
-    // we assume most users will be in the 'default' group so we split the 
-    // IP space of default in n(=number of OpenVPN instances on the current 
-    // machine) and assign that to each of the instances, that way we do not
-    // need to fiddle with the routing table for the default group users in
-    // client-connect
-    $ipDefaultRange = new IP($ipConfig->v('v4', 'pools', 'default', 'range'));
-    $defaultRanges = $ipDefaultRange->splitRange(count($openVpnConfig));
-
     $serverConfig = new ServerConfig();
-
-    for ($i = 0; $i < count($openVpnConfig); ++$i) {
-        $k = array_keys($openVpnConfig)[$i];
-        $v = $openVpnConfig[$k];
-
+    foreach ($mainConfig->v('openVpn') as $k => $v) {
         $instanceConfig = [];
         $instanceConfig['dev'] = sprintf('tun-%s', $k);
         if ('udp' === $v['proto']) {
@@ -108,34 +103,7 @@ try {
         }
         $instanceConfig['port'] = $v['port'];
         $instanceConfig['management_port'] = $v['managementPort'];
-
-        $rangeIp = new IP($defaultRanges[$i]);
-
-        $v6_gateway = $ipConfig->v('v6', 'prefix').$rangeIp->getFirstHostAs6();
-        $v6_net = $v6_gateway.'/96';
-
-        $ipC = [
-            'v4_network' => $rangeIp->getNetwork(),
-            'v4_netmask' => $rangeIp->getNetmask(),
-            'v6_network' => $v6_net,
-            'v6_gateway' => $v6_gateway,
-        ];
-
-#        $ipC['v4_network'] = $rangeIp->getNetwork();
-#        $ipC['v4_netmask'] = $rangeIp->getNetmask();
-
-        $vpnConfig = implode(
-            PHP_EOL,
-            $serverConfig->get(
-                array_merge(
-                    $instanceConfig,
-                    $dhParam,
-                    $ipC,
-                    $configData['certificate']
-                )
-            )
-        );
-
+        $vpnConfig = implode(PHP_EOL, $serverConfig->get(array_merge($instanceConfig, $dhParam, $ipConfig, $configData['certificate'])));
         file_put_contents(sprintf('/etc/openvpn/server-%s.conf', $k), $vpnConfig);
     }
 } catch (Exception $e) {

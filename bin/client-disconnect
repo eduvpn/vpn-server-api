@@ -68,7 +68,6 @@ try {
     @unlink(sprintf('%s/%s', $leaseDir, $v4));
 
     // try to remove the routes
-    // XXX this is only needed when not the default pool was used!
     Utils::delRoute4($v4, false);
     Utils::delRoute6($v6, false);
 
