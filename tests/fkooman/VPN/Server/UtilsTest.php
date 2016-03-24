@@ -71,7 +71,7 @@ class UtilsTest extends PHPUnit_Framework_TestCase
                     'v6_gw' => 'fd00:4242:4242:1194::1',
                     'default_gw' => false,
                     'dst_net4' => ['192.168.1.0/24'],
-                    'dst_net6' => ['fd00:1010:1010:1010::/64']
+                    'dst_net6' => ['fd00:1010:1010:1010::/64'],
                 ]
             )
         );
