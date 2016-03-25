@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.4.2 (2016-03-25)
+- update `fkooman/json`
+
 ## 3.4.1 (2016-03-24)
 - remove `fkooman/io` dependency by directly using DateTime object instead
   of beating around the bush
