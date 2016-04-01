@@ -3,6 +3,8 @@
 ## 3.4.3 (...)
 - improve generate-firewall script to also include help text and
   show error when required parameters are missing
+- allow specifying allowed input ports in `ip.yaml` instead of only the 
+  default set
 
 ## 3.4.2 (2016-03-25)
 - update `fkooman/json`
