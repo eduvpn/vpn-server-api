@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.4.3 (...)
+## 3.4.3 (2016-04-01)
 - improve generate-firewall script to also include help text and
   show error when required parameters are missing
 - allow specifying allowed input ports in `ip.yaml` instead of only the 
