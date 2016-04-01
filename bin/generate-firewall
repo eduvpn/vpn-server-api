@@ -22,20 +22,34 @@ use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\Utils;
 use fkooman\VPN\Server\Firewall;
 
+function showHelp(array $argv)
+{
+    $helpText = sprintf('SYNTAX: %s [--nat] [--install] interface', $argv[0]);
+    $helpText .= PHP_EOL;
+    $helpText .= '--nat      use IP masquerading for NAT'.PHP_EOL;
+    $helpText .= '--install  install the firewall script'.PHP_EOL;
+    $helpText .= 'interface  the external interface of the machine'.PHP_EOL;
+    echo $helpText;
+}
+
 try {
     $useNat = false;
-    $extIf = 'eth0';
+    $extIf = null;
     $installFw = false;
 
     for ($i = 1; $i < $argc; ++$i) {
         if ('--nat' === $argv[$i]) {
             $useNat = true;
-        }
-        if ('--install' === $argv[$i]) {
+        } elseif ('--install' === $argv[$i]) {
             $installFw = true;
+        } else {
+            $extIf = $argv[$i];
         }
+    }
 
-        $extIf = $argv[$i];
+    if (null === $extIf) {
+        showHelp($argv);
+        throw new Exception('missing interface');
     }
 
     // read configuration
@@ -89,6 +103,6 @@ try {
         echo $f6->getFirewall();
     }
 } catch (Exception $e) {
-    echo $e->getMessage().PHP_EOL;
+    echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
 }
