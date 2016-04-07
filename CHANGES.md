@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.4.4 (...)
+- do not send the 0.0.0.0/0 default route any more
+
 ## 3.4.3 (2016-04-01)
 - improve generate-firewall script to also include help text and
   show error when required parameters are missing
