@@ -26,18 +26,33 @@ use fkooman\VPN\Server\Config\IPv4;
 use fkooman\VPN\Server\Config\IPv6;
 use fkooman\VPN\Server\Utils;
 
+function showHelp(array $argv)
+{
+    $helpText = sprintf('SYNTAX: %s [--reuse] [CN]', $argv[0]);
+    $helpText .= PHP_EOL;
+    $helpText .= '--reuse    use the existing keys and certificates instead of generating again'.PHP_EOL;
+    $helpText .= 'CN         the common name for the certificate, typically the hostname'.PHP_EOL;
+    echo $helpText;
+}
+
 try {
     $dhLength = 2048;
 
-    // get common name from first parameter
-    if (2 > $argc) {
-        $syntaxMessage = [
-            sprintf('syntax: %s [cn]', $argv[0]),
-        ];
+    $reUse = false;
+    $commonName = false;
 
-        throw new Exception(implode(PHP_EOL, $syntaxMessage));
+    for ($i = 1; $i < $argc; ++$i) {
+        if ('--reuse' === $argv[$i]) {
+            $reUse = true;
+        } else {
+            $commonName = $argv[$i];
+        }
     }
-    $commonName = $argv[1];
+
+    if (false === $reUse && false === $commonName) {
+        showHelp($argv);
+        throw new Exception('must specificy either CN or --reuse flag');
+    }
 
     $mainConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
@@ -47,45 +62,56 @@ try {
         new YamlFile(dirname(__DIR__).'/config/ip.yaml')
     );
 
-    $client = new Client(
-        [
-            'defaults' => [
-                'headers' => [
-                    'Authorization' => sprintf('Bearer %s', $mainConfig->v('remoteApi', 'vpn-ca-api', 'token')),
+    $openVpnConfig = $mainConfig->v('openVpn');
+
+    if ($reUse) {
+        // open the first file to extract the data
+        $fileSuffix = array_keys($openVpnConfig)[0];
+        $configFile = sprintf('/etc/openvpn/server-%s.conf', $fileSuffix);
+        $configData = Utils::extractCertificates(file_get_contents($configFile));
+        // XXX fix this in vpn-ca-api to return tls-auth instead of ta
+        $configData['ta'] = $configData['tls-auth'];
+    } else {
+        // get a new certificate, and also generate a new DH
+        $client = new Client(
+            [
+                'defaults' => [
+                    'headers' => [
+                        'Authorization' => sprintf('Bearer %s', $mainConfig->v('remoteApi', 'vpn-ca-api', 'token')),
+                    ],
                 ],
-            ],
-        ]
-    );
+            ]
+        );
 
-    $requestUri = $mainConfig->v('remoteApi', 'vpn-ca-api', 'uri');
+        $requestUri = $mainConfig->v('remoteApi', 'vpn-ca-api', 'uri');
 
-    $configData = $client->post(
-        $requestUri.'/certificate/',
-        [
-            'headers' => [
-                'Accept' => 'application/json',
-            ],
-            'body' => [
-                'common_name' => $commonName,
-                'cert_type' => 'server',
-            ],
-        ]
-    )->json();
+        $configData = $client->post(
+            $requestUri.'/certificate/',
+            [
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+                'body' => [
+                    'common_name' => $commonName,
+                    'cert_type' => 'server',
+                ],
+            ]
+        )->json();
 
-    $dhFile = tempnam(sys_get_temp_dir(), 'dh_');
-    Utils::exec(sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength));
+        $configData = $configData['certificate'];
 
-    if (false === $dhContent = @file_get_contents($dhFile)) {
-        throw new Exception('unable to read DH file');
+        $dhFile = tempnam(sys_get_temp_dir(), 'dh_');
+        Utils::exec(sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength));
+
+        if (false === $dhContent = @file_get_contents($dhFile)) {
+            throw new Exception('unable to read DH file');
+        }
+
+        $configData['dh'] = trim($dhContent);
+        @unlink($dhFile); // we don't care if this fails
     }
 
-    $dhParam = ['dh' => trim($dhContent)];
-    @unlink($dhFile); // we don't care if this fails
-#    $dhParam = ['dh' => 'foo'];
-
     $serverConfig = new ServerConfig();
-
-    $openVpnConfig = $mainConfig->v('openVpn');
 
     $instanceCount = count($openVpnConfig);
     $ip4 = new IPv4($ipConfig->v('v4', 'range'));
@@ -118,7 +144,7 @@ try {
         }
         $instanceConfig['port'] = $v['port'];
         $instanceConfig['management_port'] = $v['managementPort'];
-        $vpnConfig = implode(PHP_EOL, $serverConfig->get(array_merge($instanceConfig, $dhParam, $ipConfig, $configData['certificate'])));
+        $vpnConfig = implode(PHP_EOL, $serverConfig->get(array_merge($instanceConfig, $ipConfig, $configData)));
         file_put_contents(sprintf('/etc/openvpn/server-%s.conf', $k), $vpnConfig);
 
         ++$i;
