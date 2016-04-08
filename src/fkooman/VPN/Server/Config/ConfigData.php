@@ -21,26 +21,15 @@ use fkooman\VPN\Server\InputValidation;
 
 class ConfigData
 {
-    /** @var string */
-    private $pool;
-
     /** @var bool */
     private $disable;
 
     public function __construct(array $configData)
     {
-        $pool = array_key_exists('pool', $configData) ? $configData['pool'] : 'default';
-        InputValidation::pool($pool);
         $disable = array_key_exists('disable', $configData) ? $configData['disable'] : false;
         InputValidation::disable($disable);
 
-        $this->pool = $pool;
         $this->disable = $disable;
-    }
-
-    public function getPool()
-    {
-        return $this->pool;
     }
 
     public function getDisable()
@@ -51,7 +40,6 @@ class ConfigData
     public function toArray()
     {
         return [
-            'pool' => $this->pool,
             'disable' => $this->disable,
         ];
     }
