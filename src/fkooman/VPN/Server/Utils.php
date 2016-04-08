@@ -40,4 +40,30 @@ class Utils
             throw new RuntimeException('unable to write temporary config file');
         }
     }
+
+    /**
+     * @param string $configData the current OpenVPN configuration file with
+     *                           keys and certificates
+     *
+     * @return array the extracted keys and certificates
+     */
+    public static function extractCertificates($configData)
+    {
+        $serverConfig = [];
+
+        foreach (array('cert', 'ca', 'key', 'tls-auth', 'dh') as $inlineType) {
+            $pattern = sprintf('/\<%s\>(.*)\<\/%s\>/msU', $inlineType, $inlineType);
+            if (1 !== preg_match($pattern, $configData, $matches)) {
+                throw new DomainException('inline type not found');
+            }
+            $serverConfig[$inlineType] = trim($matches[1]);
+        }
+
+        $parsedCert = openssl_x509_parse($serverConfig['cert']);
+        $serverConfig['valid_from'] = $parsedCert['validFrom_time_t'];
+        $serverConfig['valid_to'] = $parsedCert['validTo_time_t'];
+        $serverConfig['cn'] = $parsedCert['subject']['CN'];
+
+        return $serverConfig;
+    }
 }
