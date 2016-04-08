@@ -20,6 +20,7 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\Json\Json;
+use fkooman\VPN\Server\Config\FileConfigStorage;
 use fkooman\VPN\Server\Config\IP;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Utils;
@@ -65,6 +66,8 @@ try {
     $logConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/log.yaml')
     );
+
+    $configStorage = new FileConfigStorage($ipConfig->v('configDir'));
 
     $clientConfig = new ClientConfig(
         $ipConfig->getConfig(),
