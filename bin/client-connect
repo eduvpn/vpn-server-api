@@ -20,7 +20,6 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\Json\Json;
-use fkooman\VPN\Server\Config\FileConfigStorage;
 use fkooman\VPN\Server\Config\IP;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Utils;
@@ -31,11 +30,6 @@ openlog(
     LOG_PERROR,
     LOG_USER
 );
-
-# global, we need those for cleanup if something goes wrong
-$v4 = null;
-$v6 = null;
-$leaseDir = null;
 
 try {
     // OpenVPN specifies a temporary file to write a configuration for that 
@@ -50,6 +44,8 @@ try {
         'common_name',
         'time_unix',
         'dev',
+        'ifconfig_pool_remote_ip',
+        'ifconfig_pool_remote_ip6',
     ];
 
     // read environment variables
@@ -70,34 +66,19 @@ try {
         new YamlFile(dirname(__DIR__).'/config/log.yaml')
     );
 
-    $configStorage = new FileConfigStorage($ipConfig->v('configDir'));
-    $leaseDir = $ipConfig->v('leaseDir');
-
     $clientConfig = new ClientConfig(
         $ipConfig->getConfig(),
         $configStorage
     );
 
     $configData = $clientConfig->get($envData['common_name']);
-    $v4 = $configData['v4'];
-    $v6 = $configData['v6'];
-
-    $openVpnConfigData = Utils::configDataToOpenVpn($configData);
-
-    // mark the IP address as used    
-    if (false === @touch(sprintf('%s/%s', $leaseDir, $v4))) {
-        throw new RuntimeException(sprintf('unable to claim IP address "%s"', $v4));
-    }
-    Utils::writeTempConfig($cnConfigFile, $openVpnConfigData);
-
-    Utils::addRoute4($v4, $envData['dev']);
-    Utils::addRoute6($v6, $envData['dev']);
+    Utils::writeTempConfig($cnConfigFile, $configData);
 
     // log stuff
     $logData = array(
         'common_name' => $envData['common_name'],
-        'v4' => $v4,
-        'v6' => Utils::normalizeIP($v6),
+        'v4' => $envData['ifconfig_pool_remote_ip'],
+        'v6' => $envData['ifconfig_pool_remote_ip6'],
         'time_unix' => $envData['time_unix'],
         'dev' => $envData['dev'],
     );
@@ -113,22 +94,5 @@ try {
     $connectionLog->connect($logData);
 } catch (Exception $e) {
     syslog(LOG_ERR, $e->getMessage());
-
-    // remove the lease file if it was created
-    if (!is_null($leaseDir) && !is_null($v4)) {
-        $leaseFile = sprintf('%s/%s', $leaseDir, $v4);
-        if (@file_exists($leaseFile)) {
-            @unlink($leaseFile);
-        }
-    }
-
-    // remove routes if they exist
-    if (!is_null($v4)) {
-        Utils::delRoute4($v4, false);
-    }
-    if (!is_null($v6)) {
-        Utils::delRoute6($v6, false);
-    }
-
     exit(66);
 }

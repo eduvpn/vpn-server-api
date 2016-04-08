@@ -17,64 +17,121 @@
 
 namespace fkooman\VPN\Server\Config;
 
+use InvalidArgumentException;
+
 class IPv4
 {
-    /** @var IP */
-    private $range;
+    /** @var string */
+    private $ip;
 
-    /** @var array */
-    private $dns;
+    /** @var int */
+    private $prefix;
 
-    /** @var array */
-    private $pools;
-
-    public function __construct(array $input)
+    public function __construct($cidrIp)
     {
-        $this->parseConfig($input);
+        // must be of form IP/PREFIX
+        if (1 !== substr_count($cidrIp, '/')) {
+            throw new InvalidArgumentException('not in CIDR format');
+        }
+        list($ip, $prefix) = explode('/', $cidrIp);
+
+        // check IP
+        self::validateIP($ip);
+        $this->ip = $ip;
+
+        // check prefix
+        if (!is_numeric($prefix) || 0 > $prefix || 32 < $prefix) {
+            throw new InvalidArgumentException('invalid prefix, must be >0 and <32');
+        }
+
+        $this->prefix = intval($prefix);
     }
 
     public function getRange()
     {
-        return $this->range;
+        return sprintf('%s/%d', $this->ip, $this->prefix);
     }
 
-    public function getDns()
+    public function getNetmask()
     {
-        return $this->dns;
+        return long2ip(-1 << (32 - $this->prefix));
     }
 
-    public function getPool($id)
+    public function getNetwork()
     {
-        return $this->pools[$id];
+        return long2ip(ip2long($this->ip) & ip2long($this->getNetmask()));
     }
 
-    public function getPools()
+    public function getFirstHost()
     {
-        return $this->pools;
+        return long2ip(ip2long($this->getNetwork()) + 1);
+    }
+
+    public function getLastHost()
+    {
+        return long2ip(ip2long($this->getBroadcast()) + -1);
+    }
+
+    public function getBroadcast()
+    {
+        return long2ip(
+            ip2long($this->getNetwork()) | ~ip2long($this->getNetmask())
+        );
     }
 
     /**
-     * Parse and validate the configuration and set default values if they
-     * are missing from the configuration file.
+     * Check if a given IP address is in the range of the network.
+     *
+     * @param string $ip                      the IP address to check
+     * @param bool   $includeNetworkBroadcast whether or not to consider the
+     *                                        network and broadcast address of the network also part of the range
      */
-    private function parseConfig(array $input)
+    public function inRange($ip, $includeNetworkBroadcast = false)
     {
-        foreach (['range', 'pools'] as $k) {
-            if (!array_key_exists($k, $input)) {
-                throw new RuntimeException(sprintf('missing key "%s" in configuration', $k));
-            }
+        self::validateIP($ip);
+
+        $longIp = ip2long($ip);
+        $startIp = ip2long($this->getNetwork());
+        $endIp = ip2long($this->getBroadcast());
+
+        if ($includeNetworkBroadcast) {
+            return $longIp >= $startIp && $longIp <= $endIp;
         }
 
-        $this->range = new IP($input['range']);
+        return $longIp > $startIp && $longIp < $endIp;
+    }
 
-        if (!array_key_exists('dns', $input)) {
-            $input['dns'] = ['8.8.8.8', '8.8.4.4'];
+    /**
+     * Split the provided range in $no equal sized CIDRs.
+     */
+    public function splitRange($no)
+    {
+        if (1 === $no) {
+            $prefixNo = 1;
+        } elseif (2 === $no) {
+            $prefixNo = 2;
+        } elseif (3 === $no || 4 === $no) {
+            $prefixNo = 4;
+        } else {
+            throw new InvalidArgumentException('too many instances, only 1,2,3 or 4 allowed');
         }
-        $this->dns = $input['dns'];
 
-        $this->pools = [];
-        foreach ($input['pools'] as $k => $v) {
-            $this->pools[$k] = new PoolConfig($v);
+        $prefix = $this->prefix + floor($prefixNo / 2);
+        $ranges = [];
+        for ($i = 0; $i < $no; ++$i) {
+            $noHosts = pow(2, 32 - $prefix);
+            $networkAddress = long2ip($i * $noHosts + ip2long($this->ip));
+            $ip = new self($networkAddress.'/'.$prefix);
+            $ranges[] = $ip->getRange();
+        }
+
+        return $ranges;
+    }
+
+    private static function validateIP($ip)
+    {
+        if (false === filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            throw new InvalidArgumentException('invalid IP address');
         }
     }
 }

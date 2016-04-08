@@ -29,11 +29,11 @@ class ServerConfig
             'valid_to',
             'dev',          // tun-udp, tun-tcp, tun0, tun1, ...
             'proto',        // udp6, tcp-server
-            'port',         // 1194
+            'port',         // 1194, 443, ...
             'v4_network',
             'v4_netmask',
-            'v6_network',
-            'v6_gateway',
+            'v6_prefix',
+            'dns',
             'management_port',  // 7505, 7506, ...
             'ca',
             'cert',
@@ -50,6 +50,11 @@ class ServerConfig
             }
         }
 
+        $dnsEntries = [];
+        foreach ($serverConfig['dns'] as $dnsAddress) {
+            $dnsEntries[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress);
+        }
+
         return [
             sprintf('# OpenVPN Server Configuration for %s', $serverConfig['cn']),
 
@@ -63,12 +68,25 @@ class ServerConfig
             sprintf('port %d', $serverConfig['port']),
 
             # IPv4
-            sprintf('server %s %s nopool', $serverConfig['v4_network'], $serverConfig['v4_netmask']),
+            sprintf('server %s %s', $serverConfig['v4_network'], $serverConfig['v4_netmask']),
 
             # IPv6
-            sprintf('ifconfig-ipv6 %s %s', $serverConfig['v6_network'], $serverConfig['v6_gateway']),
-            'tun-ipv6',
-            'push "tun-ipv6"',
+            sprintf('server-ipv6 %s', $serverConfig['v6_prefix']),
+
+            'push "redirect-gateway def1 bypass-dhcp"',
+
+            # for Windows clients we need this extra route to mark the TAP adapter as 
+            # trusted and as having "Internet" access to allow the user to set it to 
+            # "Home" or "Work" to allow accessing file shares and printers  
+            #'push "route 0.0.0.0 0.0.0.0"',
+
+            # for iOS we need this OpenVPN 2.4 "ipv6" flag to redirect-gateway
+            # See https://docs.openvpn.net/docs/openvpn-connect/openvpn-connect-ios-faq.html
+            'push "redirect-gateway ipv6"',
+
+            # we use 2000::/3 instead of ::/0 because it seems to break on native IPv6 
+            # networks where the ::/0 default route already exists
+            'push "route-ipv6 2000::/3"',
 
             'topology subnet',
             # disable compression
@@ -107,6 +125,9 @@ class ServerConfig
 
             # ask client to tell us on disconnect
             'push "explicit-exit-notify 3"',
+
+            # DNS
+            implode(PHP_EOL, $dnsEntries),
 
             # disable "netbios", i.e. Windows file sharing over TCP/IP
             #push "dhcp-option DISABLE-NBT"

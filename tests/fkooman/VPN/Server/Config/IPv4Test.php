@@ -20,11 +20,11 @@ namespace fkooman\VPN\Server\Config;
 
 use PHPUnit_Framework_TestCase;
 
-class IPTest extends PHPUnit_Framework_TestCase
+class IPv4Test extends PHPUnit_Framework_TestCase
 {
     public function test24()
     {
-        $i = new IP('10.42.42.0/24');
+        $i = new IPv4('10.42.42.0/24');
         $this->assertSame('255.255.255.0', $i->getNetmask());
         $this->assertSame('10.42.42.0', $i->getNetwork());
         $this->assertSame('10.42.42.255', $i->getBroadcast());
@@ -32,7 +32,7 @@ class IPTest extends PHPUnit_Framework_TestCase
 
     public function test25()
     {
-        $i = new IP('10.42.42.0/25');
+        $i = new IPv4('10.42.42.0/25');
         $this->assertSame('255.255.255.128', $i->getNetmask());
         $this->assertSame('10.42.42.0', $i->getNetwork());
         $this->assertSame('10.42.42.127', $i->getBroadcast());
@@ -40,7 +40,7 @@ class IPTest extends PHPUnit_Framework_TestCase
 
     public function test23()
     {
-        $i = new IP('10.42.42.0/23');
+        $i = new IPv4('10.42.42.0/23');
         $this->assertSame('255.255.254.0', $i->getNetmask());
         $this->assertSame('10.42.42.0', $i->getNetwork());
         $this->assertSame('10.42.43.255', $i->getBroadcast());
@@ -48,7 +48,7 @@ class IPTest extends PHPUnit_Framework_TestCase
 
     public function test32()
     {
-        $i = new IP('10.42.42.42/32');
+        $i = new IPv4('10.42.42.42/32');
         $this->assertSame('255.255.255.255', $i->getNetmask());
         $this->assertSame('10.42.42.42', $i->getNetwork());
         $this->assertSame('10.42.42.42', $i->getBroadcast());
@@ -56,7 +56,7 @@ class IPTest extends PHPUnit_Framework_TestCase
 
     public function testNonNullStart()
     {
-        $i = new IP('10.42.43.12/23');
+        $i = new IPv4('10.42.43.12/23');
         $this->assertSame('255.255.254.0', $i->getNetmask());
         $this->assertSame('10.42.42.0', $i->getNetwork());
         $this->assertSame('10.42.43.255', $i->getBroadcast());
@@ -68,7 +68,7 @@ class IPTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidIP()
     {
-        $i = new IP('10.42.42.260/24');
+        $i = new IPv4('10.42.42.260/24');
     }
 
     /**
@@ -77,7 +77,7 @@ class IPTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidPrefix()
     {
-        $i = new IP('10.42.42.0/40');
+        $i = new IPv4('10.42.42.0/40');
     }
 
     /**
@@ -86,7 +86,7 @@ class IPTest extends PHPUnit_Framework_TestCase
      */
     public function testNotCidr()
     {
-        $i = new IP('10.42.42.0');
+        $i = new IPv4('10.42.42.0');
     }
 
     /**
@@ -95,12 +95,12 @@ class IPTest extends PHPUnit_Framework_TestCase
      */
     public function testNotValidCidr()
     {
-        $i = new IP('10.42.42.0//24');
+        $i = new IPv4('10.42.42.0//24');
     }
 
     public function testRange()
     {
-        $i = new IP('10.42.42.0/24');
+        $i = new IPv4('10.42.42.0/24');
         $this->assertTrue($i->inRange('10.42.42.25'));
         $this->assertTrue($i->inRange('10.42.42.1'));
         $this->assertTrue($i->inRange('10.42.42.254'));
@@ -110,7 +110,7 @@ class IPTest extends PHPUnit_Framework_TestCase
 
     public function testRange25()
     {
-        $i = new IP('10.42.42.0/25');
+        $i = new IPv4('10.42.42.0/25');
         $this->assertTrue($i->inRange('10.42.42.25'));
         $this->assertTrue($i->inRange('10.42.42.1'));
         $this->assertTrue($i->inRange('10.42.42.126'));
@@ -120,7 +120,7 @@ class IPTest extends PHPUnit_Framework_TestCase
 
     public function testRange23()
     {
-        $i = new IP('10.42.42.199/23');
+        $i = new IPv4('10.42.42.199/23');
         $this->assertTrue($i->inRange('10.42.42.25'));
         $this->assertTrue($i->inRange('10.42.42.1'));
         $this->assertTrue($i->inRange('10.42.42.126'));
@@ -131,20 +131,14 @@ class IPTest extends PHPUnit_Framework_TestCase
 
     public function testGetFirstLastHost()
     {
-        $i = new IP('10.42.42.0/25');
+        $i = new IPv4('10.42.42.0/25');
         $this->assertSame('10.42.42.1', $i->getFirstHost());
         $this->assertSame('10.42.42.126', $i->getLastHost());
     }
 
-    public function testGetFirstHostAs6()
-    {
-        $i = new IP('10.42.42.0/25');
-        $this->assertSame('::ffff:0a2a:2a01', $i->getFirstHostAs6());
-    }
-
     public function testInRangeNetworkBroadcast()
     {
-        $i = new IP('10.42.42.128/25');
+        $i = new IPv4('10.42.42.128/25');
         $this->assertTrue($i->inRange('10.42.42.128', true));
         $this->assertTrue($i->inRange('10.42.42.255', true));
         $this->assertFalse($i->inRange('10.42.42.128', false));
@@ -153,25 +147,25 @@ class IPTest extends PHPUnit_Framework_TestCase
 
     public function testSplitRange()
     {
-        $i = new IP('10.42.42.0/24');
+        $i = new IPv4('10.42.42.0/24');
         $this->assertSame(['10.42.42.0/24'], $i->splitRange(1));
 
-        $i = new IP('10.42.42.0/24');
+        $i = new IPv4('10.42.42.0/24');
         $this->assertSame(['10.42.42.0/25', '10.42.42.128/25'], $i->splitRange(2));
 
-        $i = new IP('10.42.42.0/27');
+        $i = new IPv4('10.42.42.0/27');
         $this->assertSame(['10.42.42.0/28', '10.42.42.16/28'], $i->splitRange(2));
 
-        $i = new IP('10.42.42.0/24');
+        $i = new IPv4('10.42.42.0/24');
         $this->assertSame(['10.42.42.0/26', '10.42.42.64/26', '10.42.42.128/26'], $i->splitRange(3));
 
-        $i = new IP('10.42.42.0/24');
+        $i = new IPv4('10.42.42.0/24');
         $this->assertSame(['10.42.42.0/26', '10.42.42.64/26', '10.42.42.128/26', '10.42.42.192/26'], $i->splitRange(4));
 
-        $i = new IP('10.42.42.0/25');
+        $i = new IPv4('10.42.42.0/25');
         $this->assertSame(['10.42.42.0/26', '10.42.42.64/26'], $i->splitRange(2));
 
-        $i = new IP('10.42.42.0/26');
+        $i = new IPv4('10.42.42.0/26');
         $this->assertSame(['10.42.42.0/28', '10.42.42.16/28', '10.42.42.32/28', '10.42.42.48/28'], $i->splitRange(4));
     }
 }

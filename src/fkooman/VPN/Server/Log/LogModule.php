@@ -6,7 +6,6 @@ use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\Exception\BadRequestException;
-use fkooman\IO\IO;
 use fkooman\Http\JsonResponse;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Http\Exception\ForbiddenException;
@@ -24,7 +23,7 @@ class LogModule implements ServiceModuleInterface
     public function __construct(ConnectionLog $connectionLog, DateTime $dateTime = null)
     {
         $this->connectionLog = $connectionLog;
-        if(null === $dateTime) {
+        if (null === $dateTime) {
             $dateTime = new DateTime();
         }
         $this->dateTime = $dateTime;
