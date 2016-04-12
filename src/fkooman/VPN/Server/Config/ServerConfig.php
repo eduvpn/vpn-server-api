@@ -96,7 +96,7 @@ class ServerConfig
             # To work with default configuration in iOS OpenVPN with
             # "Force AES-CBC ciphersuites" enabled, we need to accept an 
             # additional cipher "TLS_DHE_RSA_WITH_AES_256_CBC_SHA"
-            'tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS_DHE_RSA_WITH_AES_256_CBC_SHA',
+            'tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA',
 
             'script-security 2',
             'client-connect /usr/bin/vpn-server-api-client-connect',
