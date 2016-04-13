@@ -38,7 +38,6 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $configModule = new ConfigModule(
             new TestConfigStorage(),
-            ['default', 'v6'],
             new NullLogger()
         );
 
@@ -64,7 +63,6 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'pool' => 'v6',
                 'disable' => false,
             ],
             $this->makeRequest('GET', '/config/foo_bar')
@@ -87,15 +85,12 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
             [
                 'items' => [
                     'foo_bar' => [
-                        'pool' => 'v6',
                         'disable' => false,
                     ],
                     'bar_foo' => [
-                        'pool' => 'default',
                         'disable' => true,
                     ],
                     'admin_xyz' => [
-                        'pool' => 'admin',
                         'disable' => false,
                     ],
                 ],
@@ -110,7 +105,6 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
             [
                 'items' => [
                     'foo_bar' => [
-                        'pool' => 'v6',
                         'disable' => false,
                     ],
                 ],

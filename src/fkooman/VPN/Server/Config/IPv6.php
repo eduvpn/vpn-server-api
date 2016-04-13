@@ -17,45 +17,79 @@
 
 namespace fkooman\VPN\Server\Config;
 
+use InvalidArgumentException;
+
 class IPv6
 {
     /** @var string */
+    private $ip;
+
+    /** @var int */
     private $prefix;
 
-    /** @var array */
-    private $dns;
-
-    public function __construct(array $input)
+    public function __construct($prefixIp)
     {
-        $this->parseConfig($input);
+        // must be of form IP/PREFIX
+        if (1 !== substr_count($prefixIp, '/')) {
+            throw new InvalidArgumentException('not a prefix');
+        }
+        list($ip, $prefix) = explode('/', $prefixIp);
+
+        // check IP
+        self::validateIP($ip);
+        $this->ip = inet_ntop(inet_pton($ip));
+
+        // check prefix
+        if (!is_numeric($prefix) || 0 > $prefix || 64 < $prefix) {
+            throw new InvalidArgumentException('invalid prefix, must be <= /64');
+        }
+
+        $this->prefix = intval($prefix);
     }
 
-    public function getPrefix()
+    public function getRange()
     {
-        return $this->prefix;
-    }
-
-    public function getDns()
-    {
-        return $this->dns;
+        return sprintf('%s/%d', $this->ip, $this->prefix);
     }
 
     /**
-     * Parse and validate the configuration and set default values if they
-     * are missing from the configuration file.
+     * Split the provided range in $no /64s.
      */
-    private function parseConfig(array $input)
+    public function splitRange($no)
     {
-        foreach (['prefix'] as $k) {
-            if (!array_key_exists($k, $input)) {
-                throw new RuntimeException(sprintf('missing key "%s" in configuration', $k));
-            }
-        }
-        $this->prefix = $input['prefix'];
+        // XXX must be at least /60
 
-        if (!array_key_exists('dns', $input)) {
-            $input['dns'] = ['2001:4860:4860::8888', '2001:4860:4860::8844'];
+        $bitIp = inet_pton($this->ip);
+        $hexIp = bin2hex($bitIp);
+        $splitIp = str_split($hexIp, 4);
+
+        $ranges = [];
+
+        for ($i = 0; $i < $no; ++$i) {
+            // the last 4 fields become 0, the last digit of field 3 becomes 0, and 1, ...
+
+            $splitIp[3] = dechex(
+                (
+                    hexdec($splitIp[3]) & 0xfff0
+                ) + $i
+            );
+
+            $splitIp[4] = 0;
+            $splitIp[5] = 0;
+            $splitIp[6] = 0;
+            $splitIp[7] = 0;
+            $rangeIp = inet_ntop(inet_pton(implode($splitIp, ':')));
+
+            $ranges[] = $rangeIp.'/64';
         }
-        $this->dns = $input['dns'];
+
+        return $ranges;
+    }
+
+    private static function validateIP($ip)
+    {
+        if (false === filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            throw new InvalidArgumentException('invalid IP address');
+        }
     }
 }

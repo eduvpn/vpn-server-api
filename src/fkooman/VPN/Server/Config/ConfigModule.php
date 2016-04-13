@@ -33,16 +33,12 @@ class ConfigModule implements ServiceModuleInterface
     /** @var ConfigStorageInterface */
     private $configStorage;
 
-    /** @var array */
-    private $allowedPools;
-
     /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
-    public function __construct(ConfigStorageInterface $configStorage, array $allowedPools, LoggerInterface $logger)
+    public function __construct(ConfigStorageInterface $configStorage, LoggerInterface $logger)
     {
         $this->configStorage = $configStorage;
-        $this->allowedPools = $allowedPools;
         $this->logger = $logger;
     }
 
@@ -100,9 +96,6 @@ class ConfigModule implements ServiceModuleInterface
                 InputValidation::commonName($commonName);
 
                 $configData = new ConfigData(Json::decode($request->getBody()));
-                if (!in_array($configData->getPool(), $this->allowedPools)) {
-                    throw new BadRequestException('invalid "pool"');
-                }
                 $this->configStorage->setConfig($commonName, $configData);
 
                 $response = new JsonResponse();

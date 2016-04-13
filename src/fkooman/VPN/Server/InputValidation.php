@@ -52,14 +52,6 @@ class InputValidation
         }
     }
 
-    public static function pool($pool)
-    {
-        if (!is_string($pool)) {
-            throw new BadRequestException('"pool" must be string');
-        }
-        // XXX length
-    }
-
     public static function disable($disable)
     {
         if (!is_bool($disable)) {

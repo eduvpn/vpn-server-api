@@ -30,8 +30,8 @@ production deployment setup and will not work well for development.
 
     $ cp config/ip.yaml.example config/ip.yaml
 
-Point `leaseDir` and `configDir` to a writable directory, and optionally modify
-the IP pools.
+Point `configDir` to a writable directory, and optionally modify
+the IP configuration.
 
     $ cp config/log.yaml.example config/log.yaml
 

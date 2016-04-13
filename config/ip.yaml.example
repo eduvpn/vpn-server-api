@@ -22,27 +22,8 @@ v4:
         - 8.8.8.8
         - 8.8.4.4
 
-    pools:
-        default:
-            name: Default
-            range: 10.42.42.0/27
-
-        v6:
-            name: IPv6-only
-            range: 10.42.42.32/27
-            firewall:
-                dst_net:
-                    - '::/0'
-
-        https:
-            name: HTTPS-only
-            range: 10.42.42.64/27
-            firewall:
-                dst_port:
-                    - TCP/443
-
 v6:
-    prefix: 'fd00:4242:4242:1194'
+    prefix: 'fd00:4242:4242:1194::/60'
 
     dns:
         - '2001:4860:4860::8888'

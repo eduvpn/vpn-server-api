@@ -19,7 +19,6 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
-use fkooman\VPN\Server\Utils;
 use fkooman\VPN\Server\Firewall;
 
 function showHelp(array $argv)
@@ -57,10 +56,6 @@ try {
         new YamlFile(dirname(__DIR__).'/config/ip.yaml')
     );
 
-    // get the pools
-    $ipPools = $ipConfig->v('v4', 'pools');
-    $range6 = $ipConfig->v('v6', 'prefix');
-
     $inputPorts = $ipConfig->v('firewall', 'dst_port', false, ['TCP/22', 'TCP/80', 'TCP/443', 'TCP/1194']);
 
     $f4 = new Firewall(4, $extIf, $useNat);
@@ -68,22 +63,12 @@ try {
     $f6 = new Firewall(6, $extIf, $useNat);
     $f6->addInputPorts($inputPorts);
 
-    foreach ($ipPools as $poolId => $ipPool) {
-        $poolId = sprintf('vpn_%s', $poolId);
-        $srcNet = $ipPool['range'];
-        $srcNet6 = Utils::convert4to6($range6, $srcNet);
+    // get the ranges
+    $ip4Range = $ipConfig->v('v4', 'range');
+    $ip6Range = $ipConfig->v('v6', 'prefix');
 
-        if (!array_key_exists('firewall', $ipPool) || !array_key_exists('dst_net', $ipPool['firewall'])) {
-            $ipPool['firewall']['dst_net'] = ['0.0.0.0/0', '::/0'];
-        }
-
-        if (!array_key_exists('dst_port', $ipPool['firewall'])) {
-            $ipPool['firewall']['dst_port'] = [];
-        }
-
-        $f4->addPool($poolId, $srcNet, $ipPool['firewall']['dst_net'], $ipPool['firewall']['dst_port']);
-        $f6->addPool($poolId, $srcNet6, $ipPool['firewall']['dst_net'], $ipPool['firewall']['dst_port']);
-    }
+    $f4->addRange($ip4Range);
+    $f6->addRange($ip6Range);
 
     if ($installFw) {
         if (false === @file_put_contents('/etc/sysconfig/iptables', $f4->getFirewall())) {

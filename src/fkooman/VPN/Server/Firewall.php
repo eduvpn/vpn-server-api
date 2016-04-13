@@ -23,6 +23,7 @@ class Firewall
     private $externalIf;
     private $useNat;
     private $inputPorts;
+    private $ranges;
 
     public function __construct($ipVersion = 4, $externalIf = 'eth0', $useNat = true)
     {
@@ -30,7 +31,7 @@ class Firewall
         $this->externalIf = $externalIf;
         $this->useNat = $useNat;
         $this->inputPorts = [];
-        $this->pool = [];
+        $this->ranges = [];
     }
 
     private function getNat()
@@ -79,13 +80,10 @@ class Firewall
             '-N vpn',
             '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
             sprintf('-A FORWARD -i tun+ -o %s -j vpn', $this->externalIf),
-            sprintf('-A vpn -p %s -j ACCEPT', 4 === $this->ipVersion ? 'icmp' : 'ipv6-icmp'),
-            '-A vpn -m udp -p udp --dport 53 -j ACCEPT',
-            '-A vpn -m tcp -p tcp --dport 53 -j ACCEPT',
         ];
 
-        foreach ($this->pool as $p) {
-            $forward = array_merge($forward, $p);
+        foreach ($this->ranges as $r) {
+            $forward = array_merge($forward, $r);
         }
 
         return $forward;
@@ -96,35 +94,12 @@ class Firewall
         $this->inputPorts = $inputPorts;
     }
 
-    public function addPool($poolId, $srcNet, array $dstNets = [], array $dstPorts = [])
+    public function addRange($srcNet)
     {
-        $pool = [];
-        $pool[] = sprintf('-N %s', $poolId);
-        $pool[] = sprintf('-A vpn -s %s -j %s', $srcNet, $poolId);
+        $range = [];
+        $range[] = sprintf('-A vpn -s %s -j ACCEPT', $srcNet);
 
-        // add rules
-        foreach ($dstNets as $dstNet) {
-            if ($this->ipVersion === self::getFamily($dstNet)) {
-                // only include dstNet if it matches FW type 
-                continue;
-            }
-
-            if (0 !== count($dstPorts)) {
-                foreach ($dstPorts as $dstPort) {
-                    list($protocol, $port) = explode('/', $dstPort);
-                    $pool[] = sprintf('-A %s -d %s -m %s -p %s --dport %d -j ACCEPT', $poolId, $dstNet, strtolower($protocol), strtolower($protocol), $port);
-                }
-            } else {
-                $pool[] = sprintf('-A %s -d %s -j ACCEPT', $poolId, $dstNet);
-            }
-        }
-
-        $this->pool[] = $pool;
-    }
-
-    private static function getFamily($dstNet)
-    {
-        return false !== strpos($dstNet, ':') ? 4 : 6;
+        $this->ranges[] = $range;
     }
 
     public function getFirewall()

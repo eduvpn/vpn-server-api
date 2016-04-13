@@ -43,29 +43,8 @@ class InfoModule implements ServiceModuleInterface
 
         $responseData = [];
         $responseData['range'] = $net4;
-        $responseData['range6'] = Utils::convert4to6($prefix6, $net4);
-        $responseData['pools'] = [];
+        $responseData['range6'] = $prefix6;
         $responseData['dns'] = array_merge($this->v4['dns'], $this->v6['dns']);
-
-        foreach ($this->v4['pools'] as $id => $pool) {
-            $poolInfo = [
-                'name' => $pool['name'],
-                'range' => $pool['range'],
-                'range6' => Utils::convert4to6($prefix6, $pool['range']),
-            ];
-            if (!array_key_exists('firewall', $pool)) {
-                $pool['firewall'] = [];
-            }
-            if (!array_key_exists('dst_net', $pool['firewall'])) {
-                $pool['firewall']['dst_net'] = ['0.0.0.0/0', '::/0'];
-            }
-            if (!array_key_exists('dst_port', $pool['firewall'])) {
-                $pool['firewall']['dst_port'] = ['*/*'];
-            }
-            $poolInfo['firewall'] = $pool['firewall'];
-
-            $responseData['pools'][$id] = $poolInfo;
-        }
 
         $response = new JsonResponse();
         $response->setBody($responseData);

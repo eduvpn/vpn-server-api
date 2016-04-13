@@ -21,7 +21,6 @@ use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\Json\Json;
 use fkooman\VPN\Server\Log\ConnectionLog;
-use fkooman\VPN\Server\Utils;
 
 openlog(
     basename($argv[0]),
@@ -58,23 +57,10 @@ try {
         $envData[$envKey] = $envValue;
     }
 
-    $leaseDir = $ipConfig->v('leaseDir');
-
-    // XXX validate the environment variables
-    $v4 = $envData['ifconfig_pool_remote_ip'];
-    $v6 = $envData['ifconfig_pool_remote_ip6'];
-
-    // try to remove the leaseFile
-    @unlink(sprintf('%s/%s', $leaseDir, $v4));
-
-    // try to remove the routes
-    Utils::delRoute4($v4, false);
-    Utils::delRoute6($v6, false);
-
     $logData = array(
         'common_name' => $envData['common_name'],
-        'v4' => $v4,
-        'v6' => Utils::normalizeIP($v6),
+        'v4' => $envData['ifconfig_pool_remote_ip'],
+        'v6' => $envData['ifconfig_pool_remote_ip6'],
         'time_unix' => $envData['time_unix'],
         'disconnect_time_unix' => time(),
         'bytes_received' => $envData['bytes_received'],
