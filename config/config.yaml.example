@@ -3,11 +3,11 @@ openVpn:
     udp:
         proto: udp
         port: 1194
-        managementPort: 7505
+        managementPort: 11940
     tcp:
         proto: tcp
         port: 1194
-        managementPort: 7506
+        managementPort: 11941
 
 # CRL
 crl:

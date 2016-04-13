@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.0.2 (...)
+- move the default management ports of OpenVPN to the 1194x port range
+
 ## 4.0.1 (2016-04-13)
 - allow rejecting IPv6 traffic routing, forcing IPv4 only
 - update `ip.yaml` template
