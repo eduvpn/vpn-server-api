@@ -1,8 +1,5 @@
 # IP address configuration
 
-# stores IP addresses currently in use 
-leaseDir: /var/lib/openvpn/pool
-
 # contains the configurations of the CN
 configDir: /var/lib/vpn-server-api/config
 
@@ -15,7 +12,6 @@ firewall:
         - UDP/1194
 
 v4:
-    # the range containing all the subsequent ranges mentioned below
     range: 10.42.42.0/24
 
     dns:
@@ -23,7 +19,7 @@ v4:
         - 8.8.4.4
 
 v6:
-    prefix: 'fd00:4242:4242:1194::/60'
+    prefix: 'fd00:4242:4242::/48'
 
     dns:
         - '2001:4860:4860::8888'
