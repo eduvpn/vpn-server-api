@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.1 (2016-04-13)
+- allow rejecting IPv6 traffic routing, forcing IPv4 only
+- update `ip.yaml` template
+
 ## 4.0.0 (2016-04-13)
 - for now remove all custom route support, go back to simple split IP range 
   over the UDP/TCP instances

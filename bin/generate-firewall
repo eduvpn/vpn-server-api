@@ -23,9 +23,10 @@ use fkooman\VPN\Server\Firewall;
 
 function showHelp(array $argv)
 {
-    $helpText = sprintf('SYNTAX: %s [--nat] [--install] interface', $argv[0]);
+    $helpText = sprintf('SYNTAX: %s [--nat] [--reject6] [--install] interface', $argv[0]);
     $helpText .= PHP_EOL;
     $helpText .= '--nat      use IP masquerading for NAT'.PHP_EOL;
+    $helpText .= '--reject6  do not actually forward IPv6 traffic, reject it'.PHP_EOL;
     $helpText .= '--install  install the firewall script'.PHP_EOL;
     $helpText .= 'interface  the external interface of the machine'.PHP_EOL;
     echo $helpText;
@@ -35,10 +36,13 @@ try {
     $useNat = false;
     $extIf = null;
     $installFw = false;
+    $forward6 = true;
 
     for ($i = 1; $i < $argc; ++$i) {
         if ('--nat' === $argv[$i]) {
             $useNat = true;
+        } elseif ('--reject6' === $argv[$i]) {
+            $forward6 = false;
         } elseif ('--install' === $argv[$i]) {
             $installFw = true;
         } else {
@@ -58,9 +62,9 @@ try {
 
     $inputPorts = $ipConfig->v('firewall', 'dst_port', false, ['TCP/22', 'TCP/80', 'TCP/443', 'TCP/1194']);
 
-    $f4 = new Firewall(4, $extIf, $useNat);
+    $f4 = new Firewall(4, $extIf, $useNat, true);
     $f4->addInputPorts($inputPorts);
-    $f6 = new Firewall(6, $extIf, $useNat);
+    $f6 = new Firewall(6, $extIf, $useNat, $forward6);
     $f6->addInputPorts($inputPorts);
 
     // get the ranges

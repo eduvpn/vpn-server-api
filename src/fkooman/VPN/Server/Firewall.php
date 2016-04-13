@@ -24,14 +24,16 @@ class Firewall
     private $useNat;
     private $inputPorts;
     private $ranges;
+    private $enableForward;
 
-    public function __construct($ipVersion = 4, $externalIf = 'eth0', $useNat = true)
+    public function __construct($ipVersion = 4, $externalIf = 'eth0', $useNat = true, $enableForward = true)
     {
         $this->ipVersion = $ipVersion;
         $this->externalIf = $externalIf;
         $this->useNat = $useNat;
         $this->inputPorts = [];
         $this->ranges = [];
+        $this->enableForward = $enableForward;
     }
 
     private function getNat()
@@ -76,6 +78,10 @@ class Firewall
 
     private function getForward()
     {
+        if (!$this->enableForward) {
+            return [];
+        }
+
         $forward = [
             '-N vpn',
             '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
