@@ -1,5 +1,16 @@
 # Changelog
 
+## 4.0.0 (2016-04-13)
+- for now remove all custom route support, go back to simple split IP range 
+  over the UDP/TCP instances
+- simplify firewall
+- implement `--reuse` option to `server-config` script to use the certificates 
+  and keys in the existing server configs
+- slightly change the `v6` -> `prefix` config option in `ip.yaml` to also 
+  require the net size, IPv6 blocks of size `/64` will be taken from this 
+  prefix
+- fix iOS with "Force AES-CBC ciphers" configuration option
+
 ## 3.4.4 (2016-04-08)
 - do not send the 0.0.0.0/0 default route any more, this may break
   file sharing on Windows, but we do not really support that now anyway
