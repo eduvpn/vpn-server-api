@@ -1,6 +1,6 @@
 # Changelog
 
-## 4.0.2 (...)
+## 4.0.2 (2016-04-13)
 - move the default management ports of OpenVPN to the 1194x port range
 
 ## 4.0.1 (2016-04-13)
