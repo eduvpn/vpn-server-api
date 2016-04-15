@@ -1,10 +1,12 @@
 # OpenVPN management sockets
 openVpn:
     udp:
+        #listen: '::'
         proto: udp
         port: 1194
         managementPort: 11940
     tcp:
+        #listen: '::'
         proto: tcp
         port: 1194
         managementPort: 11941
