@@ -10,6 +10,7 @@ firewall:
         - TCP/80
         - TCP/22
         - UDP/1194
+        - TCP/1194
 
 v4:
     range: 10.42.42.0/24
