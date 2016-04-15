@@ -60,7 +60,7 @@ try {
         new YamlFile(dirname(__DIR__).'/config/ip.yaml')
     );
 
-    $inputPorts = $ipConfig->v('firewall', 'dst_port', false, ['TCP/22', 'TCP/80', 'TCP/443', 'TCP/1194']);
+    $inputPorts = $ipConfig->v('firewall', 'dst_port', false, ['TCP/22', 'TCP/80', 'TCP/443', 'UDP/1194']);
 
     $f4 = new Firewall(4, $extIf, $useNat, true);
     $f4->addInputPorts($inputPorts);
