@@ -137,10 +137,20 @@ try {
 
         $instanceConfig = [];
         $instanceConfig['dev'] = sprintf('tun-%s', $k);
-        if ('udp' === $v['proto']) {
-            $instanceConfig['proto'] = 'udp6';
+
+        // determine the listen address
+        if (!array_key_exists('listen', $v)) {
+            $instanceConfig['listen'] = '::';
         } else {
-            $instanceConfig['proto'] = 'tcp-server';
+            $instanceConfig['listen'] = $v['listen'];
+        }
+
+        // determine the proto, based on whether the listen address is v4 or v6
+        $is6 = false !== strpos($instanceConfig['listen'], ':');
+        if ('udp' === $v['proto']) {
+            $instanceConfig['proto'] = $is6 ? 'udp6' : 'udp';
+        } else {
+            $instanceConfig['proto'] = $is6 ? 'tcp6-server' : 'tcp-server';
         }
         $instanceConfig['port'] = $v['port'];
         $instanceConfig['management_port'] = $v['managementPort'];

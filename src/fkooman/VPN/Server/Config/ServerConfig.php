@@ -40,9 +40,10 @@ class ServerConfig
             'key',
             'dh',
             'ta',
+            'listen',
         ];
 
-        // XXX verfiy the parameters and types
+        // XXX verify the parameters and types
 
         foreach ($requiredParameters as $p) {
             if (!array_key_exists($p, $serverConfig)) {
@@ -62,6 +63,8 @@ class ServerConfig
             sprintf('# Valid To: %s', date('c', $serverConfig['valid_to'])),
 
             sprintf('dev %s', $serverConfig['dev']),
+
+            sprintf('local %s', $serverConfig['listen']),
 
             # UDP6 (works also for UDP)
             sprintf('proto %s', $serverConfig['proto']),
