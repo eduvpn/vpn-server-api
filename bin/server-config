@@ -36,7 +36,7 @@ function showHelp(array $argv)
 }
 
 try {
-    $dhLength = 2048;
+    $dhLength = 3072;
 
     $reUse = false;
     $commonName = false;
