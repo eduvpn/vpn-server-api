@@ -1,11 +1,11 @@
 # Changelog
 
-## 4.0.3 (...)
+## 4.0.3 (2016-04-19)
 - allow specifying the `listen` directive in `config.yaml` to bind instances
   to particular IP addresses
 - default to listening on `::` with either `udp6` or `tcp6-server` as proto
-- fix small issue if no firewall was specified in `ip.yaml` that `tcp/1194` 
-  was opened instead of `udp/1194`
+- fix small issue if no firewall was specified in `ip.yaml` that only `tcp/1194` 
+  was opened instead of also `udp/1194`
 
 ## 4.0.2 (2016-04-13)
 - move the default management ports of OpenVPN to the 1194x port range
