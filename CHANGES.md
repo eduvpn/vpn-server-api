@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.0.4 (2016-04-19)
+- tag new release, something got confused
+
 ## 4.0.3 (2016-04-19)
 - allow specifying the `listen` directive in `config.yaml` to bind instances
   to particular IP addresses
