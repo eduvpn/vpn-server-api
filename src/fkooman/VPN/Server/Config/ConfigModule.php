@@ -24,7 +24,6 @@ use fkooman\Http\JsonResponse;
 use Psr\Log\LoggerInterface;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Json\Json;
-use fkooman\Http\Exception\BadRequestException;
 use fkooman\Http\Exception\ForbiddenException;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 

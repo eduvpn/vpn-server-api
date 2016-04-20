@@ -30,8 +30,7 @@ class ServerConfig
             'dev',          // tun-udp, tun-tcp, tun0, tun1, ...
             'proto',        // udp6, tcp-server
             'port',         // 1194, 443, ...
-            'v4_network',
-            'v4_netmask',
+            'v4_prefix',    // 10.42.42.0/24, ...
             'v6_prefix',
             'dns',
             'management_port',  // 7505, 7506, ...
@@ -50,6 +49,8 @@ class ServerConfig
                 throw new RuntimeException(sprintf('missing parameter "%s"', $p));
             }
         }
+
+        $v4 = new IPv4($serverConfig['v4_prefix']);
 
         $dnsEntries = [];
         foreach ($serverConfig['dns'] as $dnsAddress) {
@@ -71,7 +72,7 @@ class ServerConfig
             sprintf('port %d', $serverConfig['port']),
 
             # IPv4
-            sprintf('server %s %s', $serverConfig['v4_network'], $serverConfig['v4_netmask']),
+            sprintf('server %s %s', $v4->getNetwork(), $v4->getNetmask()),
 
             # IPv6
             sprintf('server-ipv6 %s', $serverConfig['v6_prefix']),
@@ -98,7 +99,7 @@ class ServerConfig
             'persist-key',
             'persist-tun',
             'verb 3',
-            'max-clients 100',
+            sprintf('max-clients %d', $v4->getNumberOfHosts() - 1),
             'keepalive 10 60',
             'user openvpn',
             'group openvpn',

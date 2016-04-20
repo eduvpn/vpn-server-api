@@ -145,6 +145,14 @@ class IPv4Test extends PHPUnit_Framework_TestCase
         $this->assertFalse($i->inRange('10.42.42.255', false));
     }
 
+    public function testNumberOfHosts()
+    {
+        $i = new IPv4('10.42.42.0/24');
+        $this->assertEquals(254, $i->getNumberOfHosts());
+        $i = new IPv4('10.42.42.0/25');
+        $this->assertEquals(126, $i->getNumberOfHosts());
+    }
+
     public function testSplitRange()
     {
         $i = new IPv4('10.42.42.0/24');

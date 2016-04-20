@@ -8,7 +8,6 @@ use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\JsonResponse;
 use fkooman\Http\Exception\ForbiddenException;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
-use fkooman\VPN\Server\Utils;
 
 class InfoModule implements ServiceModuleInterface
 {

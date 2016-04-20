@@ -79,6 +79,11 @@ class IPv4
         );
     }
 
+    public function getNumberOfHosts()
+    {
+        return pow(2, 32 - $this->prefix) - 2;
+    }
+
     /**
      * Check if a given IP address is in the range of the network.
      *

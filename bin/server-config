@@ -125,13 +125,9 @@ try {
 
     $i = 0;
     foreach ($openVpnConfig as $k => $v) {
-        $ip4Range = new IPv4($ip4Ranges[$i]);
-        $ip6Range = new IPv6($ip6Ranges[$i]);
-
         $ipConfig = [
-            'v4_network' => $ip4Range->getNetwork(),
-            'v4_netmask' => $ip4Range->getNetmask(),
-            'v6_prefix' => $ip6Range->getRange(),
+            'v4_prefix' => $ip4Ranges[$i],
+            'v6_prefix' => $ip6Ranges[$i],
             'dns' => array_merge($dns4, $dns6),
         ];
 
