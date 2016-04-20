@@ -1,7 +1,8 @@
 # Changelog
 
-## 4.0.6 (...)
-- automatically determine `max-clients` based on the IP range
+## 4.0.6 (2016-04-20)
+- automatically determine `max-clients` based on the IP range when generating 
+  server configurations
 
 ## 4.0.5 (2016-04-20)
 - update the default config file to listen on additional UDP ports
