@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.0.5 (2016-04-20)
+- update the default config file to listen on additional UDP ports
+
 ## 4.0.4 (2016-04-19)
 - tag new release, something got confused
 

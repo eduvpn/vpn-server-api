@@ -6,11 +6,12 @@ configDir: /var/lib/vpn-server-api/config
 firewall:
     # allow connections to these ports on the VPN server itself
     dst_port:
-        - TCP/443
-        - TCP/80
-        - TCP/22
         - UDP/1194
-        - TCP/1194
+        - UDP/1195
+        - UDP/1196
+        - TCP/22
+        - TCP/80
+        - TCP/443
 
 v4:
     range: 10.42.42.0/24
