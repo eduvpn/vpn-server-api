@@ -19,7 +19,39 @@ namespace fkooman\VPN\Server\Config;
 
 interface ConfigStorageInterface
 {
-    public function getConfig($commonName);
-    public function getAllConfig($userId);
-    public function setConfig($commonName, ConfigData $configData);
+    /**
+     * Get configuration specific to a particular user.
+     *
+     * @return UserConfig
+     */
+    public function getUserConfig($userId);
+
+    /**
+     * Set the configuration for a particular user.
+     */
+    public function setUserConfig($userId, UserConfig $userConfig);
+
+    /**
+     * Get the configuration for a particular common name.
+     *
+     * @return CommonNameConfig
+     */
+    public function getCommonNameConfig($commonName);
+
+    /**
+     * Get all common name configurations, optionally limited to a particular
+     * user.
+     *
+     * @param string|null $userId the userId to retrieve the common names for,
+     *                            if the parameter is null all common name configurations for all users 
+     *                            are retrieved
+     *
+     * @return CommonNameConfig[]
+     */
+    public function getAllCommonNameConfig($userId);
+
+    /** 
+     * Set the configuration for a particular common name.
+     */
+    public function setCommonNameConfig($commonName, CommonNameConfig $commonNameConfig);
 }

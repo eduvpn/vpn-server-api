@@ -63,7 +63,7 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'disable' => false,
+                'disable' => true,
             ],
             $this->makeRequest('GET', '/config/foo_bar')
         );
@@ -85,12 +85,12 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
             [
                 'items' => [
                     'foo_bar' => [
+                        'disable' => true,
+                    ],
+                    'foo_baz' => [
                         'disable' => false,
                     ],
                     'bar_foo' => [
-                        'disable' => true,
-                    ],
-                    'admin_xyz' => [
                         'disable' => false,
                     ],
                 ],
@@ -104,12 +104,12 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'items' => [
-                    'foo_bar' => [
+                    'bar_foo' => [
                         'disable' => false,
                     ],
                 ],
             ],
-            $this->makeRequest('GET', '/config/', ['user_id' => 'foo'])
+            $this->makeRequest('GET', '/config/', ['user_id' => 'bar'])
         );
     }
 

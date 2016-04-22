@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.0 (...)
+- refactor storing common name and user configuration in the backend, preparing
+  for OTP support and disabling users
+
 ## 4.0.6 (2016-04-20)
 - automatically determine `max-clients` based on the IP range when generating 
   server configurations

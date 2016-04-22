@@ -17,50 +17,97 @@
 
 namespace fkooman\VPN\Server\Config;
 
-use fkooman\Json\Json;
 use RuntimeException;
+use fkooman\Json\Json;
 
 class FileConfigStorage implements ConfigStorageInterface
 {
     /** @var string */
-    private $staticConfigDir;
+    private $configDir;
 
-    public function __construct($staticConfigDir)
+    public function __construct($configDir)
     {
-        $this->staticConfigDir = $staticConfigDir;
+        $this->configDir = $configDir;
     }
 
-    public function getConfig($commonName)
+    /**
+     * Get configuration specific to a particular user.
+     *
+     * @return UserConfig
+     */
+    public function getUserConfig($userId)
     {
-        $commonNamePath = sprintf('%s/%s', $this->staticConfigDir, $commonName);
-        try {
-            return new ConfigData(Json::decodeFile($commonNamePath));
-        } catch (RuntimeException $e) {
-            return new ConfigData([]);
-        }
+        $userData = $this->readFile(
+            sprintf('%s/users/%s', $this->configDir, $userId)
+        );
+
+        return new UserConfig($userData);
     }
 
-    public function getAllConfig($userId)
+    /**
+     * Set the configuration for a particular user.
+     */
+    public function setUserConfig($userId, UserConfig $userConfig)
+    {
+        $this->writeFile(
+            sprintf('%s/users/%s', $this->configDir, $userId),
+            $userConfig->toArray()
+        );
+    }
+
+    /**
+     * Get the configuration for a particular common name.
+     *
+     * @return CommonNameConfig
+     */
+    public function getCommonNameConfig($commonName)
+    {
+        $commonNameData = $this->readFile(
+            sprintf('%s/common_names/%s', $this->configDir, $commonName)
+        );
+
+        return new CommonNameConfig($commonNameData);
+    }
+
+    public function getAllCommonNameConfig($userId)
     {
         $configArray = [];
-        $pathFilter = sprintf('%s/*', $this->staticConfigDir);
+        $pathFilter = sprintf('%s/common_names/*', $this->configDir);
         if (!is_null($userId)) {
-            $pathFilter = sprintf('%s/%s_*', $this->staticConfigDir, $userId);
+            $pathFilter = sprintf('%s/common_names/%s_*', $this->configDir, $userId);
         }
         foreach (glob($pathFilter) as $commonNamePath) {
             $commonName = basename($commonNamePath);
-            $configArray[$commonName] = $this->getConfig($commonName)->toArray();
+            $configArray[$commonName] = $this->getCommonNameConfig($commonName)->toArray();
         }
 
         return $configArray;
     }
 
-    public function setConfig($commonName, ConfigData $config)
+    /** 
+     * Set the configuration for a particular common name.
+     */
+    public function setCommonNameConfig($commonName, CommonNameConfig $commonNameConfig)
     {
-        $commonNamePath = sprintf('%s/%s', $this->staticConfigDir, $commonName);
+        $this->writeFile(
+            sprintf('%s/common_names/%s', $this->configDir, $commonName),
+            $commonNameConfig->toArray()
+        );
+    }
 
-        if (false === @file_put_contents($commonNamePath, Json::encode($config->toArray()))) {
-            throw new RuntimeException('unable to write to static configuration file');
+    private function readFile($fileName)
+    {
+        if (false === $fileContent = @file_get_contents($fileName)) {
+            return [];
+        }
+
+        return Json::decode($fileContent);
+    }
+
+    private function writeFile($fileName, array $fileContent)
+    {
+        if (false === @file_put_contents($fileName, Json::encode($fileContent))) {
+            throw new RuntimeException(sprintf('unable to write file "%s"', $fileName));
         }
     }
 }
