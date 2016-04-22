@@ -59,4 +59,24 @@ class InputValidationTest extends PHPUnit_Framework_TestCase
     {
         InputValidation::date('a2015-01-01', true);
     }
+
+    public function testOtpKey()
+    {
+        InputValidation::otpKey('123456');
+    }
+
+    /**
+     * @expectedException fkooman\Http\Exception\BadRequestException
+     * @expectedExceptionMessage invalid OTP key format
+     */
+    public function testOtpKeyInvalid()
+    {
+        // must be length 6
+        InputValidation::otpKey('123');
+    }
+
+    public function testOtpSecret()
+    {
+        InputValidation::otpSecret('AZ09A90');
+    }
 }

@@ -34,7 +34,7 @@ class UserConfig
         $this->disable = $disable;
 
         $otpSecret = array_key_exists('otpSecret', $configData) ? $configData['otpSecret'] : false;
-        // XXX: InputValidation::otpSecret($otpSecret);
+        InputValidation::otpSecret($otpSecret);
         $this->otpSecret = $otpSecret;
     }
 

@@ -24,7 +24,8 @@ class InputValidation
     const COMMON_NAME_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
     const USER_ID_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
     const DATE_PATTERN = '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/';
-    const OTP_PATTERN = '/^[0-9]{6}$/';
+    const OTP_KEY_PATTERN = '/^[0-9]{6}$/';
+    const OTP_SECRET_PATTERN = '/^[A-Z0-9]+$/';
 
     public static function commonName($commonName)
     {
@@ -60,10 +61,17 @@ class InputValidation
         }
     }
 
-    public static function otp($otpValue)
+    public static function otpKey($otpKey)
     {
-        if (0 === preg_match(self::OTP_PATTERN, $otpValue)) {
-            throw new BadRequestException('invalid value for "otp"');
+        if (0 === preg_match(self::OTP_KEY_PATTERN, $otpKey)) {
+            throw new BadRequestException('invalid OTP key format');
+        }
+    }
+
+    public static function otpSecret($otpSecret)
+    {
+        if (0 === preg_match(self::OTP_SECRET_PATTERN, $otpSecret)) {
+            throw new BadRequestException('invalid OTP secret format');
         }
     }
 }

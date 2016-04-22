@@ -54,9 +54,9 @@ try {
     // the same as the CN, or maybe allow it to indicate the OTP method used, 
     // e.g. 'totp|hotp|yubi'
 
-    $otpValue = $envData['password'];
-    // validate the OTP value
-    InputValidation::otp($otpValue);
+    $otpKey = $envData['password'];
+    // validate the OTP key
+    InputValidation::otpKey($otpKey);
 
     $commonName = $envData['common_name'];
     $userId = substr($commonName, 0, strpos($commonName, '_'));
@@ -74,11 +74,11 @@ try {
     }
 
     $otp = new Otp();
-    if ($otp->checkTotp(Base32::decode($otpSecret), $otpValue)) {
+    if ($otp->checkTotp(Base32::decode($otpSecret), $otpKey)) {
         // XXX make sure key was not used before
         exit(0);
     } else {
-        throw new RuntimeException(sprintf('unexpected OTP value from user "%s"', $userId));
+        throw new RuntimeException(sprintf('unexpected OTP key from user "%s"', $userId));
     }
 } catch (Exception $e) {
     syslog(LOG_ERR, $e->getMessage());
