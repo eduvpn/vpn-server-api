@@ -18,35 +18,49 @@
 namespace fkooman\VPN\Server\Config\Test;
 
 use fkooman\VPN\Server\Config\ConfigStorageInterface;
-use fkooman\VPN\Server\Config\ConfigData;
+use fkooman\VPN\Server\Config\UserConfig;
+use fkooman\VPN\Server\Config\CommonNameConfig;
 
 class TestConfigStorage implements ConfigStorageInterface
 {
     /** @var array */
-    private $configData;
+    private $commonNameConfig;
+
+    /** @var array */
+    private $userConfig;
 
     public function __construct()
     {
-        $this->configData = [
-            'foo_bar' => new ConfigData(['pool' => 'v6']),
-            'bar_foo' => new ConfigData(['disable' => true]),
-            'admin_xyz' => new ConfigData(['pool' => 'admin']),
+        $this->commonNameConfig = [
+            'foo_bar' => new CommonNameConfig(['disable' => true]),
+            'foo_baz' => new CommonNameConfig(['disable' => false]),
+            'bar_foo' => new CommonNameConfig([]),
         ];
     }
 
-    public function getConfig($commonName)
+    public function getUserConfig($userId)
     {
-        if (array_key_exists($commonName, $this->configData)) {
-            return $this->configData[$commonName];
-        }
-
-        return new ConfigData([]);
+        return [];
     }
 
-    public function getAllConfig($userId)
+    public function setUserConfig($userId, UserConfig $userConfig)
+    {
+        // NOP
+    }
+
+    public function getCommonNameConfig($commonName)
+    {
+        if (array_key_exists($commonName, $this->commonNameConfig)) {
+            return $this->commonNameConfig[$commonName];
+        }
+
+        return new CommonNameConfig([]);
+    }
+
+    public function getAllCommonNameConfig($userId)
     {
         $c = [];
-        foreach ($this->configData as $k => $v) {
+        foreach ($this->commonNameConfig as $k => $v) {
             if (is_null($userId)) {
                 $c[$k] = $v->toArray();
             } else {
@@ -59,8 +73,8 @@ class TestConfigStorage implements ConfigStorageInterface
         return $c;
     }
 
-    public function setConfig($commonName, ConfigData $configData)
+    public function setCommonNameConfig($commonName, CommonNameConfig $commonNameConfig)
     {
-        $this->configData[$commonName] = $configData;
+        $this->commonNameConfig[$commonName] = $commonNameConfig;
     }
 }

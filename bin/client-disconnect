@@ -30,10 +30,6 @@ openlog(
 
 try {
     // read configuration
-    $ipConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/ip.yaml')
-    );
-
     $logConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/log.yaml')
     );

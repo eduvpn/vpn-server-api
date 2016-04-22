@@ -58,7 +58,7 @@ class ConfigModule implements ServiceModuleInterface
                 $response = new JsonResponse();
                 $response->setBody(
                     [
-                        'items' => $this->configStorage->getAllConfig($userId),
+                        'items' => $this->configStorage->getAllCommonNameConfig($userId),
                     ]
                 );
 
@@ -76,7 +76,7 @@ class ConfigModule implements ServiceModuleInterface
 
                 $response = new JsonResponse();
                 $response->setBody(
-                    $this->configStorage->getConfig($commonName)->toArray()
+                    $this->configStorage->getCommonNameConfig($commonName)->toArray()
                 );
 
                 return $response;
@@ -94,8 +94,8 @@ class ConfigModule implements ServiceModuleInterface
 
                 InputValidation::commonName($commonName);
 
-                $configData = new ConfigData(Json::decode($request->getBody()));
-                $this->configStorage->setConfig($commonName, $configData);
+                $configData = new CommonNameConfig(Json::decode($request->getBody()));
+                $this->configStorage->setCommonNameConfig($commonName, $configData);
 
                 $response = new JsonResponse();
                 $response->setBody(

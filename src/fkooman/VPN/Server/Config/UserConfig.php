@@ -19,17 +19,23 @@ namespace fkooman\VPN\Server\Config;
 
 use fkooman\VPN\Server\InputValidation;
 
-class ConfigData
+class UserConfig
 {
     /** @var bool */
     private $disable;
+
+    /** @var string|false */
+    private $otpSecret;
 
     public function __construct(array $configData)
     {
         $disable = array_key_exists('disable', $configData) ? $configData['disable'] : false;
         InputValidation::disable($disable);
-
         $this->disable = $disable;
+
+        $disable = array_key_exists('otpSecret', $configData) ? $configData['otpSecret'] : false;
+        // XXX: InputValidation::otpSecret($otpSecret);
+        $this->otpSecret = $otpSecret;
     }
 
     public function getDisable()
@@ -37,10 +43,16 @@ class ConfigData
         return $this->disable;
     }
 
+    public function getOtpSecret()
+    {
+        return $this->otpSecret;
+    }
+
     public function toArray()
     {
         return [
             'disable' => $this->disable,
+            'otpSecret' => $this->otpSecret,
         ];
     }
 }

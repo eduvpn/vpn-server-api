@@ -13,7 +13,6 @@ control them.
 - Get a list of currently connected clients
 - Disconnect a client
 - Access to connection log
-- Manage IPv4 and IPv6 address pools
 
 # Deployment
 

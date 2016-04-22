@@ -21,10 +21,8 @@ use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\Json\Json;
 use fkooman\VPN\Server\Config\FileConfigStorage;
-use fkooman\VPN\Server\Config\IP;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Utils;
-use fkooman\VPN\Server\Config\ClientConfig;
 
 openlog(
     basename($argv[0]),
@@ -68,12 +66,7 @@ try {
     );
 
     $configStorage = new FileConfigStorage($ipConfig->v('configDir'));
-
-    $clientConfig = new ClientConfig(
-        $configStorage
-    );
-
-    $configData = $clientConfig->get($envData['common_name']);
+    $configData = $configStorage->getCommonNameConfig($envData['common_name']);
     Utils::writeTempConfig($cnConfigFile, $configData);
 
     // log stuff
