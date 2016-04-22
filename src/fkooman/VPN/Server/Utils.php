@@ -34,13 +34,6 @@ class Utils
         }
     }
 
-    public static function writeTempConfig($tmpConfig, array $configFileData)
-    {
-        if (false === @file_put_contents($tmpConfig, implode(PHP_EOL, $configFileData))) {
-            throw new RuntimeException('unable to write temporary config file');
-        }
-    }
-
     /**
      * @param string $configData the current OpenVPN configuration file with
      *                           keys and certificates

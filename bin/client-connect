@@ -22,7 +22,6 @@ use fkooman\Config\YamlFile;
 use fkooman\Json\Json;
 use fkooman\VPN\Server\Config\FileConfigStorage;
 use fkooman\VPN\Server\Log\ConnectionLog;
-use fkooman\VPN\Server\Utils;
 
 openlog(
     basename($argv[0]),
@@ -56,6 +55,9 @@ try {
         $envData[$envKey] = $envValue;
     }
 
+    $commonName = $commonName;
+    $userId = substr($commonName, 0, strpos($commonName, '_'));
+
     // read configuration
     $ipConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/ip.yaml')
@@ -66,12 +68,31 @@ try {
     );
 
     $configStorage = new FileConfigStorage($ipConfig->v('configDir'));
-    $configData = $configStorage->getCommonNameConfig($envData['common_name']);
-    Utils::writeTempConfig($cnConfigFile, $configData);
+
+    $configData = [];
+
+    // check if the user is disabled
+    $userConfig = $configStorage->getUserConfig($userId);
+    if ($userConfig->getDisable()) {
+        syslog(LOG_INFO(sprintf('client not allowed, user "%s" is disabled', $userId)));
+        $configData = ['disable'];
+    } else {
+        // user not disabled, but maybe the CN is
+        $commonNameConfig = $configStorage->getCommonNameConfig($commonName);
+        if ($commonNameConfig->getDisable()) {
+            syslog(LOG_INFO(sprintf('client not allowed, CN "%s" is disabled', $commonName)));
+            $configData = ['disable'];
+        }
+    }
+
+    // write the configuration file
+    if (false === @file_put_contents($cnConfigFile, implode(PHP_EOL, $configData))) {
+        throw new RuntimeException('unable to write CN configuration file');
+    }
 
     // log stuff
     $logData = array(
-        'common_name' => $envData['common_name'],
+        'common_name' => $commonName,
         'v4' => $envData['ifconfig_pool_remote_ip'],
         'v6' => $envData['ifconfig_pool_remote_ip6'],
         'time_unix' => $envData['time_unix'],
