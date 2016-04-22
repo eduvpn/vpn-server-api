@@ -55,7 +55,7 @@ try {
         $envData[$envKey] = $envValue;
     }
 
-    $commonName = $commonName;
+    $commonName = $envData['common_name'];
     $userId = substr($commonName, 0, strpos($commonName, '_'));
 
     // read configuration
