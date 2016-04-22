@@ -36,11 +36,19 @@ class TestConfigStorage implements ConfigStorageInterface
             'foo_baz' => new CommonNameConfig(['disable' => false]),
             'bar_foo' => new CommonNameConfig([]),
         ];
+
+        $this->userConfig = [
+            'foo' => new UserConfig([]),
+        ];
     }
 
     public function getUserConfig($userId)
     {
-        return [];
+        if (array_key_exists($userId, $this->userConfig)) {
+            return $this->userConfig[$userId];
+        }
+
+        return new UserConfig([]);
     }
 
     public function setUserConfig($userId, UserConfig $userConfig)
