@@ -74,13 +74,13 @@ try {
     // check if the user is disabled
     $userConfig = $configStorage->getUserConfig($userId);
     if ($userConfig->getDisable()) {
-        syslog(LOG_INFO(sprintf('client not allowed, user "%s" is disabled', $userId)));
+        syslog(LOG_INFO, sprintf('client not allowed, user "%s" is disabled', $userId));
         $configData = ['disable'];
     } else {
         // user not disabled, but maybe the CN is
         $commonNameConfig = $configStorage->getCommonNameConfig($commonName);
         if ($commonNameConfig->getDisable()) {
-            syslog(LOG_INFO(sprintf('client not allowed, CN "%s" is disabled', $commonName)));
+            syslog(LOG_INFO, sprintf('client not allowed, CN "%s" is disabled', $commonName));
             $configData = ['disable'];
         }
     }
