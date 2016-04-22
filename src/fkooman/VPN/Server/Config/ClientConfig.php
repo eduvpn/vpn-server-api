@@ -23,15 +23,11 @@ namespace fkooman\VPN\Server\Config;
  */
 class ClientConfig
 {
-    /** @var array */
-    private $ipConfig;
-
     /** @var ConfigStorageInterface */
     private $configStorage;
 
-    public function __construct(array $ipConfig, ConfigStorageInterface $configStorage)
+    public function __construct(ConfigStorageInterface $configStorage)
     {
-        $this->ipConfig = $ipConfig;
         $this->configStorage = $configStorage;
     }
 

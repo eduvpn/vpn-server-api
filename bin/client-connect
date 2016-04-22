@@ -70,7 +70,6 @@ try {
     $configStorage = new FileConfigStorage($ipConfig->v('configDir'));
 
     $clientConfig = new ClientConfig(
-        $ipConfig->getConfig(),
         $configStorage
     );
 
