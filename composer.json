@@ -18,7 +18,6 @@
         "christian-riesen/otp": "^1.0",
         "ext-date": "*",
         "ext-filter": "*",
-        "ext-libsodium": "*",
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-spl": "*",
