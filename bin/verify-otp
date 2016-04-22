@@ -1,0 +1,83 @@
+#!/usr/bin/php
+<?php
+/**
+ * Copyright 2015 François Kooman <fkooman@tuxed.net>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+require_once dirname(__DIR__).'/vendor/autoload.php';
+
+use Otp\Otp;
+use Base32\Base32;
+
+openlog(
+    basename($argv[0]),
+    LOG_PERROR,
+    LOG_USER
+);
+
+try {
+    $envData = [];
+    $envKeys = [
+        'common_name',
+        'time_unix',
+        'username',
+        'password',
+    ];
+
+    // read environment variables
+    foreach ($envKeys as $envKey) {
+        $envValue = getenv($envKey);
+        if (empty($envValue)) {
+            throw new RuntimeException(sprintf('environment variable "%s" is not set', $envKey));
+        }
+        $envData[$envKey] = $envValue;
+    }
+
+    // username MUST be the common_name before the '_'
+    // XXX implement compare
+    // XXX maybe allow the username to indicate the OTP method? 
+    // 'totp|yubikey|hotp'? 
+
+    // fetch the secret from the user config
+    $secret = 'PK3YDKEYMTFEDAAI';
+
+    // verify the provided password as OTP token
+
+    // Now how to check
+    $otp = new Otp();
+
+    // $key is a 6 digit number, coming from the User
+
+    // XXX sanitize password
+
+    // Assuming this is present and sanitized
+    // Allows for a 1 code time drift by default
+    // Third parameter can alter that behavior
+    if ($otp->checkTotp(Base32::decode($secret), $envData['password'])) {
+        // Correct key
+        // XXX keep a list of used tokens
+
+        // IMPORTANT! Note this key as being used
+        // so nobody could launch a replay attack.
+        // Cache that for the next minutes and you
+        // should be good.
+        exit(0);
+    } else {
+        // Wrong key
+        exit(66);
+    }
+} catch (Exception $e) {
+    syslog(LOG_ERR, $e->getMessage());
+    exit(66);
+}
