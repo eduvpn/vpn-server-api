@@ -19,6 +19,10 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use Otp\Otp;
 use Base32\Base32;
+use fkooman\VPN\Server\InputValidation;
+use fkooman\Config\Reader;
+use fkooman\Config\YamlFile;
+use fkooman\VPN\Server\Config\FileConfigStorage;
 
 openlog(
     basename($argv[0]),
@@ -26,7 +30,7 @@ openlog(
     LOG_USER
 );
 
-# XXX script security has to be 3 in order to work with environment stuff 
+# XXX --script-security has to be 3 in order to work with environment stuff 
 # (via-env), we could probably use a file 
 
 try {
@@ -46,38 +50,35 @@ try {
         $envData[$envKey] = $envValue;
     }
 
-    // username MUST be the common_name before the '_'
-    // XXX implement compare
-    // XXX maybe allow the username to indicate the OTP method instead? 
-    // 'totp|yubikey|hotp'? 
+    // for now we ignore the "username" field, either we require it to be
+    // the same as the CN, or maybe allow it to indicate the OTP method used, 
+    // e.g. 'totp|hotp|yubi'
 
-    // fetch the secret from the user config
-    $secret = 'PK3YDKEYMTFEDAAI';
+    $otpValue = $envData['password'];
+    // validate the OTP value
+    InputValidation::otp($otpValue);
 
-    // verify the provided password as OTP token
+    $commonName = $envData['common_name'];
+    $userId = substr($commonName, 0, strpos($commonName, '_'));
 
-    // Now how to check
+    // obtain the OTP secret from the CN's configuration
+    $ipConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/ip.yaml')
+    );
+    $configStorage = new FileConfigStorage($ipConfig->v('configDir'));
+    $userConfig = $configStorage->getUserConfig($userId);
+
+    $otpSecret = $userConfig->getOtpSecret();
+    if (false === $otpSecret) {
+        throw new RuntimeException(sprintf('no OTP secret for user "%s" registered', $userId));
+    }
+
     $otp = new Otp();
-
-    // $key is a 6 digit number, coming from the User
-
-    // XXX sanitize password
-
-    // Assuming this is present and sanitized
-    // Allows for a 1 code time drift by default
-    // Third parameter can alter that behavior
-    if ($otp->checkTotp(Base32::decode($secret), $envData['password'])) {
-        // Correct key
-        // XXX keep a list of used tokens, must not allow replay
-
-        // IMPORTANT! Note this key as being used
-        // so nobody could launch a replay attack.
-        // Cache that for the next minutes and you
-        // should be good.
+    if ($otp->checkTotp(Base32::decode($otpSecret), $otpValue)) {
+        // XXX make sure key was not used before
         exit(0);
     } else {
-        // Wrong key
-        exit(1);
+        throw new RuntimeException(sprintf('unexpected OTP value from user "%s"', $userId));
     }
 } catch (Exception $e) {
     syslog(LOG_ERR, $e->getMessage());

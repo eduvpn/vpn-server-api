@@ -24,6 +24,7 @@ class InputValidation
     const COMMON_NAME_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
     const USER_ID_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
     const DATE_PATTERN = '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/';
+    const OTP_PATTERN = '/^[0-9]{6}$/';
 
     public static function commonName($commonName)
     {
@@ -56,6 +57,13 @@ class InputValidation
     {
         if (!is_bool($disable)) {
             throw new BadRequestException('"disable" must be boolean');
+        }
+    }
+
+    public static function otp($otpValue)
+    {
+        if (0 === preg_match(self::OTP_PATTERN, $otpValue)) {
+            throw new BadRequestException('invalid value for "otp"');
         }
     }
 }

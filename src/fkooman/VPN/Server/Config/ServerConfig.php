@@ -40,6 +40,7 @@ class ServerConfig
             'dh',
             'ta',
             'listen',
+            'otp',
         ];
 
         // XXX verify the parameters and types
@@ -55,6 +56,11 @@ class ServerConfig
         $dnsEntries = [];
         foreach ($serverConfig['dns'] as $dnsAddress) {
             $dnsEntries[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress);
+        }
+
+        $otpEntries = [];
+        if ($serverConfig['otp']) {
+            $otpEntries[] = 'auth-user-pass-verify /usr/bin/vpn-server-api-verify-otp via-env';
         }
 
         return [
@@ -120,9 +126,12 @@ class ServerConfig
             # additional cipher "TLS_DHE_RSA_WITH_AES_256_CBC_SHA"
             'tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA',
 
-            'script-security 2',
+            sprintf('script-security %d', $serverConfig['otp'] ? 3 : 2),
             'client-connect /usr/bin/vpn-server-api-client-connect',
             'client-disconnect /usr/bin/vpn-server-api-client-disconnect',
+
+            # OTP
+            implode(PHP_EOL, $otpEntries),
 
             # Certificate Revocation List
             'crl-verify /var/lib/vpn-server-api/ca.crl',
