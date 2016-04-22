@@ -69,28 +69,29 @@ try {
 
     $configStorage = new FileConfigStorage($ipConfig->v('configDir'));
 
-    $configData = [];
-
+    $dropClient = false;
     // check if the user is disabled
     $userConfig = $configStorage->getUserConfig($userId);
     if ($userConfig->getDisable()) {
         syslog(LOG_INFO, sprintf('client not allowed, user "%s" is disabled', $userId));
-        $configData = ['disable'];
-    } else {
-        // user not disabled, but maybe the CN is
-        $commonNameConfig = $configStorage->getCommonNameConfig($commonName);
-        if ($commonNameConfig->getDisable()) {
-            syslog(LOG_INFO, sprintf('client not allowed, CN "%s" is disabled', $commonName));
-            $configData = ['disable'];
+        $dropClient = true;
+    }
+    // if user not disabled, maybe the CN is
+    $commonNameConfig = $configStorage->getCommonNameConfig($commonName);
+    if ($commonNameConfig->getDisable()) {
+        syslog(LOG_INFO, sprintf('client not allowed, CN "%s" is disabled', $commonName));
+        $dropClient = true;
+    }
+
+    if ($dropClient) {
+        // write the configuration file
+        if (false === @file_put_contents($cnConfigFile, implode(PHP_EOL, $configData))) {
+            throw new RuntimeException('unable to write CN configuration file');
         }
+        exit(0);
     }
 
-    // write the configuration file
-    if (false === @file_put_contents($cnConfigFile, implode(PHP_EOL, $configData))) {
-        throw new RuntimeException('unable to write CN configuration file');
-    }
-
-    // log stuff
+    // log the connection
     $logData = array(
         'common_name' => $commonName,
         'v4' => $envData['ifconfig_pool_remote_ip'],
