@@ -15,8 +15,10 @@
     "license": "Apache-2.0",
     "name": "eduvpn/vpn-server-api",
     "require": {
+        "christian-riesen/otp": "^1.0",
         "ext-date": "*",
         "ext-filter": "*",
+        "ext-libsodium": "*",
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-spl": "*",
@@ -28,6 +30,7 @@
         "fkooman/rest-plugin-authentication-bearer": "^2.2.0",
         "guzzlehttp/guzzle": "^5.3",
         "monolog/monolog": "^1.17",
+        "paragonie/random_compat": "^1.0",
         "php": ">=5.4",
         "psr/log": "^1.0.0"
     }
