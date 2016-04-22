@@ -30,7 +30,7 @@ try {
     $envData = [];
     $envKeys = [
         'common_name',
-        'time_unix',
+#        'time_unix',
         'username',
         'password',
     ];
