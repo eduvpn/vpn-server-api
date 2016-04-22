@@ -26,11 +26,13 @@ openlog(
     LOG_USER
 );
 
+# XXX script security has to be 3 in order to work with environment stuff 
+# (via-env), we could probably use a file 
+
 try {
     $envData = [];
     $envKeys = [
         'common_name',
-#        'time_unix',
         'username',
         'password',
     ];
@@ -46,7 +48,7 @@ try {
 
     // username MUST be the common_name before the '_'
     // XXX implement compare
-    // XXX maybe allow the username to indicate the OTP method? 
+    // XXX maybe allow the username to indicate the OTP method instead? 
     // 'totp|yubikey|hotp'? 
 
     // fetch the secret from the user config
@@ -66,7 +68,7 @@ try {
     // Third parameter can alter that behavior
     if ($otp->checkTotp(Base32::decode($secret), $envData['password'])) {
         // Correct key
-        // XXX keep a list of used tokens
+        // XXX keep a list of used tokens, must not allow replay
 
         // IMPORTANT! Note this key as being used
         // so nobody could launch a replay attack.
@@ -75,7 +77,7 @@ try {
         exit(0);
     } else {
         // Wrong key
-        exit(66);
+        exit(1);
     }
 } catch (Exception $e) {
     syslog(LOG_ERR, $e->getMessage());
