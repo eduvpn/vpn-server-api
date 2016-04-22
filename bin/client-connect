@@ -85,7 +85,7 @@ try {
 
     if ($dropClient) {
         // write the configuration file
-        if (false === @file_put_contents($cnConfigFile, implode(PHP_EOL, $configData))) {
+        if (false === @file_put_contents($cnConfigFile, 'disable')) {
             throw new RuntimeException('unable to write CN configuration file');
         }
         exit(0);
