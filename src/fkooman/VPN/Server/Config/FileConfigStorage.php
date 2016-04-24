@@ -30,13 +30,8 @@ class FileConfigStorage implements ConfigStorageInterface
 
     public function __construct($configDir)
     {
-        $usersConfigDir = sprintf('%s/users', $configDir);
-        self::checkMakeDirectory($usersConfigDir);
-        $commonNamesConfigDir = sprintf('%s/common_names', $configDir);
-        self::checkMakeDirectory($commonNamesConfigDir);
-
-        $this->usersConfigDir = $usersConfigDir;
-        $this->commonNamesConfigDir = $commonNamesConfigDir;
+        $this->usersConfigDir = sprintf('%s/users', $configDir);
+        $this->commonNamesConfigDir = sprintf('%s/common_names', $configDir);
     }
 
     /**
@@ -115,6 +110,7 @@ class FileConfigStorage implements ConfigStorageInterface
 
     private function writeFile($fileName, array $fileContent)
     {
+        self::checkMakeDirectory(dirname($fileName));
         if (false === @file_put_contents($fileName, Json::encode($fileContent))) {
             throw new RuntimeException(sprintf('unable to write file "%s"', $fileName));
         }
