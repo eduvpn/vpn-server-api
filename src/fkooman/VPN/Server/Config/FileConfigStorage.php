@@ -42,7 +42,7 @@ class FileConfigStorage implements ConfigStorageInterface
     public function getUserConfig($userId)
     {
         $userData = $this->readFile(
-            sprintf('%s/%s', $usersConfigDir, $userId)
+            sprintf('%s/%s', $this->usersConfigDir, $userId)
         );
 
         return new UserConfig($userData);
