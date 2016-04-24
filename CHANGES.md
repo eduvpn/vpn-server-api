@@ -1,8 +1,12 @@
 # Changelog
 
 ## 5.0.0 (...)
-- refactor storing common name and user configuration in the backend, preparing
-  for OTP support and disabling users
+- refactor storing common name and user configuration in the backend
+- support storing 2FA secret in user configuration
+- script to verify OTP token
+- allow `server-config` to verify user password as OTP token
+- update the API, allowing setting both user specific settings as well as CN 
+  specific settings
 
 ## 4.0.6 (2016-04-20)
 - automatically determine `max-clients` based on the IP range when generating 
