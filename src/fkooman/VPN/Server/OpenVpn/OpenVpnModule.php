@@ -45,7 +45,7 @@ class OpenVpnModule implements ServiceModuleInterface
         $service->get(
             '/openvpn/status',
             function (Request $request, TokenInfo $tokenInfo) {
-                self::requireScope($tokenInfo, 'openvpn_info');
+                self::requireScope($tokenInfo, ['admin']);
 
                 $response = new JsonResponse();
                 $response->setBody($this->serverManager->status());
@@ -57,7 +57,7 @@ class OpenVpnModule implements ServiceModuleInterface
         $service->get(
             '/openvpn/load-stats',
             function (Request $request, TokenInfo $tokenInfo) {
-                self::requireScope($tokenInfo, 'openvpn_info');
+                self::requireScope($tokenInfo, ['admin']);
 
                 $response = new JsonResponse();
                 $response->setBody($this->serverManager->loadStats());
@@ -69,7 +69,7 @@ class OpenVpnModule implements ServiceModuleInterface
         $service->get(
             '/openvpn/version',
             function (Request $request, TokenInfo $tokenInfo) {
-                self::requireScope($tokenInfo, 'openvpn_info');
+                self::requireScope($tokenInfo, ['admin']);
 
                 $response = new JsonResponse();
                 $response->setBody($this->serverManager->version());
@@ -81,7 +81,7 @@ class OpenVpnModule implements ServiceModuleInterface
         $service->post(
             '/openvpn/kill',
             function (Request $request, TokenInfo $tokenInfo) {
-                self::requireScope($tokenInfo, 'openvpn_kill');
+                self::requireScope($tokenInfo, ['admin', 'portal']);
 
                 $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);
@@ -96,10 +96,14 @@ class OpenVpnModule implements ServiceModuleInterface
         );
     }
 
-    private static function requireScope(TokenInfo $tokenInfo, $requiredScope)
+    private static function requireScope(TokenInfo $tokenInfo, array $requiredScope)
     {
-        if (!$tokenInfo->getScope()->hasScope($requiredScope)) {
-            throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', $requiredScope));
+        foreach ($requiredScope as $s) {
+            if ($tokenInfo->getScope()->hasScope($s)) {
+                return;
+            }
         }
+
+        throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', implode(',', $requiredScope)));
     }
 }

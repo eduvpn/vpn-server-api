@@ -28,7 +28,7 @@ class InfoModule implements ServiceModuleInterface
         $service->get(
             '/info/net',
             function (Request $request, TokenInfo $tokenInfo) {
-                self::requireScope($tokenInfo, 'info_get');
+                self::requireScope($tokenInfo, ['admin', 'portal']);
 
                 return $this->getInfo();
             }
@@ -51,10 +51,14 @@ class InfoModule implements ServiceModuleInterface
         return $response;
     }
 
-    private static function requireScope(TokenInfo $tokenInfo, $requiredScope)
+    private static function requireScope(TokenInfo $tokenInfo, array $requiredScope)
     {
-        if (!$tokenInfo->getScope()->hasScope($requiredScope)) {
-            throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', $requiredScope));
+        foreach ($requiredScope as $s) {
+            if ($tokenInfo->getScope()->hasScope($s)) {
+                return;
+            }
         }
+
+        throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', implode(',', $requiredScope)));
     }
 }

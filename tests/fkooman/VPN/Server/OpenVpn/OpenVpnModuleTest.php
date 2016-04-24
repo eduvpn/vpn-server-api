@@ -44,7 +44,7 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                     [
                         'vpn-user-portal' => [
                             'token' => 'aabbcc',
-                            'scope' => 'openvpn_info openvpn_kill',
+                            'scope' => 'admin portal',
                         ],
                     ]
                 )

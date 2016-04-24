@@ -70,7 +70,7 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
                     [
                         'vpn-user-portal' => [
                             'token' => 'aabbcc',
-                            'scope' => 'log_get',
+                            'scope' => 'admin portal',
                         ],
                     ]
                 )

@@ -64,7 +64,7 @@ class CaModuleTest extends PHPUnit_Framework_TestCase
                     [
                         'vpn-user-portal' => [
                             'token' => 'aabbcc',
-                            'scope' => 'ca_crl_fetch',
+                            'scope' => 'admin portal',
                         ],
                     ]
                 )

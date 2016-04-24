@@ -44,7 +44,7 @@ class CaModule implements ServiceModuleInterface
         $service->post(
             '/ca/crl/fetch',
             function (Request $request, TokenInfo $tokenInfo) {
-                self::requireScope($tokenInfo, 'ca_crl_fetch');
+                self::requireScope($tokenInfo, ['admin', 'portal']);
 
                 $this->logger->info('fetching CRL');
 
@@ -60,10 +60,14 @@ class CaModule implements ServiceModuleInterface
         );
     }
 
-    private static function requireScope(TokenInfo $tokenInfo, $requiredScope)
+    private static function requireScope(TokenInfo $tokenInfo, array $requiredScope)
     {
-        if (!$tokenInfo->getScope()->hasScope($requiredScope)) {
-            throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', $requiredScope));
+        foreach ($requiredScope as $s) {
+            if ($tokenInfo->getScope()->hasScope($s)) {
+                return;
+            }
         }
+
+        throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', implode(',', $requiredScope)));
     }
 }

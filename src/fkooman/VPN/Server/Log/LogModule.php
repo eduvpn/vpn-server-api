@@ -34,7 +34,7 @@ class LogModule implements ServiceModuleInterface
         $service->get(
             '/log/:showDate',
             function (Request $request, TokenInfo $tokenInfo, $showDate) {
-                self::requireScope($tokenInfo, 'log_get');
+                self::requireScope($tokenInfo, ['admin']);
 
                 InputValidation::date($showDate);
 
@@ -68,10 +68,14 @@ class LogModule implements ServiceModuleInterface
         );
     }
 
-    private static function requireScope(TokenInfo $tokenInfo, $requiredScope)
+    private static function requireScope(TokenInfo $tokenInfo, array $requiredScope)
     {
-        if (!$tokenInfo->getScope()->hasScope($requiredScope)) {
-            throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', $requiredScope));
+        foreach ($requiredScope as $s) {
+            if ($tokenInfo->getScope()->hasScope($s)) {
+                return;
+            }
         }
+
+        throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', implode(',', $requiredScope)));
     }
 }
