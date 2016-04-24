@@ -45,14 +45,15 @@ class ConfigModule implements ServiceModuleInterface
     {
         // get all configurations
         $service->get(
-            '/config/',
+            '/config/common_names/',
             function (Request $request, TokenInfo $tokenInfo) {
+                self::requireScope($tokenInfo, ['admin', 'portal']);
+
                 $userId = $request->getUrl()->getQueryParameter('user_id');
-                if (!is_null($userId)) {
-                    self::requireScope($tokenInfo, ['config_get', 'config_get_user']);
-                    InputValidation::userId($userId);
+                if (is_null($userId)) {
+                    self::requireScope($tokenInfo, ['admin']);
                 } else {
-                    self::requireScope($tokenInfo, ['config_get']);
+                    InputValidation::userId($userId);
                 }
 
                 $response = new JsonResponse();
@@ -68,9 +69,9 @@ class ConfigModule implements ServiceModuleInterface
 
         // get configuration for a particular common_name
         $service->get(
-            '/config/:commonName',
+            '/config/common_names/:commonName',
             function (Request $request, TokenInfo $tokenInfo, $commonName) {
-                self::requireScope($tokenInfo, ['config_get']);
+                self::requireScope($tokenInfo, ['admin', 'portal']);
 
                 InputValidation::commonName($commonName);
 
@@ -85,17 +86,76 @@ class ConfigModule implements ServiceModuleInterface
 
         // set configuration for a particular common_name
         $service->put(
-            '/config/:commonName',
+            '/config/common_names/:commonName',
             function (Request $request, TokenInfo $tokenInfo, $commonName) {
-                self::requireScope($tokenInfo, ['config_update']);
+                self::requireScope($tokenInfo, ['admin']);
+
+                InputValidation::commonName($commonName);
 
                 // XXX check content type
                 // XXX allow for disconnect as well when updating config
 
-                InputValidation::commonName($commonName);
-
                 $configData = new CommonNameConfig(Json::decode($request->getBody()));
                 $this->configStorage->setCommonNameConfig($commonName, $configData);
+
+                $response = new JsonResponse();
+                $response->setBody(
+                    ['ok' => true]
+                );
+
+                return $response;
+            }
+        );
+
+        // get configuration for a particular user_id
+        $service->get(
+            '/config/users/:userId',
+            function (Request $request, TokenInfo $tokenInfo, $userId) {
+                self::requireScope($tokenInfo, ['admin', 'portal']);
+
+                InputValidation::userId($userId);
+
+                $userConfig = $this->configStorage->getUserConfig($userId);
+                // we never want the OTP secret to leave the system
+                $userConfig->hideOtpSecret();
+
+                $response = new JsonResponse();
+                $response->setBody(
+                    $userConfig->toArray()
+                );
+
+                return $response;
+            }
+        );
+
+        // set configuration for a particular user_id
+        $service->put(
+            '/config/users/:userId',
+            function (Request $request, TokenInfo $tokenInfo, $userId) {
+                self::requireScope($tokenInfo, ['admin', 'portal']);
+
+                InputValidation::userId($userId);
+
+                $userConfig = $this->configStorage->getUserConfig($userId);
+                $newUserConfig = new UserConfig(Json::decode($request->getBody()));
+
+                if ($userConfig->getDisable() !== $newUserConfig->getDisable()) {
+                    // only 'admin' can change disable state of user
+                    self::requireScope($tokenInfo, ['admin']);
+                }
+
+                if (false !== $userConfig->getOtpSecret()) {
+                    // currently an OTP secret it set, the value has to be 'true'
+                    // if not, admin is required to be able to update it
+                    if (true !== $newUserConfig->getOtpSecret()) {
+                        self::requireScope($tokenInfo, ['admin']);
+                    } else {
+                        // we use the old value
+                        $newUserConfig->setOtpSecret($userConfig->getOtpSecret());
+                    }
+                }
+
+                $this->configStorage->setUserConfig($userId, $newUserConfig);
 
                 $response = new JsonResponse();
                 $response->setBody(

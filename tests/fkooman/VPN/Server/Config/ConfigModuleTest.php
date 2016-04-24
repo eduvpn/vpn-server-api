@@ -28,6 +28,7 @@ use fkooman\VPN\Server\Config\Test\TestConfigStorage;
 use Psr\Log\NullLogger;
 use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
+use fkooman\Json\Json;
 
 class ConfigModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -49,8 +50,12 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
                 new ArrayBearerValidator(
                     [
                         'vpn-user-portal' => [
-                            'token' => 'aabbcc',
-                            'scope' => 'config_get config_update',
+                            'token' => 'portal',
+                            'scope' => 'portal',
+                        ],
+                        'vpn-admin-portal' => [
+                            'token' => 'admin',
+                            'scope' => 'admin',
                         ],
                     ]
                 )
@@ -59,27 +64,29 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
         $this->service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     }
 
-    public function testGetCnConfig()
+    // COMMON_NAMES | ADMIN
+
+    public function testGetCnConfigAdmin()
     {
         $this->assertSame(
             [
                 'disable' => true,
             ],
-            $this->makeRequest('GET', '/config/foo_bar')
+            $this->makeRequest('GET', '/config/common_names/foo_bar', [], 'admin')
         );
     }
 
-    public function testPutCnConfig()
+    public function testPutCnConfigAdmin()
     {
         $this->assertSame(
             [
                 'ok' => true,
             ],
-            $this->makeRequest('PUT', '/config/foo_bar', [], '{"pool": "v6"}')
+            $this->makeRequest('PUT', '/config/common_names/foo_bar', ['pool' => 'v6'], 'admin')
         );
     }
 
-    public function testGetConfigs()
+    public function testGetConfigsAdmin()
     {
         $this->assertSame(
             [
@@ -95,11 +102,11 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
-            $this->makeRequest('GET', '/config/')
+            $this->makeRequest('GET', '/config/common_names/', [], 'admin')
         );
     }
 
-    public function testGetConfigsPerUser()
+    public function testGetConfigsPerUserAdmin()
     {
         $this->assertSame(
             [
@@ -109,13 +116,168 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
-            $this->makeRequest('GET', '/config/', ['user_id' => 'bar'])
+            $this->makeRequest('GET', '/config/common_names/', ['user_id' => 'bar'], 'admin')
         );
     }
 
-    private function makeRequest($requestMethod, $requestUri, array $queryBody = [], $body = '')
+    public function testGetCnConfigPortal()
     {
-        if ('GET' === $requestMethod || 'DELETE' === $requestMethod) {
+        $this->assertSame(
+            [
+                'disable' => true,
+            ],
+            $this->makeRequest('GET', '/config/common_names/foo_bar', [], 'portal')
+        );
+    }
+
+    public function testPutCnConfigPortal()
+    {
+        $this->assertSame(
+            [
+                'error' => 'insufficient_scope',
+                'error_description' => '"admin" scope required',
+            ],
+            $this->makeRequest('PUT', '/config/common_names/foo_bar', ['pool' => 'v6'], 'portal')
+        );
+    }
+
+    public function testGetConfigsPortal()
+    {
+        $this->assertSame(
+            [
+                'error' => 'insufficient_scope',
+                'error_description' => '"admin" scope required',
+            ],
+            $this->makeRequest('GET', '/config/common_names/', [], 'portal')
+        );
+    }
+
+    public function testGetConfigsPerUserPortal()
+    {
+        $this->assertSame(
+            [
+                'items' => [
+                    'bar_foo' => [
+                        'disable' => false,
+                    ],
+                ],
+            ],
+            $this->makeRequest('GET', '/config/common_names/', ['user_id' => 'bar'], 'portal')
+        );
+    }
+
+    // USERS
+
+    public function testGetUserAdmin()
+    {
+        $this->assertSame(
+            [
+                'disable' => false,
+                'otp_secret' => false,
+            ],
+            $this->makeRequest('GET', '/config/users/foo', [], 'admin')
+        );
+    }
+
+    public function testDisableUserAdmin()
+    {
+        $this->assertSame(
+            [
+                'ok' => true,
+            ],
+            $this->makeRequest('PUT', '/config/users/foo', ['disable' => true], 'admin')
+        );
+    }
+
+    public function testDisableOtpSecretAdmin()
+    {
+        $this->assertSame(
+            [
+                'ok' => true,
+            ],
+            $this->makeRequest('PUT', '/config/users/baz', ['otp_secret' => false], 'admin')
+        );
+    }
+
+    public function testGetUserPortal()
+    {
+        $this->assertSame(
+            [
+                'disable' => false,
+                'otp_secret' => false,
+            ],
+            $this->makeRequest('GET', '/config/users/foo', [], 'portal')
+        );
+    }
+
+    public function testDisableUserPortal()
+    {
+        $this->assertSame(
+            [
+                'error' => 'insufficient_scope',
+                'error_description' => '"admin" scope required',
+            ],
+            $this->makeRequest('PUT', '/config/users/foo', ['disable' => true], 'portal')
+        );
+    }
+
+    public function testDisableOtpSecretPortal()
+    {
+        $this->assertSame(
+            [
+                'error' => 'insufficient_scope',
+                'error_description' => '"admin" scope required',
+            ],
+            $this->makeRequest('PUT', '/config/users/baz', ['otp_secret' => false], 'portal')
+        );
+    }
+
+    public function testSetOtpSecretPortal()
+    {
+        $this->assertSame(
+            [
+                'ok' => true,
+            ],
+            $this->makeRequest('PUT', '/config/users/foo', ['otp_secret' => '7ZCJEKXKHJVDZXXX'], 'portal')
+        );
+    }
+
+    public function testSetOtpSecretWhenAlreadySetPortal()
+    {
+        $this->assertSame(
+            [
+                'error' => 'insufficient_scope',
+                'error_description' => '"admin" scope required',
+            ],
+            $this->makeRequest('PUT', '/config/users/baz', ['otp_secret' => '8ZCJEKXKHJVDZXXX'], 'portal')
+        );
+    }
+
+    public function testSetOtpDisableWhenAlreadySetPortal()
+    {
+        $this->assertSame(
+            [
+                'error' => 'insufficient_scope',
+                'error_description' => '"admin" scope required',
+            ],
+            $this->makeRequest('PUT', '/config/users/baz', ['otp_secret' => false], 'portal')
+        );
+    }
+
+    public function testSetOtpTrueWhenAlreadySetPortal()
+    {
+        $this->assertSame(
+            [
+                'ok' => true,
+            ],
+            $this->makeRequest('PUT', '/config/users/baz', ['otp_secret' => true], 'portal')
+        );
+    }
+
+    private function makeRequest($requestMethod, $requestUri, array $queryBody = [], $accessToken)
+    {
+        if ('GET' === $requestMethod) {
+            // GET
             return $this->service->run(
                 new Request(
                     array(
@@ -125,7 +287,7 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
                         'REQUEST_URI' => sprintf('%s?%s', $requestUri, http_build_query($queryBody)),
                         'PATH_INFO' => $requestUri,
                         'QUERY_STRING' => http_build_query($queryBody),
-                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', 'aabbcc'),
+                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $accessToken),
                     )
                 )
             )->getBody();
@@ -140,10 +302,10 @@ class ConfigModuleTest extends PHPUnit_Framework_TestCase
                         'REQUEST_URI' => $requestUri,
                         'PATH_INFO' => $requestUri,
                         'QUERY_STRING' => '',
-                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', 'aabbcc'),
+                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $accessToken),
                     ),
                     null,
-                    $body
+                    Json::encode($queryBody)
                 )
             )->getBody();
         }

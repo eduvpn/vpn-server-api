@@ -18,12 +18,12 @@
  */
 require_once dirname(__DIR__).'/vendor/autoload.php';
 
-use fkooman\VPN\Server\Config\ServerConfig;
+use fkooman\VPN\Server\ServerConfig;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use GuzzleHttp\Client;
-use fkooman\VPN\Server\Config\IPv4;
-use fkooman\VPN\Server\Config\IPv6;
+use fkooman\VPN\Server\IPv4;
+use fkooman\VPN\Server\IPv6;
 use fkooman\VPN\Server\Utils;
 
 function showHelp(array $argv)

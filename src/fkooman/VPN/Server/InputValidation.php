@@ -25,7 +25,7 @@ class InputValidation
     const USER_ID_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
     const DATE_PATTERN = '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/';
     const OTP_KEY_PATTERN = '/^[0-9]{6}$/';
-    const OTP_SECRET_PATTERN = '/^[A-Z0-9]+$/';
+    const OTP_SECRET_PATTERN = '/^[A-Z0-9]{16}$/';
 
     public static function commonName($commonName)
     {

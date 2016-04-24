@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\Config;
+namespace fkooman\VPN\Server;
 
 use RuntimeException;
 

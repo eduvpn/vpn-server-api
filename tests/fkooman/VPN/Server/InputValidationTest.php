@@ -77,6 +77,6 @@ class InputValidationTest extends PHPUnit_Framework_TestCase
 
     public function testOtpSecret()
     {
-        InputValidation::otpSecret('AZ09A90');
+        InputValidation::otpSecret('7ZCJEKXKHJVDZBWN');
     }
 }

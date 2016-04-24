@@ -39,6 +39,8 @@ class TestConfigStorage implements ConfigStorageInterface
 
         $this->userConfig = [
             'foo' => new UserConfig([]),
+            'bar' => new UserConfig(['disable' => true, 'otp_secret' => false]),
+            'baz' => new UserConfig(['disable' => false, 'otp_secret' => '7ZCJEKXKHJVDZXXX']),
         ];
     }
 
