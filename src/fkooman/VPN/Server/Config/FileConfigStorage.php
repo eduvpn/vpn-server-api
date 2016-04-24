@@ -23,11 +23,20 @@ use fkooman\Json\Json;
 class FileConfigStorage implements ConfigStorageInterface
 {
     /** @var string */
-    private $configDir;
+    private $usersConfigDir;
+
+    /** @var string */
+    private $commonNamesConfigDir;
 
     public function __construct($configDir)
     {
-        $this->configDir = $configDir;
+        $usersConfigDir = sprintf('%s/users', $configDir);
+        self::checkMakeDirectory($usersConfigDir);
+        $commonNamesConfigDir = sprintf('%s/common_names', $configDir);
+        self::checkMakeDirectory($commonNamesConfigDir);
+
+        $this->usersConfigDir = $usersConfigDir;
+        $this->commonNamesConfigDir = $commonNamesConfigDir;
     }
 
     /**
@@ -38,7 +47,7 @@ class FileConfigStorage implements ConfigStorageInterface
     public function getUserConfig($userId)
     {
         $userData = $this->readFile(
-            sprintf('%s/users/%s', $this->configDir, $userId)
+            sprintf('%s/%s', $usersConfigDir, $userId)
         );
 
         return new UserConfig($userData);
@@ -50,7 +59,7 @@ class FileConfigStorage implements ConfigStorageInterface
     public function setUserConfig($userId, UserConfig $userConfig)
     {
         $this->writeFile(
-            sprintf('%s/users/%s', $this->configDir, $userId),
+            sprintf('%s/%s', $this->usersConfigDir, $userId),
             $userConfig->toArray()
         );
     }
@@ -63,7 +72,7 @@ class FileConfigStorage implements ConfigStorageInterface
     public function getCommonNameConfig($commonName)
     {
         $commonNameData = $this->readFile(
-            sprintf('%s/common_names/%s', $this->configDir, $commonName)
+            sprintf('%s/%s', $this->commonNamesConfigDir, $commonName)
         );
 
         return new CommonNameConfig($commonNameData);
@@ -72,9 +81,9 @@ class FileConfigStorage implements ConfigStorageInterface
     public function getAllCommonNameConfig($userId)
     {
         $configArray = [];
-        $pathFilter = sprintf('%s/common_names/*', $this->configDir);
+        $pathFilter = sprintf('%s/*', $this->commonNamesConfigDir);
         if (!is_null($userId)) {
-            $pathFilter = sprintf('%s/common_names/%s_*', $this->configDir, $userId);
+            $pathFilter = sprintf('%s/%s_*', $this->commonNamesConfigDir, $userId);
         }
         foreach (glob($pathFilter) as $commonNamePath) {
             $commonName = basename($commonNamePath);
@@ -90,7 +99,7 @@ class FileConfigStorage implements ConfigStorageInterface
     public function setCommonNameConfig($commonName, CommonNameConfig $commonNameConfig)
     {
         $this->writeFile(
-            sprintf('%s/common_names/%s', $this->configDir, $commonName),
+            sprintf('%s/%s', $this->commonNamesConfigDir, $commonName),
             $commonNameConfig->toArray()
         );
     }
@@ -108,6 +117,15 @@ class FileConfigStorage implements ConfigStorageInterface
     {
         if (false === @file_put_contents($fileName, Json::encode($fileContent))) {
             throw new RuntimeException(sprintf('unable to write file "%s"', $fileName));
+        }
+    }
+
+    private static function checkMakeDirectory($dirName)
+    {
+        if (!is_dir($dirName)) {
+            if (false === @mkdir($dirName, 0755, true)) {
+                throw new RuntimeException('unable to create directory "%s"', $dirName);
+            }
         }
     }
 }
