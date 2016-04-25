@@ -24,7 +24,7 @@ class UserConfig
     /** @var bool */
     private $disable;
 
-    /** @var string|false */
+    /** @var string|bool */
     private $otpSecret;
 
     public function __construct(array $configData)
