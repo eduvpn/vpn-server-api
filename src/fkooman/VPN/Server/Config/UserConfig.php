@@ -29,15 +29,13 @@ class UserConfig
 
     public function __construct(array $configData)
     {
-        $disable = array_key_exists('disable', $configData) ? $configData['disable'] : false;
-        InputValidation::disable($disable);
-        $this->disable = $disable;
+        $this->setDisable(
+            array_key_exists('disable', $configData) ? $configData['disable'] : false
+        );
 
-        $otpSecret = array_key_exists('otp_secret', $configData) ? $configData['otp_secret'] : false;
-        if (!is_bool($otpSecret)) {
-            InputValidation::otpSecret($otpSecret);
-        }
-        $this->otpSecret = $otpSecret;
+        $this->setOtpSecret(
+            array_key_exists('otp_secret', $configData) ? $configData['otp_secret'] : false
+        );
     }
 
     public function getDisable()
@@ -56,6 +54,14 @@ class UserConfig
         return $this->otpSecret;
     }
 
+    public function setOtpSecret($otpSecret)
+    {
+        if (!is_bool($otpSecret)) {
+            InputValidation::otpSecret($otpSecret);
+        }
+        $this->otpSecret = $otpSecret;
+    }
+
     /**
      * Hide the OTP secret by setting it to 'true' if a secret is set, or leave
      * it 'false' when no OTP secret was set.
@@ -65,12 +71,6 @@ class UserConfig
         if (false !== $this->otpSecret) {
             $this->otpSecret = true;
         }
-    }
-
-    public function setOtpSecret($otpSecret)
-    {
-        InputValidation::otpSecret($otpSecret);
-        $this->otpSecret = $otpSecret;
     }
 
     public function toArray()

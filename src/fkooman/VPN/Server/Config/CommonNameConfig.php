@@ -26,15 +26,20 @@ class CommonNameConfig
 
     public function __construct(array $configData)
     {
-        $disable = array_key_exists('disable', $configData) ? $configData['disable'] : false;
-        InputValidation::disable($disable);
-
-        $this->disable = $disable;
+        $this->setDisable(
+            array_key_exists('disable', $configData) ? $configData['disable'] : false
+        );
     }
 
     public function getDisable()
     {
         return $this->disable;
+    }
+
+    public function setDisable($disable)
+    {
+        InputValidation::disable($disable);
+        $this->disable = $disable;
     }
 
     public function toArray()
