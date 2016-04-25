@@ -69,7 +69,7 @@ class ServerConfig
         }
 
         $tcpOptions = [];
-        if('tcp' === $serverConfig['proto'] || 'tcp6' === $serverConfig) {
+        if('tcp-server' === $serverConfig['proto'] || 'tcp6-server' === $serverConfig['proto']) {
             $tcpOptions[] = 'socket-flags TCP_NODELAY';
             $tcpOptions[] = 'push "socket-flags TCP_NODELAY"';
         }
