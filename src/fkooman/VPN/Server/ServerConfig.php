@@ -40,7 +40,7 @@ class ServerConfig
             'dh',
             'ta',
             'listen',
-            'otp',
+            '2fa',
         ];
 
         // XXX verify the parameters and types
@@ -58,18 +58,18 @@ class ServerConfig
             $dnsEntries[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress);
         }
 
-        $otpEntries = [];
-        if ($serverConfig['otp']) {
-            $otpEntries[] = 'auth-user-pass-verify /usr/bin/vpn-server-api-verify-otp via-env';
+        $tfaEntries = [];
+        if ($serverConfig['2fa']) {
+            $tfaEntries[] = 'auth-user-pass-verify /usr/bin/vpn-server-api-verify-otp via-env';
 
             # increase the renegotiation time to 8h from the default of 1h when
-            # using OTP, otherwise the user will be asked for the OTP key every
+            # using 2FA, otherwise the user will be asked for the 2FA key every
             # hour
-            $otpEntries[] = 'reneg-sec 28800';
+            $tfaEntries[] = 'reneg-sec 28800';
         }
 
         $tcpOptions = [];
-        if('tcp-server' === $serverConfig['proto'] || 'tcp6-server' === $serverConfig['proto']) {
+        if ('tcp-server' === $serverConfig['proto'] || 'tcp6-server' === $serverConfig['proto']) {
             $tcpOptions[] = 'socket-flags TCP_NODELAY';
             $tcpOptions[] = 'push "socket-flags TCP_NODELAY"';
         }
@@ -140,12 +140,12 @@ class ServerConfig
             # additional cipher "TLS_DHE_RSA_WITH_AES_256_CBC_SHA"
             'tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA',
 
-            sprintf('script-security %d', $serverConfig['otp'] ? 3 : 2),
+            sprintf('script-security %d', $serverConfig['2fa'] ? 3 : 2),
             'client-connect /usr/bin/vpn-server-api-client-connect',
             'client-disconnect /usr/bin/vpn-server-api-client-disconnect',
 
-            # OTP
-            implode(PHP_EOL, $otpEntries),
+            # 2FA
+            implode(PHP_EOL, $tfaEntries),
 
             # Certificate Revocation List
             'crl-verify /var/lib/vpn-server-api/ca.crl',
