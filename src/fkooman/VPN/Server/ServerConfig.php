@@ -61,6 +61,11 @@ class ServerConfig
         $otpEntries = [];
         if ($serverConfig['otp']) {
             $otpEntries[] = 'auth-user-pass-verify /usr/bin/vpn-server-api-verify-otp via-env';
+
+            # increase the renegotiation time to 8h from the default of 1h when
+            # using OTP, otherwise the user will be asked for the OTP key every
+            # hour
+            $otpEntries[] = 'reneg-sec 28800';
         }
 
         return [
