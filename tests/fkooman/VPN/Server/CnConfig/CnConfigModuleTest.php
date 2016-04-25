@@ -69,13 +69,14 @@ class CnConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'foo_one' => [
-                    'disable' => true,
-                ],
-                'bar_one' => [
-                    'disable' => true,
-                ],
-
+                'items' => [
+                    'foo_one' => [
+                        'disable' => true,
+                    ],
+                    'bar_one' => [
+                        'disable' => true,
+                    ],
+                ]
             ],
             $this->makeRequest('GET', '/config/common_names', [], 'admin')
         );
@@ -85,9 +86,11 @@ class CnConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'foo_one' => [
-                    'disable' => true,
-                ],
+                'items' => [
+                    'foo_one' => [
+                        'disable' => true,
+                    ],
+                ]
             ],
             $this->makeRequest('GET', '/config/common_names', ['user_id' => 'foo'], 'admin')
         );

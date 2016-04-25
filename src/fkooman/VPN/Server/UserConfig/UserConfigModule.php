@@ -67,7 +67,7 @@ class UserConfigModule implements ServiceModuleInterface
                 }
 
                 $response = new JsonResponse();
-                $response->setBody($userConfigArray);
+                $response->setBody(['items' => $userConfigArray]);
 
                 return $response;
             }
