@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0d0270ae250636e77bb401e2e6efbded",
-    "content-hash": "4bb2e3125100f1f70fbf973c4443d507",
+    "hash": "69d70d1abb5faf86c8b2f03e5a2002e0",
+    "content-hash": "892cbf2501b863e6492fc0506a65591c",
     "packages": [
         {
             "name": "christian-riesen/base32",
@@ -194,6 +194,45 @@
             ],
             "description": "Simple PHP library for dealing with HTTP requests and responses.",
             "time": "2016-03-25 14:11:53"
+        },
+        {
+            "name": "fkooman/io",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fkooman/php-lib-io.git",
+                "reference": "1fd97c6cac1fbe0bb0b6c72c394f1818d49d5a56"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fkooman/php-lib-io/zipball/1fd97c6cac1fbe0bb0b6c72c394f1818d49d5a56",
+                "reference": "1fd97c6cac1fbe0bb0b6c72c394f1818d49d5a56",
+                "shasum": ""
+            },
+            "require": {
+                "ext-date": "*",
+                "ext-spl": "*",
+                "paragonie/random_compat": "^1.0",
+                "php": ">= 5.3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "fkooman\\IO\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "François Kooman",
+                    "email": "fkooman@tuxed.net"
+                }
+            ],
+            "description": "Simple IO library",
+            "time": "2016-04-25 20:35:20"
         },
         {
             "name": "fkooman/json",
@@ -790,7 +829,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "fkooman/io": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

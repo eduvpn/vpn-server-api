@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\Config;
+namespace fkooman\VPN\Server\UserConfig;
 
 use fkooman\VPN\Server\InputValidation;
 
@@ -32,7 +32,6 @@ class UserConfig
         $this->setDisable(
             array_key_exists('disable', $configData) ? $configData['disable'] : false
         );
-
         $this->setOtpSecret(
             array_key_exists('otp_secret', $configData) ? $configData['otp_secret'] : false
         );

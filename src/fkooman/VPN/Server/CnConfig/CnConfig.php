@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\Config;
+namespace fkooman\VPN\Server\CnConfig;
 
 use fkooman\VPN\Server\InputValidation;
 
-class CommonNameConfig
+class CnConfig
 {
     /** @var bool */
     private $disable;

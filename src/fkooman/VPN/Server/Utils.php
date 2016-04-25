@@ -17,6 +17,8 @@
 
 namespace fkooman\VPN\Server;
 
+use fkooman\Http\Exception\ForbiddenException;
+use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use RuntimeException;
 
 class Utils
@@ -58,5 +60,16 @@ class Utils
         $serverConfig['cn'] = $parsedCert['subject']['CN'];
 
         return $serverConfig;
+    }
+
+    public static function requireScope(TokenInfo $tokenInfo, array $requiredScope)
+    {
+        foreach ($requiredScope as $s) {
+            if ($tokenInfo->getScope()->hasScope($s)) {
+                return;
+            }
+        }
+
+        throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', implode(',', $requiredScope)));
     }
 }
