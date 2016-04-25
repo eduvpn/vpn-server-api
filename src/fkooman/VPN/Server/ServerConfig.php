@@ -68,6 +68,12 @@ class ServerConfig
             $otpEntries[] = 'reneg-sec 28800';
         }
 
+        $tcpOptions = [];
+        if('tcp' === $serverConfig['proto'] || 'tcp6' === $serverConfig) {
+            $tcpOptions[] = 'socket-flags TCP_NODELAY';
+            $tcpOptions[] = 'push "socket-flags TCP_NODELAY"';
+        }
+
         return [
             sprintf('# OpenVPN Server Configuration for %s', $serverConfig['cn']),
 
@@ -115,6 +121,9 @@ class ServerConfig
             'user openvpn',
             'group openvpn',
             'remote-cert-tls client',
+
+            # when using TCP, we want to reduce the latency of the TCP tunnel
+            implode(PHP_EOL, $tcpOptions),
 
             # CRYPTO (DATA CHANNEL)
             'auth SHA256',
