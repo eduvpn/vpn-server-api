@@ -76,7 +76,7 @@ class CnConfigModuleTest extends PHPUnit_Framework_TestCase
                     'bar_one' => [
                         'disable' => true,
                     ],
-                ]
+                ],
             ],
             $this->makeRequest('GET', '/config/common_names', [], 'admin')
         );
@@ -90,7 +90,7 @@ class CnConfigModuleTest extends PHPUnit_Framework_TestCase
                     'foo_one' => [
                         'disable' => true,
                     ],
-                ]
+                ],
             ],
             $this->makeRequest('GET', '/config/common_names', ['user_id' => 'foo'], 'admin')
         );

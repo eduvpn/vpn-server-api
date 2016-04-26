@@ -31,7 +31,6 @@ function showHelp(array $argv)
     $helpText = sprintf('SYNTAX: %s [--reuse] [CN]', $argv[0]);
     $helpText .= PHP_EOL;
     $helpText .= '--reuse    use the existing keys and certificates instead of generating again'.PHP_EOL;
-    $helpText .= '--2fa      enable 2FA'.PHP_EOL;
     $helpText .= 'CN         the common name for the certificate, typically the hostname'.PHP_EOL;
     echo $helpText;
 }
@@ -40,14 +39,11 @@ try {
     $dhLength = 3072;
 
     $reUse = false;
-    $enable2fa = false;
     $commonName = false;
 
     for ($i = 1; $i < $argc; ++$i) {
         if ('--reuse' === $argv[$i]) {
             $reUse = true;
-        } elseif ('--2fa' === $argv[$i]) {
-            $enable2fa = true;
         } else {
             $commonName = $argv[$i];
         }
@@ -126,6 +122,7 @@ try {
 
     $dns4 = $ipConfig->v('v4', 'dns');
     $dns6 = $ipConfig->v('v6', 'dns');
+    $twoFactor = $ipConfig->v('twoFactor', false, false);
 
     $i = 0;
     foreach ($openVpnConfig as $k => $v) {
@@ -133,6 +130,7 @@ try {
             'v4_prefix' => $ip4Ranges[$i],
             'v6_prefix' => $ip6Ranges[$i],
             'dns' => array_merge($dns4, $dns6),
+            '2fa' => $twoFactor,
         ];
 
         $instanceConfig = [];
@@ -154,7 +152,7 @@ try {
         }
         $instanceConfig['port'] = $v['port'];
         $instanceConfig['management_port'] = $v['managementPort'];
-        $vpnConfig = implode(PHP_EOL, $serverConfig->get(array_merge(['2fa' => $enable2fa], $instanceConfig, $ipConfig, $configData)));
+        $vpnConfig = implode(PHP_EOL, $serverConfig->get(array_merge($instanceConfig, $ipConfig, $configData)));
         file_put_contents(sprintf('/etc/openvpn/server-%s.conf', $k), $vpnConfig);
 
         ++$i;

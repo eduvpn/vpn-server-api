@@ -13,6 +13,9 @@ firewall:
         - TCP/80
         - TCP/443
 
+# enable Two-factor Authentication on the server
+twoFactor: false
+
 v4:
     range: 10.42.42.0/24
 

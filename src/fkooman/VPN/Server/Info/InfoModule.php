@@ -17,10 +17,14 @@ class InfoModule implements ServiceModuleInterface
     /** @var array */
     private $v6;
 
-    public function __construct(array $v4, array $v6)
+    /** @var bool */
+    private $twoFactor;
+
+    public function __construct(array $v4, array $v6, $twoFactor)
     {
         $this->v4 = $v4;
         $this->v6 = $v6;
+        $this->twoFactor = $twoFactor;
     }
 
     public function init(Service $service)
@@ -44,6 +48,7 @@ class InfoModule implements ServiceModuleInterface
         $responseData['range'] = $net4;
         $responseData['range6'] = $prefix6;
         $responseData['dns'] = array_merge($this->v4['dns'], $this->v6['dns']);
+        $responseData['tfa'] = $this->twoFactor;
 
         $response = new JsonResponse();
         $response->setBody($responseData);
