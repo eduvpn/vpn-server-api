@@ -123,7 +123,8 @@ class CnConfigModule implements ServiceModuleInterface
 
                 $this->io->writeFile(
                     sprintf('%s/%s', $this->configDir, $commonName),
-                    Json::encode($requestCnConfig->toArray())
+                    Json::encode($requestCnConfig->toArray()),
+                    true
                 );
 
                 $response = new JsonResponse();

@@ -139,7 +139,8 @@ class UserConfigModule implements ServiceModuleInterface
 
                 $this->io->writeFile(
                     sprintf('%s/%s', $this->configDir, $userId),
-                    Json::encode($userConfig->toArray())
+                    Json::encode($userConfig->toArray()),
+                    true
                 );
 
                 $response = new JsonResponse();
@@ -161,7 +162,8 @@ class UserConfigModule implements ServiceModuleInterface
 
                 $this->io->writeFile(
                     sprintf('%s/%s', $this->configDir, $userId),
-                    Json::encode($requestUserConfig->toArray())
+                    Json::encode($requestUserConfig->toArray()),
+                    true
                 );
 
                 $response = new JsonResponse();

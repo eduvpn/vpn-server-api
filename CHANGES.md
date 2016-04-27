@@ -1,5 +1,8 @@
 # Changelog
 
+## 5.0.1 (2016-04-27)
+- update `fkooman/io` to allow creating directory when writing files
+
 ## 5.0.0 (2016-04-27)
 - refactor storing common name and user configuration in the backend
 - support storing 2FA secret in user configuration
