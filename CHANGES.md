@@ -1,6 +1,6 @@
 # Changelog
 
-## 5.0.0 (...)
+## 5.0.0 (2016-04-27)
 - refactor storing common name and user configuration in the backend
 - support storing 2FA secret in user configuration
 - script to verify OTP token
