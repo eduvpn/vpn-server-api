@@ -114,16 +114,16 @@
         },
         {
             "name": "fkooman/config",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-lib-config.git",
-                "reference": "961f2cb63bab8916c921a7b29a7eb3e22b5bcda1"
+                "reference": "a93d481c46fdd3ece1699d22340d53b769da4902"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-lib-config/zipball/961f2cb63bab8916c921a7b29a7eb3e22b5bcda1",
-                "reference": "961f2cb63bab8916c921a7b29a7eb3e22b5bcda1",
+                "url": "https://api.github.com/repos/fkooman/php-lib-config/zipball/a93d481c46fdd3ece1699d22340d53b769da4902",
+                "reference": "a93d481c46fdd3ece1699d22340d53b769da4902",
                 "shasum": ""
             },
             "require": {
@@ -149,7 +149,7 @@
                 }
             ],
             "description": "Read and write configuration files",
-            "time": "2015-11-09 18:12:16"
+            "time": "2016-04-27 10:00:40"
         },
         {
             "name": "fkooman/http",

@@ -133,7 +133,7 @@ class ConnectionLogTest extends PHPUnit_Framework_TestCase
             'bytes_received' => '4843',
             'bytes_sent' => '5317',
         ]);
-        $this->assertSame(0, $this->connectionLog->removeLogBefore(1452535466));
-        $this->assertSame(1, $this->connectionLog->removeLogBefore(1452535499));
+        $this->assertSame(0, $this->connectionLog->housekeeping(1452535466));
+        $this->assertSame(1, $this->connectionLog->housekeeping(1452535499));
     }
 }

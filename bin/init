@@ -20,6 +20,7 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\Log\ConnectionLog;
+use fkooman\VPN\Server\Log\OtpLog;
 
 try {
     $config = new Reader(
@@ -34,6 +35,15 @@ try {
 
     $connectionLog = new ConnectionLog($db);
     $connectionLog->initDatabase();
+
+    $db = new PDO(
+        $config->v('otp', 'dsn'),
+        $config->v('otp', 'username', false),
+        $config->v('otp', 'password', false)
+    );
+
+    $otpLog = new OtpLog($db);
+    $otpLog->initDatabase();
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL;
     exit(1);

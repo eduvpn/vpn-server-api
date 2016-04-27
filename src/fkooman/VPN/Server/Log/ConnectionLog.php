@@ -145,7 +145,7 @@ class ConnectionLog
      *
      * @param int $timeStamp the unix timestamp before which to remove all log entries
      */
-    public function removeLogBefore($timeStamp)
+    public function housekeeping($timeStamp)
     {
         $stmt = $this->db->prepare(
             sprintf(
@@ -171,12 +171,12 @@ class ConnectionLog
         $tables = array('connections');
         foreach ($tables as $t) {
             // make sure the tables are empty
-            $this->db->query(
-                sprintf(
-                    'DELETE FROM %s',
-                    $this->prefix.$t
-                )
-            );
+#            $this->db->query(
+#                sprintf(
+#                    'DELETE FROM %s',
+#                    $this->prefix.$t
+#                )
+#            );
         }
     }
 }

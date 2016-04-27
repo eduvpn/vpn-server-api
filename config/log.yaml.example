@@ -3,3 +3,9 @@ log:
     dsn: 'sqlite:/var/lib/openvpn/log.sqlite'
     #username: foo
     #password: bar
+
+# The OTP database
+otp:
+    dsn: 'sqlite:/var/lib/openvpn/otp.sqlite'
+    #username: foo
+    #password: bar
