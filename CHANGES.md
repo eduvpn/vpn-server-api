@@ -1,5 +1,9 @@
 # Changelog
 
+## 5.0.2 (2016-04-27)
+- allow OpenVPN to read the user/CN config files by default when the directories
+  are created
+
 ## 5.0.1 (2016-04-27)
 - update `fkooman/io` to allow creating directory when writing files
 
