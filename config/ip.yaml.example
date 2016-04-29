@@ -20,12 +20,20 @@ v4:
     range: 10.42.42.0/24
 
     dns:
-        - 8.8.8.8
-        - 8.8.4.4
+        # https://dns.watch/index
+        - 84.200.69.80
+        - 84.200.70.40
+        # https://developers.google.com/speed/public-dns/
+        #- 8.8.8.8
+        #- 8.8.4.4
 
 v6:
     prefix: 'fd00:4242:4242::/48'
 
     dns:
-        - '2001:4860:4860::8888'
-        - '2001:4860:4860::8844'
+        # https://dns.watch/index
+        - '2001:1608:10:25::1c04:b12f'
+        - '2001:1608:10:25::9249:d69b'
+        # https://developers.google.com/speed/public-dns/
+        #- '2001:4860:4860::8888'
+        #- '2001:4860:4860::8844'
