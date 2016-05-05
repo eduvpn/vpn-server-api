@@ -41,6 +41,7 @@ class ServerConfig
             'ta',
             'listen',
             '2fa',
+            'routes',
         ];
 
         // XXX verify the parameters and types
@@ -51,11 +52,43 @@ class ServerConfig
             }
         }
 
+        $routeConfig = [];
+        if (0 === count($serverConfig['routes'])) {
+            $routeConfig[] = 'push "redirect-gateway def1 bypass-dhcp"';
+
+            # for Windows clients we need this extra route to mark the TAP adapter as 
+            # trusted and as having "Internet" access to allow the user to set it to 
+            # "Home" or "Work" to allow accessing file shares and printers  
+            #$routeConfig[] = 'push "route 0.0.0.0 0.0.0.0"';
+
+            # for iOS we need this OpenVPN 2.4 "ipv6" flag to redirect-gateway
+            # See https://docs.openvpn.net/docs/openvpn-connect/openvpn-connect-ios-faq.html
+            $routeConfig[] = 'push "redirect-gateway ipv6"';
+
+            # we use 2000::/3 instead of ::/0 because it seems to break on native IPv6 
+            # networks where the ::/0 default route already exists
+            $routeConfig[] = 'push "route-ipv6 2000::/3"';
+        } else {
+            // there are some routes specified, push those, and not the default 
+            foreach ($serverConfig['routes'] as $r) {
+                if (false !== strpos($r, ':')) {
+                    // IPv6
+                    $routeConfig[] = sprintf('push "route-ipv6 %s"', $r);
+                } else {
+                    // IPv4
+                    $routeConfig[] = sprintf('push "route %s"', $r);
+                }
+            }
+        }
+
         $v4 = new IPv4($serverConfig['v4_prefix']);
 
         $dnsEntries = [];
-        foreach ($serverConfig['dns'] as $dnsAddress) {
-            $dnsEntries[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress);
+        if (0 === count($serverConfig['routes'])) {
+            // only push DNS when we are the default route
+            foreach ($serverConfig['dns'] as $dnsAddress) {
+                $dnsEntries[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress);
+            }
         }
 
         $tfaEntries = [];
@@ -94,20 +127,7 @@ class ServerConfig
             # IPv6
             sprintf('server-ipv6 %s', $serverConfig['v6_prefix']),
 
-            'push "redirect-gateway def1 bypass-dhcp"',
-
-            # for Windows clients we need this extra route to mark the TAP adapter as 
-            # trusted and as having "Internet" access to allow the user to set it to 
-            # "Home" or "Work" to allow accessing file shares and printers  
-            #'push "route 0.0.0.0 0.0.0.0"',
-
-            # for iOS we need this OpenVPN 2.4 "ipv6" flag to redirect-gateway
-            # See https://docs.openvpn.net/docs/openvpn-connect/openvpn-connect-ios-faq.html
-            'push "redirect-gateway ipv6"',
-
-            # we use 2000::/3 instead of ::/0 because it seems to break on native IPv6 
-            # networks where the ::/0 default route already exists
-            'push "route-ipv6 2000::/3"',
+            implode(PHP_EOL, $routeConfig),
 
             'topology subnet',
             # disable compression

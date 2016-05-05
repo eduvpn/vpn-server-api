@@ -5,35 +5,25 @@ configDir: /var/lib/vpn-server-api/config
 
 firewall:
     # allow connections to these ports on the VPN server itself
-    dst_port:
-        - UDP/1194
-        - UDP/1195
-        - UDP/1196
-        - TCP/22
-        - TCP/80
-        - TCP/443
+    dst_port: [UDP/1194, UDP/1195, UDP/1196, TCP/22, TCP/80, TCP/443]
 
-# enable Two-factor Authentication on the server
+# enable 2FA on the server
 twoFactor: false
 
-v4:
-    range: 10.42.42.0/24
+# IPv4 range for clients
+range: 10.42.42.0/24
 
-    dns:
-        # https://dns.watch/index
-        - 84.200.69.80
-        - 84.200.70.40
-        # https://developers.google.com/speed/public-dns/
-        #- 8.8.8.8
-        #- 8.8.4.4
+# IPv6 range for clients
+range6: 'fd00:4242:4242::/48'
 
-v6:
-    prefix: 'fd00:4242:4242::/48'
+# Specify the routes that are pushed to clients, if not specified or the list
+# of routes is empty, the VPN will be used as the default gateway
+routes: []
+#routes: [10.10.10.0/16, 192.168.1.0/24, 'fd00:1234:5678:9999::/64']
 
-    dns:
-        # https://dns.watch/index
-        - '2001:1608:10:25::1c04:b12f'
-        - '2001:1608:10:25::9249:d69b'
-        # https://developers.google.com/speed/public-dns/
-        #- '2001:4860:4860::8888'
-        #- '2001:4860:4860::8844'
+# DNS servers to push to clients, only pushed when VPN is used as default 
+# gateway
+# https://developers.google.com/speed/public-dns/
+dns: [8.8.8.8, 8.8.4.4, '2001:4860:4860::8888', '2001:4860:4860::8844']
+# https://dns.watch/index
+#dns: [84.200.69.80, 84.200.70.40, '2001:1608:10:25::1c04:b12f', '2001:1608:10:25::9249:d69b']

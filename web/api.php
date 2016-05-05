@@ -132,7 +132,7 @@ try {
     $service->addModule(new UserConfigModule($ipConfig->v('configDir').'/users', $logger, $io));
     $service->addModule(new CnConfigModule($ipConfig->v('configDir').'/common_names', $logger, $io));
     $service->addModule(new CaModule($crlFetcher, $logger));
-    $service->addModule(new InfoModule($ipConfig->v('v4'), $ipConfig->v('v6'), $ipConfig->v('twoFactor', false, false)));
+    $service->addModule(new InfoModule($ipConfig));
     $service->run()->send();
 } catch (Exception $e) {
     // internal server error

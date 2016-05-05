@@ -68,8 +68,8 @@ try {
     $f6->addInputPorts($inputPorts);
 
     // get the ranges
-    $ip4Range = $ipConfig->v('v4', 'range');
-    $ip6Range = $ipConfig->v('v6', 'prefix');
+    $ip4Range = $ipConfig->v('range');
+    $ip6Range = $ipConfig->v('range6');
 
     $f4->addRange($ip4Range);
     $f6->addRange($ip6Range);

@@ -114,22 +114,24 @@ try {
     $serverConfig = new ServerConfig();
 
     $instanceCount = count($openVpnConfig);
-    $ip4 = new IPv4($ipConfig->v('v4', 'range'));
-    $ip6 = new IPv6($ipConfig->v('v6', 'prefix'));
+    $ip4 = new IPv4($ipConfig->v('range'));
+    $ip6 = new IPv6($ipConfig->v('range6'));
 
     $ip4Ranges = $ip4->splitRange($instanceCount);
     $ip6Ranges = $ip6->splitRange($instanceCount);
 
-    $dns4 = $ipConfig->v('v4', 'dns');
-    $dns6 = $ipConfig->v('v6', 'dns');
+    $dns = $ipConfig->v('dns');
     $twoFactor = $ipConfig->v('twoFactor', false, false);
+
+    $routes = $ipConfig->v('routes', false, []);
 
     $i = 0;
     foreach ($openVpnConfig as $k => $v) {
         $ipConfig = [
             'v4_prefix' => $ip4Ranges[$i],
             'v6_prefix' => $ip6Ranges[$i],
-            'dns' => array_merge($dns4, $dns6),
+            'routes' => $routes,
+            'dns' => $dns,
             '2fa' => $twoFactor,
         ];
 
