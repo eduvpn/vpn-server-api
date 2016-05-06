@@ -38,6 +38,7 @@ class InfoModule implements ServiceModuleInterface
         $responseData['range'] = $this->config->v('range');
         $responseData['range6'] = $this->config->v('range6');
         $responseData['dns'] = $this->config->v('dns');
+        $responseData['routes'] = $this->config->v('routes');
         $responseData['tfa'] = $this->config->v('twoFactor', false, false);
 
         $response = new JsonResponse();
