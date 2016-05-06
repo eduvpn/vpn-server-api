@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.0.0 (2016-05-06)
+- update configuration format of `ip.yaml`
+- support restricting destination routes, i.e. not only default gateway 
+  configurations
+
 ## 5.0.2 (2016-04-27)
 - allow OpenVPN to read the user/CN config files by default when the directories
   are created
