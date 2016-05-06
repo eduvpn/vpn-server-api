@@ -71,7 +71,7 @@ try {
     $ip4Range = $ipConfig->v('range');
     $ip6Range = $ipConfig->v('range6');
 
-    $routes = $ipConfig->v('routes');
+    $routes = $ipConfig->v('routes', false, []);
     $ip4Routes = [];
     $ip6Routes = [];
 
