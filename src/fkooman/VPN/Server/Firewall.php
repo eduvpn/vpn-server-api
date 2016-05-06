@@ -88,9 +88,9 @@ class Firewall
             sprintf('-A FORWARD -i tun+ -o %s -j vpn', $this->externalIf),
         ];
 
-        foreach ($this->ranges as $r) {
-            $forward = array_merge($forward, $r);
-        }
+#        foreach ($this->ranges as $r) {
+            $forward = array_merge($forward, $this->ranges);
+#        }
 
         return $forward;
     }
@@ -100,12 +100,15 @@ class Firewall
         $this->inputPorts = $inputPorts;
     }
 
-    public function addRange($srcNet)
+    public function addRange($srcNet, $dstNets = [])
     {
-        $range = [];
-        $range[] = sprintf('-A vpn -s %s -j ACCEPT', $srcNet);
-
-        $this->ranges[] = $range;
+        if (0 === count($dstNets)) {
+            $this->ranges[] = sprintf('-A vpn -s %s -j ACCEPT', $srcNet);
+        } else {
+            foreach ($dstNets as $dstNet) {
+                $this->ranges[] = sprintf('-A vpn -s %s -d %s -j ACCEPT', $srcNet, $dstNet);
+            }
+        }
     }
 
     public function getFirewall()

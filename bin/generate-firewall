@@ -71,8 +71,20 @@ try {
     $ip4Range = $ipConfig->v('range');
     $ip6Range = $ipConfig->v('range6');
 
-    $f4->addRange($ip4Range);
-    $f6->addRange($ip6Range);
+    $routes = $ipConfig->v('routes');
+    $ip4Routes = [];
+    $ip6Routes = [];
+
+    foreach ($routes as $r) {
+        if (false !== strpos($r, ':')) {
+            $ip6Routes[] = $r;
+        } else {
+            $ip4Routes[] = $r;
+        }
+    }
+
+    $f4->addRange($ip4Range, $ip4Routes);
+    $f6->addRange($ip6Range, $ip6Routes);
 
     if ($installFw) {
         if (false === @file_put_contents('/etc/sysconfig/iptables', $f4->getFirewall())) {
