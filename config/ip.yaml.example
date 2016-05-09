@@ -1,4 +1,9 @@
-# IP address configuration
+# OpenVPN instance configuration
+#
+# **NOTE**:
+# When modifying this file, do not forget to run 
+# "vpn-server-api-server-config --reuse" and "vpn-server-api-generate-firewall"
+# and restart the instances/firewall to activate the new configuration
 
 # contains the configurations of the CN
 configDir: /var/lib/vpn-server-api/config
