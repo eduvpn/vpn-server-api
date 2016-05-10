@@ -1,6 +1,6 @@
 # Changelog
 
-## 6.0.1 (...)
+## 6.0.1 (2016-05-10)
 - fix iOS sniproxy/openvpn IPv6 snafu
 
 ## 6.0.0 (2016-05-06)
