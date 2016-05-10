@@ -1,5 +1,8 @@
 # Changelog
 
+## 6.0.1 (...)
+- fix iOS sniproxy/openvpn IPv6 snafu
+
 ## 6.0.0 (2016-05-06)
 - update configuration format of `ip.yaml`
 - support restricting destination routes, i.e. not only default gateway 

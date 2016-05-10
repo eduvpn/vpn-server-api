@@ -16,7 +16,9 @@ openVpn:
         port: 1196
         managementPort: 11942
     tcp1194:
-        listen: '::'
+        # sniproxy will take care of IPv6, listening on IPv6 here will break
+        # iOS OpenVPN clients
+        listen: 0.0.0.0
         proto: tcp
         port: 1194
         managementPort: 11943

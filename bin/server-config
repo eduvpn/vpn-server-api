@@ -140,7 +140,14 @@ try {
 
         // determine the listen address
         if (!array_key_exists('listen', $v)) {
-            $instanceConfig['listen'] = '::';
+            if ('udp' === $v['proto']) {
+                $instanceConfig['listen'] = '::';
+            } else {
+                // sniproxy + iOS + tcp6-server has issues, not sure what 
+                // exactly is going on, but it does not work. Fortunatly 
+                // sniproxy will take care of IPv6 and IPv4 TCP connections
+                $instanceConfig['listen'] = '0.0.0.0';
+            }
         } else {
             $instanceConfig['listen'] = $v['listen'];
         }
