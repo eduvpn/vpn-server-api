@@ -1,5 +1,8 @@
 # Changelog
 
+## 6.0.3 (...)
+- expose client-to-client config setting through info API
+
 ## 6.0.2 (2016-05-11)
 - support client-to-client connectivity (optional, default disabled)
 
