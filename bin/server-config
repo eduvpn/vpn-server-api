@@ -122,6 +122,7 @@ try {
 
     $dns = $ipConfig->v('dns');
     $twoFactor = $ipConfig->v('twoFactor', false, false);
+    $clientToClient = $ipConfig->v('clientToClient', false, false);
 
     $routes = $ipConfig->v('routes', false, []);
 
@@ -133,6 +134,7 @@ try {
             'routes' => $routes,
             'dns' => $dns,
             '2fa' => $twoFactor,
+            'c2c' => $clientToClient,
         ];
 
         $instanceConfig = [];

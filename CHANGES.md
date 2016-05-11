@@ -1,5 +1,8 @@
 # Changelog
 
+## 6.0.2 (...)
+- support client-to-client connectivity (optional, default disabled)
+
 ## 6.0.1 (2016-05-10)
 - fix iOS sniproxy/openvpn IPv6 snafu
 

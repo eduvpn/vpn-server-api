@@ -42,6 +42,7 @@ class ServerConfig
             'listen',
             '2fa',
             'routes',
+            'c2c',
         ];
 
         // XXX verify the parameters and types
@@ -107,6 +108,10 @@ class ServerConfig
             $tcpOptions[] = 'push "socket-flags TCP_NODELAY"';
         }
 
+        if ($serverConfig['c2c']) {
+            $clientToClient[] = 'client-to-client';
+        }
+
         return [
             sprintf('# OpenVPN Server Configuration for %s', $serverConfig['cn']),
 
@@ -128,6 +133,8 @@ class ServerConfig
             sprintf('server-ipv6 %s', $serverConfig['v6_prefix']),
 
             implode(PHP_EOL, $routeConfig),
+
+            implode(PHP_EOL, $clientToClient),
 
             'topology subnet',
             # disable compression

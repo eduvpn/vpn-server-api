@@ -25,6 +25,7 @@ class Firewall
     private $inputPorts;
     private $ranges;
     private $enableForward;
+    private $clientToClient;
 
     public function __construct($ipVersion = 4, $externalIf = 'eth0', $useNat = true, $enableForward = true)
     {
@@ -34,6 +35,12 @@ class Firewall
         $this->inputPorts = [];
         $this->ranges = [];
         $this->enableForward = $enableForward;
+        $this->clientToClient = false;
+    }
+
+    public function clientToClient($clientToClient)
+    {
+        $this->clientToClient = (bool) $clientToClient;
     }
 
     private function getNat()
@@ -78,19 +85,27 @@ class Firewall
 
     private function getForward()
     {
-        if (!$this->enableForward) {
-            return [];
-        }
-
         $forward = [
-            '-N vpn',
             '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
-            sprintf('-A FORWARD -i tun+ -o %s -j vpn', $this->externalIf),
         ];
 
-#        foreach ($this->ranges as $r) {
-            $forward = array_merge($forward, $this->ranges);
-#        }
+        if ($this->clientToClient) {
+            // allow communication between the various tun interfaces
+            // XXX mention actually only the explicit interface(s) for which 
+            // forwarding should be enabled
+            $forward[] = '-A FORWARD -i tun+ -o tun+ -j ACCEPT';
+        }
+
+        if (!$this->enableForward) {
+            // do not allow forwarding to Internet
+            return $forward;
+        }
+
+        $forward[] = '-N vpn';
+        // XXX mention the explicit tun interface(s)
+        $forward[] = sprintf('-A FORWARD -i tun+ -o %s -j vpn', $this->externalIf);
+
+        $forward = array_merge($forward, $this->ranges);
 
         return $forward;
     }

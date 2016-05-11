@@ -15,6 +15,10 @@ firewall:
 # enable 2FA on the server
 twoFactor: false
 
+# allow direct client-to-client communication (in the same instance and between
+# OpenVPN instances)
+clientToClient: false
+
 # IPv4 range for clients
 range: 10.42.42.0/24
 

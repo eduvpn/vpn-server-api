@@ -67,6 +67,10 @@ try {
     $f6 = new Firewall(6, $extIf, $useNat, $forward6);
     $f6->addInputPorts($inputPorts);
 
+    $clientToClient = $ipConfig->v('clientToClient', false, false);
+    $f4->clientToClient($clientToClient);
+    $f6->clientToClient($clientToClient);
+
     // get the ranges
     $ip4Range = $ipConfig->v('range');
     $ip6Range = $ipConfig->v('range6');
