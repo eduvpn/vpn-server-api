@@ -40,6 +40,7 @@ class InfoModule implements ServiceModuleInterface
         $responseData['dns'] = $this->config->v('dns');
         $responseData['routes'] = $this->config->v('routes', false, []);
         $responseData['tfa'] = $this->config->v('twoFactor', false, false);
+        $responseData['c2c'] = $this->config->v('clientToClient', false, false);
 
         $response = new JsonResponse();
         $response->setBody($responseData);
