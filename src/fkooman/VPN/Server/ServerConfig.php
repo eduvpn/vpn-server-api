@@ -108,6 +108,7 @@ class ServerConfig
             $tcpOptions[] = 'push "socket-flags TCP_NODELAY"';
         }
 
+        $clientToClient = [];
         if ($serverConfig['c2c']) {
             $clientToClient[] = 'client-to-client';
         }
