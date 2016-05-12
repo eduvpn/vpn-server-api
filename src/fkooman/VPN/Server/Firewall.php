@@ -89,21 +89,21 @@ class Firewall
             '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
         ];
 
-        if ($this->clientToClient) {
-            // allow communication between the various tun interfaces
-            // XXX mention actually only the explicit interface(s) for which 
-            // forwarding should be enabled
-            $forward[] = '-A FORWARD -i tun+ -o tun+ -j ACCEPT';
-        }
+#        if ($this->clientToClient) {
+#            // allow communication between the various tun interfaces
+#            // XXX mention actually only the explicit interface(s) for which 
+#            // forwarding should be enabled
+#            $forward[] = '-A FORWARD -i tun+ -o tun+ -j ACCEPT';
+#        }
 
         if (!$this->enableForward) {
             // do not allow forwarding to Internet
             return $forward;
         }
 
-        $forward[] = '-N vpn';
-        // XXX mention the explicit tun interface(s)
-        $forward[] = sprintf('-A FORWARD -i tun+ -o %s -j vpn', $this->externalIf);
+#        $forward[] = '-N vpn';
+#        // XXX mention the explicit tun interface(s)
+#        $forward[] = sprintf('-A FORWARD -i tun+ -o %s -j vpn', $this->externalIf);
 
         $forward = array_merge($forward, $this->ranges);
 
@@ -115,13 +115,15 @@ class Firewall
         $this->inputPorts = $inputPorts;
     }
 
-    public function addRange($srcNet, $dstNets = [])
+    public function addRange($poolName, $srcNet, $dstNets = [])
     {
+        $this->ranges[] = sprintf('-N vpn-%s', $poolName);
+        $this->ranges[] = sprintf('-A FORWARD -i tun-%s+ -s %s -o %s -j vpn-%s', $poolName, $srcNet, $this->externalIf, $poolName);
         if (0 === count($dstNets)) {
-            $this->ranges[] = sprintf('-A vpn -s %s -j ACCEPT', $srcNet);
+            $this->ranges[] = sprintf('-A vpn-%s -j ACCEPT', $poolName, $srcNet);
         } else {
             foreach ($dstNets as $dstNet) {
-                $this->ranges[] = sprintf('-A vpn -s %s -d %s -j ACCEPT', $srcNet, $dstNet);
+                $this->ranges[] = sprintf('-A vpn-%s -d %s -j ACCEPT', $poolName, $dstNet);
             }
         }
     }

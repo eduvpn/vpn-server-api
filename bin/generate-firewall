@@ -20,6 +20,7 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\Firewall;
+use fkooman\VPN\Server\Pools;
 
 function showHelp(array $argv)
 {
@@ -60,35 +61,47 @@ try {
         new YamlFile(dirname(__DIR__).'/config/ip.yaml')
     );
 
-    $inputPorts = $ipConfig->v('firewall', 'dst_port', false, ['TCP/22', 'TCP/80', 'TCP/443', 'UDP/1194', 'TCP/1194']);
+    $serverPools = new Pools($ipConfig->v('pools'));
+
+    // XXX probably get this from the pool config? although... maybe not 
+    // needed, just open enough udp ports
+    $inputPorts = $ipConfig->v(
+        'firewall',
+        'dst_port',
+        false,
+        ['udp/1194', 'udp/1195', 'udp/1196', 'tcp/22', 'tcp/80', 'tcp/443']
+    );
 
     $f4 = new Firewall(4, $extIf, $useNat, true);
     $f4->addInputPorts($inputPorts);
     $f6 = new Firewall(6, $extIf, $useNat, $forward6);
     $f6->addInputPorts($inputPorts);
 
-    $clientToClient = $ipConfig->v('clientToClient', false, false);
-    $f4->clientToClient($clientToClient);
-    $f6->clientToClient($clientToClient);
+    foreach ($serverPools->getPools() as $serverPool) {
 
-    // get the ranges
-    $ip4Range = $ipConfig->v('range');
-    $ip6Range = $ipConfig->v('range6');
+#        $clientToClient = $ipConfig->v('clientToClient', false, false);
+#        $f4->clientToClient($clientToClient);
+#        $f6->clientToClient($clientToClient);
 
-    $routes = $ipConfig->v('routes', false, []);
-    $ip4Routes = [];
-    $ip6Routes = [];
+        // get the ranges
+        $range = $serverPool->getRange()->getRange();
+        $range6 = $serverPool->getRange6()->getRange();
 
-    foreach ($routes as $r) {
-        if (false !== strpos($r, ':')) {
-            $ip6Routes[] = $r;
-        } else {
-            $ip4Routes[] = $r;
+        $routes = $serverPool->getRoutes();
+        $ip4Routes = [];
+        $ip6Routes = [];
+
+        foreach ($routes as $r) {
+            if (6 === $r->getFamily()) {
+                $ip6Routes[] = $r->getRange();
+            } else {
+                $ip4Routes[] = $r->getRange();
+            }
         }
-    }
 
-    $f4->addRange($ip4Range, $ip4Routes);
-    $f6->addRange($ip6Range, $ip6Routes);
+        $f4->addRange($serverPool->getName(), $range, $ip4Routes);
+        $f6->addRange($serverPool->getName(), $range6, $ip6Routes);
+    }
 
     if ($installFw) {
         if (false === @file_put_contents('/etc/sysconfig/iptables', $f4->getFirewall())) {
