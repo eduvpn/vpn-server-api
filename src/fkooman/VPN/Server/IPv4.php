@@ -52,6 +52,11 @@ class IPv4
         return sprintf('%s/%d', $this->ip, $this->prefix);
     }
 
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
     public function getNetmask()
     {
         return long2ip(-1 << (32 - $this->prefix));
