@@ -47,6 +47,11 @@ class IPv4
         $this->prefix = intval($prefix);
     }
 
+    public function getFamily()
+    {
+        return 4;
+    }
+
     public function getRange()
     {
         return sprintf('%s/%d', $this->ip, $this->prefix);
