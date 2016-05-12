@@ -29,6 +29,7 @@ use fkooman\VPN\Server\Ca\CrlFetcher;
 use fkooman\VPN\Server\UserConfig\UserConfigModule;
 use fkooman\VPN\Server\CnConfig\CnConfigModule;
 use fkooman\VPN\Server\Info\InfoModule;
+use fkooman\VPN\Server\Pools;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Log\LogModule;
 use fkooman\VPN\Server\OpenVpn\OpenVpnModule;
@@ -49,6 +50,8 @@ try {
     $ipConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/ip.yaml')
     );
+
+    $serverPools = new Pools($ipConfig->v('pools'));
 
     $logConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/log.yaml')
@@ -80,11 +83,10 @@ try {
 
     // handles the connection to the various OpenVPN instances
     $serverManager = new ServerManager();
-    foreach ($config->v('openVpn') as $k => $v) {
-        $socket = sprintf('tcp://localhost:%d', $v['managementPort']);
+    foreach ($serverPools->getManagementSockets() as $name => $socket) {
         $serverManager->addServer(
             new ServerApi(
-                $k,
+                $name,
                 new ServerSocket($socket)
             )
         );
@@ -132,7 +134,7 @@ try {
     $service->addModule(new UserConfigModule($ipConfig->v('configDir').'/users', $logger, $io));
     $service->addModule(new CnConfigModule($ipConfig->v('configDir').'/common_names', $logger, $io));
     $service->addModule(new CaModule($crlFetcher, $logger));
-    $service->addModule(new InfoModule($ipConfig));
+    $service->addModule(new InfoModule($serverPools));
     $service->run()->send();
 } catch (Exception $e) {
     // internal server error

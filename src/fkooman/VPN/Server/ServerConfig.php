@@ -24,21 +24,14 @@ class ServerConfig
     public function get(array $serverConfig)
     {
         $requiredParameters = [
-            'cn',
-            'valid_from',
-            'valid_to',
             'dev',          // tun-udp, tun-tcp, tun0, tun1, ...
             'proto',        // udp6, tcp-server
             'port',         // 1194, 443, ...
             'v4_prefix',    // 10.42.42.0/24, ...
             'v6_prefix',
             'dns',
+            'management_ip',
             'management_port',  // 7505, 7506, ...
-            'ca',
-            'cert',
-            'key',
-            'dh',
-            'ta',
             'listen',
             '2fa',
             'routes',
@@ -72,17 +65,17 @@ class ServerConfig
         } else {
             // there are some routes specified, push those, and not the default 
             foreach ($serverConfig['routes'] as $r) {
-                if (false !== strpos($r, ':')) {
+                if (6 === $r->getFamily()) {
                     // IPv6
-                    $routeConfig[] = sprintf('push "route-ipv6 %s"', $r);
+                    $routeConfig[] = sprintf('push "route-ipv6 %s"', $r->getRange());
                 } else {
                     // IPv4
-                    $routeConfig[] = sprintf('push "route %s"', $r);
+                    $routeConfig[] = sprintf('push "route %s"', $r->getRange());
                 }
             }
         }
 
-        $v4 = new IPv4($serverConfig['v4_prefix']);
+        $v4 = $serverConfig['v4_prefix'];
 
         $dnsEntries = [];
         if (0 === count($serverConfig['routes'])) {
@@ -113,11 +106,14 @@ class ServerConfig
             $clientToClient[] = 'client-to-client';
         }
 
-        return [
-            sprintf('# OpenVPN Server Configuration for %s', $serverConfig['cn']),
+        // if proto is tcp-server, the service listens on managementIp to 
+        // be forwarded from sniproxy
+        if ('tcp-server' === $serverConfig['proto']) {
+            $serverConfig['listen'] = $serverConfig['management_ip'];
+        }
 
-            sprintf('# Valid From: %s', date('c', $serverConfig['valid_from'])),
-            sprintf('# Valid To: %s', date('c', $serverConfig['valid_to'])),
+        return [
+            '# OpenVPN Server Configuration',
 
             sprintf('dev %s', $serverConfig['dev']),
 
@@ -131,7 +127,7 @@ class ServerConfig
             sprintf('server %s %s', $v4->getNetwork(), $v4->getNetmask()),
 
             # IPv6
-            sprintf('server-ipv6 %s', $serverConfig['v6_prefix']),
+            sprintf('server-ipv6 %s', $serverConfig['v6_prefix']->getRange()),
 
             implode(PHP_EOL, $routeConfig),
 
@@ -190,20 +186,13 @@ class ServerConfig
             # also send a NTP server
             #push "dhcp-option NTP time.example.org"
 
-            # allow client-to-client communication, see openvpn(8)
-            #client-to-client
+            sprintf('management %s %d', $serverConfig['management_ip'], $serverConfig['management_port']),
 
-            # need to allow 7505 also with SELinux
-            sprintf('management localhost %d', $serverConfig['management_port']),
-
-            sprintf('<ca>%s</ca>', PHP_EOL.$serverConfig['ca'].PHP_EOL),
-            sprintf('<cert>%s</cert>', PHP_EOL.$serverConfig['cert'].PHP_EOL),
-            sprintf('<key>%s</key>', PHP_EOL.$serverConfig['key'].PHP_EOL),
-            sprintf('<dh>%s</dh>', PHP_EOL.$serverConfig['dh'].PHP_EOL),
-
-            'key-direction 0',
-
-            sprintf('<tls-auth>%s</tls-auth>', PHP_EOL.$serverConfig['ta'].PHP_EOL),
+            'ca /etc/openvpn/ca.crt',
+            'cert /etc/openvpn/server.crt',
+            'key /etc/openvpn/server.key',
+            'dh /etc/openvpn/dh.pem',
+            'tls-auth /etc/openvpn/ta.key 0',
         ];
     }
 }

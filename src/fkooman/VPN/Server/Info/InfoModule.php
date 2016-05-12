@@ -2,22 +2,22 @@
 
 namespace fkooman\VPN\Server\Info;
 
-use fkooman\Config\Reader;
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\JsonResponse;
 use fkooman\Http\Exception\ForbiddenException;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
+use fkooman\VPN\Server\Pools;
 
 class InfoModule implements ServiceModuleInterface
 {
-    /** @var \fkooman\Config\Reader */
-    private $configData;
+    /** @var \fkooman\VPN\Server\Pools */
+    private $pools;
 
-    public function __construct(Reader $config)
+    public function __construct(Pools $pools)
     {
-        $this->config = $config;
+        $this->pools = $pools;
     }
 
     public function init(Service $service)
@@ -34,16 +34,8 @@ class InfoModule implements ServiceModuleInterface
 
     private function getInfo()
     {
-        $responseData = [];
-        $responseData['range'] = $this->config->v('range');
-        $responseData['range6'] = $this->config->v('range6');
-        $responseData['dns'] = $this->config->v('dns');
-        $responseData['routes'] = $this->config->v('routes', false, []);
-        $responseData['tfa'] = $this->config->v('twoFactor', false, false);
-        $responseData['c2c'] = $this->config->v('clientToClient', false, false);
-
         $response = new JsonResponse();
-        $response->setBody($responseData);
+        $response->setBody(['items' => $this->pools->getInfo()]);
 
         return $response;
     }

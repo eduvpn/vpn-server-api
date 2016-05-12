@@ -52,6 +52,11 @@ class IPv6
         return 6;
     }
 
+    public function __toString()
+    {
+        return sprintf('%s/%d', $this->ip, $this->prefix);
+    }
+
     public function getRange()
     {
         return sprintf('%s/%d', $this->ip, $this->prefix);

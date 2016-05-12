@@ -18,13 +18,21 @@
  */
 require_once dirname(__DIR__).'/vendor/autoload.php';
 
-use fkooman\VPN\Server\ServerConfig;
+use fkooman\VPN\Server\Pools;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use GuzzleHttp\Client;
-use fkooman\VPN\Server\IPv4;
-use fkooman\VPN\Server\IPv6;
 use fkooman\VPN\Server\Utils;
+use fkooman\IO\IO;
+
+$dhFile = '/etc/openvpn/dh.pem';
+$caFile = '/etc/openvpn/ca.crt';
+$certFile = '/etc/openvpn/server.crt';
+$keyFile = '/etc/openvpn/server.key';
+$taFile = '/etc/openvpn/ta.key';
+
+# the size of the DH prime
+$dhLength = 3072;
 
 function showHelp(array $argv)
 {
@@ -36,8 +44,6 @@ function showHelp(array $argv)
 }
 
 try {
-    $dhLength = 3072;
-
     $reUse = false;
     $commonName = false;
 
@@ -54,24 +60,15 @@ try {
         throw new Exception('must specificy either CN or --reuse flag');
     }
 
-    $mainConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/config.yaml')
-    );
-
     $ipConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/ip.yaml')
     );
 
-    $openVpnConfig = $mainConfig->v('openVpn');
+    $mainConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/config.yaml')
+    );
 
-    if ($reUse) {
-        // open the first file to extract the data
-        $fileSuffix = array_keys($openVpnConfig)[0];
-        $configFile = sprintf('/etc/openvpn/server-%s.conf', $fileSuffix);
-        $configData = Utils::extractCertificates(file_get_contents($configFile));
-        // XXX fix this in vpn-ca-api to return tls-auth instead of ta
-        $configData['ta'] = $configData['tls-auth'];
-    } else {
+    if (!$reUse) {
         // get a new certificate, and also generate a new DH
         $client = new Client(
             [
@@ -100,73 +97,19 @@ try {
 
         $configData = $configData['certificate'];
 
-        $dhFile = tempnam(sys_get_temp_dir(), 'dh_');
+        IO::writeFile($caFile, $configData['ca']);
+        IO::writeFile($certFile, $configData['cert']);
+        IO::writeFile($keyFile, $configData['key']);
+        IO::writeFile($taFile, $configData['ta']);
+
         Utils::exec(sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength));
-
-        if (false === $dhContent = @file_get_contents($dhFile)) {
-            throw new Exception('unable to read DH file');
-        }
-
-        $configData['dh'] = trim($dhContent);
-        @unlink($dhFile); // we don't care if this fails
     }
 
-    $serverConfig = new ServerConfig();
-
-    $instanceCount = count($openVpnConfig);
-    $ip4 = new IPv4($ipConfig->v('range'));
-    $ip6 = new IPv6($ipConfig->v('range6'));
-
-    $ip4Ranges = $ip4->splitRange($instanceCount);
-    $ip6Ranges = $ip6->splitRange($instanceCount);
-
-    $dns = $ipConfig->v('dns');
-    $twoFactor = $ipConfig->v('twoFactor', false, false);
-    $clientToClient = $ipConfig->v('clientToClient', false, false);
-
-    $routes = $ipConfig->v('routes', false, []);
-
-    $i = 0;
-    foreach ($openVpnConfig as $k => $v) {
-        $ipConfig = [
-            'v4_prefix' => $ip4Ranges[$i],
-            'v6_prefix' => $ip6Ranges[$i],
-            'routes' => $routes,
-            'dns' => $dns,
-            '2fa' => $twoFactor,
-            'c2c' => $clientToClient,
-        ];
-
-        $instanceConfig = [];
-        $instanceConfig['dev'] = sprintf('tun-%s', $k);
-
-        // determine the listen address
-        if (!array_key_exists('listen', $v)) {
-            if ('udp' === $v['proto']) {
-                $instanceConfig['listen'] = '::';
-            } else {
-                // sniproxy + iOS + tcp6-server has issues, not sure what 
-                // exactly is going on, but it does not work. Fortunatly 
-                // sniproxy will take care of IPv6 and IPv4 TCP connections
-                $instanceConfig['listen'] = '0.0.0.0';
-            }
-        } else {
-            $instanceConfig['listen'] = $v['listen'];
+    $p = new Pools($ipConfig->v('pools'));
+    foreach ($p->getPools() as $pool) {
+        foreach ($pool->getServerConfig() as $name => $serverConfig) {
+            IO::writeFile(sprintf('/etc/openvpn/server-%s.conf', $name), implode(PHP_EOL, $serverConfig));
         }
-
-        // determine the proto, based on whether the listen address is v4 or v6
-        $is6 = false !== strpos($instanceConfig['listen'], ':');
-        if ('udp' === $v['proto']) {
-            $instanceConfig['proto'] = $is6 ? 'udp6' : 'udp';
-        } else {
-            $instanceConfig['proto'] = $is6 ? 'tcp6-server' : 'tcp-server';
-        }
-        $instanceConfig['port'] = $v['port'];
-        $instanceConfig['management_port'] = $v['managementPort'];
-        $vpnConfig = implode(PHP_EOL, $serverConfig->get(array_merge($instanceConfig, $ipConfig, $configData)));
-        file_put_contents(sprintf('/etc/openvpn/server-%s.conf', $k), $vpnConfig);
-
-        ++$i;
     }
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL;
