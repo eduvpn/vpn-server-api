@@ -43,6 +43,8 @@ function showHelp(array $argv)
     echo $helpText;
 }
 
+$io = new IO();
+
 try {
     $reUse = false;
     $commonName = false;
@@ -97,10 +99,10 @@ try {
 
         $configData = $configData['certificate'];
 
-        IO::writeFile($caFile, $configData['ca']);
-        IO::writeFile($certFile, $configData['cert']);
-        IO::writeFile($keyFile, $configData['key']);
-        IO::writeFile($taFile, $configData['ta']);
+        $io->writeFile($caFile, $configData['ca']);
+        $io->writeFile($certFile, $configData['cert']);
+        $io->writeFile($keyFile, $configData['key']);
+        $io->writeFile($taFile, $configData['ta']);
 
         Utils::exec(sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength));
     }
@@ -108,7 +110,7 @@ try {
     $p = new Pools($ipConfig->v('pools'));
     foreach ($p->getPools() as $pool) {
         foreach ($pool->getServerConfig() as $name => $serverConfig) {
-            IO::writeFile(sprintf('/etc/openvpn/server-%s.conf', $name), implode(PHP_EOL, $serverConfig));
+            $io->writeFile(sprintf('/etc/openvpn/server-%s.conf', $name), implode(PHP_EOL, $serverConfig));
         }
     }
 } catch (Exception $e) {
