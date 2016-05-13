@@ -79,7 +79,8 @@ try {
 
     foreach ($serverPools->getPools() as $serverPool) {
         $clientToClient = $serverPool->getClientToClient();
-        var_dump($clientToClient);
+        $f4->setDefaultGateway($serverPool->getDefaultGateway());
+        $f6->setDefaultGateway($serverPool->getDefaultGateway());
         $f4->clientToClient($clientToClient);
         $f6->clientToClient($clientToClient);
 

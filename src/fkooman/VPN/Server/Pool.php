@@ -12,6 +12,12 @@ class Pool
     /** @var string */
     private $poolName;
 
+    /** @var string */
+    private $hostName;
+
+    /** @var bool */
+    private $defaultGateway;
+
     /** @var IPv4 */
     private $range;
 
@@ -42,17 +48,32 @@ class Pool
     public function __construct($id, array $poolData)
     {
         $this->setId($id);
-        $this->setName($poolData['name']);
-        $this->setRange(new IPv4($poolData['range']));
-        $this->setRange6(new IPv6($poolData['range6']));
-        $this->setRoutes($poolData['routes']);
-        $this->setDns($poolData['dns']);
-        $this->setTwoFactor($poolData['twoFactor']);
-        $this->setClientToClient($poolData['clientToClient']);
+        $this->setName(Utils::validate($poolData, 'name'));
+        $this->setHostName(Utils::validate($poolData, 'hostName'));
+        $this->setDefaultGateway(Utils::validate($poolData, 'defaultGateway'));
+        $this->setRange(new IPv4(Utils::validate($poolData, 'range')));
+        $this->setRange6(new IPv6(Utils::validate($poolData, 'range6')));
+        $this->setRoutes(Utils::validate($poolData, 'routes', false, []));
+        $this->setDns(Utils::validate($poolData, 'dns', false, []));
+        $this->setTwoFactor(Utils::validate($poolData, 'twoFactor', false, false));
+        $this->setClientToClient(Utils::validate($poolData, 'clientToClient', false, false));
         $this->setManagementIp(sprintf('127.42.%d.1', $this->getId()));
-        $this->setListen($poolData['listen']);
+        $this->setListen(Utils::validate($poolData, 'listen'));
 
         $this->populateInstances();
+    }
+
+    public static function validate(array $configData, $configName, $requiredField = true, $defaultValue = false)
+    {
+        if (!array_key_exists($configName, $configData)) {
+            if ($requiredField) {
+                throw new RuntimeException(sprintf('missing configuration field "%s"', $configName));
+            }
+
+            return $defaultValue;
+        }
+
+        return $configData[$configName];
     }
 
     public function setId($id)
@@ -75,6 +96,27 @@ class Pool
     public function getName()
     {
         return $this->poolName;
+    }
+
+    public function setHostName($hostName)
+    {
+        // XXX validate
+        $this->hostName = $hostName;
+    }
+
+    public function getHostName()
+    {
+        return $this->hostName;
+    }
+
+    public function setDefaultGateway($defaultGateway)
+    {
+        $this->defaultGateway = (bool) $defaultGateway;
+    }
+
+    public function getDefaultGateway()
+    {
+        return $this->defaultGateway;
     }
 
     public function setRange(IPv4 $range)
@@ -245,25 +287,8 @@ class Pool
     public function getServerConfig()
     {
         $serverConfig = [];
-
         foreach ($this->getInstances() as $k => $instance) {
-            $s = new ServerConfig();
-            $serverConfig[sprintf('%s-%d', $this->getName(), $k)] = $s->get(
-                [
-                    'dev' => $instance->getDev(),
-                    'proto' => $instance->getProto(),
-                    'port' => $instance->getPort(),
-                    'v4_prefix' => $instance->getRange(),
-                    'v6_prefix' => $instance->getRange6(),
-                    'dns' => $this->getDns(),
-                    'management_ip' => $this->getManagementIp(),
-                    'management_port' => $instance->getManagementPort(),
-                    'listen' => $this->getListen(),
-                    '2fa' => $this->getTwoFactor(),
-                    'routes' => $this->getRoutes(),
-                    'c2c' => $this->getClientToClient(),
-                ]
-            );
+            $serverConfig[sprintf('%s-%d', $this->getName(), $k)] = ServerConfig::get($this, $instance);
         }
 
         return $serverConfig;

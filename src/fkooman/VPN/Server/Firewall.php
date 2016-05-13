@@ -26,6 +26,7 @@ class Firewall
     private $ranges;
     private $enableForward;
     private $clientToClient;
+    private $defaultGateway;
 
     public function __construct($ipVersion = 4, $externalIf = 'eth0', $useNat = true, $enableForward = true)
     {
@@ -36,6 +37,7 @@ class Firewall
         $this->ranges = [];
         $this->enableForward = $enableForward;
         $this->clientToClient = false;
+        $this->defaultGateway = false;
     }
 
     public function clientToClient($clientToClient)
@@ -104,16 +106,26 @@ class Firewall
         $this->inputPorts = $inputPorts;
     }
 
+    public function setDefaultGateway($defaultGateway)
+    {
+        $this->defaultGateway = (bool) $defaultGateway;
+    }
+
+    public function getDefaultGateway()
+    {
+        return $this->defaultGateway;
+    }
+
     public function addRange($poolName, $srcNet, $dstNets = [])
     {
         if ($this->clientToClient) {
             // allow communication between the various tun interfaces of a pool
-            $this->ranges[] = sprintf('-A FORWARD -i tun-%s+ -o tun-%s+ -j ACCEPT', $poolName, $poolName);
+            $this->ranges[] = sprintf('-A FORWARD -i tun-%s+ -s %s -d %s -o tun-%s+ -j ACCEPT', $poolName, $srcNet, $srcNet, $poolName);
         }
 
         $this->ranges[] = sprintf('-N vpn-%s', $poolName);
         $this->ranges[] = sprintf('-A FORWARD -i tun-%s+ -s %s -o %s -j vpn-%s', $poolName, $srcNet, $this->externalIf, $poolName);
-        if (0 === count($dstNets)) {
+        if ($this->getDefaultGateway()) {
             $this->ranges[] = sprintf('-A vpn-%s -j ACCEPT', $poolName, $srcNet);
         } else {
             foreach ($dstNets as $dstNet) {

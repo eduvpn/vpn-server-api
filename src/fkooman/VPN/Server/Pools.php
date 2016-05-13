@@ -56,6 +56,8 @@ class Pools
                 'name' => $pool->getName(),
                 'range' => $pool->getRange()->getRange(),
                 'range6' => $pool->getRange6()->getRange(),
+                'defaultGateway' => $pool->getDefaultGateway(),
+                'hostName' => $pool->getHostName(),
                 'dns' => $pool->getDns(),
                 'routes' => $routesArray,
                 'twoFactor' => $pool->getTwoFactor(),

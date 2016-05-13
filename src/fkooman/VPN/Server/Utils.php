@@ -36,30 +36,17 @@ class Utils
         }
     }
 
-    /**
-     * @param string $configData the current OpenVPN configuration file with
-     *                           keys and certificates
-     *
-     * @return array the extracted keys and certificates
-     */
-    public static function extractCertificates($configData)
+    public static function validate(array $configData, $configName, $requiredField = true, $defaultValue = false)
     {
-        $serverConfig = [];
-
-        foreach (array('cert', 'ca', 'key', 'tls-auth', 'dh') as $inlineType) {
-            $pattern = sprintf('/\<%s\>(.*)\<\/%s\>/msU', $inlineType, $inlineType);
-            if (1 !== preg_match($pattern, $configData, $matches)) {
-                throw new DomainException('inline type not found');
+        if (!array_key_exists($configName, $configData)) {
+            if ($requiredField) {
+                throw new RuntimeException(sprintf('missing configuration field "%s"', $configName));
             }
-            $serverConfig[$inlineType] = trim($matches[1]);
+
+            return $defaultValue;
         }
 
-        $parsedCert = openssl_x509_parse($serverConfig['cert']);
-        $serverConfig['valid_from'] = $parsedCert['validFrom_time_t'];
-        $serverConfig['valid_to'] = $parsedCert['validTo_time_t'];
-        $serverConfig['cn'] = $parsedCert['subject']['CN'];
-
-        return $serverConfig;
+        return $configData[$configName];
     }
 
     public static function requireScope(TokenInfo $tokenInfo, array $requiredScope)
