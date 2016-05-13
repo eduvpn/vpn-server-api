@@ -286,7 +286,7 @@ class Pool
         $protoPort = [];
         foreach ($this->getInstances() as $k => $instance) {
             // for TCP connections we only want the client to connect to tcp/443
-            if('tcp-server' === $instance->getProto()) {
+            if ('tcp-server' === $instance->getProto()) {
                 $proto = 'tcp';
                 $port = 443;
             } else {
