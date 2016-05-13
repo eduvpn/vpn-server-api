@@ -63,19 +63,6 @@ class Pool
         $this->populateInstances();
     }
 
-    public static function validate(array $configData, $configName, $requiredField = true, $defaultValue = false)
-    {
-        if (!array_key_exists($configName, $configData)) {
-            if ($requiredField) {
-                throw new RuntimeException(sprintf('missing configuration field "%s"', $configName));
-            }
-
-            return $defaultValue;
-        }
-
-        return $configData[$configName];
-    }
-
     public function setId($id)
     {
         // XXX validate
@@ -292,5 +279,24 @@ class Pool
         }
 
         return $serverConfig;
+    }
+
+    public function getConnectInfo()
+    {
+        $protoPort = [];
+        foreach ($this->getInstances() as $k => $instance) {
+            // for TCP connections we only want the client to connect to tcp/443
+            if('tcp-server' === $instance->getProto()) {
+                $proto = 'tcp';
+                $port = 443;
+            } else {
+                $proto = 'udp';
+                $port = $instance->getPort();
+            }
+
+            $protoPort[] = ['host' => $this->getHostName(), 'proto' => $proto, 'port' => $port];
+        }
+
+        return $protoPort;
     }
 }
