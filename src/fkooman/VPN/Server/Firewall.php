@@ -118,18 +118,19 @@ class Firewall
 
     public function addRange($poolName, $srcNet, $dstNets = [])
     {
+        $this->ranges[] = sprintf('-N vpn-%s', $poolName);
+        $this->ranges[] = sprintf('-A FORWARD -i tun-%s+ -s %s -j vpn-%s', $poolName, $srcNet, $poolName);
+
         if ($this->clientToClient) {
             // allow communication between the various tun interfaces of a pool
-            $this->ranges[] = sprintf('-A FORWARD -i tun-%s+ -s %s -d %s -o tun-%s+ -j ACCEPT', $poolName, $srcNet, $srcNet, $poolName);
+            $this->ranges[] = sprintf('-A vpn-%s -o tun-%s+ -d %s -j ACCEPT', $poolName, $poolName, $srcNet);
         }
 
-        $this->ranges[] = sprintf('-N vpn-%s', $poolName);
-        $this->ranges[] = sprintf('-A FORWARD -i tun-%s+ -s %s -o %s -j vpn-%s', $poolName, $srcNet, $this->externalIf, $poolName);
         if ($this->getDefaultGateway()) {
-            $this->ranges[] = sprintf('-A vpn-%s -j ACCEPT', $poolName, $srcNet);
+            $this->ranges[] = sprintf('-A vpn-%s -o %s -j ACCEPT', $poolName, $this->externalIf, $srcNet);
         } else {
             foreach ($dstNets as $dstNet) {
-                $this->ranges[] = sprintf('-A vpn-%s -d %s -j ACCEPT', $poolName, $dstNet);
+                $this->ranges[] = sprintf('-A vpn-%s -o %s -d %s -j ACCEPT', $poolName, $this->externalIf, $dstNet);
             }
         }
     }

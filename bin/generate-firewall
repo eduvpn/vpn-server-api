@@ -78,11 +78,10 @@ try {
     $f6->addInputPorts($inputPorts);
 
     foreach ($serverPools->getPools() as $serverPool) {
-        $clientToClient = $serverPool->getClientToClient();
         $f4->setDefaultGateway($serverPool->getDefaultGateway());
         $f6->setDefaultGateway($serverPool->getDefaultGateway());
-        $f4->clientToClient($clientToClient);
-        $f6->clientToClient($clientToClient);
+        $f4->clientToClient($serverPool->getClientToClient());
+        $f6->clientToClient($serverPool->getClientToClient());
 
         // get the ranges
         $range = $serverPool->getRange()->getRange();
