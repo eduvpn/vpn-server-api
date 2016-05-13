@@ -61,11 +61,6 @@ class ServerConfig
         $tfaEntries = [];
         if ($pool->getTwoFactor()) {
             $tfaEntries[] = 'auth-user-pass-verify /usr/bin/vpn-server-api-verify-otp via-env';
-
-            # increase the renegotiation time to 8h from the default of 1h when
-            # using 2FA, otherwise the user will be asked for the 2FA key every
-            # hour
-            $tfaEntries[] = 'reneg-sec 28800';
         }
 
         $tcpOptions = [];
@@ -141,6 +136,11 @@ class ServerConfig
             sprintf('script-security %d', $pool->getTwoFactor() ? 3 : 2),
             'client-connect /usr/bin/vpn-server-api-client-connect',
             'client-disconnect /usr/bin/vpn-server-api-client-disconnect',
+
+            # increase the renegotiation time to 8h from the default of 1h when
+            # using 2FA, otherwise the user will be asked for the 2FA key every
+            # hour
+            sprintf('reneg-sec %d', $pool->getTwoFactor() ? 28800 : 3600),
 
             # 2FA
             implode(PHP_EOL, $tfaEntries),
