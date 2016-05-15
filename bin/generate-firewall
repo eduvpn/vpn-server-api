@@ -84,8 +84,8 @@ try {
         $f6->clientToClient($serverPool->getClientToClient());
 
         // get the ranges
-        $range = $serverPool->getRange()->getRange();
-        $range6 = $serverPool->getRange6()->getRange();
+        $range = $serverPool->getRange();
+        $range6 = $serverPool->getRange6();
 
         $routes = $serverPool->getRoutes();
         $ip4Routes = [];
@@ -93,9 +93,9 @@ try {
 
         foreach ($routes as $r) {
             if (6 === $r->getFamily()) {
-                $ip6Routes[] = $r->getRange();
+                $ip6Routes[] = $r;
             } else {
-                $ip4Routes[] = $r->getRange();
+                $ip4Routes[] = $r;
             }
         }
 

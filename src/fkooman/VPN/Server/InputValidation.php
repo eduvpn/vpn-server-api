@@ -74,4 +74,11 @@ class InputValidation
             throw new BadRequestException('invalid OTP secret format');
         }
     }
+
+    public static function ipAddress($ipAddress)
+    {
+        if (false === filter_var($ipAddress, FILTER_VALIDATE_IP)) {
+            throw new BadRequestException('invalid IP address');
+        }
+    }
 }

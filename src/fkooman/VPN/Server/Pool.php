@@ -18,10 +18,10 @@ class Pool
     /** @var bool */
     private $defaultGateway;
 
-    /** @var IPv4 */
+    /** @var IP */
     private $range;
 
-    /** @var IPv6 */
+    /** @var IP */
     private $range6;
 
     /** @var array */
@@ -51,14 +51,14 @@ class Pool
         $this->setName(Utils::validate($poolData, 'name'));
         $this->setHostName(Utils::validate($poolData, 'hostName'));
         $this->setDefaultGateway(Utils::validate($poolData, 'defaultGateway'));
-        $this->setRange(new IPv4(Utils::validate($poolData, 'range')));
-        $this->setRange6(new IPv6(Utils::validate($poolData, 'range6')));
+        $this->setRange(new IP(Utils::validate($poolData, 'range')));
+        $this->setRange6(new IP(Utils::validate($poolData, 'range6')));
         $this->setRoutes(Utils::validate($poolData, 'routes', false, []));
         $this->setDns(Utils::validate($poolData, 'dns', false, []));
         $this->setTwoFactor(Utils::validate($poolData, 'twoFactor', false, false));
         $this->setClientToClient(Utils::validate($poolData, 'clientToClient', false, false));
-        $this->setManagementIp(sprintf('127.42.%d.1', $this->getId()));
-        $this->setListen(Utils::validate($poolData, 'listen'));
+        $this->setManagementIp(new IP(sprintf('127.42.%d.1', $this->getId())));
+        $this->setListen(new IP(Utils::validate($poolData, 'listen')));
 
         $this->populateInstances();
     }
@@ -106,7 +106,7 @@ class Pool
         return $this->defaultGateway;
     }
 
-    public function setRange(IPv4 $range)
+    public function setRange(IP $range)
     {
         $this->range = $range;
     }
@@ -116,7 +116,7 @@ class Pool
         return $this->range;
     }
 
-    public function setRange6(IPv6 $range6)
+    public function setRange6(IP $range6)
     {
         $this->range6 = $range6;
     }
@@ -131,13 +131,7 @@ class Pool
         $this->routes = [];
 
         foreach ($routes as $route) {
-            if (false !== strpos($route, ':')) {
-                // IPv6
-                $this->routes[] = new IPv6($route);
-            } else {
-                // IPv4
-                $this->routes[] = new IPv4($route);
-            }
+            $this->routes[] = new IP($route);
         }
     }
 
@@ -148,8 +142,11 @@ class Pool
 
     public function setDns(array $dns)
     {
-        // XXX validate
-        $this->dns = $dns;
+        $this->dns = [];
+
+        foreach ($dns as $server) {
+            $this->dns[] = new IP($server);
+        }
     }
 
     public function getDns()
@@ -177,9 +174,8 @@ class Pool
         return $this->clientToClient;
     }
 
-    public function setManagementIp($managementIp)
+    public function setManagementIp(IP $managementIp)
     {
-        // XXX validate, must be valid IPv4 or IPv6 address
         $this->managementIp = $managementIp;
     }
 
@@ -188,9 +184,8 @@ class Pool
         return $this->managementIp;
     }
 
-    public function setListen($listen)
+    public function setListen(IP $listen)
     {
-        // XXX validate, must be valid IPv4 or IPv6 address
         $this->listen = $listen;
     }
 
@@ -207,8 +202,8 @@ class Pool
     private function populateInstances()
     {
         $instanceCount = self::getNetCount($this->getRange()->getPrefix());
-        $splitRange = $this->getRange()->splitRange($instanceCount);
-        $splitRange6 = $this->getRange6()->splitRange($instanceCount);
+        $splitRange = $this->getRange()->split($instanceCount);
+        $splitRange6 = $this->getRange6()->split($instanceCount);
 
         $is6 = false !== strpos($this->getListen(), ':');
 
@@ -235,8 +230,8 @@ class Pool
 
             $this->instances[] = new Instance(
                 [
-                    'range' => new IPv4($splitRange[$i]),
-                    'range6' => new IPv6($splitRange6[$i]),
+                    'range' => $splitRange[$i],
+                    'range6' => $splitRange6[$i],
                     'dev' => sprintf('tun-%s-%d', $this->getName(), $i),
                     'proto' => $proto,
                     'port' => $port,
@@ -300,5 +295,12 @@ class Pool
         }
 
         return $protoPort;
+    }
+
+    private static function validateIpAddress($ipAddress)
+    {
+        if (false === filter_var($ipAddress, FILTER_VALIDATE_IP)) {
+            throw new BadRequestException('invalid IP address');
+        }
     }
 }

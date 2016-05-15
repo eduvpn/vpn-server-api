@@ -4,10 +4,10 @@ namespace fkooman\VPN\Server;
 
 class Instance
 {
-    /** @var IPv4 */
+    /** @var IP */
     private $range;
 
-    /** @var IPv6 */
+    /** @var IP */
     private $range6;
 
     /** @var string */
@@ -32,7 +32,7 @@ class Instance
         $this->setPort($instanceData['port']);
     }
 
-    public function setRange(IPv4 $range)
+    public function setRange(IP $range)
     {
         $this->range = $range;
     }
@@ -42,7 +42,7 @@ class Instance
         return $this->range;
     }
 
-    public function setRange6(IPv6 $range6)
+    public function setRange6(IP $range6)
     {
         $this->range6 = $range6;
     }

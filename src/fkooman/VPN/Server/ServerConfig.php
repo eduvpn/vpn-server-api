@@ -42,10 +42,10 @@ class ServerConfig
             foreach ($pool->getRoutes() as $route) {
                 if (6 === $route->getFamily()) {
                     // IPv6
-                    $routeConfig[] = sprintf('push "route-ipv6 %s"', $route->getRange());
+                    $routeConfig[] = sprintf('push "route-ipv6 %s"', $route);
                 } else {
                     // IPv4
-                    $routeConfig[] = sprintf('push "route %s"', $route->getRange());
+                    $routeConfig[] = sprintf('push "route %s"', $route);
                 }
             }
         }
@@ -54,7 +54,7 @@ class ServerConfig
         if ($pool->getDefaultGateway()) {
             // only push DNS when we are the default route
             foreach ($pool->getDns() as $dnsAddress) {
-                $dnsEntries[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress);
+                $dnsEntries[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress->getAddress());
             }
         }
 
@@ -86,7 +86,7 @@ class ServerConfig
 
             sprintf('dev %s', $instance->getDev()),
 
-            sprintf('local %s', $listen),
+            sprintf('local %s', $listen->getAddress()),
 
             # UDP6 (works also for UDP)
             sprintf('proto %s', $instance->getProto()),
@@ -96,7 +96,7 @@ class ServerConfig
             sprintf('server %s %s', $instance->getRange()->getNetwork(), $instance->getRange()->getNetmask()),
 
             # IPv6
-            sprintf('server-ipv6 %s', $instance->getRange6()->getRange()),
+            sprintf('server-ipv6 %s', $instance->getRange6()),
 
             implode(PHP_EOL, $routeConfig),
 
@@ -160,7 +160,7 @@ class ServerConfig
             # also send a NTP server
             #push "dhcp-option NTP time.example.org"
 
-            sprintf('management %s %d', $pool->getManagementIp(), $instance->getManagementPort()),
+            sprintf('management %s %d', $pool->getManagementIp()->getAddress(), $instance->getManagementPort()),
 
             'ca /etc/openvpn/ca.crt',
             'cert /etc/openvpn/server.crt',
