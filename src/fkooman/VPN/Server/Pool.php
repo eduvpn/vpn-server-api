@@ -210,17 +210,19 @@ class Pool
         $splitRange = $this->getRange()->splitRange($instanceCount);
         $splitRange6 = $this->getRange6()->splitRange($instanceCount);
 
+        $is6 = false !== strpos($this->getListen(), ':');
+
         for ($i = 0; $i < $instanceCount; ++$i) {
             // protocol is udp6 unless it is the last instance when there is
             // not just one instance
             if (1 === $instanceCount) {
-                $proto = 'udp6';
+                $proto = $is6 ? 'udp6' : 'udp';
             } elseif ($i === $instanceCount - 1) {
                 // the TCP instance always listens on IPv4 to work around iOS
                 // issue together with sniproxy
                 $proto = 'tcp-server';
             } else {
-                $proto = 'udp6';
+                $proto = $is6 ? 'udp6' : 'udp';
             }
 
             if ($proto === 'tcp-server') {
