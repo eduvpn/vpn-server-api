@@ -23,7 +23,7 @@ class InfoModule implements ServiceModuleInterface
     public function init(Service $service)
     {
         $service->get(
-            '/info/net',
+            '/info/server',
             function (Request $request, TokenInfo $tokenInfo) {
                 self::requireScope($tokenInfo, ['admin', 'portal']);
 
