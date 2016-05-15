@@ -155,7 +155,6 @@ class IPTest extends PHPUnit_Framework_TestCase
 #        IPv6::validateIP('ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff');
 #    }
 
-
 #    public function testValidateIP()
 #    {
 #        IPv4::validateIP('127.0.0.1');
