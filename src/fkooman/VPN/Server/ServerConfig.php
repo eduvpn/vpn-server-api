@@ -50,8 +50,9 @@ class ServerConfig
             }
         }
 
-        # we also push the IPv6 range of the pool if clientToClient is enabled
+        # we always push pool range if clientToClient is enabled
         if ($pool->getClientToClient()) {
+            $routeConfig[] = sprintf('push "route %s"', $pool->getRange()->getAddressPrefix());
             $routeConfig[] = sprintf('push "route-ipv6 %s"', $pool->getRange6()->getAddressPrefix());
         }
 
