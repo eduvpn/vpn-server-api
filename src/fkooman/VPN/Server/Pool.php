@@ -58,7 +58,7 @@ class Pool
         $this->setTwoFactor(Utils::validate($poolData, 'twoFactor', false, false));
         $this->setClientToClient(Utils::validate($poolData, 'clientToClient', false, false));
         $this->setManagementIp(new IP(sprintf('127.42.%d.1', $this->getId())));
-        $this->setListen(new IP(Utils::validate($poolData, 'listen')));
+        $this->setListen(new IP(Utils::validate($poolData, 'listen', false, '::')));
 
         $this->populateInstances();
     }
