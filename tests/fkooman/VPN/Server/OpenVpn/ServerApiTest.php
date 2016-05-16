@@ -27,71 +27,30 @@ class ServerApiTest extends PHPUnit_Framework_TestCase
 {
     public function testUnableToConnect()
     {
-        $socket = new TestSocket(self::readFile('openvpn_23_version.txt'), true);
-        $api = new ServerApi('one', $socket);
-        $this->assertSame(
-            array(
-                'id' => 'one',
-                'ok' => false,
-            ),
-            $api->version()
-        );
-    }
-
-    public function testVersion()
-    {
-        $socket = new TestSocket(self::readFile('openvpn_23_version.txt'));
-        $api = new ServerApi('one', $socket);
-        $this->assertSame(
-            array(
-                'id' => 'one',
-                'ok' => true,
-                'version' => 'OpenVPN 2.3.8 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Aug  4 2015',
-            ),
-            $api->version()
-        );
-    }
-
-    public function testLoadStats()
-    {
-        $socket = new TestSocket(self::readFile('openvpn_23_load_stats.txt'));
-        $api = new ServerApi('one', $socket);
-        $this->assertSame(
-            array(
-                'id' => 'one',
-                'ok' => true,
-                'load-stats' => array(
-                    'number_of_clients' => 0,
-                    'bytes_in' => 2224463,
-                    'bytes_out' => 6102370,
-                ),
-            ),
-            $api->loadStats()
+        $socket = new TestSocket(self::readFile('openvpn_23_status_one_client.txt'), true);
+        $api = new ServerApi($socket);
+        $this->assertFalse(
+            $api->status()
         );
     }
 
     public function testStatus()
     {
         $socket = new TestSocket(self::readFile('openvpn_23_status_one_client.txt'));
-        $api = new ServerApi('one', $socket);
+        $api = new ServerApi($socket);
         $this->assertSame(
             array(
-                'id' => 'one',
-                'ok' => true,
-                'status' => array(
-                    array(
-                        'common_name' => 'fkooman_samsung_i9300',
-                        'real_address' => '91.64.87.183:43103',
-                        'bytes_in' => 18301,
-                        'bytes_out' => 30009,
-                        'connected_since' => 1451323167,
-                        'virtual_address' => array(
-                            'fd00:4242:4242::1003',
-                            '10.42.42.5',
-                        ),
+                array(
+                    'common_name' => 'fkooman_samsung_i9300',
+                    'real_address' => '91.64.87.183:43103',
+                    'bytes_in' => 18301,
+                    'bytes_out' => 30009,
+                    'connected_since' => 1451323167,
+                    'virtual_address' => array(
+                        'fd00:4242:4242::1003',
+                        '10.42.42.5',
                     ),
                 ),
-
             ),
             $api->status()
         );
@@ -100,13 +59,8 @@ class ServerApiTest extends PHPUnit_Framework_TestCase
     public function testKillSuccess()
     {
         $socket = new TestSocket(self::readFile('openvpn_23_kill_success.txt'));
-        $api = new ServerApi('one', $socket);
-        $this->assertSame(
-            array(
-                'id' => 'one',
-                'ok' => true,
-                'kill' => true,
-            ),
+        $api = new ServerApi($socket);
+        $this->assertTrue(
             $api->kill('dummy')
         );
     }
@@ -114,13 +68,8 @@ class ServerApiTest extends PHPUnit_Framework_TestCase
     public function testKillError()
     {
         $socket = new TestSocket(self::readFile('openvpn_23_kill_error.txt'));
-        $api = new ServerApi('one', $socket);
-        $this->assertSame(
-            array(
-                'id' => 'one',
-                'ok' => true,
-                'kill' => false,
-            ),
+        $api = new ServerApi($socket);
+        $this->assertFalse(
             $api->kill('dummy')
         );
     }

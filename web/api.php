@@ -33,9 +33,7 @@ use fkooman\VPN\Server\Pools;
 use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Log\LogModule;
 use fkooman\VPN\Server\OpenVpn\OpenVpnModule;
-use fkooman\VPN\Server\OpenVpn\ServerApi;
 use fkooman\VPN\Server\OpenVpn\ServerManager;
-use fkooman\VPN\Server\OpenVpn\ServerSocket;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
@@ -82,15 +80,7 @@ try {
     );
 
     // handles the connection to the various OpenVPN instances
-    $serverManager = new ServerManager();
-    foreach ($serverPools->getManagementSockets() as $name => $socket) {
-        $serverManager->addServer(
-            new ServerApi(
-                $name,
-                new ServerSocket($socket)
-            )
-        );
-    }
+    $serverManager = new ServerManager($serverPools);
 
     // handles the connection history log
     try {

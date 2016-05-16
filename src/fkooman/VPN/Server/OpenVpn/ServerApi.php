@@ -25,21 +25,12 @@ use fkooman\VPN\Server\OpenVpn\Exception\ServerSocketException;
  */
 class ServerApi
 {
-    /** @var string */
-    private $id;
-
     /** @var ServerSocketInterface */
     private $serverSocket;
 
-    public function __construct($id, ServerSocketInterface $serverSocket)
+    public function __construct(ServerSocketInterface $serverSocket)
     {
-        $this->id = $id;
         $this->serverSocket = $serverSocket;
-    }
-
-    public function getId()
-    {
-        return $this->id;
     }
 
     /**
@@ -54,63 +45,9 @@ class ServerApi
             $response = $this->serverSocket->command('status 2');
             $this->serverSocket->close();
 
-            return $this->ok('status', StatusParser::parse($response));
+            return StatusParser::parse($response);
         } catch (ServerSocketException $e) {
-            return $this->error();
-        }
-    }
-
-    /**
-     * Obtain OpenVPN version information.
-     * 
-     * @return string the OpenVPN version string
-     */
-    public function version()
-    {
-        try {
-            $this->serverSocket->open();
-            $response = $this->serverSocket->command('version');
-            $this->serverSocket->close();
-
-            return $this->ok(
-                'version',
-                substr($response[0], strlen('OpenVPN Version: '))
-            );
-        } catch (ServerSocketException $e) {
-            return $this->error();
-        }
-    }
-
-    /**
-     * Obtain the current load statistics from OpenVPN.
-     * 
-     * @return array load statistics
-     */
-    public function loadStats()
-    {
-        try {
-            $keyMapping = array(
-                'nclients' => 'number_of_clients',
-                'bytesin' => 'bytes_in',
-                'bytesout' => 'bytes_out',
-            );
-
-            $this->serverSocket->open();
-            $response = $this->serverSocket->command('load-stats');
-            $this->serverSocket->close();
-
-            $statArray = explode(',', substr($response[0], strlen('SUCCESS: ')));
-            $loadStats = array();
-            foreach ($statArray as $statItem) {
-                list($key, $value) = explode('=', $statItem);
-                if (array_key_exists($key, $keyMapping)) {
-                    $loadStats[$keyMapping[$key]] = intval($value);
-                }
-            }
-
-            return $this->ok('load-stats', $loadStats);
-        } catch (ServerSocketException $e) {
-            return $this->error();
+            return false;
         }
     }
 
@@ -126,26 +63,9 @@ class ServerApi
             $response = $this->serverSocket->command(sprintf('kill %s', $commonName));
             $this->serverSocket->close();
 
-            return $this->ok('kill', 0 === strpos($response[0], 'SUCCESS: '));
+            return 0 === strpos($response[0], 'SUCCESS: ');
         } catch (ServerSocketException $e) {
-            return $this->error();
+            return false;
         }
-    }
-
-    private function ok($command, $response)
-    {
-        return array(
-            'id' => $this->getId(),
-            'ok' => true,
-            $command => $response,
-        );
-    }
-
-    private function error()
-    {
-        return array(
-            'id' => $this->getId(),
-            'ok' => false,
-        );
     }
 }

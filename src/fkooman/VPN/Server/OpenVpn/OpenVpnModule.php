@@ -54,30 +54,6 @@ class OpenVpnModule implements ServiceModuleInterface
             }
         );
 
-        $service->get(
-            '/openvpn/load-stats',
-            function (Request $request, TokenInfo $tokenInfo) {
-                self::requireScope($tokenInfo, ['admin']);
-
-                $response = new JsonResponse();
-                $response->setBody($this->serverManager->loadStats());
-
-                return $response;
-            }
-        );
-
-        $service->get(
-            '/openvpn/version',
-            function (Request $request, TokenInfo $tokenInfo) {
-                self::requireScope($tokenInfo, ['admin']);
-
-                $response = new JsonResponse();
-                $response->setBody($this->serverManager->version());
-
-                return $response;
-            }
-        );
-
         $service->post(
             '/openvpn/kill',
             function (Request $request, TokenInfo $tokenInfo) {

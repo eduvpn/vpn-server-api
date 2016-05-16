@@ -17,6 +17,8 @@
 
 namespace fkooman\VPN\Server\OpenVpn;
 
+use fkooman\VPN\Server\Pools;
+
 /**
  * Manage all OpenVPN servers controlled by this service using each instance's
  * ServerApi.
@@ -24,26 +26,11 @@ namespace fkooman\VPN\Server\OpenVpn;
 class ServerManager
 {
     /** @var array */
-    private $servers;
+    private $pools;
 
-    public function __construct()
+    public function __construct(Pools $pools)
     {
-        $this->servers = array();
-    }
-
-    public function addServer(ServerApi $serverApi)
-    {
-        $this->servers[] = $serverApi;
-    }
-
-    public function version()
-    {
-        $serverVersions = array();
-        foreach ($this->servers as $server) {
-            $serverVersions[] = $server->version();
-        }
-
-        return array('items' => $serverVersions);
+        $this->pools = $pools;
     }
 
     /**
@@ -53,27 +40,21 @@ class ServerManager
      */
     public function status()
     {
-        $serverConnections = array();
-        foreach ($this->servers as $server) {
-            $serverConnections[] = $server->status();
+        $serverStatus = [];
+        foreach ($this->pools->getPools() as $pool) {
+            $poolInstances = [];
+            foreach ($pool->getInstances() as $instance) {
+                $socket = sprintf('tcp://%s:%d', $pool->getManagementIp()->getAddress(), $instance->getManagementPort());
+                $serverSocket = new ServerSocket($socket);
+                $serverApi = new ServerApi($serverSocket);
+                if (false !== $status = $serverApi->status()) {
+                    $poolInstances[] = $status;
+                }
+            }
+            $serverStatus[] = ['name' => $pool->getName(), 'status' => $poolInstances];
         }
 
-        return array('items' => $serverConnections);
-    }
-
-    /**
-     * Get server information.
-     *
-     * @return array per server status information
-     */
-    public function loadStats()
-    {
-        $loadStats = array();
-        foreach ($this->servers as $server) {
-            $loadStats[] = $server->loadStats();
-        }
-
-        return array('items' => $loadStats);
+        return array('items' => $serverStatus);
     }
 
     /**

@@ -32,11 +32,14 @@ class Pools
         $managementSockets = [];
 
         foreach ($this->pools as $pool) {
-            $i = 0;
+            $sockets = [];
             foreach ($pool->getInstances() as $instance) {
-                $managementSockets[sprintf('%s-%d', $pool->getName(), $i)] = sprintf('tcp://%s:%d', $pool->getManagementIp()->getAddress(), $instance->getManagementPort());
-                ++$i;
+                $sockets[] = sprintf('tcp://%s:%d', $pool->getManagementIp()->getAddress(), $instance->getManagementPort());
             }
+            $managementSockets[] = [
+                'name' => $pool->getName(),
+                'sockets' => $sockets,
+            ];
         }
 
         return $managementSockets;
