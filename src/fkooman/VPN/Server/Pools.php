@@ -47,11 +47,11 @@ class Pools
         $poolInfo = [];
         foreach ($this->pools as $pool) {
             $routeList = [];
-            foreach($pool->getRoutes() as $route) {
+            foreach ($pool->getRoutes() as $route) {
                 $routeList[] = $route->getAddressPrefix();
             }
             $dnsList = [];
-            foreach($pool->getDns() as $dns) {
+            foreach ($pool->getDns() as $dns) {
                 $dnsList[] = $dns->getAddress();
             }
 
