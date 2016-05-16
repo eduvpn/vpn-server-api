@@ -10,7 +10,7 @@ configDir: /var/lib/vpn-server-api/config
 
 firewall:
     # allow connections to these ports on the VPN server itself
-    dst_port: [UDP/1194, UDP/1195, UDP/1196, TCP/22, TCP/80, TCP/443]
+    dst_port: [udp/1194, udp/1195, udp/1196, tcp/22, tcp/80, tcp/443]
 
 # The VPN server pools
 pools:
@@ -23,16 +23,17 @@ pools:
 
         # IPv4 range for clients
         range: 10.42.42.0/24
+
         # IPv6 range for clients
         range6: 'fd00:4242:4242::/48'
 
         # use VPN as default gateway
         defaultGateway: true
 
-        # Routes pushed to the clients, ignored when using defaultGateway
+        # Routes pushed to the clients, ignored when defaultGateway is true
         #routes: [10.10.0.0/16, 192.168.1.0/24, 'fd00:1234:5678:9999::/64']
 
-        # DNS servers to push to clients, only when using defaultGateway
+        # DNS servers to push to clients, only when defaultGateway is true
         # https://developers.google.com/speed/public-dns/
         dns: [8.8.8.8, 8.8.4.4, '2001:4860:4860::8888', '2001:4860:4860::8844']
         # https://dns.watch/index
