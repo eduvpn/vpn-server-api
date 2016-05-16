@@ -49,7 +49,7 @@ class ServerManager
                 $serverApi = new ServerApi($serverSocket);
                 $status = $serverApi->status();
                 if(false !== $status && 0 !== count($status)) {
-                    $poolInstances[] = $status;
+                    $poolInstances = array_merge($poolInstances, $status);
                 }
             }
             $serverStatus[] = ['name' => $pool->getName(), 'connections' => $poolInstances];
