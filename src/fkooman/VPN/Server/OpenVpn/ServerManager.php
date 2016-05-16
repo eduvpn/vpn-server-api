@@ -47,7 +47,8 @@ class ServerManager
                 $socket = sprintf('tcp://%s:%d', $pool->getManagementIp()->getAddress(), $instance->getManagementPort());
                 $serverSocket = new ServerSocket($socket);
                 $serverApi = new ServerApi($serverSocket);
-                if (false !== $status = $serverApi->status()) {
+                $status = $serverApi->status();
+                if(false !== $status && 0 !== count($status)) {
                     $poolInstances[] = $status;
                 }
             }
