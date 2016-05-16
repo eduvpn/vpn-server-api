@@ -43,7 +43,7 @@ class IP
 
         // validate the IP address
         if (false === filter_var($ipAddress, FILTER_VALIDATE_IP)) {
-            throw new IPException(sprintf('"%s" is an invalid IP address', $ipAddress));
+            throw new IPException('invalid IP address');
         }
 
         $is6 = false !== strpos($ipAddress, ':');
@@ -81,13 +81,18 @@ class IP
         return $this->ipPrefix;
     }
 
+    public function getAddressPrefix()
+    {
+        return sprintf('%s/%d', $this->getAddress(), $this->getPrefix());
+    }
+
     public function getFamily()
     {
         return $this->ipFamily;
     }
 
     /**
-     * IPv4.
+     * IPv4 only.
      */
     public function getNetmask()
     {
@@ -99,7 +104,7 @@ class IP
     }
 
     /**
-     * IPv4.
+     * IPv4 only.
      */
     public function getNetwork()
     {
@@ -111,7 +116,7 @@ class IP
     }
 
     /**
-     * IPv4.
+     * IPv4 only.
      */
     public function getNumberOfHosts()
     {
@@ -141,6 +146,14 @@ class IP
 
     private function split4($networkCount)
     {
+        if (30 <= $this->getPrefix()) {
+            throw new IPException('network too small to split up, must be bigger than /30');
+        }
+
+        if (pow(2, 32 - $this->getPrefix() - 2) < $networkCount) {
+            throw new IPException('network too small to split in this many networks');
+        }
+
         $prefix = $this->getPrefix() + log($networkCount, 2);
         $splitRanges = [];
         for ($i = 0; $i < $networkCount; ++$i) {
@@ -185,10 +198,6 @@ class IP
 
     public function __toString()
     {
-        if ((4 === $this->getFamily() && 32 === $this->getPrefix()) || 6 === $this->getFamily() && 128 === $this->getPrefix()) {
-            return $this->getAddress();
-        }
-
-        return sprintf('%s/%d', $this->getAddress(), $this->getPrefix());
+        return $this->getAddressPrefix();
     }
 }

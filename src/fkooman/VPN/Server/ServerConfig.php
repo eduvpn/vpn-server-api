@@ -42,10 +42,10 @@ class ServerConfig
             foreach ($pool->getRoutes() as $route) {
                 if (6 === $route->getFamily()) {
                     // IPv6
-                    $routeConfig[] = sprintf('push "route-ipv6 %s"', $route);
+                    $routeConfig[] = sprintf('push "route-ipv6 %s"', $route->getAddressPrefix());
                 } else {
                     // IPv4
-                    $routeConfig[] = sprintf('push "route %s"', $route);
+                    $routeConfig[] = sprintf('push "route %s"', $route->getAddressPrefix());
                 }
             }
         }
