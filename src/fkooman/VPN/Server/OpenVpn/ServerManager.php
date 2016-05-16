@@ -52,7 +52,7 @@ class ServerManager
                     $poolInstances[] = $status;
                 }
             }
-            $serverStatus[] = ['name' => $pool->getName(), 'status' => $poolInstances];
+            $serverStatus[] = ['name' => $pool->getName(), 'connections' => $poolInstances];
         }
 
         return array('items' => $serverStatus);
