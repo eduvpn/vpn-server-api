@@ -45,22 +45,25 @@ class Pools
     public function getInfo()
     {
         $poolInfo = [];
-
         foreach ($this->pools as $pool) {
-            $routesArray = [];
-            foreach ($pool->getRoutes() as $route) {
-                $routesArray[] = $route->getRange();
+            $routeList = [];
+            foreach($pool->getRoutes() as $route) {
+                $routeList[] = $route->getAddressPrefix();
+            }
+            $dnsList = [];
+            foreach($pool->getDns() as $dns) {
+                $dnsList[] = $dns->getAddress();
             }
 
             $poolInfo[] = [
                 'name' => $pool->getName(),
-                'range' => $pool->getRange()->getRange(),
-                'range6' => $pool->getRange6()->getRange(),
+                'range' => $pool->getRange()->getAddressPrefix(),
+                'range6' => $pool->getRange6()->getAddressPrefix(),
                 'defaultGateway' => $pool->getDefaultGateway(),
                 'hostName' => $pool->getHostName(),
                 'connectInfo' => $pool->getConnectInfo(),
-                'dns' => $pool->getDns(),
-                'routes' => $routesArray,
+                'dns' => $dnsList,
+                'routes' => $routeList,
                 'twoFactor' => $pool->getTwoFactor(),
                 'clientToClient' => $pool->getClientToClient(),
                 'numberOfInstances' => count($pool->getInstances()),    // XXX optimize!
