@@ -45,14 +45,14 @@ class ServerConfig
                     $routeConfig[] = sprintf('push "route-ipv6 %s"', $route->getAddressPrefix());
                 } else {
                     // IPv4
-                    $routeConfig[] = sprintf('push "route %s"', $route->getAddressPrefix());
+                    $routeConfig[] = sprintf('push "route %s %s"', $route->getAddress(), $route->getNetmask());
                 }
             }
         }
 
         # we always push pool range if clientToClient is enabled
         if ($pool->getClientToClient()) {
-            $routeConfig[] = sprintf('push "route %s"', $pool->getRange()->getAddressPrefix());
+            $routeConfig[] = sprintf('push "route %s %s"', $pool->getRange()->getAddress(), $pool->getRange()->getPrefix());
             $routeConfig[] = sprintf('push "route-ipv6 %s"', $pool->getRange6()->getAddressPrefix());
         }
 
