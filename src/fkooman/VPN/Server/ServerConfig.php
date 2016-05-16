@@ -37,6 +37,11 @@ class ServerConfig
             # we use 2000::/3 instead of ::/0 because it seems to break on native IPv6 
             # networks where the ::/0 default route already exists
             $routeConfig[] = 'push "route-ipv6 2000::/3"';
+
+            # we also push the IPv6 range if it starts with fdXX
+            if (0 === strpos($pool->getRange6(), 'fd')) {
+                $routeConfig[] = sprintf('push "route-ipv6 %s"', $pool->getRange6()->getAddressPrefix());
+            }
         } else {
             // there are some routes specified, push those, and not the default 
             foreach ($pool->getRoutes() as $route) {
