@@ -8,17 +8,13 @@
 # contains the configurations of the CN
 configDir: /var/lib/vpn-server-api/config
 
-firewall:
-    # allow connections to these ports on the VPN server itself
-    dst_port: [udp/1194, udp/1195, udp/1196, tcp/22, tcp/80, tcp/443]
-
 # The VPN server pools
 pools:
     default:
         name: Default Pool
 
         # The address to listen on
-        listen: '::'
+        #listen: '::'
 
         # the hostName to advertize to clients to connect to this pool
         hostName: vpn.example
