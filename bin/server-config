@@ -109,8 +109,8 @@ try {
 
     $p = new Pools($ipConfig->v('pools'));
     foreach ($p->getPools() as $pool) {
-        foreach ($pool->getServerConfig() as $name => $serverConfig) {
-            $io->writeFile(sprintf('/etc/openvpn/server-%s.conf', $name), implode(PHP_EOL, $serverConfig));
+        foreach ($pool->getServerConfig() as $id => $serverConfig) {
+            $io->writeFile(sprintf('/etc/openvpn/server-%s.conf', $id), implode(PHP_EOL, $serverConfig));
         }
     }
 } catch (Exception $e) {

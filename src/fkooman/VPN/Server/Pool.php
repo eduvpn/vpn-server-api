@@ -37,27 +37,24 @@ class Pool
     private $clientToClient;
 
     /** @var string */
-    private $managementIp;
-
-    /** @var string */
     private $listen;
 
     /** @var array */
     private $instances;
 
-    public function __construct($id, array $poolData)
+    public function __construct($poolNumber, array $poolData)
     {
-        $this->setId($id);
-        $this->setName(Utils::validate($poolData, 'name'));
+        $this->setId(Utils::validate($poolData, 'id'));
+        $this->setName(Utils::validate($poolData, 'name', false, $this->getId()));
         $this->setHostName(Utils::validate($poolData, 'hostName'));
-        $this->setDefaultGateway(Utils::validate($poolData, 'defaultGateway'));
+        $this->setDefaultGateway(Utils::validate($poolData, 'defaultGateway', false, false));
         $this->setRange(new IP(Utils::validate($poolData, 'range')));
         $this->setRange6(new IP(Utils::validate($poolData, 'range6')));
         $this->setRoutes(Utils::validate($poolData, 'routes', false, []));
         $this->setDns(Utils::validate($poolData, 'dns', false, []));
         $this->setTwoFactor(Utils::validate($poolData, 'twoFactor', false, false));
         $this->setClientToClient(Utils::validate($poolData, 'clientToClient', false, false));
-        $this->setManagementIp(new IP(sprintf('127.42.%d.1', $this->getId())));
+        $this->setManagementIp(new IP(sprintf('127.42.%d.1', $poolNumber)));
         $this->setListen(new IP(Utils::validate($poolData, 'listen', false, '::')));
 
         $this->populateInstances();
@@ -205,34 +202,22 @@ class Pool
         $splitRange = $this->getRange()->split($instanceCount);
         $splitRange6 = $this->getRange6()->split($instanceCount);
 
-        $is6 = false !== strpos($this->getListen(), ':');
-
         for ($i = 0; $i < $instanceCount; ++$i) {
-            // protocol is udp6 unless it is the last instance when there is
+            // protocol is udp unless it is the last instance when there is
             // not just one instance
-            if (1 === $instanceCount) {
-                $proto = $is6 ? 'udp6' : 'udp';
-            } elseif ($i === $instanceCount - 1) {
-                // the TCP instance always listens on IPv4 to work around iOS
-                // issue together with sniproxy
-                $proto = 'tcp-server';
-            } else {
-                $proto = $is6 ? 'udp6' : 'udp';
-            }
-
-            if ($proto === 'tcp-server') {
-                // there is only one TCP instance and it always listens on tcp/1194
-                $port = 1194;
-            } else {
-                // the UDP instances can cover a range of ports
+            if (1 !== $instanceCount && $i !== $instanceCount - 1) {
+                $proto = 'udp';
                 $port = 1194 + $i;
+            } else {
+                $proto = 'tcp';
+                $port = 1194;
             }
 
             $this->instances[] = new Instance(
                 [
                     'range' => $splitRange[$i],
                     'range6' => $splitRange6[$i],
-                    'dev' => sprintf('tun-%s-%d', $this->getName(), $i),
+                    'dev' => sprintf('tun-%s-%d', $this->getId(), $i),
                     'proto' => $proto,
                     'port' => $port,
                     'managementPort' => 11940 + $i,
@@ -268,39 +253,47 @@ class Pool
         return 4;
     }
 
+    public function toArray()
+    {
+        $routesList = [];
+        foreach ($this->getRoutes() as $route) {
+            $routesList[] = $route->getAddressPrefix();
+        }
+
+        $dnsList = [];
+        foreach ($this->getDns() as $dns) {
+            $dnsList[] = $dns->getAddress();
+        }
+
+        $instancesList = [];
+        foreach ($this->getInstances() as $instance) {
+            $instancesList[] = $instance->toArray();
+        }
+
+        return [
+            'clientToClient' => $this->getClientToClient(),
+            'defaultGateway' => $this->getDefaultGateway(),
+            'dns' => $dnsList,
+            'hostName' => $this->getHostName(),
+            'id' => $this->getId(),
+            'instances' => $instancesList,
+            'listen' => $this->getListen()->getAddress(),
+            'managementIp' => $this->getManagementIp()->getAddress(),
+            'name' => $this->getName(),
+            'range' => $this->getRange()->getAddressPrefix(),
+            'range6' => $this->getRange6()->getAddressPrefix(),
+            'routes' => $routesList,
+            'twoFactor' => $this->getTwoFactor(),
+        ];
+    }
+
     public function getServerConfig()
     {
         $serverConfig = [];
         foreach ($this->getInstances() as $k => $instance) {
-            $serverConfig[sprintf('%s-%d', $this->getName(), $k)] = ServerConfig::get($this, $instance);
+            $serverConfig[sprintf('%s-%d', $this->getId(), $k)] = ServerConfig::get($this, $instance);
         }
 
         return $serverConfig;
-    }
-
-    public function getConnectInfo()
-    {
-        $protoPort = [];
-        foreach ($this->getInstances() as $k => $instance) {
-            // for TCP connections we only want the client to connect to tcp/443
-            if ('tcp-server' === $instance->getProto()) {
-                $proto = 'tcp';
-                $port = 443;
-            } else {
-                $proto = 'udp';
-                $port = $instance->getPort();
-            }
-
-            $protoPort[] = ['host' => $this->getHostName(), 'proto' => $proto, 'port' => $port];
-        }
-
-        return $protoPort;
-    }
-
-    private static function validateIpAddress($ipAddress)
-    {
-        if (false === filter_var($ipAddress, FILTER_VALIDATE_IP)) {
-            throw new BadRequestException('invalid IP address');
-        }
     }
 }

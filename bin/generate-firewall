@@ -99,8 +99,8 @@ try {
             }
         }
 
-        $f4->addRange($serverPool->getName(), $range, $ip4Routes);
-        $f6->addRange($serverPool->getName(), $range6, $ip6Routes);
+        $f4->addRange($serverPool->getId(), $range, $ip4Routes);
+        $f6->addRange($serverPool->getId(), $range6, $ip6Routes);
     }
 
     if ($installFw) {

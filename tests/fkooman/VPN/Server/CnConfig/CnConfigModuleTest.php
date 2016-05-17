@@ -69,7 +69,7 @@ class CnConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'items' => [
+                'data' => [
                     'foo_one' => [
                         'disable' => true,
                     ],
@@ -86,7 +86,7 @@ class CnConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'items' => [
+                'data' => [
                     'foo_one' => [
                         'disable' => true,
                     ],

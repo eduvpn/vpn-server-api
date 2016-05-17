@@ -69,7 +69,7 @@ class UserConfigModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'items' => [
+                'data' => [
                     'foo' => [
                         'disable' => true,
                         'otp_secret' => true,

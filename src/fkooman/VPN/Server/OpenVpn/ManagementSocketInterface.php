@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015 François Kooman <fkooman@tuxed.net>.
+ * Copyright 2016 François Kooman <fkooman@tuxed.net>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,20 @@
 
 namespace fkooman\VPN\Server\OpenVpn;
 
-interface ServerSocketInterface
+interface ManagementSocketInterface
 {
     /**
      * Open the socket.
      *
-     * @param int $timeOut the amount of time to wait before 
-     *                     giving up on trying to connect
+     * @param string $socketAddress the socket to connect to, e.g.: 
+     *                              "tcp://localhost:7505"
+     * @param int    $timeOut       the amount of time to wait before 
+     *                              giving up on trying to connect
      *
      * @throws Exception\ServerSocketException if the socket cannot be opened 
      *                                         within timeout
      */
-    public function open();
+    public function open($socketAddress, $timeOut = 5);
 
     /**
      * Send an OpenVPN command and get the response.

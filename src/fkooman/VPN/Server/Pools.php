@@ -15,8 +15,8 @@ class Pools
         $this->pools = [];
 
         $i = 0;
-        foreach ($poolsData as $poolName => $poolData) {
-            $poolData['name'] = $poolName;
+        foreach ($poolsData as $poolId => $poolData) {
+            $poolData['id'] = $poolId;
             $this->pools[] = new Pool($i, $poolData);
             ++$i;
         }
@@ -27,50 +27,11 @@ class Pools
         return $this->pools;
     }
 
-    public function getManagementSockets()
-    {
-        $managementSockets = [];
-
-        foreach ($this->pools as $pool) {
-            $sockets = [];
-            foreach ($pool->getInstances() as $instance) {
-                $sockets[] = sprintf('tcp://%s:%d', $pool->getManagementIp()->getAddress(), $instance->getManagementPort());
-            }
-            $managementSockets[] = [
-                'name' => $pool->getName(),
-                'sockets' => $sockets,
-            ];
-        }
-
-        return $managementSockets;
-    }
-
     public function getInfo()
     {
         $poolInfo = [];
         foreach ($this->pools as $pool) {
-            $routeList = [];
-            foreach ($pool->getRoutes() as $route) {
-                $routeList[] = $route->getAddressPrefix();
-            }
-            $dnsList = [];
-            foreach ($pool->getDns() as $dns) {
-                $dnsList[] = $dns->getAddress();
-            }
-
-            $poolInfo[] = [
-                'name' => $pool->getName(),
-                'range' => $pool->getRange()->getAddressPrefix(),
-                'range6' => $pool->getRange6()->getAddressPrefix(),
-                'defaultGateway' => $pool->getDefaultGateway(),
-                'hostName' => $pool->getHostName(),
-                'connectInfo' => $pool->getConnectInfo(),
-                'dns' => $dnsList,
-                'routes' => $routeList,
-                'twoFactor' => $pool->getTwoFactor(),
-                'clientToClient' => $pool->getClientToClient(),
-                'numberOfInstances' => count($pool->getInstances()),    // XXX optimize!
-            ];
+            $poolInfo[] = $pool->toArray();
         }
 
         return $poolInfo;

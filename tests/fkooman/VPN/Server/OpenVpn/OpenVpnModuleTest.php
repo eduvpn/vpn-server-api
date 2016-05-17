@@ -28,6 +28,7 @@ use fkooman\VPN\Server\OpenVpn\Test\TestSocket;
 use Psr\Log\NullLogger;
 use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
+use fkooman\VPN\Server\Pools;
 
 class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -55,14 +56,13 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
 
     public function testGetStatus()
     {
-        $this->addModule('openvpn_23_status_one_client.txt');
+        $this->addModule('connections');
         $this->assertSame(
             [
-                'items' => [
+                'data' => [
                     [
-                        'id' => 'one',
-                        'ok' => true,
-                        'status' => [
+                        'id' => 'default',
+                        'connections' => [
                             [
                                 'common_name' => 'fkooman_samsung_i9300',
                                 'real_address' => '91.64.87.183:43103',
@@ -78,58 +78,19 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
-            $this->makeRequest('GET', '/openvpn/status', [])
-        );
-    }
-
-    public function testGetLoadStats()
-    {
-        $this->addModule('openvpn_23_load_stats.txt');
-        $this->assertSame(
-            [
-                'items' => [
-                    [
-                        'id' => 'one',
-                        'ok' => true,
-                        'load-stats' => [
-                            'number_of_clients' => 0,
-                            'bytes_in' => 2224463,
-                            'bytes_out' => 6102370,
-                        ],
-                    ],
-                ],
-            ],
-            $this->makeRequest('GET', '/openvpn/load-stats', [])
-        );
-    }
-
-    public function testGetVersion()
-    {
-        $this->addModule('openvpn_23_version.txt');
-        $this->assertSame(
-            [
-                'items' => [
-                    [
-                        'id' => 'one',
-                        'ok' => true,
-                        'version' => 'OpenVPN 2.3.8 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Aug  4 2015',
-                    ],
-                ],
-            ],
-            $this->makeRequest('GET', '/openvpn/version', [])
+            $this->makeRequest('GET', '/openvpn/connections', [])
         );
     }
 
     public function testKillClient()
     {
-        $this->addModule('openvpn_23_kill_success.txt');
+        $this->addModule('kill');
         $this->assertSame(
             [
-                'items' => [
+                'data' => [
                     [
-                        'id' => 'one',
-                        'ok' => true,
-                        'kill' => true,
+                        'id' => 'default',
+                        'killCount' => 1,
                     ],
                 ],
             ],
@@ -172,28 +133,27 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
         }
     }
 
-    private static function readFile($fileName)
+    private function addModule($callType)
     {
-        return @file_get_contents(
-            sprintf(__DIR__.'/data/socket/%s', $fileName)
+        $p = new Pools(
+            [
+                'default' => [
+                    'name' => 'Default Instance',
+                    'hostName' => 'vpn.example',
+                    'range' => '10.42.42.0/24',
+                    'range6' => 'fd00:4242:4242::/48',
+                    'dns' => ['8.8.8.8', '2001:4860:4860::8888'],
+                    'routes' => ['192.168.1.0/24', 'fd00:1010:1010::/48'],
+                ],
+            ]
         );
-    }
 
-    private function addModule($fileName)
-    {
-        $serverManager = new ServerManager();
-        $serverManager->addServer(
-            new ServerApi(
-                'one',
-                new TestSocket(
-                    self::readFile($fileName)
-                )
-            )
-        );
+        $socket = new TestSocket($callType);
+        $serverManager = new ServerManager($p, $socket, new NullLogger());
+
         $this->service->addModule(
             new OpenVpnModule(
-                $serverManager,
-                new NullLogger()
+                $serverManager
             )
         );
     }

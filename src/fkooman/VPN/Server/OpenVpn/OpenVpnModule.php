@@ -21,7 +21,6 @@ use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\JsonResponse;
-use Psr\Log\LoggerInterface;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Http\Exception\ForbiddenException;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
@@ -31,24 +30,20 @@ class OpenVpnModule implements ServiceModuleInterface
     /** @var ServerManager */
     private $serverManager;
 
-    /** @var \Psr\Log\LoggerInterface */
-    private $logger;
-
-    public function __construct(ServerManager $serverManager, LoggerInterface $logger)
+    public function __construct(ServerManager $serverManager)
     {
         $this->serverManager = $serverManager;
-        $this->logger = $logger;
     }
 
     public function init(Service $service)
     {
         $service->get(
-            '/openvpn/status',
+            '/openvpn/connections',
             function (Request $request, TokenInfo $tokenInfo) {
                 self::requireScope($tokenInfo, ['admin']);
 
                 $response = new JsonResponse();
-                $response->setBody($this->serverManager->status());
+                $response->setBody($this->serverManager->connections());
 
                 return $response;
             }
@@ -61,8 +56,6 @@ class OpenVpnModule implements ServiceModuleInterface
 
                 $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);
-
-                $this->logger->info('killing cn', array('cn' => $commonName));
 
                 $response = new JsonResponse();
                 $response->setBody($this->serverManager->kill($commonName));

@@ -70,7 +70,7 @@ class ServerConfig
         }
 
         $tcpOptions = [];
-        if ('tcp-server' === $instance->getProto()) {
+        if ('tcp' === $instance->getProto()) {
             $tcpOptions[] = 'socket-flags TCP_NODELAY';
             $tcpOptions[] = 'push "socket-flags TCP_NODELAY"';
         }
@@ -80,11 +80,25 @@ class ServerConfig
             $clientToClient[] = 'client-to-client';
         }
 
-        if ('tcp-server' === $instance->getProto()) {
+        if ('tcp' === $instance->getProto()) {
             // must listen on managementIp
             $listen = $pool->getManagementIp();
         } else {
             $listen = $pool->getListen();
+        }
+
+        if (6 === $listen->getFamily()) {
+            if ('tcp' === $instance->getProto()) {
+                $proto = 'tcp6-server';
+            } else {
+                $proto = 'udp6';
+            }
+        } else {
+            if ('tcp' === $instance->getProto()) {
+                $proto = 'tcp-server';
+            } else {
+                $proto = 'udp';
+            }
         }
 
         return [
@@ -95,7 +109,7 @@ class ServerConfig
             sprintf('local %s', $listen->getAddress()),
 
             # UDP6 (works also for UDP)
-            sprintf('proto %s', $instance->getProto()),
+            sprintf('proto %s', $proto),
             sprintf('port %d', $instance->getPort()),
 
             # IPv4

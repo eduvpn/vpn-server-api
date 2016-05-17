@@ -18,6 +18,8 @@
 namespace fkooman\VPN\Server\OpenVpn;
 
 use fkooman\VPN\Server\Pools;
+use Psr\Log\LoggerInterface;
+use fkooman\VPN\Server\OpenVpn\Exception\ManagementSocketException;
 
 /**
  * Manage all OpenVPN servers controlled by this service using each instance's
@@ -28,51 +30,112 @@ class ServerManager
     /** @var array */
     private $pools;
 
-    public function __construct(Pools $pools)
+    /** @var ManagementSocketInterface */
+    private $managementSocket;
+
+    /** @var \Psr\Log\LoggerInterface */
+    private $logger;
+
+    public function __construct(Pools $pools, ManagementSocketInterface $managementSocket, LoggerInterface $logger)
     {
         $this->pools = $pools;
+        $this->managementSocket = $managementSocket;
+        $this->logger = $logger;
     }
 
     /**
      * Get the connection information about connected clients.
-     *
-     * @return array per server connection information
      */
-    public function status()
+    public function connections()
     {
-        $serverStatus = [];
+        $clientConnections = [];
+        // loop over all pools
         foreach ($this->pools->getPools() as $pool) {
-            $poolInstances = [];
+            $poolConnections = [];
+            // loop over all instances
             foreach ($pool->getInstances() as $instance) {
-                $socket = sprintf('tcp://%s:%d', $pool->getManagementIp()->getAddress(), $instance->getManagementPort());
-                $serverSocket = new ServerSocket($socket);
-                $serverApi = new ServerApi($serverSocket);
-                $status = $serverApi->status();
-                if(false !== $status && 0 !== count($status)) {
-                    $poolInstances = array_merge($poolInstances, $status);
+                // add all connections from this instance to poolConnections
+                try {
+                    // open the socket connection
+                    $this->managementSocket->open(
+                        sprintf(
+                            'tcp://%s:%d',
+                            $pool->getManagementIp()->getAddress(),
+                            $instance->getManagementPort()
+                        )
+                    );
+                    $poolConnections = array_merge(
+                        $poolConnections,
+                        StatusParser::parse($this->managementSocket->command('status 2'))
+                    );
+                    // close the socket connection
+                    $this->managementSocket->close();
+                } catch (ManagementSocketException $e) {
+                    // we log the error, but continue with the next instance
+                    $this->logger->error(
+                        sprintf(
+                            'error with socket "%s:%s", message: "%s"',
+                            $pool->getManagementIp()->getAddress(),
+                            $instance->getManagementPort(),
+                            $e->getMessage()
+                        )
+                    );
                 }
             }
-            $serverStatus[] = ['name' => $pool->getName(), 'connections' => $poolInstances];
+            // we add the poolConnections to the clientConnections array
+            $clientConnections[] = ['id' => $pool->getId(), 'connections' => $poolConnections];
         }
 
-        return array('items' => $serverStatus);
+        return ['data' => $clientConnections];
     }
 
     /**
-     * Disconnect all clients with this CN from all servers managed by this
-     * service.
+     * Disconnect all clients with this CN from all pools and instances 
+     * managed by this service.
      *
      * @param string $commonName the CN to kill
-     *
-     * @return bool true if >= 1 client was killed, otherwise false
      */
     public function kill($commonName)
     {
-        $killStats = array();
-        foreach ($this->servers as $server) {
-            $killStats[] = $server->kill($commonName);
+        $clientsKills = [];
+        // loop over all pools
+        foreach ($this->pools->getPools() as $pool) {
+            $poolKill = 0;
+            // loop over all instances
+            foreach ($pool->getInstances() as $instance) {
+                // add all kills from this instance to poolKills
+                try {
+                    // open the socket connection
+                    $this->managementSocket->open(
+                        sprintf(
+                            'tcp://%s:%d',
+                            $pool->getManagementIp()->getAddress(),
+                            $instance->getManagementPort()
+                        )
+                    );
+
+                    $response = $this->managementSocket->command(sprintf('kill %s', $commonName));
+                    if (0 === strpos($response[0], 'SUCCESS: ')) {
+                        ++$poolKill;
+                    }
+                    // close the socket connection
+                    $this->managementSocket->close();
+                } catch (ManagementSocketException $e) {
+                    // we log the error, but continue with the next instance
+                    $this->logger->error(
+                        sprintf(
+                            'error with socket "%s:%s", message: "%s"',
+                            $pool->getManagementIp()->getAddress(),
+                            $instance->getManagementPort(),
+                            $e->getMessage()
+                        )
+                    );
+                }
+            }
+            // we add the poolKill to the clientsKill array
+            $clientsKills[] = ['id' => $pool->getId(), 'killCount' => $poolKill];
         }
 
-        return array('items' => $killStats);
+        return ['data' => $clientsKills];
     }
 }

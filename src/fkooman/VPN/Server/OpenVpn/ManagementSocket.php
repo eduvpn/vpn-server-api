@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015 François Kooman <fkooman@tuxed.net>.
+ * Copyright 2016 François Kooman <fkooman@tuxed.net>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,21 @@
 
 namespace fkooman\VPN\Server\OpenVpn;
 
-use fkooman\VPN\Server\OpenVpn\Exception\ServerSocketException;
+use fkooman\VPN\Server\OpenVpn\Exception\ManagementSocketException;
 
 /**
  * Abstraction to use the OpenVPN management interface using a socket 
  * connection.
  */
-class ServerSocket implements ServerSocketInterface
+class ManagementSocket implements ManagementSocketInterface
 {
-    /** @var string */
-    private $socketAddress;
-
     /** @var resource */
     private $socket;
+
+    public function __construct()
+    {
+        $this->socket = null;
+    }
 
     /**
      * Connect to an OpenVPN management socket.
@@ -37,17 +39,11 @@ class ServerSocket implements ServerSocketInterface
      * @param string $socketAddress the socket to connect to, e.g.: 
      *                              "tcp://localhost:7505"
      */
-    public function __construct($socketAddress)
+    public function open($socketAddress, $timeOut = 5)
     {
-        $this->socketAddress = $socketAddress;
-        $this->socket = null;
-    }
-
-    public function open($timeOut = 5)
-    {
-        $this->socket = @stream_socket_client($this->socketAddress, $errno, $errstr, $timeOut);
+        $this->socket = @stream_socket_client($socketAddress, $errno, $errstr, $timeOut);
         if (false === $this->socket) {
-            throw new ServerSocketException(
+            throw new ManagementSocketException(
                 sprintf('%s (%s)', $errstr, $errno)
             );
         }
@@ -70,14 +66,14 @@ class ServerSocket implements ServerSocketInterface
     {
         $this->requireOpenSocket();
         if (false === @fclose($this->socket)) {
-            throw new ServerSocketException('unable to close the socket');
+            throw new ManagementSocketException('unable to close the socket');
         }
     }
 
     private function write($data)
     {
         if (false === @fwrite($this->socket, $data)) {
-            throw new ServerSocketException('unable to write to socket');
+            throw new ManagementSocketException('unable to write to socket');
         }
     }
 
@@ -86,7 +82,7 @@ class ServerSocket implements ServerSocketInterface
         $dataBuffer = array();
         while (!feof($this->socket) && !$this->isEndOfResponse(end($dataBuffer))) {
             if (false === $readData = @fgets($this->socket, 4096)) {
-                throw new ServerSocketException('unable to read from socket');
+                throw new ManagementSocketException('unable to read from socket');
             }
             $dataBuffer[] = trim($readData);
         }
@@ -109,7 +105,7 @@ class ServerSocket implements ServerSocketInterface
     private function requireOpenSocket()
     {
         if (is_null($this->socket)) {
-            throw new ServerSocketException('socket not open');
+            throw new ManagementSocketException('socket not open');
         }
     }
 }

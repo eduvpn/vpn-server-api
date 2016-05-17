@@ -76,7 +76,7 @@ class CnConfigModule implements ServiceModuleInterface
                 }
 
                 $response = new JsonResponse();
-                $response->setBody(['items' => $cnConfigArray]);
+                $response->setBody(['data' => $cnConfigArray]);
 
                 return $response;
             }

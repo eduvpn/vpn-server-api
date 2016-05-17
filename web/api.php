@@ -34,6 +34,7 @@ use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\VPN\Server\Log\LogModule;
 use fkooman\VPN\Server\OpenVpn\OpenVpnModule;
 use fkooman\VPN\Server\OpenVpn\ServerManager;
+use fkooman\VPN\Server\OpenVpn\ManagementSocket;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
@@ -79,8 +80,16 @@ try {
         $client
     );
 
+    $logger = new Logger('vpn-server-api');
+    $syslog = new SyslogHandler('vpn-server-api', 'user');
+    $formatter = new LineFormatter();
+    $syslog->setFormatter($formatter);
+    $logger->pushHandler($syslog);
+
+    $managementSocket = new ManagementSocket();
+
     // handles the connection to the various OpenVPN instances
-    $serverManager = new ServerManager($serverPools);
+    $serverManager = new ServerManager($serverPools, $managementSocket, $logger);
 
     // handles the connection history log
     try {
@@ -96,12 +105,6 @@ try {
         syslog(LOG_ERR, $e->__toString());
         $connectionLog = null;
     }
-
-    $logger = new Logger('vpn-server-api');
-    $syslog = new SyslogHandler('vpn-server-api', 'user');
-    $formatter = new LineFormatter();
-    $syslog->setFormatter($formatter);
-    $logger->pushHandler($syslog);
 
     // http request router
     $service = new Service();
@@ -120,7 +123,7 @@ try {
     $authenticationPlugin->register($apiAuth, 'api');
     $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     $service->addModule(new LogModule($connectionLog));
-    $service->addModule(new OpenVpnModule($serverManager, $logger));
+    $service->addModule(new OpenVpnModule($serverManager));
     $service->addModule(new UserConfigModule($ipConfig->v('configDir').'/users', $logger, $io));
     $service->addModule(new CnConfigModule($ipConfig->v('configDir').'/common_names', $logger, $io));
     $service->addModule(new CaModule($crlFetcher, $logger));

@@ -2,6 +2,8 @@
 
 namespace fkooman\VPN\Server;
 
+use InvalidArgumentException;
+
 class Instance
 {
     /** @var IP */
@@ -54,7 +56,14 @@ class Instance
 
     public function setProto($proto)
     {
-        // XXX validate
+        if (!is_string($proto)) {
+            throw new InvalidArgumentException('parameter must be string');
+        }
+        $validProtocols = ['udp', 'tcp'];
+        if (!in_array($proto, $validProtocols)) {
+            throw new InstanceException('invalid proto');
+        }
+
         $this->proto = $proto;
     }
 
@@ -65,7 +74,12 @@ class Instance
 
     public function setDev($dev)
     {
-        // XXX validate
+        if (!is_string($dev)) {
+            throw new InvalidArgumentException('parameter must be string');
+        }
+        if (0 !== strpos($dev, 'tun-')) {
+            throw new InstanceException('dev must start with "tun-"');
+        }
         $this->dev = $dev;
     }
 
@@ -76,7 +90,12 @@ class Instance
 
     public function setManagementPort($managementPort)
     {
-        // XXX validate
+        if (!is_int($managementPort)) {
+            throw new InvalidArgumentException('parameter must be int');
+        }
+        if (1024 >= $managementPort || 65536 <= $managementPort) {
+            throw new InstanceException('invalid port, must be positive integer between 1025 and 65535');
+        }
         $this->managementPort = $managementPort;
     }
 
@@ -87,12 +106,29 @@ class Instance
 
     public function setPort($port)
     {
-        // XXX validate
+        if (!is_int($port)) {
+            throw new InvalidArgumentException('parameter must be int');
+        }
+        if (1024 >= $port || 65536 <= $port) {
+            throw new InstanceException('invalid port, must be positive integer between 1025 and 65535');
+        }
         $this->port = $port;
     }
 
     public function getPort()
     {
         return $this->port;
+    }
+
+    public function toArray()
+    {
+        return [
+            'dev' => $this->getDev(),
+            'managementPort' => $this->getManagementPort(),
+            'port' => $this->getPort(),
+            'proto' => $this->getProto(),
+            'range' => $this->getRange()->getAddressPrefix(),
+            'range6' => $this->getRange6()->getAddressPrefix(),
+        ];
     }
 }

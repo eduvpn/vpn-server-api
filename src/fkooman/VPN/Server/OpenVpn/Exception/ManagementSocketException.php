@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright 2015 François Kooman <fkooman@tuxed.net>.
+ * Copyright 2016 François Kooman <fkooman@tuxed.net>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,6 @@ namespace fkooman\VPN\Server\OpenVpn\Exception;
 
 use RuntimeException;
 
-class ServerSocketException extends RuntimeException
+class ManagementSocketException extends RuntimeException
 {
 }
