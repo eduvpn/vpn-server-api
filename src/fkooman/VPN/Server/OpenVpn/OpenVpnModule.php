@@ -22,8 +22,8 @@ use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\JsonResponse;
 use fkooman\VPN\Server\InputValidation;
-use fkooman\Http\Exception\ForbiddenException;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
+use fkooman\VPN\Server\Utils;
 
 class OpenVpnModule implements ServiceModuleInterface
 {
@@ -40,7 +40,7 @@ class OpenVpnModule implements ServiceModuleInterface
         $service->get(
             '/openvpn/connections',
             function (Request $request, TokenInfo $tokenInfo) {
-                self::requireScope($tokenInfo, ['admin']);
+                Utils::requireScope($tokenInfo, ['admin']);
 
                 $response = new JsonResponse();
                 $response->setBody($this->serverManager->connections());
@@ -52,7 +52,7 @@ class OpenVpnModule implements ServiceModuleInterface
         $service->post(
             '/openvpn/kill',
             function (Request $request, TokenInfo $tokenInfo) {
-                self::requireScope($tokenInfo, ['admin', 'portal']);
+                Utils::requireScope($tokenInfo, ['admin', 'portal']);
 
                 $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);
@@ -63,16 +63,5 @@ class OpenVpnModule implements ServiceModuleInterface
                 return $response;
             }
         );
-    }
-
-    private static function requireScope(TokenInfo $tokenInfo, array $requiredScope)
-    {
-        foreach ($requiredScope as $s) {
-            if ($tokenInfo->getScope()->hasScope($s)) {
-                return;
-            }
-        }
-
-        throw new ForbiddenException('insufficient_scope', sprintf('"%s" scope required', implode(',', $requiredScope)));
     }
 }
