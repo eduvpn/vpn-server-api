@@ -49,8 +49,12 @@ class InfoModule implements ServiceModuleInterface
 
     private function getInfo()
     {
+        $data = [];
+        foreach ($this->pools as $pool) {
+            $data[] = $pool->toArray();
+        }
         $response = new JsonResponse();
-        $response->setBody(['data' => $this->pools->getInfo()]);
+        $response->setBody(['data' => $data]);
 
         return $response;
     }
