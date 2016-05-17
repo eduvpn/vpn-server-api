@@ -19,17 +19,17 @@ namespace fkooman\VPN\Server;
 
 class Firewall
 {
-    public static function getFirewall4(Pools $p, $extIf, $useNat)
+    public static function getFirewall4(Pools $p, $extIf, $useNat, $disableForward = false, $asArray = false)
     {
-        return self::getFirewall($p, 4, $extIf, $useNat);
+        return self::getFirewall($p, 4, $extIf, $useNat, $disableForward, $asArray);
     }
 
-    public static function getFirewall6(Pools $p, $extIf, $useNat, $disableForward)
+    public static function getFirewall6(Pools $p, $extIf, $useNat, $disableForward = false, $asArray = false)
     {
-        return self::getFirewall($p, 6, $extIf, $useNat, $disableForward);
+        return self::getFirewall($p, 6, $extIf, $useNat, $disableForward, $asArray);
     }
 
-    public static function getFirewall(Pools $p, $inetFamily, $extIf, $useNat, $disableForward = false)
+    private static function getFirewall(Pools $p, $inetFamily, $extIf, $useNat, $disableForward, $asArray)
     {
         $firewall = [];
         // NAT
@@ -39,6 +39,10 @@ class Firewall
 
         // FILTER
         $firewall = array_merge($firewall, self::getFilter($p, $inetFamily, $extIf, $disableForward));
+
+        if ($asArray) {
+            return $firewall;
+        }
 
         return implode(PHP_EOL, $firewall).PHP_EOL;
     }
