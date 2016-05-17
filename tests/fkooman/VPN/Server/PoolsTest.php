@@ -38,7 +38,6 @@ class PoolsTest extends PHPUnit_Framework_TestCase
         );
         $this->assertSame(
             [
-              0 => array(
                 'clientToClient' => false,
                 'defaultGateway' => false,
                 'dns' => array(
@@ -92,9 +91,8 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                   1 => 'fd00:1010:1010::/48',
                 ),
                 'twoFactor' => false,
-              ),
             ],
-            $p->getInfo()
+            $p[0]->toArray()
         );
     }
 }

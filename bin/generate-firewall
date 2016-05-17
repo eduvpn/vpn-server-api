@@ -77,7 +77,7 @@ try {
     $f6 = new Firewall(6, $extIf, $useNat, $forward6);
     $f6->addInputPorts($inputPorts);
 
-    foreach ($serverPools->getPools() as $serverPool) {
+    foreach ($serverPools as $serverPool) {
         $f4->setDefaultGateway($serverPool->getDefaultGateway());
         $f6->setDefaultGateway($serverPool->getDefaultGateway());
         $f4->clientToClient($serverPool->getClientToClient());

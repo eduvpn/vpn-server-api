@@ -2,38 +2,19 @@
 
 namespace fkooman\VPN\Server;
 
-class Pools
-{
-    /** @var array */
-    private $pools;
+use ArrayObject;
 
+class Pools extends ArrayObject
+{
     public function __construct(array $poolsData)
     {
-        // XXX listen cannot be the same for different Pool
-        // XXX also, if there is more than one pool, listen cannot be '::' or 0.0.0.0
-
-        $this->pools = [];
-
+        $poolList = [];
         $i = 0;
         foreach ($poolsData as $poolId => $poolData) {
             $poolData['id'] = $poolId;
-            $this->pools[] = new Pool($i, $poolData);
+            $poolList[] = new Pool($i, $poolData);
             ++$i;
         }
-    }
-
-    public function getPools()
-    {
-        return $this->pools;
-    }
-
-    public function getInfo()
-    {
-        $poolInfo = [];
-        foreach ($this->pools as $pool) {
-            $poolInfo[] = $pool->toArray();
-        }
-
-        return $poolInfo;
+        parent::__construct($poolList, ArrayObject::STD_PROP_LIST);
     }
 }

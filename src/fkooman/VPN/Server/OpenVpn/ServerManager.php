@@ -50,7 +50,7 @@ class ServerManager
     {
         $clientConnections = [];
         // loop over all pools
-        foreach ($this->pools->getPools() as $pool) {
+        foreach ($this->pools as $pool) {
             $poolConnections = [];
             // loop over all instances
             foreach ($pool->getInstances() as $instance) {
@@ -99,7 +99,7 @@ class ServerManager
     {
         $clientsKills = [];
         // loop over all pools
-        foreach ($this->pools->getPools() as $pool) {
+        foreach ($this->pools as $pool) {
             $poolKill = 0;
             // loop over all instances
             foreach ($pool->getInstances() as $instance) {
