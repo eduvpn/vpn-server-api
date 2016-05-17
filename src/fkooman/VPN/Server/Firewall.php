@@ -19,131 +19,138 @@ namespace fkooman\VPN\Server;
 
 class Firewall
 {
-    private $ipVersion;
-    private $externalIf;
-    private $useNat;
-    private $inputPorts;
-    private $ranges;
-    private $enableForward;
-    private $clientToClient;
-    private $defaultGateway;
-
-    public function __construct($ipVersion = 4, $externalIf = 'eth0', $useNat = true, $enableForward = true)
+    public static function getFirewall4(Pools $p, $extIf, $useNat)
     {
-        $this->ipVersion = $ipVersion;
-        $this->externalIf = $externalIf;
-        $this->useNat = $useNat;
-        $this->inputPorts = [];
-        $this->ranges = [];
-        $this->enableForward = $enableForward;
-        $this->clientToClient = false;
-        $this->defaultGateway = false;
+        return self::getFirewall($p, 4, $extIf, $useNat);
     }
 
-    public function clientToClient($clientToClient)
+    public static function getFirewall6(Pools $p, $extIf, $useNat, $disableForward)
     {
-        $this->clientToClient = (bool) $clientToClient;
+        return self::getFirewall($p, 6, $extIf, $useNat, $disableForward);
     }
 
-    private function getNat()
+    public static function getFirewall(Pools $p, $inetFamily, $extIf, $useNat, $disableForward = false)
     {
-        return [
-            '*nat',
-            ':PREROUTING ACCEPT [0:0]',
-            ':OUTPUT ACCEPT [0:0]',
-            ':POSTROUTING ACCEPT [0:0]',
-            sprintf('-A POSTROUTING -o %s -j MASQUERADE', $this->externalIf),
-            'COMMIT',
-        ];
+        $firewall = [];
+        // NAT
+        if ($useNat) {
+            $firewall = array_merge($firewall, self::getNat($extIf));
+        }
+
+        // FILTER
+        $firewall = array_merge($firewall, self::getFilter($p, $inetFamily, $extIf, $disableForward));
+
+        return implode(PHP_EOL, $firewall).PHP_EOL;
     }
 
-    private function getFilter()
+    private static function getFilter(Pools $p, $inetFamily, $extIf, $disableForward)
     {
         $filter = [
             '*filter',
             ':INPUT ACCEPT [0:0]',
             ':FORWARD ACCEPT [0:0]',
             ':OUTPUT ACCEPT [0:0]',
-            '-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT',
-            sprintf('-A INPUT -p %s -j ACCEPT', 4 === $this->ipVersion ? 'icmp' : 'ipv6-icmp'),
-            '-A INPUT -i lo -j ACCEPT',
         ];
 
-        foreach ($this->inputPorts as $inputPort) {
-            list($proto, $port) = explode('/', $inputPort);
-            $proto = strtolower($proto);
-            $filter[] = sprintf('-A INPUT -m state --state NEW -m %s -p %s --dport %d -j ACCEPT', $proto, $proto, $port);
-        }
+        // INPUT
+        $filter = array_merge($filter, self::getInputChain($p, $inetFamily));
 
-        $filter[] = sprintf('-A INPUT -j REJECT --reject-with %s', 4 === $this->ipVersion ? 'icmp-host-prohibited' : 'icmp6-adm-prohibited');
+        // FORWARD
+        $filter = array_merge($filter, self::getForwardChain($p, $inetFamily, $extIf, $disableForward));
 
-        $filter = array_merge($filter, $this->getForward());
-
-        $filter[] = sprintf('-A FORWARD -j REJECT --reject-with %s', 4 === $this->ipVersion ? 'icmp-host-prohibited' : 'icmp6-adm-prohibited');
         $filter[] = 'COMMIT';
 
         return $filter;
     }
 
-    private function getForward()
+    private static function getInputChain(Pools $p, $inetFamily)
     {
-        $forward = [
+        $inputChain = [
+            '-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT',
+            sprintf('-A INPUT -p %s -j ACCEPT', 4 === $inetFamily ? 'icmp' : 'ipv6-icmp'),
+            '-A INPUT -i lo -j ACCEPT',
+        ];
+
+        $inputPorts = self::getIngressPorts($p);
+        foreach ($inputPorts as $inputPort) {
+            list($proto, $port) = explode('/', $inputPort);
+            $inputChain[] = sprintf('-A INPUT -m state --state NEW -m %s -p %s --dport %d -j ACCEPT', $proto, $proto, $port);
+        }
+
+        $inputChain[] = sprintf('-A INPUT -j REJECT --reject-with %s', 4 === $inetFamily ? 'icmp-host-prohibited' : 'icmp6-adm-prohibited');
+
+        return $inputChain;
+    }
+
+    private static function getForwardChain(Pools $p, $inetFamily, $extIf, $disableForward)
+    {
+        $forwardChain = [
             '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
         ];
 
-        if (!$this->enableForward) {
-            // do not allow forwarding to Internet
-            return $forward;
-        }
-
-        $forward = array_merge($forward, $this->ranges);
-
-        return $forward;
-    }
-
-    public function addInputPorts(array $inputPorts)
-    {
-        $this->inputPorts = $inputPorts;
-    }
-
-    public function setDefaultGateway($defaultGateway)
-    {
-        $this->defaultGateway = (bool) $defaultGateway;
-    }
-
-    public function getDefaultGateway()
-    {
-        return $this->defaultGateway;
-    }
-
-    public function addRange($poolName, $srcNet, $dstNets = [])
-    {
-        $this->ranges[] = sprintf('-N vpn-%s', $poolName);
-        $this->ranges[] = sprintf('-A FORWARD -i tun-%s+ -s %s -j vpn-%s', $poolName, $srcNet, $poolName);
-
-        if ($this->clientToClient) {
-            // allow communication between the various tun interfaces of a pool
-            $this->ranges[] = sprintf('-A vpn-%s -o tun-%s+ -d %s -j ACCEPT', $poolName, $poolName, $srcNet);
-        }
-
-        if ($this->getDefaultGateway()) {
-            $this->ranges[] = sprintf('-A vpn-%s -o %s -j ACCEPT', $poolName, $this->externalIf, $srcNet);
-        } else {
-            foreach ($dstNets as $dstNet) {
-                $this->ranges[] = sprintf('-A vpn-%s -o %s -d %s -j ACCEPT', $poolName, $this->externalIf, $dstNet);
+        if (!$disableForward) {
+            foreach ($p as $pool) {
+                if (4 === $inetFamily) {
+                    // get the IPv4 range
+                    $srcNet = $pool->getRange()->getAddressPrefix();
+                } else {
+                    // get the IPv6 range
+                    $srcNet = $pool->getRange6()->getAddressPrefix();
+                }
+                $forwardChain[] = sprintf('-N vpn-%s', $pool->getId());
+                $forwardChain[] = sprintf('-A FORWARD -i tun-%s+ -s %s -j vpn-%s', $pool->getId(), $srcNet, $pool->getId());
+                if ($pool->getClientToClient()) {
+                    // allow client-to-client
+                    $forwardChain[] = sprintf('-A vpn-%s -o tun-%s+ -d %s -j ACCEPT', $pool->getId(), $pool->getId(), $srcNet);
+                }
+                if ($pool->getDefaultGateway()) {
+                    // allow all traffic to the external interface
+                    $forwardChain[] = sprintf('-A vpn-%s -o %s -j ACCEPT', $pool->getId(), $extIf, $srcNet);
+                } else {
+                    // only allow certain traffic to the external interface
+                    foreach ($pool->getRoutes() as $route) {
+                        if ($inetFamily === $route->getFamily()) {
+                            $forwardChain[] = sprintf('-A vpn-%s -o %s -d %s -j ACCEPT', $pool->getId(), $extIf, $route->getAddressPrefix());
+                        }
+                    }
+                }
             }
         }
+
+        $forwardChain[] = sprintf('-A FORWARD -j REJECT --reject-with %s', 4 === $inetFamily ? 'icmp-host-prohibited' : 'icmp6-adm-prohibited');
+
+        return $forwardChain;
     }
 
-    public function getFirewall()
+    private static function getNat($extIf)
     {
-        $firewall = [];
+        return [
+            '*nat',
+            ':PREROUTING ACCEPT [0:0]',
+            ':OUTPUT ACCEPT [0:0]',
+            ':POSTROUTING ACCEPT [0:0]',
+            sprintf('-A POSTROUTING -o %s -j MASQUERADE', $extIf),
+            'COMMIT',
+        ];
+    }
 
-        if ($this->useNat) {
-            $firewall = array_merge($firewall, $this->getNat());
+    private static function getIngressPorts(Pools $p)
+    {
+        $ingressPorts = ['tcp/22', 'tcp/80', 'tcp/443'];
+
+        // we only care about additional UDP ports, as we only want UDP and 
+        // fallback to tcp/443
+        foreach ($p as $pool) {
+            foreach ($pool->getInstances() as $instance) {
+                if ('udp' === $instance->getProto()) {
+                    $port = sprintf('udp/%d', $instance->getPort());
+                    if (!in_array($port, $ingressPorts)) {
+                        $ingressPorts[] = $port;
+                    }
+                }
+            }
         }
-        $firewall = array_merge($firewall, $this->getFilter());
 
-        return implode(PHP_EOL, $firewall).PHP_EOL;
+        return $ingressPorts;
     }
 }

@@ -24,26 +24,30 @@ use fkooman\VPN\Server\Pools;
 
 function showHelp(array $argv)
 {
-    $helpText = sprintf('SYNTAX: %s [--nat] [--reject6] [--install] interface', $argv[0]);
-    $helpText .= PHP_EOL;
-    $helpText .= '--nat      use IP masquerading for NAT'.PHP_EOL;
-    $helpText .= '--reject6  do not actually forward IPv6 traffic, reject it'.PHP_EOL;
-    $helpText .= '--install  install the firewall script'.PHP_EOL;
-    $helpText .= 'interface  the external interface of the machine'.PHP_EOL;
-    echo $helpText;
+    $helpText = [
+        sprintf('SYNTAX: %s [--nat] [--drop6] [--install] interface', $argv[0]),
+        PHP_EOL,
+        '--nat      use IP masquerading (NAT)',
+        '--drop6    do not actually forward IPv6 traffic, reject it',
+        '--install  install the firewall rules',
+        'interface  the external interface of the machine, e.g. "eth0"',
+        PHP_EOL,
+    ];
+
+    echo implode(PHP_EOL, $helpText);
 }
 
 try {
     $useNat = false;
     $extIf = null;
     $installFw = false;
-    $forward6 = true;
+    $drop6 = false;
 
     for ($i = 1; $i < $argc; ++$i) {
         if ('--nat' === $argv[$i]) {
             $useNat = true;
-        } elseif ('--reject6' === $argv[$i]) {
-            $forward6 = false;
+        } elseif ('--drop6' === $argv[$i]) {
+            $drop6 = true;
         } elseif ('--install' === $argv[$i]) {
             $installFw = true;
         } else {
@@ -51,76 +55,38 @@ try {
         }
     }
 
-    if (null === $extIf) {
+    if (is_null($extIf)) {
         showHelp($argv);
         throw new Exception('missing interface');
     }
 
-    // read configuration
     $ipConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/ip.yaml')
     );
 
-    $serverPools = new Pools($ipConfig->v('pools'));
+    $p = new Pools($ipConfig->v('pools'));
 
-    // XXX probably get this from the pool config? although... maybe not 
-    // needed, just open enough udp ports
-    $inputPorts = $ipConfig->v(
-        'firewall',
-        'dst_port',
-        false,
-        ['udp/1194', 'udp/1195', 'udp/1196', 'tcp/22', 'tcp/80', 'tcp/443']
-    );
-
-    $f4 = new Firewall(4, $extIf, $useNat, true);
-    $f4->addInputPorts($inputPorts);
-    $f6 = new Firewall(6, $extIf, $useNat, $forward6);
-    $f6->addInputPorts($inputPorts);
-
-    foreach ($serverPools as $serverPool) {
-        $f4->setDefaultGateway($serverPool->getDefaultGateway());
-        $f6->setDefaultGateway($serverPool->getDefaultGateway());
-        $f4->clientToClient($serverPool->getClientToClient());
-        $f6->clientToClient($serverPool->getClientToClient());
-
-        // get the ranges
-        $range = $serverPool->getRange();
-        $range6 = $serverPool->getRange6();
-
-        $routes = $serverPool->getRoutes();
-        $ip4Routes = [];
-        $ip6Routes = [];
-
-        foreach ($routes as $r) {
-            if (6 === $r->getFamily()) {
-                $ip6Routes[] = $r;
-            } else {
-                $ip4Routes[] = $r;
-            }
-        }
-
-        $f4->addRange($serverPool->getId(), $range, $ip4Routes);
-        $f6->addRange($serverPool->getId(), $range6, $ip6Routes);
-    }
+    $firewall = Firewall::getFirewall4($p, $extIf, $useNat);
+    $firewall6 = Firewall::getFirewall6($p, $extIf, $useNat, $drop6);
 
     if ($installFw) {
-        if (false === @file_put_contents('/etc/sysconfig/iptables', $f4->getFirewall())) {
+        if (false === @file_put_contents('/etc/sysconfig/iptables', $firewall)) {
             throw new Exception('unable to write /etc/sysconfig/iptables');
         }
 
-        if (false === @file_put_contents('/etc/sysconfig/ip6tables', $f6->getFirewall())) {
+        if (false === @file_put_contents('/etc/sysconfig/ip6tables', $firewall6)) {
             throw new Exception('unable to write /etc/sysconfig/ip6tables');
         }
     } else {
         echo '##########################################'.PHP_EOL;
         echo '# IPv4'.PHP_EOL;
         echo '##########################################'.PHP_EOL;
-        echo $f4->getFirewall();
+        echo $firewall;
 
         echo '##########################################'.PHP_EOL;
         echo '# IPv6'.PHP_EOL;
         echo '##########################################'.PHP_EOL;
-        echo $f6->getFirewall();
+        echo $firewall6;
     }
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
