@@ -27,7 +27,7 @@ use fkooman\VPN\Server\OpenVpn\Exception\ManagementSocketException;
  */
 class ServerManager
 {
-    /** @var array */
+    /** @var \fkooman\VPN\Server\Pools */
     private $pools;
 
     /** @var ManagementSocketInterface */

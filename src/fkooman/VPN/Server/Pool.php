@@ -51,7 +51,10 @@ class Pool
     /** @var bool */
     private $clientToClient;
 
-    /** @var string */
+    /** @var IP */
+    private $managementIp;
+
+    /** @var IP */
     private $listen;
 
     /** @var array */
