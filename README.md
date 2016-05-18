@@ -27,7 +27,7 @@ Point `crl/path` to a writable directory, e.g. `data/` under the current
 directory. The defaults in this file, and in the other files are for the 
 production deployment setup and will not work well for development.
 
-    $ cp config/ip.yaml.example config/ip.yaml
+    $ cp config/pools.yaml.example config/pools.yaml
 
 Point `configDir` to a writable directory, and optionally modify
 the IP configuration.

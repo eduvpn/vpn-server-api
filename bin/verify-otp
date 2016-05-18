@@ -65,13 +65,13 @@ try {
     $userId = substr($commonName, 0, strpos($commonName, '_'));
 
     // obtain the OTP secret from the CN's configuration
-    $ipConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/ip.yaml')
+    $poolsConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/pools.yaml')
     );
 
     // retrieve the user's configuration file
     $io = new IO();
-    $userFile = sprintf('%s/users/%s', $ipConfig->v('configDir'), $userId);
+    $userFile = sprintf('%s/users/%s', $poolsConfig->v('configDir'), $userId);
     if (!$io->isFile($userFile)) {
         $userConfig = new UserConfig([]);
     } else {

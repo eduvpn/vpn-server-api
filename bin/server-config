@@ -62,8 +62,8 @@ try {
         throw new Exception('must specificy either CN or --reuse flag');
     }
 
-    $ipConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/ip.yaml')
+    $poolsConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/pools.yaml')
     );
 
     $mainConfig = new Reader(
@@ -114,7 +114,7 @@ try {
         }
     }
 
-    $serverConfigurations = ServerConfig::getConfig(new Pools($ipConfig->v('pools')));
+    $serverConfigurations = ServerConfig::getConfig(new Pools($poolsConfig->v('pools')));
     //var_export($serverConfigurations);
     foreach ($serverConfigurations as $k => $serverConfig) {
         $io->writeFile(sprintf('/etc/openvpn/server-%s.conf', $k), implode(PHP_EOL, $serverConfig));

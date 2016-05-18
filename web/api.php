@@ -46,11 +46,11 @@ try {
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
 
-    $ipConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/ip.yaml')
+    $poolsConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/pools.yaml')
     );
 
-    $serverPools = new Pools($ipConfig->v('pools'));
+    $serverPools = new Pools($poolsConfig->v('pools'));
 
     $logConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/log.yaml')
@@ -124,8 +124,8 @@ try {
     $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     $service->addModule(new LogModule($connectionLog));
     $service->addModule(new OpenVpnModule($serverManager));
-    $service->addModule(new UserConfigModule($ipConfig->v('configDir').'/users', $logger, $io));
-    $service->addModule(new CnConfigModule($ipConfig->v('configDir').'/common_names', $logger, $io));
+    $service->addModule(new UserConfigModule($poolsConfig->v('configDir').'/users', $logger, $io));
+    $service->addModule(new CnConfigModule($poolsConfig->v('configDir').'/common_names', $logger, $io));
     $service->addModule(new CaModule($crlFetcher, $logger));
     $service->addModule(new InfoModule($serverPools));
     $service->run()->send();

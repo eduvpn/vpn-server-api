@@ -61,8 +61,8 @@ try {
     $userId = substr($commonName, 0, strpos($commonName, '_'));
 
     // read configuration
-    $ipConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/ip.yaml')
+    $poolsConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/pools.yaml')
     );
 
     $logConfig = new Reader(
@@ -71,7 +71,7 @@ try {
 
     // retrieve the user's configuration file
     $io = new IO();
-    $userFile = sprintf('%s/users/%s', $ipConfig->v('configDir'), $userId);
+    $userFile = sprintf('%s/users/%s', $poolsConfig->v('configDir'), $userId);
     if (!$io->isFile($userFile)) {
         $userConfig = new UserConfig([]);
     } else {
@@ -84,7 +84,7 @@ try {
 
     // retrieve the cn's configuration file
     $io = new IO();
-    $commonNameFile = sprintf('%s/common_names/%s', $ipConfig->v('configDir'), $commonName);
+    $commonNameFile = sprintf('%s/common_names/%s', $poolsConfig->v('configDir'), $commonName);
     if (!$io->isFile($commonNameFile)) {
         $cnConfig = new CnConfig([]);
     } else {

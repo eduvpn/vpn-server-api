@@ -60,11 +60,11 @@ try {
         throw new Exception('missing interface');
     }
 
-    $ipConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/ip.yaml')
+    $poolsConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/pools.yaml')
     );
 
-    $p = new Pools($ipConfig->v('pools'));
+    $p = new Pools($poolsConfig->v('pools'));
 
     $firewall = Firewall::getFirewall4($p, $extIf, $useNat);
     $firewall6 = Firewall::getFirewall6($p, $extIf, $useNat, $drop6);
