@@ -59,18 +59,18 @@ class Pool
 
     public function __construct($poolNumber, array $poolData)
     {
-        $this->setId(Utils::validate($poolData, 'id'));
-        $this->setName(Utils::validate($poolData, 'name', false, $this->getId()));
-        $this->setHostName(Utils::validate($poolData, 'hostName'));
-        $this->setDefaultGateway(Utils::validate($poolData, 'defaultGateway', false, false));
-        $this->setRange(new IP(Utils::validate($poolData, 'range')));
-        $this->setRange6(new IP(Utils::validate($poolData, 'range6')));
-        $this->setRoutes(Utils::validate($poolData, 'routes', false, []));
-        $this->setDns(Utils::validate($poolData, 'dns', false, []));
-        $this->setTwoFactor(Utils::validate($poolData, 'twoFactor', false, false));
-        $this->setClientToClient(Utils::validate($poolData, 'clientToClient', false, false));
+        $this->setId(self::validate($poolData, 'id'));
+        $this->setName(self::validate($poolData, 'name', false, $this->getId()));
+        $this->setHostName(self::validate($poolData, 'hostName'));
+        $this->setDefaultGateway(self::validate($poolData, 'defaultGateway', false, false));
+        $this->setRange(new IP(self::validate($poolData, 'range')));
+        $this->setRange6(new IP(self::validate($poolData, 'range6')));
+        $this->setRoutes(self::validate($poolData, 'routes', false, []));
+        $this->setDns(self::validate($poolData, 'dns', false, []));
+        $this->setTwoFactor(self::validate($poolData, 'twoFactor', false, false));
+        $this->setClientToClient(self::validate($poolData, 'clientToClient', false, false));
         $this->setManagementIp(new IP(sprintf('127.42.%d.1', $poolNumber)));
-        $this->setListen(new IP(Utils::validate($poolData, 'listen', false, '::')));
+        $this->setListen(new IP(self::validate($poolData, 'listen', false, '::')));
 
         $this->populateInstances();
     }
@@ -300,5 +300,18 @@ class Pool
             'routes' => $routesList,
             'twoFactor' => $this->getTwoFactor(),
         ];
+    }
+
+    private static function validate(array $configData, $configName, $requiredField = true, $defaultValue = false)
+    {
+        if (!array_key_exists($configName, $configData)) {
+            if ($requiredField) {
+                throw new RuntimeException(sprintf('missing configuration field "%s"', $configName));
+            }
+
+            return $defaultValue;
+        }
+
+        return $configData[$configName];
     }
 }

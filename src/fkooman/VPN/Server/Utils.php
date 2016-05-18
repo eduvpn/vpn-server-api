@@ -19,23 +19,9 @@ namespace fkooman\VPN\Server;
 
 use fkooman\Http\Exception\ForbiddenException;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
-use RuntimeException;
 
 class Utils
 {
-    public static function validate(array $configData, $configName, $requiredField = true, $defaultValue = false)
-    {
-        if (!array_key_exists($configName, $configData)) {
-            if ($requiredField) {
-                throw new RuntimeException(sprintf('missing configuration field "%s"', $configName));
-            }
-
-            return $defaultValue;
-        }
-
-        return $configData[$configName];
-    }
-
     public static function requireScope(TokenInfo $tokenInfo, array $requiredScope)
     {
         foreach ($requiredScope as $s) {
