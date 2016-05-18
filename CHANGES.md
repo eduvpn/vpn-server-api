@@ -1,5 +1,15 @@
 # Changelog
 
+## 7.0.0 (...)
+- rename `config/ip.yaml` to `config/pools.yaml` and update file format, see
+  `config/pools.yaml.example`
+- implement "Pools" allowing multiple groups of instances of OpenVPN servers 
+  running on different IP addresses
+- major refactoring and cleaning up of code
+- use `/etc/openvpn/tls` to store the certificates and keys now instead of 
+  inline, making the `server-config --reuse` a lot simpler to implement
+- 
+
 ## 6.0.3 (2016-05-11)
 - expose client-to-client config setting through info API
 

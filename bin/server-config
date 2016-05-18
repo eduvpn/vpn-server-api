@@ -33,7 +33,7 @@ $keyFile = sprintf('%s/server.key', $tlsDir);
 $taFile = sprintf('%s/ta.key', $tlsDir);
 
 # the size of the DH prime
-$dhLength = 1024;
+$dhLength = 3072;
 
 function showHelp(array $argv)
 {
