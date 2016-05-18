@@ -23,7 +23,6 @@ use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\JsonResponse;
 use Psr\Log\LoggerInterface;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
-use fkooman\VPN\Server\Utils;
 
 class CaModule implements ServiceModuleInterface
 {
@@ -44,7 +43,7 @@ class CaModule implements ServiceModuleInterface
         $service->post(
             '/ca/crl/fetch',
             function (Request $request, TokenInfo $tokenInfo) {
-                Utils::requireScope($tokenInfo, ['admin', 'portal']);
+                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
 
                 $this->logger->info('fetching CRL');
 

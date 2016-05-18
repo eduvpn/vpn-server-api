@@ -23,7 +23,6 @@ use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\JsonResponse;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use fkooman\VPN\Server\Pools;
-use fkooman\VPN\Server\Utils;
 
 class InfoModule implements ServiceModuleInterface
 {
@@ -40,7 +39,7 @@ class InfoModule implements ServiceModuleInterface
         $service->get(
             '/info/server',
             function (Request $request, TokenInfo $tokenInfo) {
-                Utils::requireScope($tokenInfo, ['admin', 'portal']);
+                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
 
                 return $this->getInfo();
             }

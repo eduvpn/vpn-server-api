@@ -26,7 +26,6 @@ use fkooman\VPN\Server\InputValidation;
 use fkooman\Json\Json;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use fkooman\IO\IOInterface;
-use fkooman\VPN\Server\Utils;
 
 class CnConfigModule implements ServiceModuleInterface
 {
@@ -53,7 +52,7 @@ class CnConfigModule implements ServiceModuleInterface
         $service->get(
             '/config/common_names',
             function (Request $request, TokenInfo $tokenInfo) {
-                Utils::requireScope($tokenInfo, ['admin', 'portal']);
+                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
                 $userId = $request->getUrl()->getQueryParameter('user_id');
                 if (!is_null($userId)) {
                     InputValidation::userId($userId);
@@ -61,7 +60,7 @@ class CnConfigModule implements ServiceModuleInterface
                     $fileFilter = sprintf('%s_*', $userId);
                 } else {
                     // only admin is allow to request all CNs for all users
-                    Utils::requireScope($tokenInfo, ['admin']);
+                    $tokenInfo->getScope()->requireScope(['admin']);
                     $fileFilter = '*';
                 }
 
@@ -86,7 +85,7 @@ class CnConfigModule implements ServiceModuleInterface
         $service->get(
             '/config/common_names/:commonName',
             function (Request $request, TokenInfo $tokenInfo, $commonName) {
-                Utils::requireScope($tokenInfo, ['admin']);
+                $tokenInfo->getScope()->requireScope(['admin']);
                 InputValidation::commonName($commonName);
 
                 $fileName = sprintf('%s/%s', $this->configDir, $commonName);
@@ -114,7 +113,7 @@ class CnConfigModule implements ServiceModuleInterface
         $service->put(
             '/config/common_names/:commonName',
             function (Request $request, TokenInfo $tokenInfo, $commonName) {
-                Utils::requireScope($tokenInfo, ['admin']);
+                $tokenInfo->getScope()->requireScope(['admin']);
                 InputValidation::commonName($commonName);
 
                 // we wrap the request body in an CnConfig object to validate

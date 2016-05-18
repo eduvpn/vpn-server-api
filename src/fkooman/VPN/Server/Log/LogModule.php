@@ -25,7 +25,6 @@ use fkooman\Http\JsonResponse;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use DateTime;
-use fkooman\VPN\Server\Utils;
 
 class LogModule implements ServiceModuleInterface
 {
@@ -49,7 +48,7 @@ class LogModule implements ServiceModuleInterface
         $service->get(
             '/log/:showDate',
             function (Request $request, TokenInfo $tokenInfo, $showDate) {
-                Utils::requireScope($tokenInfo, ['admin']);
+                $tokenInfo->getScope()->requireScope(['admin']);
 
                 InputValidation::date($showDate);
 

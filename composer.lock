@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3702496f8859b7f05cd56270642e2910",
-    "content-hash": "facb53548df45191b8cbf99ccc39db5c",
+    "hash": "c8af670f5ad309ce5e35d8019927743e",
+    "content-hash": "6d1215d4e96689160fcf721bd90d821b",
     "packages": [
         {
             "name": "christian-riesen/base32",
@@ -368,16 +368,16 @@
         },
         {
             "name": "fkooman/rest-plugin-authentication-bearer",
-            "version": "2.3.0",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-lib-rest-plugin-authentication-bearer.git",
-                "reference": "08c97721f98d4a74a021325da6b543934cb23bb4"
+                "reference": "8f6a956823225ccc84b3903d3f9b5a4583fe6fbf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-lib-rest-plugin-authentication-bearer/zipball/08c97721f98d4a74a021325da6b543934cb23bb4",
-                "reference": "08c97721f98d4a74a021325da6b543934cb23bb4",
+                "url": "https://api.github.com/repos/fkooman/php-lib-rest-plugin-authentication-bearer/zipball/8f6a956823225ccc84b3903d3f9b5a4583fe6fbf",
+                "reference": "8f6a956823225ccc84b3903d3f9b5a4583fe6fbf",
                 "shasum": ""
             },
             "require": {
@@ -407,7 +407,7 @@
                 }
             ],
             "description": "Bearer (OAuth) Authentication plugin for fkooman/rest-plugin-authentication",
-            "time": "2016-02-26 17:37:24"
+            "time": "2016-05-18 11:47:41"
         },
         {
             "name": "guzzlehttp/guzzle",

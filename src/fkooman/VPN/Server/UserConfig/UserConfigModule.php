@@ -26,7 +26,6 @@ use fkooman\VPN\Server\InputValidation;
 use fkooman\Json\Json;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use fkooman\IO\IOInterface;
-use fkooman\VPN\Server\Utils;
 use fkooman\Http\Exception\BadRequestException;
 
 class UserConfigModule implements ServiceModuleInterface
@@ -52,7 +51,7 @@ class UserConfigModule implements ServiceModuleInterface
         $service->get(
             '/config/users',
             function (Request $request, TokenInfo $tokenInfo) {
-                Utils::requireScope($tokenInfo, ['admin']);
+                $tokenInfo->getScope()->requireScope(['admin']);
 
                 $userConfigArray = [];
                 foreach ($this->io->readFolder($this->configDir) as $configFile) {
@@ -76,7 +75,7 @@ class UserConfigModule implements ServiceModuleInterface
         $service->get(
             '/config/users/:userId',
             function (Request $request, TokenInfo $tokenInfo, $userId) {
-                Utils::requireScope($tokenInfo, ['admin', 'portal']);
+                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
                 InputValidation::userId($userId);
 
                 $fileName = sprintf('%s/%s', $this->configDir, $userId);
@@ -105,7 +104,7 @@ class UserConfigModule implements ServiceModuleInterface
         $service->put(
             '/config/users/:userId/otp_secret',
             function (Request $request, TokenInfo $tokenInfo, $userId) {
-                Utils::requireScope($tokenInfo, ['admin', 'portal']);
+                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
                 InputValidation::userId($userId);
 
                 $fileName = sprintf('%s/%s', $this->configDir, $userId);
@@ -154,7 +153,7 @@ class UserConfigModule implements ServiceModuleInterface
         $service->put(
             '/config/users/:userId',
             function (Request $request, TokenInfo $tokenInfo, $userId) {
-                Utils::requireScope($tokenInfo, ['admin']);
+                $tokenInfo->getScope()->requireScope(['admin']);
                 InputValidation::userId($userId);
 
                 // we wrap the request body in an UserConfig object to validate
