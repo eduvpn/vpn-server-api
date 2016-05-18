@@ -208,7 +208,7 @@ class ServerConfig
 
     private static function getProto(Pool $pool, Instance $instance)
     {
-        if (6 === $pool->getListen()->getFamily()) {
+        if (6 === $pool->getListen()->getFamily() && '::' !== $pool->getListen()->getAddress()) {
             if ('tcp' === $instance->getProto()) {
                 $proto = 'tcp6-server';
             } else {
