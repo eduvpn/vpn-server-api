@@ -19,10 +19,10 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use fkooman\VPN\Server\Pools;
+use fkooman\VPN\Server\ServerConfig;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use GuzzleHttp\Client;
-use fkooman\VPN\Server\Utils;
 use fkooman\IO\IO;
 
 $dhFile = '/etc/openvpn/dh.pem';
@@ -104,14 +104,20 @@ try {
         $io->writeFile($keyFile, $configData['key']);
         $io->writeFile($taFile, $configData['ta']);
 
-        Utils::exec(sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength));
+        // generate the DH params
+        $cmd = sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength);
+        $output = [];
+        $returnValue = -1;
+        exec($cmd, $output, $returnValue);
+        if (0 !== $returnValue) {
+            throw new RuntimeException('unable to generate DH');
+        }
     }
 
-    $p = new Pools($ipConfig->v('pools'));
-    foreach ($p as $pool) {
-        foreach ($pool->getServerConfig() as $id => $serverConfig) {
-            $io->writeFile(sprintf('/etc/openvpn/server-%s.conf', $id), implode(PHP_EOL, $serverConfig));
-        }
+    $serverConfigurations = ServerConfig::getConfig(new Pools($ipConfig->v('pools')));
+    //var_export($serverConfigurations);
+    foreach ($serverConfigurations as $k => $serverConfig) {
+        $io->writeFile(sprintf('/etc/openvpn/server-%s.conf', $k), implode(PHP_EOL, $serverConfig));
     }
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL;

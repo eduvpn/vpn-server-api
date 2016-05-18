@@ -19,7 +19,93 @@ namespace fkooman\VPN\Server;
 
 class ServerConfig
 {
-    public static function get(Pool $pool, Instance $instance)
+    public static function getConfig(Pools $pools)
+    {
+        $allConfig = [];
+
+        foreach ($pools as $pool) {
+            foreach ($pool->getInstances() as $i => $instance) {
+                // static options
+                $serverConfig = [
+                    '# OpenVPN Server Configuration',
+                    'verb 3',
+                    'user openvpn',
+                    'group openvpn',
+                    'topology subnet',
+                    'persist-key',
+                    'persist-tun',
+                    'keepalive 10 60',
+                    'comp-lzo no',
+                    'remote-cert-tls client',
+                    'tls-version-min 1.2',
+                    'tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA',
+                    'auth SHA256',
+                    'cipher AES-256-CBC',
+                    'ca /etc/openvpn/tls/ca.crt',
+                    'cert /etc/openvpn/tls/server.crt',
+                    'key /etc/openvpn/tls/server.key',
+                    'dh /etc/openvpn/tls/dh.pem',
+                    'tls-auth /etc/openvpn/tls/ta.key 0',
+                    'crl-verify /var/lib/vpn-server-api/ca.crl',
+                    'client-connect /usr/bin/vpn-server-api-client-connect',
+                    'client-disconnect /usr/bin/vpn-server-api-client-disconnect',
+                    'push "comp-lzo no"',
+                    'push "explicit-exit-notify 3"',
+                ];
+
+                // Routes
+                $serverConfig = array_merge($serverConfig, self::getRoutes($pool));
+
+                // DNS
+                $serverConfig = array_merge($serverConfig, self::getDns($pool));
+
+                // Client-to-client
+                $serverConfig = array_merge($serverConfig, self::getClientToClient($pool));
+
+                // OTP
+                $serverConfig = array_merge($serverConfig, self::getOtp($pool));
+
+                // IP configuration
+                $serverConfig[] = sprintf('server %s %s', $instance->getRange()->getNetwork(), $instance->getRange()->getNetmask());
+                $serverConfig[] = sprintf('server-ipv6 %s', $instance->getRange6());
+                $serverConfig[] = sprintf('max-clients %d', $instance->getRange()->getNumberOfHosts() - 1);
+
+                // TCP options
+                $serverConfig = array_merge($serverConfig, self::getTcpOptions($instance));
+
+                // Script Security
+                $serverConfig[] = sprintf('script-security %d', $pool->getTwoFactor() ? 3 : 2);
+
+                # increase the renegotiation time to 8h from the default of 1h when
+                # using 2FA, otherwise the user will be asked for the 2FA key every
+                # hour
+                $serverConfig[] = sprintf('reneg-sec %d', $pool->getTwoFactor() ? 28800 : 3600);
+
+                // Management
+                $serverConfig[] = sprintf('management %s %d', $pool->getManagementIp()->getAddress(), $instance->getManagementPort());
+
+                // Listen
+                $serverConfig = array_merge($serverConfig, self::getListen($pool, $instance));
+
+                // Dev
+                $serverConfig[] = sprintf('dev %s', $instance->getDev());
+
+                // Proto
+                $serverConfig = array_merge($serverConfig, self::getProto($pool, $instance));
+
+                // Port
+                $serverConfig[] = sprintf('port %d', $instance->getPort());
+
+                sort($serverConfig, SORT_STRING);
+
+                $allConfig[sprintf('%s-%d', $pool->getId(), $i)] = $serverConfig;
+            }
+        }
+
+        return $allConfig;
+    }
+
+    private static function getRoutes(Pool $pool)
     {
         $routeConfig = [];
         if ($pool->getDefaultGateway()) {
@@ -27,7 +113,10 @@ class ServerConfig
 
             # for Windows clients we need this extra route to mark the TAP adapter as 
             # trusted and as having "Internet" access to allow the user to set it to 
-            # "Home" or "Work" to allow accessing file shares and printers  
+            # "Home" or "Work" to allow accessing file shares and printers
+            # NOTE: this will break OS X tunnelblick because on disconnect it will
+            # remove all default routes, including the one set before the VPN 
+            # was brought up
             #$routeConfig[] = 'push "route 0.0.0.0 0.0.0.0"';
 
             # for iOS we need this OpenVPN 2.4 "ipv6" flag to redirect-gateway
@@ -38,7 +127,7 @@ class ServerConfig
             # networks where the ::/0 default route already exists
             $routeConfig[] = 'push "route-ipv6 2000::/3"';
         } else {
-            // there are some routes specified, push those, and not the default 
+            // there may be some routes specified, push those, and not the default 
             foreach ($pool->getRoutes() as $route) {
                 if (6 === $route->getFamily()) {
                     // IPv6
@@ -50,44 +139,76 @@ class ServerConfig
             }
         }
 
-        # we always push pool range if clientToClient is enabled
-        if ($pool->getClientToClient()) {
-            $routeConfig[] = sprintf('push "route %s %s"', $pool->getRange()->getAddress(), $pool->getRange()->getNetmask());
-            $routeConfig[] = sprintf('push "route-ipv6 %s"', $pool->getRange6()->getAddressPrefix());
+        return $routeConfig;
+    }
+
+    private static function getDns(Pool $pool)
+    {
+        // only push DNS if we are the default route
+        if (!$pool->getDefaultGateway()) {
+            return [];
         }
 
         $dnsEntries = [];
-        if ($pool->getDefaultGateway()) {
-            // only push DNS when we are the default route
-            foreach ($pool->getDns() as $dnsAddress) {
-                $dnsEntries[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress->getAddress());
-            }
+        foreach ($pool->getDns() as $dnsAddress) {
+            $dnsEntries[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress->getAddress());
         }
 
-        $tfaEntries = [];
-        if ($pool->getTwoFactor()) {
-            $tfaEntries[] = 'auth-user-pass-verify /usr/bin/vpn-server-api-verify-otp via-env';
+        return $dnsEntries;
+    }
+
+    private static function getOtp(Pool $pool)
+    {
+        if (!$pool->getTwoFactor()) {
+            return [];
         }
 
-        $tcpOptions = [];
+        return ['auth-user-pass-verify /usr/bin/vpn-server-api-verify-otp via-env'];
+    }
+
+    private static function getClientToClient(Pool $pool)
+    {
+        if (!$pool->getClientToClient()) {
+            return [];
+        }
+
+        return [
+            'client-to-client',
+            sprintf('push "route %s %s"', $pool->getRange()->getAddress(), $pool->getRange()->getNetmask()),
+            sprintf('push "route-ipv6 %s"', $pool->getRange6()->getAddressPrefix()),
+        ];
+    }
+
+    private static function getTcpOptions(Instance $instance)
+    {
+        if ('tcp' !== $instance->getProto()) {
+            return [];
+        }
+
+        return [
+            'socket-flags TCP_NODELAY',
+            'push "socket-flags TCP_NODELAY"',
+        ];
+    }
+
+    private static function getListen(Pool $pool, Instance $instance)
+    {
+        // TCP instance always listens on management IP as sniproxy
+        // will redirect traffic there
         if ('tcp' === $instance->getProto()) {
-            $tcpOptions[] = 'socket-flags TCP_NODELAY';
-            $tcpOptions[] = 'push "socket-flags TCP_NODELAY"';
+            return [
+                sprintf('local %s', $pool->getManagementIp()->getAddress()),
+            ];
         }
 
-        $clientToClient = [];
-        if ($pool->getClientToClient()) {
-            $clientToClient[] = 'client-to-client';
-        }
+        return [
+            sprintf('local %s', $pool->getListen()->getAddress()),
+        ];
+    }
 
-        if ('tcp' === $instance->getProto()) {
-            // must listen on managementIp
-            $listen = $pool->getManagementIp();
-        } else {
-            $listen = $pool->getListen();
-        }
-
-        if (6 === $listen->getFamily()) {
+    private static function getProto(Pool $pool, Instance $instance)
+    {
+        if (6 === $pool->getListen()->getFamily()) {
             if ('tcp' === $instance->getProto()) {
                 $proto = 'tcp6-server';
             } else {
@@ -102,91 +223,7 @@ class ServerConfig
         }
 
         return [
-            '# OpenVPN Server Configuration',
-
-            sprintf('dev %s', $instance->getDev()),
-
-            sprintf('local %s', $listen->getAddress()),
-
-            # UDP6 (works also for UDP)
             sprintf('proto %s', $proto),
-            sprintf('port %d', $instance->getPort()),
-
-            # IPv4
-            sprintf('server %s %s', $instance->getRange()->getNetwork(), $instance->getRange()->getNetmask()),
-
-            # IPv6
-            sprintf('server-ipv6 %s', $instance->getRange6()),
-
-            implode(PHP_EOL, $routeConfig),
-
-            implode(PHP_EOL, $clientToClient),
-
-            'topology subnet',
-            # disable compression
-            'comp-lzo no',
-            'push "comp-lzo no"',
-            'persist-key',
-            'persist-tun',
-            'verb 3',
-            sprintf('max-clients %d', $instance->getRange()->getNumberOfHosts() - 1),
-            'keepalive 10 60',
-            'user openvpn',
-            'group openvpn',
-            'remote-cert-tls client',
-
-            # when using TCP, we want to reduce the latency of the TCP tunnel
-            implode(PHP_EOL, $tcpOptions),
-
-            # CRYPTO (DATA CHANNEL)
-            'auth SHA256',
-            'cipher AES-256-CBC',
-
-            # CRYPTO (CONTROL CHANNEL)
-            # @see RFC 7525  
-            # @see https://bettercrypto.org
-            # @see https://community.openvpn.net/openvpn/wiki/Hardening
-            'tls-version-min 1.2',
-
-            # To work with default configuration in iOS OpenVPN with
-            # "Force AES-CBC ciphersuites" enabled, we need to accept an 
-            # additional cipher "TLS_DHE_RSA_WITH_AES_256_CBC_SHA"
-            'tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA',
-
-            sprintf('script-security %d', $pool->getTwoFactor() ? 3 : 2),
-            'client-connect /usr/bin/vpn-server-api-client-connect',
-            'client-disconnect /usr/bin/vpn-server-api-client-disconnect',
-
-            # increase the renegotiation time to 8h from the default of 1h when
-            # using 2FA, otherwise the user will be asked for the 2FA key every
-            # hour
-            sprintf('reneg-sec %d', $pool->getTwoFactor() ? 28800 : 3600),
-
-            # 2FA
-            implode(PHP_EOL, $tfaEntries),
-
-            # Certificate Revocation List
-            'crl-verify /var/lib/vpn-server-api/ca.crl',
-
-            # ask client to tell us on disconnect
-            'push "explicit-exit-notify 3"',
-
-            # DNS
-            implode(PHP_EOL, $dnsEntries),
-
-            # disable "netbios", i.e. Windows file sharing over TCP/IP
-            #push "dhcp-option DISABLE-NBT"
-
-            # also send a NTP server
-            #push "dhcp-option NTP time.example.org"
-
-            sprintf('management %s %d', $pool->getManagementIp()->getAddress(), $instance->getManagementPort()),
-
-            'ca /etc/openvpn/ca.crt',
-            'cert /etc/openvpn/server.crt',
-            'key /etc/openvpn/server.key',
-            'dh /etc/openvpn/dh.pem',
-            'tls-auth /etc/openvpn/ta.key 0',
         ];
     }
 }

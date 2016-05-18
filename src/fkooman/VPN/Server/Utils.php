@@ -23,19 +23,6 @@ use RuntimeException;
 
 class Utils
 {
-    public static function exec($cmd, $throwExceptionOnFailure = true)
-    {
-        exec($cmd, $output, $returnValue);
-
-        if (0 !== $returnValue) {
-            if ($throwExceptionOnFailure) {
-                throw new RuntimeException(
-                    sprintf('command "%s" did not complete successfully (%d)', $cmd, $returnValue)
-                );
-            }
-        }
-    }
-
     public static function validate(array $configData, $configName, $requiredField = true, $defaultValue = false)
     {
         if (!array_key_exists($configName, $configData)) {

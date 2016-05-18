@@ -301,14 +301,4 @@ class Pool
             'twoFactor' => $this->getTwoFactor(),
         ];
     }
-
-    public function getServerConfig()
-    {
-        $serverConfig = [];
-        foreach ($this->getInstances() as $k => $instance) {
-            $serverConfig[sprintf('%s-%d', $this->getId(), $k)] = ServerConfig::get($this, $instance);
-        }
-
-        return $serverConfig;
-    }
 }
