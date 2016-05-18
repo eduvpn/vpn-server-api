@@ -210,7 +210,7 @@ class ServerConfig
     {
         if ('tcp' === $instance->getProto()) {
             // tcp
-            if ('::' === $pool->getListen()->getAddress()) {
+            if (4 === $pool->getListen()->getFamily() || '::' === $pool->getListen()->getAddress()) {
                 // this is the default, so we listen on IPv4
                 $proto = 'tcp-server';
             } else {

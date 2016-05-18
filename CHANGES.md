@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.0.1 (2016-05-18)
+- again fix a proto case when an actual IPv4 address is specified in listen
+
 ## 7.0.0 (2016-05-18)
 - rename `config/ip.yaml` to `config/pools.yaml` and update file format, see
   `config/pools.yaml.example`
