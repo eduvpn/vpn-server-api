@@ -1,6 +1,6 @@
 # Changelog
 
-## 7.0.0 (...)
+## 7.0.0 (2016-05-18)
 - rename `config/ip.yaml` to `config/pools.yaml` and update file format, see
   `config/pools.yaml.example`
 - implement "Pools" allowing multiple groups of instances of OpenVPN servers 
