@@ -208,15 +208,18 @@ class ServerConfig
 
     private static function getProto(Pool $pool, Instance $instance)
     {
-        if (6 === $pool->getListen()->getFamily() && '::' !== $pool->getListen()->getAddress()) {
-            if ('tcp' === $instance->getProto()) {
-                $proto = 'tcp6-server';
+        if ('tcp' === $instance->getProto()) {
+            // tcp
+            if ('::' === $pool->getListen()->getAddress()) {
+                // this is the default, so we listen on IPv4
+                $proto = 'tcp-server';
             } else {
-                $proto = 'udp6';
+                $proto = 'tcp6-server';
             }
         } else {
-            if ('tcp' === $instance->getProto()) {
-                $proto = 'tcp-server';
+            // udp
+            if (6 === $pool->getListen()->getFamily()) {
+                $proto = 'udp6';
             } else {
                 $proto = 'udp';
             }

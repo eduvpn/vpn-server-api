@@ -102,7 +102,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
                     17 => 'persist-key',
                     18 => 'persist-tun',
                     19 => 'port 1194',
-                    20 => 'proto tcp6-server',
+                    20 => 'proto tcp-server',
                     21 => 'push "comp-lzo no"',
                     22 => 'push "explicit-exit-notify 3"',
                     23 => 'push "route 192.168.1.0 255.255.255.0"',
