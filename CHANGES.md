@@ -8,7 +8,10 @@
 - major refactoring and cleaning up of code
 - use `/etc/openvpn/tls` to store the certificates and keys now instead of 
   inline, making the `server-config --reuse` a lot simpler to implement
-- 
+- fix configuration file permissions when running `server-config`
+- no longer specify the instances manually, all autodetect
+- no longer specify the firewall ports manually, all autodetect
+- much more code coverage for unit tests
 
 ## 6.0.3 (2016-05-11)
 - expose client-to-client config setting through info API
