@@ -25,14 +25,15 @@ use fkooman\Config\YamlFile;
 use GuzzleHttp\Client;
 use fkooman\IO\IO;
 
-$dhFile = '/etc/openvpn/dh.pem';
-$caFile = '/etc/openvpn/ca.crt';
-$certFile = '/etc/openvpn/server.crt';
-$keyFile = '/etc/openvpn/server.key';
-$taFile = '/etc/openvpn/ta.key';
+$tlsDir = '/etc/openvpn/tls';
+$dhFile = sprintf('%s/dh.pem', $tlsDir);
+$caFile = sprintf('%s/ca.crt', $tlsDir);
+$certFile = sprintf('%s/server.crt', $tlsDir);
+$keyFile = sprintf('%s/server.key', $tlsDir);
+$taFile = sprintf('%s/ta.key', $tlsDir);
 
 # the size of the DH prime
-$dhLength = 3072;
+$dhLength = 1024;
 
 function showHelp(array $argv)
 {
@@ -99,10 +100,10 @@ try {
 
         $configData = $configData['certificate'];
 
-        $io->writeFile($caFile, $configData['ca']);
-        $io->writeFile($certFile, $configData['cert']);
-        $io->writeFile($keyFile, $configData['key']);
-        $io->writeFile($taFile, $configData['ta']);
+        $io->writeFile($caFile, $configData['ca'], true);
+        $io->writeFile($certFile, $configData['cert'], true);
+        $io->writeFile($keyFile, $configData['key'], true);
+        $io->writeFile($taFile, $configData['ta'], true);
 
         // generate the DH params
         $cmd = sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength);
@@ -117,8 +118,19 @@ try {
     $serverConfigurations = ServerConfig::getConfig(new Pools($poolsConfig->v('pools')));
     //var_export($serverConfigurations);
     foreach ($serverConfigurations as $k => $serverConfig) {
-        $io->writeFile(sprintf('/etc/openvpn/server-%s.conf', $k), implode(PHP_EOL, $serverConfig));
+        $configFile = sprintf('/etc/openvpn/server-%s.conf', $k);
+        $io->writeFile($configFile, implode(PHP_EOL, $serverConfig), true);
+        // set correct file permissions
+        chmod($configFile, 0600);
     }
+
+    // fix file and directory permissions
+    chmod($tlsDir, 0700);
+    chmod($caFile, 0600);
+    chmod($certFile, 0600);
+    chmod($keyFile, 0600);
+    chmod($taFile, 0600);
+    chmod($dhFile, 0600);
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL;
     exit(1);
