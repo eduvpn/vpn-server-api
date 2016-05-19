@@ -154,6 +154,9 @@ class ServerConfig
             $dnsEntries[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress->getAddress());
         }
 
+        # prevent DNS leakage on Windows
+        $dnsEntries[] = 'push "block-outside-dns"';
+
         return $dnsEntries;
     }
 

@@ -1,5 +1,8 @@
 # Changelog
 
+## 7.0.2 (2016-05-19)
+- prevent DNS leakage on Windows
+
 ## 7.0.1 (2016-05-18)
 - again fix a proto case when an actual IPv4 address is specified in listen
 
