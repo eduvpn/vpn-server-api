@@ -30,7 +30,7 @@ class FirewallTest extends PHPUnit_Framework_TestCase
                 1 => ':PREROUTING ACCEPT [0:0]',
                 2 => ':OUTPUT ACCEPT [0:0]',
                 3 => ':POSTROUTING ACCEPT [0:0]',
-                4 => '-A POSTROUTING -o eth0 -j MASQUERADE',
+                4 => '-A POSTROUTING -s 10.42.42.0/24 -o eth0 -j MASQUERADE',
                 5 => 'COMMIT',
                 6 => '*filter',
                 7 => ':INPUT ACCEPT [0:0]',
@@ -53,7 +53,7 @@ class FirewallTest extends PHPUnit_Framework_TestCase
                 24 => '-A FORWARD -j REJECT --reject-with icmp-host-prohibited',
                 25 => 'COMMIT',
             ],
-            Firewall::getFirewall4($this->getPools(), 'eth0', true, false, true)
+            Firewall::getFirewall4($this->getPools(), false, true)
         );
     }
 
@@ -65,7 +65,7 @@ class FirewallTest extends PHPUnit_Framework_TestCase
                 1 => ':PREROUTING ACCEPT [0:0]',
                 2 => ':OUTPUT ACCEPT [0:0]',
                 3 => ':POSTROUTING ACCEPT [0:0]',
-                4 => '-A POSTROUTING -o eth0 -j MASQUERADE',
+                4 => '-A POSTROUTING -s fd00:4242:4242::/48 -o eth0 -j MASQUERADE',
                 5 => 'COMMIT',
                 6 => '*filter',
                 7 => ':INPUT ACCEPT [0:0]',
@@ -88,7 +88,7 @@ class FirewallTest extends PHPUnit_Framework_TestCase
                 24 => '-A FORWARD -j REJECT --reject-with icmp6-adm-prohibited',
                 25 => 'COMMIT',
             ],
-            Firewall::getFirewall6($this->getPools(), 'eth0', true, false, true)
+            Firewall::getFirewall6($this->getPools(), false, true)
         );
     }
 
@@ -99,6 +99,8 @@ class FirewallTest extends PHPUnit_Framework_TestCase
                 'default' => [
                     'name' => 'Default Instance',
                     'hostName' => 'vpn.example',
+                    'extIf' => 'eth0',
+                    'useNat' => true,
                     'range' => '10.42.42.0/24',
                     'range6' => 'fd00:4242:4242::/48',
                     'dns' => ['8.8.8.8', '2001:4860:4860::8888'],

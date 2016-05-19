@@ -1,5 +1,11 @@
 # Changelog
 
+## 7.1.0 (2016-05-19)
+- add `useNat` and `extIf` to the `pools.yaml` file
+- allow turning on/off NAT per pool
+- `extIf` can be different per pool, allowing more flexible setups with 
+  multiple interfaces
+
 ## 7.0.2 (2016-05-19)
 - prevent DNS leakage on Windows
 

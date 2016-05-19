@@ -32,6 +32,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
                         'hostName' => 'vpn.example',
                         'range' => '10.42.42.0/25',
                         'range6' => 'fd00:4242:4242::/48',
+                        'extIf' => 'eth0',
                         'dns' => ['8.8.8.8', '2001:4860:4860::8888'],
                         'routes' => ['192.168.1.0/24', 'fd00:1010:1010::/48'],
                     ],

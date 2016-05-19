@@ -29,6 +29,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                 'default' => [
                     'name' => 'Default Instance',
                     'hostName' => 'vpn.example',
+                    'extIf' => 'eth0',
                     'range' => '10.42.42.0/24',
                     'range6' => 'fd00:4242:4242::/48',
                     'dns' => ['8.8.8.8', '2001:4860:4860::8888'],
@@ -44,6 +45,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                   0 => '8.8.8.8',
                   1 => '2001:4860:4860::8888',
                 ),
+                'extIf' => 'eth0',
                 'hostName' => 'vpn.example',
                 'id' => 'default',
                 'instances' => array(
@@ -91,6 +93,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                   1 => 'fd00:1010:1010::/48',
                 ),
                 'twoFactor' => false,
+                'useNat' => false,
             ],
             $p[0]->toArray()
         );

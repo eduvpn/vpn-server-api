@@ -46,6 +46,12 @@ class Pool
     private $dns;
 
     /** @var bool */
+    private $useNat;
+
+    /** @var string */
+    private $extIf;
+
+    /** @var bool */
     private $twoFactor;
 
     /** @var bool */
@@ -70,6 +76,8 @@ class Pool
         $this->setRange6(new IP(self::validate($poolData, 'range6')));
         $this->setRoutes(self::validate($poolData, 'routes', false, []));
         $this->setDns(self::validate($poolData, 'dns', false, []));
+        $this->setUseNat(self::validate($poolData, 'useNat', false, false));
+        $this->setExtIf(self::validate($poolData, 'extIf'));
         $this->setTwoFactor(self::validate($poolData, 'twoFactor', false, false));
         $this->setClientToClient(self::validate($poolData, 'clientToClient', false, false));
         $this->setManagementIp(new IP(sprintf('127.42.%d.1', $poolNumber)));
@@ -169,6 +177,27 @@ class Pool
         return $this->dns;
     }
 
+    public function setUseNat($useNat)
+    {
+        $this->useNat = (bool) $useNat;
+    }
+
+    public function getUseNat()
+    {
+        return $this->useNat;
+    }
+
+    public function setExtIf($extIf)
+    {
+        // XXX validate
+        $this->extIf = $extIf;
+    }
+
+    public function getExtIf()
+    {
+        return $this->extIf;
+    }
+
     public function setTwoFactor($twoFactor)
     {
         $this->twoFactor = (bool) $twoFactor;
@@ -266,9 +295,11 @@ class Pool
             case 26:    // 64 IPs
             case 25:    // 128 IPs
                 return 2;
+            case 24:
+                return 4;
         }
 
-        return 4;
+        return 8;
     }
 
     public function toArray()
@@ -292,6 +323,7 @@ class Pool
             'clientToClient' => $this->getClientToClient(),
             'defaultGateway' => $this->getDefaultGateway(),
             'dns' => $dnsList,
+            'extIf' => $this->getExtIf(),
             'hostName' => $this->getHostName(),
             'id' => $this->getId(),
             'instances' => $instancesList,
@@ -302,6 +334,7 @@ class Pool
             'range6' => $this->getRange6()->getAddressPrefix(),
             'routes' => $routesList,
             'twoFactor' => $this->getTwoFactor(),
+            'useNat' => $this->getUseNat(),
         ];
     }
 

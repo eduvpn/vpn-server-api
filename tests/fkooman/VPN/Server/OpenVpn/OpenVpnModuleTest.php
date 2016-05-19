@@ -140,6 +140,7 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                 'default' => [
                     'name' => 'Default Instance',
                     'hostName' => 'vpn.example',
+                    'extIf' => 'eth0',
                     'range' => '10.42.42.0/24',
                     'range6' => 'fd00:4242:4242::/48',
                     'dns' => ['8.8.8.8', '2001:4860:4860::8888'],

@@ -25,12 +25,10 @@ use fkooman\VPN\Server\Pools;
 function showHelp(array $argv)
 {
     $helpText = [
-        sprintf('SYNTAX: %s [--nat] [--drop6] [--install] interface', $argv[0]),
+        sprintf('SYNTAX: %s [--drop6] [--install]', $argv[0]),
         PHP_EOL,
-        '--nat      use IP masquerading (NAT)',
         '--drop6    do not actually forward IPv6 traffic, reject it',
         '--install  install the firewall rules',
-        'interface  the external interface of the machine, e.g. "eth0"',
         PHP_EOL,
     ];
 
@@ -38,26 +36,15 @@ function showHelp(array $argv)
 }
 
 try {
-    $useNat = false;
-    $extIf = null;
     $installFw = false;
     $drop6 = false;
 
     for ($i = 1; $i < $argc; ++$i) {
-        if ('--nat' === $argv[$i]) {
-            $useNat = true;
-        } elseif ('--drop6' === $argv[$i]) {
+        if ('--drop6' === $argv[$i]) {
             $drop6 = true;
         } elseif ('--install' === $argv[$i]) {
             $installFw = true;
-        } else {
-            $extIf = $argv[$i];
         }
-    }
-
-    if (is_null($extIf)) {
-        showHelp($argv);
-        throw new Exception('missing interface');
     }
 
     $poolsConfig = new Reader(
@@ -66,8 +53,8 @@ try {
 
     $p = new Pools($poolsConfig->v('pools'));
 
-    $firewall = Firewall::getFirewall4($p, $extIf, $useNat);
-    $firewall6 = Firewall::getFirewall6($p, $extIf, $useNat, $drop6);
+    $firewall = Firewall::getFirewall4($p);
+    $firewall6 = Firewall::getFirewall6($p, $drop6);
 
     if ($installFw) {
         if (false === @file_put_contents('/etc/sysconfig/iptables', $firewall)) {

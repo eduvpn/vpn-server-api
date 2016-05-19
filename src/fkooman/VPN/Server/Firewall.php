@@ -19,26 +19,25 @@ namespace fkooman\VPN\Server;
 
 class Firewall
 {
-    public static function getFirewall4(Pools $p, $extIf, $useNat, $disableForward = false, $asArray = false)
+    public static function getFirewall4(Pools $p, $disableForward = false, $asArray = false)
     {
-        return self::getFirewall($p, 4, $extIf, $useNat, $disableForward, $asArray);
+        return self::getFirewall($p, 4, $disableForward, $asArray);
     }
 
-    public static function getFirewall6(Pools $p, $extIf, $useNat, $disableForward = false, $asArray = false)
+    public static function getFirewall6(Pools $p, $disableForward = false, $asArray = false)
     {
-        return self::getFirewall($p, 6, $extIf, $useNat, $disableForward, $asArray);
+        return self::getFirewall($p, 6, $disableForward, $asArray);
     }
 
-    private static function getFirewall(Pools $p, $inetFamily, $extIf, $useNat, $disableForward, $asArray)
+    private static function getFirewall(Pools $p, $inetFamily, $disableForward, $asArray)
     {
         $firewall = [];
+
         // NAT
-        if ($useNat) {
-            $firewall = array_merge($firewall, self::getNat($extIf));
-        }
+        $firewall = array_merge($firewall, self::getNat($p, $inetFamily));
 
         // FILTER
-        $firewall = array_merge($firewall, self::getFilter($p, $inetFamily, $extIf, $disableForward));
+        $firewall = array_merge($firewall, self::getFilter($p, $inetFamily, $disableForward));
 
         if ($asArray) {
             return $firewall;
@@ -47,7 +46,33 @@ class Firewall
         return implode(PHP_EOL, $firewall).PHP_EOL;
     }
 
-    private static function getFilter(Pools $p, $inetFamily, $extIf, $disableForward)
+    private static function getNat(Pools $p, $inetFamily)
+    {
+        $nat = [
+            '*nat',
+            ':PREROUTING ACCEPT [0:0]',
+            ':OUTPUT ACCEPT [0:0]',
+            ':POSTROUTING ACCEPT [0:0]',
+        ];
+
+        foreach ($p as $pool) {
+            if ($pool->getUseNat()) {
+                if (4 === $inetFamily) {
+                    // get the IPv4 range
+                    $srcNet = $pool->getRange()->getAddressPrefix();
+                } else {
+                    // get the IPv6 range
+                    $srcNet = $pool->getRange6()->getAddressPrefix();
+                }
+                $nat[] = sprintf('-A POSTROUTING -s %s -o %s -j MASQUERADE', $srcNet, $pool->getExtIf());
+            }
+        }
+        $nat[] = 'COMMIT';
+
+        return $nat;
+    }
+
+    private static function getFilter(Pools $p, $inetFamily, $disableForward)
     {
         $filter = [
             '*filter',
@@ -60,7 +85,7 @@ class Firewall
         $filter = array_merge($filter, self::getInputChain($p, $inetFamily));
 
         // FORWARD
-        $filter = array_merge($filter, self::getForwardChain($p, $inetFamily, $extIf, $disableForward));
+        $filter = array_merge($filter, self::getForwardChain($p, $inetFamily, $disableForward));
 
         $filter[] = 'COMMIT';
 
@@ -86,7 +111,7 @@ class Firewall
         return $inputChain;
     }
 
-    private static function getForwardChain(Pools $p, $inetFamily, $extIf, $disableForward)
+    private static function getForwardChain(Pools $p, $inetFamily, $disableForward)
     {
         $forwardChain = [
             '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
@@ -109,12 +134,12 @@ class Firewall
                 }
                 if ($pool->getDefaultGateway()) {
                     // allow all traffic to the external interface
-                    $forwardChain[] = sprintf('-A vpn-%s -o %s -j ACCEPT', $pool->getId(), $extIf, $srcNet);
+                    $forwardChain[] = sprintf('-A vpn-%s -o %s -j ACCEPT', $pool->getId(), $pool->getExtIf(), $srcNet);
                 } else {
                     // only allow certain traffic to the external interface
                     foreach ($pool->getRoutes() as $route) {
                         if ($inetFamily === $route->getFamily()) {
-                            $forwardChain[] = sprintf('-A vpn-%s -o %s -d %s -j ACCEPT', $pool->getId(), $extIf, $route->getAddressPrefix());
+                            $forwardChain[] = sprintf('-A vpn-%s -o %s -d %s -j ACCEPT', $pool->getId(), $pool->getExtIf(), $route->getAddressPrefix());
                         }
                     }
                 }
@@ -124,18 +149,6 @@ class Firewall
         $forwardChain[] = sprintf('-A FORWARD -j REJECT --reject-with %s', 4 === $inetFamily ? 'icmp-host-prohibited' : 'icmp6-adm-prohibited');
 
         return $forwardChain;
-    }
-
-    private static function getNat($extIf)
-    {
-        return [
-            '*nat',
-            ':PREROUTING ACCEPT [0:0]',
-            ':OUTPUT ACCEPT [0:0]',
-            ':POSTROUTING ACCEPT [0:0]',
-            sprintf('-A POSTROUTING -o %s -j MASQUERADE', $extIf),
-            'COMMIT',
-        ];
     }
 
     private static function getIngressPorts(Pools $p)

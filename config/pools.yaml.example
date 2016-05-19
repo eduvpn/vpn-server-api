@@ -19,6 +19,13 @@ pools:
         # the hostName to advertize to clients to connect to this pool
         hostName: vpn.example
 
+        # external interface connecting to the Internet or destination networks
+        # for this pool
+        extIf: eth0
+
+        # use NAT for this pool
+        useNat: true
+
         # IPv4 range for clients
         range: 10.42.42.0/24
 
