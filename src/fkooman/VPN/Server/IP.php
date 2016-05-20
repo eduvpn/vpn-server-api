@@ -96,9 +96,7 @@ class IP
      */
     public function getNetmask()
     {
-        if (4 !== $this->getFamily()) {
-            throw new IPException('method only for IPv4');
-        }
+        $this->requireIPv4();
 
         return long2ip(-1 << (32 - $this->getPrefix()));
     }
@@ -108,9 +106,7 @@ class IP
      */
     public function getNetwork()
     {
-        if (4 !== $this->getFamily()) {
-            throw new IPException('method only for IPv4');
-        }
+        $this->requireIPv4();
 
         return long2ip(ip2long($this->getAddress()) & ip2long($this->getNetmask()));
     }
@@ -120,9 +116,7 @@ class IP
      */
     public function getNumberOfHosts()
     {
-        if (4 !== $this->getFamily()) {
-            throw new IPException('method only for IPv4');
-        }
+        $this->requireIPv4();
 
         return pow(2, 32 - $this->getPrefix()) - 2;
     }
@@ -197,5 +191,12 @@ class IP
     public function __toString()
     {
         return $this->getAddressPrefix();
+    }
+
+    private function requireIPv4()
+    {
+        if (4 !== $this->getFamily()) {
+            throw new IPException('method only for IPv4');
+        }
     }
 }
