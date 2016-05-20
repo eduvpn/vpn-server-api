@@ -94,12 +94,7 @@ class Pool
 
     public function setId($id)
     {
-        if (!is_string($id)) {
-            throw new InvalidArgumentException('parameter must be string');
-        }
-        if (0 >= strlen($id)) {
-            throw new DomainException('parameter must be non-empty string');
-        }
+        self::validateString($id);
         $this->id = $id;
     }
 
@@ -110,12 +105,7 @@ class Pool
 
     public function setName($poolName)
     {
-        if (!is_string($poolName)) {
-            throw new InvalidArgumentException('parameter must be string');
-        }
-        if (0 >= strlen($poolName)) {
-            throw new DomainException('parameter must be non-empty string');
-        }
+        self::validateString($poolName);
         $this->poolName = $poolName;
     }
 
@@ -126,12 +116,7 @@ class Pool
 
     public function setHostName($hostName)
     {
-        if (!is_string($hostName)) {
-            throw new InvalidArgumentException('parameter must be string');
-        }
-        if (0 >= strlen($hostName)) {
-            throw new DomainException('parameter must be non-empty string');
-        }
+        self::validateString($hostName);
         $this->hostName = $hostName;
     }
 
@@ -210,12 +195,7 @@ class Pool
 
     public function setExtIf($extIf)
     {
-        if (!is_string($extIf)) {
-            throw new InvalidArgumentException('parameter must be string');
-        }
-        if (0 >= strlen($extIf)) {
-            throw new DomainException('parameter must be non-empty string');
-        }
+        self::validateString($extIf);
         $this->extIf = $extIf;
     }
 
@@ -386,5 +366,15 @@ class Pool
         }
 
         return $configData[$configName];
+    }
+
+    private static function validateString($input)
+    {
+        if (!is_string($input)) {
+            throw new InvalidArgumentException('parameter must be string');
+        }
+        if (0 >= strlen($input)) {
+            throw new DomainException('parameter must be non-empty string');
+        }
     }
 }
