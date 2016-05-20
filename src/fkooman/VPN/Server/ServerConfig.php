@@ -194,8 +194,7 @@ class ServerConfig
         }
 
         return [
-            'socket-flags TCP_NODELAY',
-            'push "socket-flags TCP_NODELAY"',
+            'tcp-nodelay',
         ];
     }
 
