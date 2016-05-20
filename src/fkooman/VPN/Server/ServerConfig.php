@@ -96,6 +96,11 @@ class ServerConfig
                 // Port
                 $serverConfig[] = sprintf('port %d', $instance->getPort());
 
+                // Log
+                if (!$pool->getEnableLog()) {
+                    $serverConfig[] = sprintf('log /dev/null');
+                }
+
                 sort($serverConfig, SORT_STRING);
 
                 $allConfig[sprintf('%s-%d', $pool->getId(), $i)] = $serverConfig;

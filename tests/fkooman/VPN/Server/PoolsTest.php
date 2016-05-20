@@ -45,6 +45,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                   0 => '8.8.8.8',
                   1 => '2001:4860:4860::8888',
                 ),
+                'enableLog' => false,
                 'extIf' => 'eth0',
                 'hostName' => 'vpn.example',
                 'id' => 'default',

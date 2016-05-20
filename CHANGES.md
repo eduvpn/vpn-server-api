@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.3.0 (...)
+- add ability to enable log (default will be no OpenVPN log) using the 
+  `enableLog` option in the pool configuration
+
 ## 7.2.0 (2016-05-20)
 - redo `server-config` to require the use of `--generate` to generate a new 
   cert and DH params

@@ -66,6 +66,9 @@ class Pool
     /** @var array */
     private $instances;
 
+    /** @var bool */
+    private $enableLog;
+
     public function __construct($poolNumber, array $poolData)
     {
         $this->setId(self::validate($poolData, 'id'));
@@ -82,6 +85,7 @@ class Pool
         $this->setClientToClient(self::validate($poolData, 'clientToClient', false, false));
         $this->setManagementIp(new IP(sprintf('127.42.%d.1', $poolNumber)));
         $this->setListen(new IP(self::validate($poolData, 'listen', false, '::')));
+        $this->setEnableLog(self::validate($poolData, 'enableLog', false, false));
 
         $this->populateInstances();
     }
@@ -243,6 +247,16 @@ class Pool
         return $this->instances;
     }
 
+    public function setEnableLog($enableLog)
+    {
+        $this->enableLog = (bool) $enableLog;
+    }
+
+    public function getEnableLog()
+    {
+        return $this->enableLog;
+    }
+
     private function populateInstances()
     {
         $instanceCount = self::getNetCount($this->getRange()->getPrefix());
@@ -323,6 +337,7 @@ class Pool
             'clientToClient' => $this->getClientToClient(),
             'defaultGateway' => $this->getDefaultGateway(),
             'dns' => $dnsList,
+            'enableLog' => $this->getEnableLog(),
             'extIf' => $this->getExtIf(),
             'hostName' => $this->getHostName(),
             'id' => $this->getId(),

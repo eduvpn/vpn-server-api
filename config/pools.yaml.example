@@ -49,3 +49,6 @@ pools:
 
         # allow client-to-client communication
         clientToClient: false
+
+        # enable/disable all (OpenVPN) logging
+        enableLog: true
