@@ -5,6 +5,7 @@
   `enableLog` option in the pool configuration
 - use `tcp-nodelay` macro in generated server config for TCP servers instead
   of expanded macro
+- fix network splitting with small networks
 
 ## 7.2.0 (2016-05-20)
 - redo `server-config` to require the use of `--generate` to generate a new 
