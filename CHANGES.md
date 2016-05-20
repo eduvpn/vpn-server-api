@@ -1,5 +1,9 @@
 # Changelog
 
+## 7.2.0 (2016-05-20)
+- redo `server-config` to require the use of `--generate` to generate a new 
+  cert and DH params
+
 ## 7.1.0 (2016-05-19)
 - add `useNat` and `extIf` to the `pools.yaml` file
 - allow turning on/off NAT per pool

@@ -37,29 +37,47 @@ $dhLength = 3072;
 
 function showHelp(array $argv)
 {
-    $helpText = sprintf('SYNTAX: %s [--reuse] [CN]', $argv[0]);
-    $helpText .= PHP_EOL;
-    $helpText .= '--reuse    use the existing keys and certificates instead of generating again'.PHP_EOL;
-    $helpText .= 'CN         the common name for the certificate, typically the hostname'.PHP_EOL;
-    echo $helpText;
+    return implode(
+        PHP_EOL,
+        [
+            sprintf('SYNTAX: %s [--reuse] [--generate CN]', $argv[0]),
+            '',
+            '--reuse        use the existing keys and certificates instead of generating',
+            '               again',
+            '--generate CN  generate a new certificate/DH params for the server with given',
+            '               CN',
+            '',
+        ]
+    );
 }
 
 $io = new IO();
 
 try {
     $reUse = false;
-    $commonName = false;
+    $commonName = null;
+    $showHelp = false;
 
     for ($i = 1; $i < $argc; ++$i) {
-        if ('--reuse' === $argv[$i]) {
+        if ('--help' === $argv[$i]) {
+            $showHelp = true;
+        } elseif ('--reuse' === $argv[$i]) {
             $reUse = true;
-        } else {
-            $commonName = $argv[$i];
+        } elseif ('--generate' === $argv[$i]) {
+            if (array_key_exists($i + 1, $argv)) {
+                $commonName = $argv[$i + 1];
+            }
         }
     }
 
-    if (false === $reUse && false === $commonName) {
-        showHelp($argv);
+    if ($showHelp) {
+        echo showHelp($argv);
+
+        return;
+    }
+
+    if (false === $reUse && null === $commonName) {
+        echo showHelp($argv);
         throw new Exception('must specificy either CN or --reuse flag');
     }
 
@@ -132,6 +150,6 @@ try {
     chmod($taFile, 0600);
     chmod($dhFile, 0600);
 } catch (Exception $e) {
-    echo $e->getMessage().PHP_EOL;
+    echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
 }
