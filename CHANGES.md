@@ -1,8 +1,8 @@
 # Changelog
 
 ## 7.3.0 (...)
-- add ability to enable log (default will be no OpenVPN log) using the 
-  `enableLog` option in the pool configuration
+- add ability to enable/disable log using the `enableLog` option in the pool 
+  configuration
 - use `tcp-nodelay` macro in generated server config for TCP servers instead
   of expanded macro
 - fix network splitting with small networks
