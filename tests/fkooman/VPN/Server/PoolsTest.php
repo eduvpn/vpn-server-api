@@ -99,4 +99,58 @@ class PoolsTest extends PHPUnit_Framework_TestCase
             $p[0]->toArray()
         );
     }
+
+    public function testSmallRange()
+    {
+        $p = new Pools(
+            [
+                'default' => [
+                    'name' => 'Default Instance',
+                    'hostName' => 'vpn.example',
+                    'extIf' => 'eth0',
+                    'range' => '10.42.42.0/29',
+                    'range6' => 'fd00:4242:4242::/48',
+                    'dns' => ['8.8.8.8', '2001:4860:4860::8888'],
+                    'routes' => ['192.168.1.0/24', 'fd00:1010:1010::/48'],
+                ],
+            ]
+        );
+
+        $this->assertSame(
+            [
+                'clientToClient' => false,
+                'defaultGateway' => false,
+                'dns' => array(
+                    '8.8.8.8',
+                    '2001:4860:4860::8888',
+                ),
+                'enableLog' => false,
+                'extIf' => 'eth0',
+                'hostName' => 'vpn.example',
+                'id' => 'default',
+                'instances' => array(
+                    array(
+                        'dev' => 'tun-default-0',
+                        'managementPort' => 11940,
+                        'port' => 1194,
+                        'proto' => 'udp',
+                        'range' => '10.42.42.0/29',
+                        'range6' => 'fd00:4242:4242::/64',
+                    ),
+                ),
+                'listen' => '::',
+                'managementIp' => '127.42.0.1',
+                'name' => 'Default Instance',
+                'range' => '10.42.42.0/29',
+                'range6' => 'fd00:4242:4242::/48',
+                'routes' => array(
+                    '192.168.1.0/24',
+                    'fd00:1010:1010::/48',
+                ),
+                'twoFactor' => false,
+                'useNat' => false,
+            ],
+            $p[0]->toArray()
+        );
+    }
 }

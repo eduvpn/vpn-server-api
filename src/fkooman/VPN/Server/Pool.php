@@ -266,7 +266,7 @@ class Pool
         for ($i = 0; $i < $instanceCount; ++$i) {
             // protocol is udp unless it is the last instance when there is
             // not just one instance
-            if (1 !== $instanceCount && $i !== $instanceCount - 1) {
+            if (1 === $instanceCount || $i !== $instanceCount - 1) {
                 $proto = 'udp';
                 $port = 1194 + $i;
             } else {
@@ -301,10 +301,10 @@ class Pool
             case 32:    // 1 IP   
             case 31:    // 2 IPs
                 throw new RuntimeException('not enough available IPs in range');
-            case 30:    // 4 IPs
+            case 30:    // 4 IPs (1 usable for client, no splitting)
+            case 29:    // 8 IPs (5 usable for clients, no splitting)
                 return 1;
-            case 29:    // 8 IPs
-            case 28:    // 16 IPs
+            case 28:    // 16 IPs (12 usable for clients)
             case 27:    // 32 IPs
             case 26:    // 64 IPs
             case 25:    // 128 IPs
