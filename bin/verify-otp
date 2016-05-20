@@ -33,9 +33,6 @@ openlog(
     LOG_USER
 );
 
-# XXX --script-security has to be 3 in order to work with environment stuff 
-# (via-env), we could probably use a file 
-
 try {
     $envData = [];
     $envKeys = [

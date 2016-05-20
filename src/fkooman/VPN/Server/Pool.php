@@ -18,10 +18,12 @@
 namespace fkooman\VPN\Server;
 
 use RuntimeException;
+use InvalidArgumentException;
+use DomainException;
 
 class Pool
 {
-    /** @var int */
+    /** @var string */
     private $id;
 
     /** @var string */
@@ -92,7 +94,12 @@ class Pool
 
     public function setId($id)
     {
-        // XXX validate
+        if (!is_string($id)) {
+            throw new InvalidArgumentException('parameter must be string');
+        }
+        if (0 >= strlen($id)) {
+            throw new DomainException('parameter must be non-empty string');
+        }
         $this->id = $id;
     }
 
@@ -103,7 +110,12 @@ class Pool
 
     public function setName($poolName)
     {
-        // XXX validate
+        if (!is_string($poolName)) {
+            throw new InvalidArgumentException('parameter must be string');
+        }
+        if (0 >= strlen($poolName)) {
+            throw new DomainException('parameter must be non-empty string');
+        }
         $this->poolName = $poolName;
     }
 
@@ -114,7 +126,12 @@ class Pool
 
     public function setHostName($hostName)
     {
-        // XXX validate
+        if (!is_string($hostName)) {
+            throw new InvalidArgumentException('parameter must be string');
+        }
+        if (0 >= strlen($hostName)) {
+            throw new DomainException('parameter must be non-empty string');
+        }
         $this->hostName = $hostName;
     }
 
@@ -193,7 +210,12 @@ class Pool
 
     public function setExtIf($extIf)
     {
-        // XXX validate
+        if (!is_string($extIf)) {
+            throw new InvalidArgumentException('parameter must be string');
+        }
+        if (0 >= strlen($extIf)) {
+            throw new DomainException('parameter must be non-empty string');
+        }
         $this->extIf = $extIf;
     }
 
