@@ -97,9 +97,7 @@ class ServerConfig
                 $serverConfig[] = sprintf('port %d', $instance->getPort());
 
                 // Log
-                if (!$pool->getEnableLog()) {
-                    $serverConfig[] = sprintf('log /dev/null');
-                }
+                $serverConfig = array_merge($serverConfig, self::getLog($pool));
 
                 sort($serverConfig, SORT_STRING);
 
@@ -172,6 +170,15 @@ class ServerConfig
         }
 
         return ['auth-user-pass-verify /usr/bin/vpn-server-api-verify-otp via-env'];
+    }
+
+    private static function getLog(Pool $pool)
+    {
+        if ($pool->getEnableLog()) {
+            return [];
+        }
+
+        return ['log /dev/null'];
     }
 
     private static function getClientToClient(Pool $pool)
