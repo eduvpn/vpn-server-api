@@ -105,7 +105,5 @@ class OtpLog
         foreach ($queries as $q) {
             $this->db->query($q);
         }
-
-        $tables = array('otp_log');
     }
 }

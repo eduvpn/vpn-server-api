@@ -182,16 +182,5 @@ class ConnectionLog
         foreach ($queries as $q) {
             $this->db->query($q);
         }
-
-        $tables = array('connections');
-        foreach ($tables as $t) {
-            // make sure the tables are empty
-#            $this->db->query(
-#                sprintf(
-#                    'DELETE FROM %s',
-#                    $this->prefix.$t
-#                )
-#            );
-        }
     }
 }
