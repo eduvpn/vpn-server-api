@@ -107,14 +107,5 @@ class OtpLog
         }
 
         $tables = array('otp_log');
-        foreach ($tables as $t) {
-            // make sure the tables are empty
-#            $this->db->query(
-#                sprintf(
-#                    'DELETE FROM %s',
-#                    $this->prefix.$t
-#                )
-#            );
-        }
     }
 }
