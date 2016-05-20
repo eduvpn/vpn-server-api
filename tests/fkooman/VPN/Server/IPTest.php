@@ -127,6 +127,49 @@ class IPTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testSplit4With0()
+    {
+        $ip = new IP('192.168.1.0/24');
+        $this->assertEquals(
+            [
+            ],
+            $ip->split(0)
+        );
+    }
+
+    public function testSplit6With0()
+    {
+        $ip = new IP('fd00:1234:1234::/48');
+        $this->assertEquals(
+            [
+            ],
+            $ip->split(0)
+        );
+    }
+
+    public function testSplit4With1()
+    {
+        $ip = new IP('192.168.1.0/24');
+        $this->assertEquals(
+            [
+                new IP('192.168.1.0/24'),
+            ],
+            $ip->split(1)
+        );
+    }
+
+    public function testSplit6With1()
+    {
+        $ip = new IP('fd00:1234:1234::/48');
+        $this->assertEquals(
+            [
+                // NOTE: the first /64 in the /48 is returned
+                new IP('fd00:1234:1234::/64'),
+            ],
+            $ip->split(1)
+        );
+    }
+
     public function testSplit6()
     {
         $ip = new IP('fd00:1234:1234::/48');

@@ -146,10 +146,6 @@ class IP
 
     private function split4($networkCount)
     {
-        if (30 <= $this->getPrefix()) {
-            throw new IPException('network too small to split up, must be bigger than /30');
-        }
-
         if (pow(2, 32 - $this->getPrefix() - 2) < $networkCount) {
             throw new IPException('network too small to split in this many networks');
         }
@@ -167,6 +163,8 @@ class IP
 
     private function split6($networkCount)
     {
+        // NOTE: if networkCount == 1, then there will be one /64 returned, and not 
+        // the whole net!
         if (64 <= $this->getPrefix()) {
             throw new IPException('network too small to split up, must be bigger than /64');
         }
