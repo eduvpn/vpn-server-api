@@ -51,6 +51,7 @@ class Firewall
         $nat = [
             '*nat',
             ':PREROUTING ACCEPT [0:0]',
+            ':INPUT ACCEPT [0:0]',
             ':OUTPUT ACCEPT [0:0]',
             ':POSTROUTING ACCEPT [0:0]',
         ];
