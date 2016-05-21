@@ -1,11 +1,23 @@
-# OpenVPN Pool Configuration
+# OpenVPN Pools Configuration
+#
+# A pool is a collection of OpenVPN instances running with the same
+# configuration. The given IP space is split over the various instances. For 
+# example a /24 is split over 4 networks of /26 which gives 3 UDP instances 
+# on port 1194, 1195 and 1196 and one TCP instance on port 443.
+#
+# You can have multiple pools with completely separate configuration. You will
+# have to modify the "listen" directive to give each pool its own IP address.
 #
 # **NOTE**:
-# When modifying this file, do not forget to run 
-# "vpn-server-api-server-config --reuse" and "vpn-server-api-generate-firewall"
-# and restart the instances/firewall to activate the new configuration
+# When modifying this file, do not forget to regenerate the configuration and
+# activate it!
+#
+# $ sudo vpn-server-api-server-config --reuse
+# $ sudo vpn-server-api-generate-firewall --install
+# 
+# and restart the instances/firewall to activate the new configuration!
 
-# contains the configurations of the CN
+# contains configuration for CNs and users
 configDir: /var/lib/vpn-server-api/config
 
 # The VPN server pools
@@ -16,7 +28,7 @@ pools:
         # The address to listen on
         #listen: '::'
 
-        # the hostName to advertize to clients to connect to this pool
+        # the hostName to advertise to clients to connect to this pool
         hostName: vpn.example
 
         # external interface connecting to the Internet or destination networks
@@ -26,10 +38,10 @@ pools:
         # use NAT for this pool
         useNat: true
 
-        # IPv4 range for clients
+        # IPv4 range for clients, at least a /29 is required
         range: 10.42.42.0/24
 
-        # IPv6 range for clients
+        # IPv6 range for clients, at least a /60 or bigger is required
         range6: 'fd00:4242:4242::/48'
 
         # use VPN as default gateway
