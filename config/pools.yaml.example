@@ -25,7 +25,7 @@ pools:
     default:
         name: Default Pool
 
-        # The address to listen on
+        # The address to listen on (default: ::)
         #listen: '::'
 
         # the hostName to advertise to clients to connect to this pool
@@ -35,7 +35,7 @@ pools:
         # for this pool
         extIf: eth0
 
-        # use NAT for this pool
+        # use NAT for this pool (default: false)
         useNat: true
 
         # IPv4 range for clients, at least a /29 is required
@@ -44,23 +44,25 @@ pools:
         # IPv6 range for clients, at least a /60 or bigger is required
         range6: 'fd00:4242:4242::/48'
 
-        # use VPN as default gateway
+        # use VPN as default gateway (default: false)
         defaultGateway: true
 
         # Routes pushed to the clients, ignored when defaultGateway is true
+        # default: []
         #routes: [10.10.0.0/16, 192.168.1.0/24, 'fd00:1234:5678:9999::/64']
 
         # DNS servers to push to clients, only when defaultGateway is true
+        # default: []
         # https://developers.google.com/speed/public-dns/
         dns: [8.8.8.8, 8.8.4.4, '2001:4860:4860::8888', '2001:4860:4860::8844']
         # https://dns.watch/index
         #dns: [84.200.69.80, 84.200.70.40, '2001:1608:10:25::1c04:b12f', '2001:1608:10:25::9249:d69b']
 
-        # enable Two-factor Authentication on the server
+        # enable Two-factor Authentication on the server (default: false)
         twoFactor: false
 
-        # allow client-to-client communication
+        # allow client-to-client communication (default: false)
         clientToClient: false
 
-        # enable/disable all (OpenVPN) logging
-        enableLog: true
+        # enable OpenVPN logging (default: false)
+        #enableLog: true
