@@ -1,6 +1,6 @@
 # Changelog
 
-## 7.3.0 (...)
+## 7.3.0 (2016-05-23)
 - add ability to enable/disable log using the `enableLog` option in the pool 
   configuration
 - use `tcp-nodelay` macro in generated server config for TCP servers instead
