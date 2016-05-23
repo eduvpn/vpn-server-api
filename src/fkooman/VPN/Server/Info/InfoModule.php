@@ -23,15 +23,20 @@ use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\JsonResponse;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use fkooman\VPN\Server\Pools;
+use fkooman\VPN\Server\GroupsInterface;
 
 class InfoModule implements ServiceModuleInterface
 {
     /** @var \fkooman\VPN\Server\Pools */
     private $pools;
 
-    public function __construct(Pools $pools)
+    /** @var \fkooman\VPN\Server\GroupsInterface */
+    private $userGroups;
+
+    public function __construct(Pools $pools, GroupsInterface $userGroups)
     {
         $this->pools = $pools;
+        $this->userGroups = $userGroups;
     }
 
     public function init(Service $service)
@@ -44,6 +49,16 @@ class InfoModule implements ServiceModuleInterface
                 return $this->getInfo();
             }
         );
+
+        $service->get(
+            '/info/users/:userId',
+            function ($userId, Request $request, TokenInfo $tokenInfo) {
+                // XXX validate userId
+                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
+
+                return $this->getUserInfo($userId);
+            }
+        );
     }
 
     private function getInfo()
@@ -54,6 +69,21 @@ class InfoModule implements ServiceModuleInterface
         }
         $response = new JsonResponse();
         $response->setBody(['data' => $data]);
+
+        return $response;
+    }
+
+    private function getUserInfo($userId)
+    {
+        $memberOf = $this->userGroups->getGroups($userId);
+        $response = new JsonResponse();
+        $response->setBody(
+            [
+                'data' => [
+                    'memberOf' => $memberOf,
+                ],
+            ]
+        );
 
         return $response;
     }

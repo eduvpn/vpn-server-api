@@ -17,19 +17,25 @@
 
 namespace fkooman\VPN\Server;
 
-use ArrayObject;
-
-class Pools extends ArrayObject
+class StaticGroups implements GroupsInterface
 {
-    public function __construct(array $poolsData)
+    /** @var array */
+    private $userGroups;
+
+    public function __construct(array $userGroups)
     {
-        $poolList = [];
-        $i = 0;
-        foreach ($poolsData as $poolId => $poolData) {
-            $poolData['id'] = $poolId;
-            $poolList[$poolId] = new Pool($i, $poolData);
-            ++$i;
+        $this->userGroups = $userGroups;
+    }
+
+    public function getGroups($userId)
+    {
+        $memberOf = [];
+        foreach ($this->userGroups as $groupId => $groupMembers) {
+            if (in_array($userId, $groupMembers)) {
+                $memberOf[] = $groupId;
+            }
         }
-        parent::__construct($poolList, ArrayObject::STD_PROP_LIST);
+
+        return $memberOf;
     }
 }

@@ -71,6 +71,9 @@ class Pool
     /** @var bool */
     private $enableLog;
 
+    /** @var bool */
+    private $requireGroup;
+
     public function __construct($poolNumber, array $poolData)
     {
         $this->setId(self::validate($poolData, 'id'));
@@ -88,19 +91,13 @@ class Pool
         $this->setManagementIp(new IP(sprintf('127.42.%d.1', $poolNumber)));
         $this->setListen(new IP(self::validate($poolData, 'listen', false, '::')));
         $this->setEnableLog(self::validate($poolData, 'enableLog', false, false));
-
+        $this->setRequireGroup(self::validate($poolData, 'requireGroup', false, false));
         $this->populateInstances();
     }
 
     public function setId($id)
     {
-        self::validateString($id);
-        $matchPattern = '/^[a-zA-Z0-9]+$/';
-        if (1 !== preg_match($matchPattern, $id)) {
-            throw new DomainException(
-                sprintf('parameter must match pattern "%s"', $matchPattern)
-            );
-        }
+        self::validateSimpleString($id);
         $this->id = $id;
     }
 
@@ -265,6 +262,16 @@ class Pool
         return $this->enableLog;
     }
 
+    public function setRequireGroup($requireGroup)
+    {
+        $this->requireGroup = (bool) $requireGroup;
+    }
+
+    public function getRequireGroup()
+    {
+        return $this->requireGroup;
+    }
+
     private function populateInstances()
     {
         $instanceCount = self::getNetCount($this->getRange()->getPrefix());
@@ -355,6 +362,7 @@ class Pool
             'name' => $this->getName(),
             'range' => $this->getRange()->getAddressPrefix(),
             'range6' => $this->getRange6()->getAddressPrefix(),
+            'requireGroup' => $this->getRequireGroup(),
             'routes' => $routesList,
             'twoFactor' => $this->getTwoFactor(),
             'useNat' => $this->getUseNat(),
@@ -381,6 +389,17 @@ class Pool
         }
         if (0 >= strlen($input)) {
             throw new DomainException('parameter must be non-empty string');
+        }
+    }
+
+    private static function validateSimpleString($input)
+    {
+        self::validateString($input);
+        $matchPattern = '/^[a-zA-Z0-9]+$/';
+        if (1 !== preg_match($matchPattern, $input)) {
+            throw new DomainException(
+                sprintf('parameter must match pattern "%s"', $matchPattern)
+            );
         }
     }
 }

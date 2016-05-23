@@ -17,19 +17,14 @@
 
 namespace fkooman\VPN\Server;
 
-use ArrayObject;
-
-class Pools extends ArrayObject
+interface GroupsInterface
 {
-    public function __construct(array $poolsData)
-    {
-        $poolList = [];
-        $i = 0;
-        foreach ($poolsData as $poolId => $poolData) {
-            $poolData['id'] = $poolId;
-            $poolList[$poolId] = new Pool($i, $poolData);
-            ++$i;
-        }
-        parent::__construct($poolList, ArrayObject::STD_PROP_LIST);
-    }
+    /**
+     * Get the groups a user is a member of.
+     *
+     * @param string userId the userID of the user to request the groups of
+     *
+     * @return array the groups as an array, empty array if no groups
+     */
+    public function getGroups($userId);
 }

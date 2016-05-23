@@ -31,6 +31,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                     'hostName' => 'vpn.example',
                     'extIf' => 'eth0',
                     'range' => '10.42.42.0/24',
+                    'requireGroup' => true,
                     'range6' => 'fd00:4242:4242::/48',
                     'dns' => ['8.8.8.8', '2001:4860:4860::8888'],
                     'routes' => ['192.168.1.0/24', 'fd00:1010:1010::/48'],
@@ -89,6 +90,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                 'name' => 'Default Instance',
                 'range' => '10.42.42.0/24',
                 'range6' => 'fd00:4242:4242::/48',
+                'requireGroup' => true,
                 'routes' => array(
                   0 => '192.168.1.0/24',
                   1 => 'fd00:1010:1010::/48',
@@ -96,7 +98,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                 'twoFactor' => false,
                 'useNat' => false,
             ],
-            $p[0]->toArray()
+            $p['default']->toArray()
         );
     }
 
@@ -143,6 +145,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                 'name' => 'Default Instance',
                 'range' => '10.42.42.0/29',
                 'range6' => 'fd00:4242:4242::/48',
+                'requireGroup' => false,
                 'routes' => array(
                     '192.168.1.0/24',
                     'fd00:1010:1010::/48',
@@ -150,7 +153,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                 'twoFactor' => false,
                 'useNat' => false,
             ],
-            $p[0]->toArray()
+            $p['default']->toArray()
         );
     }
 }

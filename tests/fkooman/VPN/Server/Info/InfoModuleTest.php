@@ -25,6 +25,7 @@ use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
 use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
 use fkooman\VPN\Server\Pools;
+use fkooman\VPN\Server\StaticGroups;
 
 class InfoModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -45,6 +46,12 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                         'dns' => ['8.8.8.8', '2001:4860:4860::8888'],
                         'routes' => ['192.168.1.0/24', 'fd00:1010:1010::/48'],
                     ],
+                ]
+            ),
+            new StaticGroups(
+                [
+                    'default' => ['foo', 'bar', 'baz'],
+                    'p2p' => ['foo'],
                 ]
             )
         );
@@ -126,6 +133,7 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                   'name' => 'Default Instance',
                   'range' => '10.42.42.0/24',
                   'range6' => 'fd00:4242:4242::/48',
+                  'requireGroup' => false,
                   'routes' => array(
                     0 => '192.168.1.0/24',
                     1 => 'fd00:1010:1010::/48',
@@ -194,6 +202,7 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                   'name' => 'Default Instance',
                   'range' => '10.42.42.0/24',
                   'range6' => 'fd00:4242:4242::/48',
+                  'requireGroup' => false,
                   'routes' => array(
                     0 => '192.168.1.0/24',
                     1 => 'fd00:1010:1010::/48',
@@ -204,6 +213,21 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
               ),
             ],
             $this->makeRequest('/info/server', 'portal')
+        );
+    }
+
+    public function testGetMembership()
+    {
+        $this->assertEquals(
+            [
+                'data' => [
+                    'memberOf' => [
+                        'default',
+                        'p2p',
+                    ],
+                ],
+            ],
+            $this->makeRequest('/info/users/foo', 'portal')
         );
     }
 

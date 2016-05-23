@@ -66,3 +66,7 @@ pools:
 
         # enable OpenVPN logging (default: false)
         #enableLog: true
+
+        # require a particular group membership to allow access to this pool
+        requireGroup: false
+        #groupList: ['student', 'employee']
