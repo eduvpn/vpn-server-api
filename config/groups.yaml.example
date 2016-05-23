@@ -1,0 +1,2 @@
+# Group Membership for Static Group backend
+default: [me]
