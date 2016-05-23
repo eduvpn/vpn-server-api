@@ -95,6 +95,12 @@ class Pool
     public function setId($id)
     {
         self::validateString($id);
+        $matchPattern = '/^[a-zA-Z0-9]+$/';
+        if (1 !== preg_match($matchPattern, $id)) {
+            throw new DomainException(
+                sprintf('parameter must match pattern "%s"', $matchPattern)
+            );
+        }
         $this->id = $id;
     }
 
