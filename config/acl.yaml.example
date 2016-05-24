@@ -14,8 +14,11 @@ RemoteAcl:
     apiBaseUrl: https://example.org/groups
 
 VootAcl:
-    authorizeUri: https://voot.surfconext.nl/oauth/authorize
-    tokenUri: https://voot.surfconext.nl/oauth/token
-    baseUrl: https://voot.surfconext.nl/
-    clientId: xyz
-    clientSecret: abc
+    # uses the VOOT protocol to obtain group memberships, it will use the 
+    # UserConfig access_token to perform the request, if no access_token is set
+    # or it is invalid, an empty list of groups will be returned
+    apiBaseUrl: https://voot.surfconext.nl/groups
+
+    # A mapping between pool IDs and groups obtained through VOOT API
+    aclMapping:
+        - default: ['urn:surfnet.nl:foo:bar']
