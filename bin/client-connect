@@ -47,6 +47,7 @@ try {
         'dev',
         'ifconfig_pool_remote_ip',
         'ifconfig_pool_remote_ip6',
+        'POOL_ID',
     ];
 
     // read environment variables
@@ -120,7 +121,7 @@ try {
     //
     // GROUP MEMBERSHIP
     //
-    $poolId = explode('-', $envData['dev'])[1];           // e.g. tun-default-0
+    $poolId = $envData['POOL_ID'];
     $pools = new Pools($poolsConfig->v('pools'));
     $pool = $pools[$poolId];
     if ($pool->getEnableAcl()) {

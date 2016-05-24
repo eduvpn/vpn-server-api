@@ -53,6 +53,9 @@ class ServerConfig
                     'push "explicit-exit-notify 3"',
                 ];
 
+                // PoolID
+                $serverConfig[] = sprintf('setenv POOL_ID %s', $pool->getId());
+
                 // Routes
                 $serverConfig = array_merge($serverConfig, self::getRoutes($pool));
 
