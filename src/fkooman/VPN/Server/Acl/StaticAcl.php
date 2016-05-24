@@ -31,8 +31,15 @@ class StaticAcl implements AclInterface
 
     public function getGroups($userId)
     {
+        if (!is_array($this->userGroups)) {
+            return [];
+        }
+
         $memberOf = [];
         foreach ($this->userGroups as $groupId => $groupMembers) {
+            if (!is_array($groupMembers)) {
+                continue;
+            }
             if (in_array($userId, $groupMembers)) {
                 $memberOf[] = $groupId;
             }
