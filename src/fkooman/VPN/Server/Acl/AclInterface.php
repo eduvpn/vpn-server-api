@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server;
+namespace fkooman\VPN\Server\Acl;
 
-interface GroupsInterface
+interface AclInterface
 {
     /**
      * Get the groups a user is a member of.

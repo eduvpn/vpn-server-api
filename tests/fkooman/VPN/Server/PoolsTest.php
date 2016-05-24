@@ -46,6 +46,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                   0 => '8.8.8.8',
                   1 => '2001:4860:4860::8888',
                 ),
+                'enableAcl' => false,
                 'enableLog' => false,
                 'extIf' => 'eth0',
                 'hostName' => 'vpn.example',
@@ -90,7 +91,6 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                 'name' => 'Default Instance',
                 'range' => '10.42.42.0/24',
                 'range6' => 'fd00:4242:4242::/48',
-                'requireGroup' => true,
                 'routes' => array(
                   0 => '192.168.1.0/24',
                   1 => 'fd00:1010:1010::/48',
@@ -126,6 +126,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                     '8.8.8.8',
                     '2001:4860:4860::8888',
                 ),
+                'enableAcl' => false,
                 'enableLog' => false,
                 'extIf' => 'eth0',
                 'hostName' => 'vpn.example',
@@ -145,7 +146,6 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                 'name' => 'Default Instance',
                 'range' => '10.42.42.0/29',
                 'range6' => 'fd00:4242:4242::/48',
-                'requireGroup' => false,
                 'routes' => array(
                     '192.168.1.0/24',
                     'fd00:1010:1010::/48',

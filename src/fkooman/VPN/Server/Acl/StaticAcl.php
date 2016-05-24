@@ -15,16 +15,18 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server;
+namespace fkooman\VPN\Server\Acl;
 
-class StaticGroups implements GroupsInterface
+use fkooman\Config\Reader;
+
+class StaticAcl implements AclInterface
 {
     /** @var array */
     private $userGroups;
 
-    public function __construct(array $userGroups)
+    public function __construct(Reader $configReader)
     {
-        $this->userGroups = $userGroups;
+        $this->userGroups = $configReader->v('StaticAcl', false, []);
     }
 
     public function getGroups($userId)

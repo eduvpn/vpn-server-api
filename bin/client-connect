@@ -25,7 +25,6 @@ use fkooman\VPN\Server\Log\ConnectionLog;
 use fkooman\IO\IO;
 use fkooman\Json\Json;
 use fkooman\VPN\Server\Pools;
-use fkooman\VPN\Server\StaticGroups;
 
 openlog(
     basename($argv[0]),
@@ -71,8 +70,8 @@ try {
         new YamlFile(dirname(__DIR__).'/config/log.yaml')
     );
 
-    $groupsConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/groups.yaml')
+    $aclConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/acl.yaml')
     );
 
     // retrieve the user's configuration file
@@ -124,10 +123,12 @@ try {
     $poolId = explode('-', $envData['dev'])[1];           // e.g. tun-default-0
     $pools = new Pools($poolsConfig->v('pools'));
     $pool = $pools[$poolId];
-    if ($pool->getRequireGroup()) {
-        // group membership required for this pool
-        $userGroups = new StaticGroups($groupsConfig->getConfig());
-        $memberOf = $userGroups->getGroups($userId);
+    if ($pool->getEnableAcl()) {
+        // ACL
+        $aclMethod = $aclConfig->v('aclMethod');
+        $aclClass = sprintf('fkooman\VPN\Server\Acl\%s', $aclMethod);
+        $acl = new $aclClass($aclConfig);
+        $memberOf = $acl->getGroups($userId);
         if (!in_array($poolId, $memberOf)) {
             syslog(LOG_INFO, sprintf('client not allowed, user is not a member of "%s"', $poolId));
             $dropClient = true;

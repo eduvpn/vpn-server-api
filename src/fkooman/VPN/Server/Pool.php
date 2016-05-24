@@ -72,7 +72,7 @@ class Pool
     private $enableLog;
 
     /** @var bool */
-    private $requireGroup;
+    private $enableAcl;
 
     public function __construct($poolNumber, array $poolData)
     {
@@ -91,7 +91,7 @@ class Pool
         $this->setManagementIp(new IP(sprintf('127.42.%d.1', $poolNumber)));
         $this->setListen(new IP(self::validate($poolData, 'listen', false, '::')));
         $this->setEnableLog(self::validate($poolData, 'enableLog', false, false));
-        $this->setRequireGroup(self::validate($poolData, 'requireGroup', false, false));
+        $this->setEnableAcl(self::validate($poolData, 'enableAcl', false, false));
         $this->populateInstances();
     }
 
@@ -262,14 +262,14 @@ class Pool
         return $this->enableLog;
     }
 
-    public function setRequireGroup($requireGroup)
+    public function setEnableAcl($enableAcl)
     {
-        $this->requireGroup = (bool) $requireGroup;
+        $this->enableAcl = (bool) $enableAcl;
     }
 
-    public function getRequireGroup()
+    public function getEnableAcl()
     {
-        return $this->requireGroup;
+        return $this->enableAcl;
     }
 
     private function populateInstances()
@@ -352,6 +352,7 @@ class Pool
             'clientToClient' => $this->getClientToClient(),
             'defaultGateway' => $this->getDefaultGateway(),
             'dns' => $dnsList,
+            'enableAcl' => $this->getEnableAcl(),
             'enableLog' => $this->getEnableLog(),
             'extIf' => $this->getExtIf(),
             'hostName' => $this->getHostName(),
@@ -362,7 +363,6 @@ class Pool
             'name' => $this->getName(),
             'range' => $this->getRange()->getAddressPrefix(),
             'range6' => $this->getRange6()->getAddressPrefix(),
-            'requireGroup' => $this->getRequireGroup(),
             'routes' => $routesList,
             'twoFactor' => $this->getTwoFactor(),
             'useNat' => $this->getUseNat(),

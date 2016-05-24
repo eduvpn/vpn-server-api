@@ -67,5 +67,6 @@ pools:
         # enable OpenVPN logging (default: false)
         #enableLog: true
 
-        # User must be member of group with name of pool, i.e. "default"
-        requireGroup: false
+        # user connecting must be member of ACL group with the same name as the 
+        # pool ID
+        enableAcl: true

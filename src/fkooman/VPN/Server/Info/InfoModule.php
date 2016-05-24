@@ -23,20 +23,20 @@ use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\JsonResponse;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use fkooman\VPN\Server\Pools;
-use fkooman\VPN\Server\GroupsInterface;
+use fkooman\VPN\Server\Acl\AclInterface;
 
 class InfoModule implements ServiceModuleInterface
 {
     /** @var \fkooman\VPN\Server\Pools */
     private $pools;
 
-    /** @var \fkooman\VPN\Server\GroupsInterface */
-    private $userGroups;
+    /** @var \fkooman\VPN\Server\AclInterface */
+    private $acl;
 
-    public function __construct(Pools $pools, GroupsInterface $userGroups)
+    public function __construct(Pools $pools, AclInterface $acl)
     {
         $this->pools = $pools;
-        $this->userGroups = $userGroups;
+        $this->acl = $acl;
     }
 
     public function init(Service $service)
@@ -75,7 +75,7 @@ class InfoModule implements ServiceModuleInterface
 
     private function getUserInfo($userId)
     {
-        $memberOf = $this->userGroups->getGroups($userId);
+        $memberOf = $this->acl->getGroups($userId);
         $response = new JsonResponse();
         $response->setBody(
             [

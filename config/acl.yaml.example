@@ -1,0 +1,15 @@
+aclMethod: StaticAcl
+#aclMethod: VootAcl
+
+StaticAcl:
+    # mapping from "pool" to user IDs
+    # below only user "me" can access the pool with ID "default" if "enableAcl" 
+    # is set to true in pools.yaml
+    default: [me]
+
+VootAcl:
+    authorizeUri: https://voot.surfconext.nl/oauth/authorize
+    tokenUri: https://voot.surfconext.nl/oauth/token
+    baseUrl: https://voot.surfconext.nl/
+    clientId: xyz
+    clientSecret: abc

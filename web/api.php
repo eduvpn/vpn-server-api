@@ -40,7 +40,6 @@ use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
 use GuzzleHttp\Client;
 use fkooman\IO\IO;
-use fkooman\VPN\Server\StaticGroups;
 
 try {
     $config = new Reader(
@@ -51,8 +50,8 @@ try {
         new YamlFile(dirname(__DIR__).'/config/pools.yaml')
     );
 
-    $groupsConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/groups.yaml')
+    $aclConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/acl.yaml')
     );
 
     $serverPools = new Pools($poolsConfig->v('pools'));
@@ -122,7 +121,10 @@ try {
         ['realm' => 'VPN Server API']
      );
 
-    $userGroups = new StaticGroups($groupsConfig->getConfig());
+    // ACL
+    $aclMethod = $aclConfig->v('aclMethod');
+    $aclClass = sprintf('fkooman\VPN\Server\Acl\%s', $aclMethod);
+    $acl = new $aclClass($aclConfig);
 
     $io = new IO();
 
@@ -134,7 +136,7 @@ try {
     $service->addModule(new UserConfigModule($poolsConfig->v('configDir').'/users', $logger, $io));
     $service->addModule(new CnConfigModule($poolsConfig->v('configDir').'/common_names', $logger, $io));
     $service->addModule(new CaModule($crlFetcher, $logger));
-    $service->addModule(new InfoModule($serverPools, $userGroups));
+    $service->addModule(new InfoModule($serverPools, $acl));
     $service->run()->send();
 } catch (Exception $e) {
     // internal server error
