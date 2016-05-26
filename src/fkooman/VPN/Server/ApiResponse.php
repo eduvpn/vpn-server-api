@@ -18,12 +18,19 @@
 namespace fkooman\VPN\Server;
 
 use fkooman\Http\JsonResponse;
+use InvalidArgumentException;
+use DomainException;
 
 class ApiResponse extends JsonResponse
 {
     public function __construct($wrapperKey, $responseData)
     {
-        // XXX wrapperKey must be string        
+        if (!is_string($wrapperKey)) {
+            throw new InvalidArgumentException('parameter must be string');
+        }
+        if (0 >= strlen($wrapperKey)) {
+            throw new DomainException('string must not be empty');
+        }
         parent::__construct();
         $this->setBody(
             [

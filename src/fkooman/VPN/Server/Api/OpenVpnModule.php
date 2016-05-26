@@ -54,7 +54,6 @@ class OpenVpnModule implements ServiceModuleInterface
                 $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);
 
-                // XXX make kill return bool
                 return new ApiResponse('ok', $this->serverManager->kill($commonName));
             }
         );
