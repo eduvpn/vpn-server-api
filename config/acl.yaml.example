@@ -8,6 +8,4 @@ StaticAcl:
     default: [me]
 
 RemoteAcl:
-    # the request URL will be appended with the user ID, e.g. in the example 
-    # below that would be: https://example.org/groups/me
-    apiBaseUrl: https://example.org/groups
+    apiUrl: https://example.org/groups

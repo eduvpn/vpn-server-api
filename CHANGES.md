@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.0.3 (2016-05-27)
+- cleanup `RemoteAcl`, make it more useful
+
 ## 8.0.2 (2016-05-27)
 - update `config/pools.yaml` a bit
 

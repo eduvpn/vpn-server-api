@@ -42,11 +42,27 @@ class RemoteAcl implements AclInterface
     public function getGroups($userId)
     {
         try {
-            $apiBaseUrl = $this->configReader->v('RemoteAcl', 'apiBaseUrl');
-            $requestUrl = sprintf('%s/%s', $apiBaseUrl, $userId);
-            $responseData = $this->client->get($requestUrl)->json();
+            $apiUrl = $this->configReader->v('RemoteAcl', 'apiUrl');
+            $responseData = $this->client->get($apiUrl)->json();
 
-            return $responseData['memberOf'];
+            if (!isset($responseData['data']['groups'][$userId])) {
+                return [];
+            }
+            $userGroups = $responseData['data']['groups'][$userId];
+
+            if (!is_array($userGroups)) {
+                return [];
+            }
+
+            $returnGroups = [];
+            foreach ($userGroups as $userGroup) {
+                if (!is_string($userGroup) || 0 >= strlen($userGroup)) {
+                    continue;
+                }
+                $returnGroups[] = $userGroup;
+            }
+
+            return $returnGroups;
         } catch (TransferException $e) {
             return [];
         }
