@@ -84,16 +84,17 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'ok' => true,
-                'history' => [
-                    [
-                        'common_name' => 'foo_vpn_ex_def',
-                        'time_unix' => '1000000000',
-                        'v4' => '10.42.42.2',
-                        'v6' => 'fd00:4242:4242::2',
-                        'bytes_received' => '4843',
-                        'bytes_sent' => '5317',
-                        'disconnect_time_unix' => '1000010000',
+                'data' => [
+                    'log' => [
+                        [
+                            'common_name' => 'foo_vpn_ex_def',
+                            'time_unix' => '1000000000',
+                            'v4' => '10.42.42.2',
+                            'v6' => 'fd00:4242:4242::2',
+                            'bytes_received' => '4843',
+                            'bytes_sent' => '5317',
+                            'disconnect_time_unix' => '1000010000',
+                        ],
                     ],
                 ],
             ],
@@ -105,8 +106,9 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'ok' => true,
-                'history' => [
+                'data' => [
+                    'log' => [
+                    ],
                 ],
             ],
             $this->makeRequest('GET', sprintf('/log/%s', date('Y-m-d', 999888888)))

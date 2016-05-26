@@ -42,7 +42,6 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
 
-
 try {
     $config = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')

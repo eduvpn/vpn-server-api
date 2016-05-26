@@ -64,22 +64,22 @@ class LogModule implements ServiceModuleInterface
                 $showDateUnixMin = strtotime('today', $showDateUnix);
                 $showDateUnixMax = strtotime('tomorrow', $showDateUnix);
 
-                $response = new JsonResponse();
-                if (is_null($this->connectionLog)) {
-                    $responseData = array(
-                        'ok' => false,
-                        'error' => 'unable to connect to log database',
-                    );
-                } else {
-                    $responseData = array(
-                        'ok' => true,
-                        'history' => $this->connectionLog->getConnectionHistory($showDateUnixMin, $showDateUnixMax),
-                    );
-                }
-                $response->setBody($responseData);
-
-                return $response;
+                return self::getResponse('log', $this->connectionLog->getConnectionHistory($showDateUnixMin, $showDateUnixMax));
             }
         );
+    }
+
+    private static function getResponse($key, $responseData)
+    {
+        $response = new JsonResponse();
+        $response->setBody(
+            [
+                'data' => [
+                    $key => $responseData,
+                ],
+            ]
+        );
+
+        return $response;
     }
 }

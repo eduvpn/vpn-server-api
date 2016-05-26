@@ -78,7 +78,9 @@ class CaModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'ok' => true,
+                'data' => [
+                    'ok' => true,
+                ],
             ],
             $this->makeRequest('POST', '/ca/crl/fetch', [])
         );

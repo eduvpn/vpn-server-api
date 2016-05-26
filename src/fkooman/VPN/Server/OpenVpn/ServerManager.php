@@ -86,7 +86,7 @@ class ServerManager
             $clientConnections[] = ['id' => $pool->getId(), 'connections' => $poolConnections];
         }
 
-        return ['data' => $clientConnections];
+        return $clientConnections;
     }
 
     /**
@@ -136,6 +136,6 @@ class ServerManager
             $clientsKills[] = ['id' => $pool->getId(), 'killCount' => $poolKill];
         }
 
-        return ['data' => $clientsKills];
+        return $clientsKills;
     }
 }

@@ -45,18 +45,26 @@ class CaModule implements ServiceModuleInterface
             '/ca/crl/fetch',
             function (Request $request, TokenInfo $tokenInfo) {
                 $tokenInfo->getScope()->requireScope(['admin', 'portal']);
-
                 $this->logger->info('fetching CRL');
-
+                // XXX error handling?
                 $this->crlFetcher->fetch();
 
-                $response = new JsonResponse();
-                $response->setBody(
-                    ['ok' => true]
-                );
-
-                return $response;
+                return self::getResponse('ok', true);
             }
         );
+    }
+
+    private static function getResponse($key, $responseData)
+    {
+        $response = new JsonResponse();
+        $response->setBody(
+            [
+                'data' => [
+                    $key => $responseData,
+                ],
+            ]
+        );
+
+        return $response;
     }
 }

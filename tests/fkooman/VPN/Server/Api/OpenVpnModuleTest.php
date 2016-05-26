@@ -61,18 +61,20 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'data' => [
-                    [
-                        'id' => 'default',
-                        'connections' => [
-                            [
-                                'common_name' => 'fkooman_samsung_i9300',
-                                'real_address' => '91.64.87.183:43103',
-                                'bytes_in' => 18301,
-                                'bytes_out' => 30009,
-                                'connected_since' => 1451323167,
-                                'virtual_address' => [
-                                    'fd00:4242:4242::1003',
-                                    '10.42.42.5',
+                    'connections' => [
+                        [
+                            'id' => 'default',
+                            'connections' => [
+                                [
+                                    'common_name' => 'fkooman_samsung_i9300',
+                                    'real_address' => '91.64.87.183:43103',
+                                    'bytes_in' => 18301,
+                                    'bytes_out' => 30009,
+                                    'connected_since' => 1451323167,
+                                    'virtual_address' => [
+                                        'fd00:4242:4242::1003',
+                                        '10.42.42.5',
+                                    ],
                                 ],
                             ],
                         ],
@@ -89,9 +91,11 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'data' => [
-                    [
-                        'id' => 'default',
-                        'killCount' => 1,
+                    'kill' => [
+                        [
+                            'id' => 'default',
+                            'killCount' => 1,
+                        ],
                     ],
                 ],
             ],

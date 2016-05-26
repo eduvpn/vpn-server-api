@@ -42,10 +42,7 @@ class OpenVpnModule implements ServiceModuleInterface
             function (Request $request, TokenInfo $tokenInfo) {
                 $tokenInfo->getScope()->requireScope(['admin']);
 
-                $response = new JsonResponse();
-                $response->setBody($this->serverManager->connections());
-
-                return $response;
+                return self::getResponse('connections', $this->serverManager->connections());
             }
         );
 
@@ -57,11 +54,22 @@ class OpenVpnModule implements ServiceModuleInterface
                 $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);
 
-                $response = new JsonResponse();
-                $response->setBody($this->serverManager->kill($commonName));
-
-                return $response;
+                return self::getResponse('kill', $this->serverManager->kill($commonName));
             }
         );
+    }
+
+    private static function getResponse($key, $responseData)
+    {
+        $response = new JsonResponse();
+        $response->setBody(
+            [
+                'data' => [
+                    $key => $responseData,
+                ],
+            ]
+        );
+
+        return $response;
     }
 }

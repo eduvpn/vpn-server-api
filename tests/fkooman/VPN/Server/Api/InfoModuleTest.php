@@ -90,66 +90,69 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-              'data' => array(
-                0 => array(
-                  'clientToClient' => false,
-                  'defaultGateway' => false,
-                  'dns' => array(
-                    0 => '8.8.8.8',
-                    1 => '2001:4860:4860::8888',
+                'data' => array(
+                'pools' => array(
+                  0 => array(
+                    'clientToClient' => false,
+                    'defaultGateway' => false,
+                    'dns' => array(
+                      0 => '8.8.8.8',
+                      1 => '2001:4860:4860::8888',
+                    ),
+                    'enableAcl' => false,
+                    'enableLog' => false,
+                    'extIf' => 'eth0',
+                    'hostName' => 'vpn.example',
+                    'id' => 'default',
+                    'instances' => array(
+                      0 => array(
+                        'dev' => 'tun-default-0',
+                        'managementPort' => 11940,
+                        'port' => 1194,
+                        'proto' => 'udp',
+                        'range' => '10.42.42.0/26',
+                        'range6' => 'fd00:4242:4242::/64',
+                      ),
+                      1 => array(
+                        'dev' => 'tun-default-1',
+                        'managementPort' => 11941,
+                        'port' => 1195,
+                        'proto' => 'udp',
+                        'range' => '10.42.42.64/26',
+                        'range6' => 'fd00:4242:4242:1::/64',
+                      ),
+                      2 => array(
+                        'dev' => 'tun-default-2',
+                        'managementPort' => 11942,
+                        'port' => 1196,
+                        'proto' => 'udp',
+                        'range' => '10.42.42.128/26',
+                        'range6' => 'fd00:4242:4242:2::/64',
+                      ),
+                      3 => array(
+                        'dev' => 'tun-default-3',
+                        'managementPort' => 11943,
+                        'port' => 1194,
+                        'proto' => 'tcp',
+                        'range' => '10.42.42.192/26',
+                        'range6' => 'fd00:4242:4242:3::/64',
+                      ),
+                    ),
+                    'listen' => '::',
+                    'managementIp' => '127.42.0.1',
+                    'name' => 'Default Instance',
+                    'range' => '10.42.42.0/24',
+                    'range6' => 'fd00:4242:4242::/48',
+                    'routes' => array(
+                      0 => '192.168.1.0/24',
+                      1 => 'fd00:1010:1010::/48',
+                    ),
+                    'twoFactor' => false,
+                    'useNat' => false,
                   ),
-                  'enableAcl' => false,
-                  'enableLog' => false,
-                  'extIf' => 'eth0',
-                  'hostName' => 'vpn.example',
-                  'id' => 'default',
-                  'instances' => array(
-                    0 => array(
-                      'dev' => 'tun-default-0',
-                      'managementPort' => 11940,
-                      'port' => 1194,
-                      'proto' => 'udp',
-                      'range' => '10.42.42.0/26',
-                      'range6' => 'fd00:4242:4242::/64',
-                    ),
-                    1 => array(
-                      'dev' => 'tun-default-1',
-                      'managementPort' => 11941,
-                      'port' => 1195,
-                      'proto' => 'udp',
-                      'range' => '10.42.42.64/26',
-                      'range6' => 'fd00:4242:4242:1::/64',
-                    ),
-                    2 => array(
-                      'dev' => 'tun-default-2',
-                      'managementPort' => 11942,
-                      'port' => 1196,
-                      'proto' => 'udp',
-                      'range' => '10.42.42.128/26',
-                      'range6' => 'fd00:4242:4242:2::/64',
-                    ),
-                    3 => array(
-                      'dev' => 'tun-default-3',
-                      'managementPort' => 11943,
-                      'port' => 1194,
-                      'proto' => 'tcp',
-                      'range' => '10.42.42.192/26',
-                      'range6' => 'fd00:4242:4242:3::/64',
-                    ),
-                  ),
-                  'listen' => '::',
-                  'managementIp' => '127.42.0.1',
-                  'name' => 'Default Instance',
-                  'range' => '10.42.42.0/24',
-                  'range6' => 'fd00:4242:4242::/48',
-                  'routes' => array(
-                    0 => '192.168.1.0/24',
-                    1 => 'fd00:1010:1010::/48',
-                  ),
-                  'twoFactor' => false,
-                  'useNat' => false,
                 ),
-              ),
+                ),
+
             ],
             $this->makeRequest('/info/server', 'admin')
         );
@@ -159,66 +162,69 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-              'data' => array(
-                0 => array(
-                  'clientToClient' => false,
-                  'defaultGateway' => false,
-                  'dns' => array(
-                    0 => '8.8.8.8',
-                    1 => '2001:4860:4860::8888',
+                'data' => array(
+                'pools' => array(
+                  0 => array(
+                    'clientToClient' => false,
+                    'defaultGateway' => false,
+                    'dns' => array(
+                      0 => '8.8.8.8',
+                      1 => '2001:4860:4860::8888',
+                    ),
+                    'enableAcl' => false,
+                    'enableLog' => false,
+                    'extIf' => 'eth0',
+                    'hostName' => 'vpn.example',
+                    'id' => 'default',
+                    'instances' => array(
+                      0 => array(
+                        'dev' => 'tun-default-0',
+                        'managementPort' => 11940,
+                        'port' => 1194,
+                        'proto' => 'udp',
+                        'range' => '10.42.42.0/26',
+                        'range6' => 'fd00:4242:4242::/64',
+                      ),
+                      1 => array(
+                        'dev' => 'tun-default-1',
+                        'managementPort' => 11941,
+                        'port' => 1195,
+                        'proto' => 'udp',
+                        'range' => '10.42.42.64/26',
+                        'range6' => 'fd00:4242:4242:1::/64',
+                      ),
+                      2 => array(
+                        'dev' => 'tun-default-2',
+                        'managementPort' => 11942,
+                        'port' => 1196,
+                        'proto' => 'udp',
+                        'range' => '10.42.42.128/26',
+                        'range6' => 'fd00:4242:4242:2::/64',
+                      ),
+                      3 => array(
+                        'dev' => 'tun-default-3',
+                        'managementPort' => 11943,
+                        'port' => 1194,
+                        'proto' => 'tcp',
+                        'range' => '10.42.42.192/26',
+                        'range6' => 'fd00:4242:4242:3::/64',
+                      ),
+                    ),
+                    'listen' => '::',
+                    'managementIp' => '127.42.0.1',
+                    'name' => 'Default Instance',
+                    'range' => '10.42.42.0/24',
+                    'range6' => 'fd00:4242:4242::/48',
+                    'routes' => array(
+                      0 => '192.168.1.0/24',
+                      1 => 'fd00:1010:1010::/48',
+                    ),
+                    'twoFactor' => false,
+                    'useNat' => false,
                   ),
-                  'enableAcl' => false,
-                  'enableLog' => false,
-                  'extIf' => 'eth0',
-                  'hostName' => 'vpn.example',
-                  'id' => 'default',
-                  'instances' => array(
-                    0 => array(
-                      'dev' => 'tun-default-0',
-                      'managementPort' => 11940,
-                      'port' => 1194,
-                      'proto' => 'udp',
-                      'range' => '10.42.42.0/26',
-                      'range6' => 'fd00:4242:4242::/64',
-                    ),
-                    1 => array(
-                      'dev' => 'tun-default-1',
-                      'managementPort' => 11941,
-                      'port' => 1195,
-                      'proto' => 'udp',
-                      'range' => '10.42.42.64/26',
-                      'range6' => 'fd00:4242:4242:1::/64',
-                    ),
-                    2 => array(
-                      'dev' => 'tun-default-2',
-                      'managementPort' => 11942,
-                      'port' => 1196,
-                      'proto' => 'udp',
-                      'range' => '10.42.42.128/26',
-                      'range6' => 'fd00:4242:4242:2::/64',
-                    ),
-                    3 => array(
-                      'dev' => 'tun-default-3',
-                      'managementPort' => 11943,
-                      'port' => 1194,
-                      'proto' => 'tcp',
-                      'range' => '10.42.42.192/26',
-                      'range6' => 'fd00:4242:4242:3::/64',
-                    ),
-                  ),
-                  'listen' => '::',
-                  'managementIp' => '127.42.0.1',
-                  'name' => 'Default Instance',
-                  'range' => '10.42.42.0/24',
-                  'range6' => 'fd00:4242:4242::/48',
-                  'routes' => array(
-                    0 => '192.168.1.0/24',
-                    1 => 'fd00:1010:1010::/48',
-                  ),
-                  'twoFactor' => false,
-                  'useNat' => false,
                 ),
-              ),
+                ),
+
             ],
             $this->makeRequest('/info/server', 'portal')
         );
@@ -229,13 +235,13 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'data' => [
-                    'memberOf' => [
+                    'acl' => [
                         'default',
                         'p2p',
                     ],
                 ],
             ],
-            $this->makeRequest('/info/users/foo', 'portal')
+            $this->makeRequest('/info/users/acl/foo', 'portal')
         );
     }
 

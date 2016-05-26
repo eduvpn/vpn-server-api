@@ -52,7 +52,7 @@ class InfoModule implements ServiceModuleInterface
         );
 
         $service->get(
-            '/info/users/:userId',
+            '/info/users/acl/:userId',
             function ($userId, Request $request, TokenInfo $tokenInfo) {
                 $tokenInfo->getScope()->requireScope(['admin', 'portal']);
                 InputValidation::userId($userId);
@@ -68,20 +68,24 @@ class InfoModule implements ServiceModuleInterface
         foreach ($this->pools as $pool) {
             $data[] = $pool->toArray();
         }
-        $response = new JsonResponse();
-        $response->setBody(['data' => $data]);
 
-        return $response;
+        return self::getResponse('pools', $data);
     }
 
     private function getUserInfo($userId)
     {
         $memberOf = $this->acl->getGroups($userId);
+
+        return self::getResponse('acl', $memberOf);
+    }
+
+    private static function getResponse($key, $responseData)
+    {
         $response = new JsonResponse();
         $response->setBody(
             [
                 'data' => [
-                    'memberOf' => $memberOf,
+                    $key => $responseData,
                 ],
             ]
         );
