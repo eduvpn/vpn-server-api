@@ -58,14 +58,13 @@ pools:
         #dns: [84.200.69.80, 84.200.70.40, '2001:1608:10:25::1c04:b12f', '2001:1608:10:25::9249:d69b']
 
         # enable Two-factor Authentication on the server (default: false)
-        twoFactor: false
+        #twoFactor: true
 
         # allow client-to-client communication (default: false)
-        clientToClient: false
+        #clientToClient: true
 
         # enable OpenVPN logging (default: false)
         #enableLog: true
 
-        # user connecting must be member of ACL group with the same name as the 
-        # pool ID
-        enableAcl: true
+        # enable ACL for this pool (default: false)
+        #enableAcl: true
