@@ -1,5 +1,13 @@
 # Changelog
 
+## 8.0.0 (2016-05-26)
+- major refactoring of the code
+- implement group ACL support (static, remote)
+- change how user/CN blocking works by just using files, simplifying things a 
+  lot
+- cleanup API responses, make them similar
+- enforce `totp` as username now for 2FA/OTP setups
+
 ## 7.3.0 (2016-05-23)
 - add ability to enable/disable log using the `enableLog` option in the pool 
   configuration
