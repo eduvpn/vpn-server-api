@@ -19,8 +19,8 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
-use fkooman\VPN\Server\Log\ConnectionLog;
-use fkooman\VPN\Server\Log\OtpLog;
+use fkooman\VPN\Server\ConnectionLog;
+use fkooman\VPN\Server\OtpLog;
 
 try {
     $config = new Reader(

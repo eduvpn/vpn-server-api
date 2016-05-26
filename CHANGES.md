@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.0.1 (2016-05-26)
+- fix `bin/init` and `bin/housekeeping`
+
 ## 8.0.0 (2016-05-26)
 - major refactoring of the code
 - implement group ACL support (static, remote)
