@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\Info;
+namespace fkooman\VPN\Server\Api;
 
 use fkooman\Rest\Service;
 use PHPUnit_Framework_TestCase;

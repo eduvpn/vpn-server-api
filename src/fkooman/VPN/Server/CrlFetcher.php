@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\Ca;
+namespace fkooman\VPN\Server;
 
 use GuzzleHttp\Client;
 use RuntimeException;

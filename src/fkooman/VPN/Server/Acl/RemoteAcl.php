@@ -20,6 +20,7 @@ namespace fkooman\VPN\Server\Acl;
 use fkooman\Config\Reader;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
+use fkooman\VPN\Server\AclInterface;
 
 class RemoteAcl implements AclInterface
 {

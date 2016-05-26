@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\Log;
+namespace fkooman\VPN\Server;
 
 use PHPUnit_Framework_TestCase;
 use PDO;

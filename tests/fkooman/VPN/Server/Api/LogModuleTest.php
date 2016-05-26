@@ -16,47 +16,62 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\CnConfig;
-
-require_once __DIR__.'/Test/TestIO.php';
+namespace fkooman\VPN\Server\Api;
 
 use fkooman\Rest\Service;
 use PHPUnit_Framework_TestCase;
 use fkooman\Http\Request;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
-use fkooman\VPN\Server\CnConfig\Test\TestIO;
-use Psr\Log\NullLogger;
+use PDO;
 use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
-use fkooman\Json\Json;
+use fkooman\VPN\Server\ConnectionLog;
 
-class CnConfigModuleTest extends PHPUnit_Framework_TestCase
+class LogModuleTest extends PHPUnit_Framework_TestCase
 {
     /** @var \fkooman\Rest\Service */
-    private $service;
+    private $server;
 
     public function setUp()
     {
-        $configModule = new CnConfigModule(
-            '/tmp',
-            new NullLogger(),
-            new TestIO()
+        $connectionLog = new ConnectionLog(new PDO('sqlite::memory:'));
+        $connectionLog->initDatabase();
+
+        $connectionLog->connect(
+            [
+                'common_name' => 'foo_vpn_ex_def',
+                'time_unix' => '1000000000',
+                'v4' => '10.42.42.2',
+                'v6' => 'fd00:4242:4242::2',
+            ]
         );
 
+        $connectionLog->disconnect(
+            [
+                'common_name' => 'foo_vpn_ex_def',
+                'time_unix' => '1000000000',
+                'disconnect_time_unix' => '1000010000',
+                'v4' => '10.42.42.2',
+                'v6' => 'fd00:4242:4242::2',
+                'bytes_received' => '4843',
+                'bytes_sent' => '5317',
+            ]
+        );
+
+        $dateTime = $this->getMockBuilder('DateTime')->getMock();
+        $dateTime->method('getTimeStamp')->will($this->returnValue(1000020000));
+        $logModule = new LogModule($connectionLog, $dateTime);
+
         $this->service = new Service();
-        $this->service->addModule($configModule);
+        $this->service->addModule($logModule);
         $authenticationPlugin = new AuthenticationPlugin();
         $authenticationPlugin->register(
             new BearerAuthentication(
                 new ArrayBearerValidator(
                     [
                         'vpn-user-portal' => [
-                            'token' => 'portal',
-                            'scope' => 'portal',
-                        ],
-                        'vpn-admin-portal' => [
-                            'token' => 'admin',
-                            'scope' => 'admin',
+                            'token' => 'aabbcc',
+                            'scope' => 'admin portal',
                         ],
                     ]
                 )
@@ -65,77 +80,52 @@ class CnConfigModuleTest extends PHPUnit_Framework_TestCase
         $this->service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     }
 
-    public function testGetCns()
-    {
-        $this->assertSame(
-            [
-                'data' => [
-                    'foo_one' => [
-                        'disable' => true,
-                    ],
-                    'bar_one' => [
-                        'disable' => true,
-                    ],
-                ],
-            ],
-            $this->makeRequest('GET', '/config/common_names', [], 'admin')
-        );
-    }
-
-    public function testGetCnsForUser()
-    {
-        $this->assertSame(
-            [
-                'data' => [
-                    'foo_one' => [
-                        'disable' => true,
-                    ],
-                ],
-            ],
-            $this->makeRequest('GET', '/config/common_names', ['user_id' => 'foo'], 'admin')
-        );
-    }
-
-    public function testGetNonExistingCn()
-    {
-        $this->assertSame(
-            [
-                'disable' => false,
-            ],
-            $this->makeRequest('GET', '/config/common_names/foo_not-there', [], 'admin')
-        );
-    }
-
-    public function testGetExistingCn()
-    {
-        $this->assertSame(
-            [
-                'disable' => true,
-            ],
-            $this->makeRequest('GET', '/config/common_names/foo_one', [], 'admin')
-        );
-    }
-
-    public function testPutCnConfig()
+    public function testGetLogHistory()
     {
         $this->assertSame(
             [
                 'ok' => true,
+                'history' => [
+                    [
+                        'common_name' => 'foo_vpn_ex_def',
+                        'time_unix' => '1000000000',
+                        'v4' => '10.42.42.2',
+                        'v6' => 'fd00:4242:4242::2',
+                        'bytes_received' => '4843',
+                        'bytes_sent' => '5317',
+                        'disconnect_time_unix' => '1000010000',
+                    ],
+                ],
             ],
-            $this->makeRequest('PUT', '/config/common_names/foo_two', ['disable' => true], 'admin')
-        );
-        $this->assertSame(
-            [
-                'disable' => true,
-            ],
-            $this->makeRequest('GET', '/config/common_names/foo_two', [], 'admin')
+            $this->makeRequest('GET', sprintf('/log/%s', date('Y-m-d', 1000010001)))
         );
     }
 
-    private function makeRequest($requestMethod, $requestUri, array $queryBody = [], $accessToken)
+    public function testGetLogHistoryForDate()
     {
-        if ('GET' === $requestMethod) {
-            // GET
+        $this->assertSame(
+            [
+                'ok' => true,
+                'history' => [
+                ],
+            ],
+            $this->makeRequest('GET', sprintf('/log/%s', date('Y-m-d', 999888888)))
+        );
+    }
+
+    public function testGetLogHistoryForDateOutOfRange()
+    {
+        $this->assertSame(
+            [
+                'error' => 'invalid date range',
+            ],
+            $this->makeRequest('GET', sprintf('/log/%s', date('Y-m-d', 1234567890)))
+        );
+    }
+
+    private function makeRequest($requestMethod, $requestUri, array $queryBody = [])
+    {
+        if ('GET' === $requestMethod || 'DELETE' === $requestMethod) {
             return $this->service->run(
                 new Request(
                     array(
@@ -145,12 +135,12 @@ class CnConfigModuleTest extends PHPUnit_Framework_TestCase
                         'REQUEST_URI' => sprintf('%s?%s', $requestUri, http_build_query($queryBody)),
                         'PATH_INFO' => $requestUri,
                         'QUERY_STRING' => http_build_query($queryBody),
-                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $accessToken),
+                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', 'aabbcc'),
                     )
                 )
             )->getBody();
         } else {
-            // PUT
+            // POST
             return $this->service->run(
                 new Request(
                     array(
@@ -160,10 +150,9 @@ class CnConfigModuleTest extends PHPUnit_Framework_TestCase
                         'REQUEST_URI' => $requestUri,
                         'PATH_INFO' => $requestUri,
                         'QUERY_STRING' => '',
-                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', $accessToken),
+                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', 'aabbcc'),
                     ),
-                    null,
-                    Json::encode($queryBody)
+                    $queryBody
                 )
             )->getBody();
         }

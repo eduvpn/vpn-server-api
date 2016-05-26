@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\Log;
+namespace fkooman\VPN\Server;
 
 use PDO;
 use PDOException;

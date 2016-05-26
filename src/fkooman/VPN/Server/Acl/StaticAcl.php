@@ -18,6 +18,7 @@
 namespace fkooman\VPN\Server\Acl;
 
 use fkooman\Config\Reader;
+use fkooman\VPN\Server\AclInterface;
 
 class StaticAcl implements AclInterface
 {

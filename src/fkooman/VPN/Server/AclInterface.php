@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\Acl;
+namespace fkooman\VPN\Server;
 
 interface AclInterface
 {

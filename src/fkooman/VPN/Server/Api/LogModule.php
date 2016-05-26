@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\Log;
+namespace fkooman\VPN\Server\Api;
 
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
@@ -25,6 +25,7 @@ use fkooman\Http\JsonResponse;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use DateTime;
+use fkooman\VPN\Server\ConnectionLog;
 
 class LogModule implements ServiceModuleInterface
 {

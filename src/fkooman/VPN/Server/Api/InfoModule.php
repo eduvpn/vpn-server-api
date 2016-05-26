@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\Info;
+namespace fkooman\VPN\Server\Api;
 
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
@@ -23,7 +23,8 @@ use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\JsonResponse;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use fkooman\VPN\Server\Pools;
-use fkooman\VPN\Server\Acl\AclInterface;
+use fkooman\VPN\Server\AclInterface;
+use fkooman\VPN\Server\InputValidation;
 
 class InfoModule implements ServiceModuleInterface
 {
@@ -53,8 +54,8 @@ class InfoModule implements ServiceModuleInterface
         $service->get(
             '/info/users/:userId',
             function ($userId, Request $request, TokenInfo $tokenInfo) {
-                // XXX validate userId
                 $tokenInfo->getScope()->requireScope(['admin', 'portal']);
+                InputValidation::userId($userId);
 
                 return $this->getUserInfo($userId);
             }

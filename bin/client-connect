@@ -19,12 +19,10 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
-use fkooman\VPN\Server\CnConfig\CnConfig;
-use fkooman\VPN\Server\UserConfig\UserConfig;
-use fkooman\VPN\Server\Log\ConnectionLog;
-use fkooman\IO\IO;
+use fkooman\VPN\Server\ConnectionLog;
 use fkooman\Json\Json;
 use fkooman\VPN\Server\Pools;
+use fkooman\VPN\Server\Disable;
 
 openlog(
     basename($argv[0]),
@@ -75,55 +73,25 @@ try {
         new YamlFile(dirname(__DIR__).'/config/acl.yaml')
     );
 
-    // retrieve the user's configuration file
-    $io = new IO();
-    $userFile = sprintf('%s/users/%s', $poolsConfig->v('configDir'), $userId);
-    if (!$io->isFile($userFile)) {
-        $userConfig = new UserConfig([]);
-    } else {
-        $userConfig = new UserConfig(
-            Json::decode(
-                $io->readFile($userFile)
-            )
-        );
-    }
-
-    // retrieve the cn's configuration file
-    $io = new IO();
-    $commonNameFile = sprintf('%s/common_names/%s', $poolsConfig->v('configDir'), $commonName);
-    if (!$io->isFile($commonNameFile)) {
-        $cnConfig = new CnConfig([]);
-    } else {
-        $cnConfig = new CnConfig(
-            Json::decode(
-                $io->readFile($commonNameFile)
-            )
-        );
-    }
-
-    $dropClient = false;
-    //
-    // USER DISABLED?
-    //
-    if ($userConfig->getDisable()) {
+    // user disabled?
+    $userDisable = new Disable($poolsConfig->v('configDir').'/users/disabled');
+    if ($userDisable->getDisable($userId)) {
         syslog(LOG_INFO, sprintf('client not allowed, user "%s" is disabled', $userId));
-        $dropClient = true;
+        exit(1);
     }
 
-    //
-    // COMMON NAME DISABLED?
-    //
-    if ($cnConfig->getDisable()) {
+    // common name disabled?
+    $commonNameDisable = new Disable($poolsConfig->v('configDir').'/common_names/disabled');
+    if ($commonNameDisable->getDisable($commonName)) {
         syslog(LOG_INFO, sprintf('client not allowed, CN "%s" is disabled', $commonName));
-        $dropClient = true;
+        exit(1);
     }
 
-    //
-    // GROUP MEMBERSHIP
-    //
+    // in ACL, if enabled?
     $poolId = $envData['POOL_ID'];
     $pools = new Pools($poolsConfig->v('pools'));
     $pool = $pools[$poolId];
+
     if ($pool->getEnableAcl()) {
         // ACL
         $aclMethod = $aclConfig->v('aclMethod');
@@ -132,16 +100,8 @@ try {
         $memberOf = $acl->getGroups($userId);
         if (!in_array($poolId, $memberOf)) {
             syslog(LOG_INFO, sprintf('client not allowed, user is not a member of "%s"', $poolId));
-            $dropClient = true;
+            exit(1);
         }
-    }
-
-    if ($dropClient) {
-        // write the configuration file
-        if (false === @file_put_contents($cnConfigFile, 'disable')) {
-            throw new RuntimeException('unable to write CN configuration file');
-        }
-        exit(0);
     }
 
     // log the connection

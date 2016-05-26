@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\Ca;
+namespace fkooman\VPN\Server\Api;
 
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
@@ -23,6 +23,7 @@ use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\JsonResponse;
 use Psr\Log\LoggerInterface;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
+use fkooman\VPN\Server\CrlFetcher;
 
 class CaModule implements ServiceModuleInterface
 {

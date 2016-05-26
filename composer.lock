@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c8af670f5ad309ce5e35d8019927743e",
-    "content-hash": "6d1215d4e96689160fcf721bd90d821b",
+    "hash": "1bd33c3e1a8bdc363c56168fbfb7b405",
+    "content-hash": "85ea601b58b7ca1eaf63bb984e4c9411",
     "packages": [
         {
             "name": "christian-riesen/base32",
@@ -197,16 +197,16 @@
         },
         {
             "name": "fkooman/io",
-            "version": "1.2.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-lib-io.git",
-                "reference": "0a7cd120cb067fdfcd9b146fd03ffc2cb7fdc465"
+                "reference": "e478f37798af631ad49c3154420c24c6bbe0484c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-lib-io/zipball/0a7cd120cb067fdfcd9b146fd03ffc2cb7fdc465",
-                "reference": "0a7cd120cb067fdfcd9b146fd03ffc2cb7fdc465",
+                "url": "https://api.github.com/repos/fkooman/php-lib-io/zipball/e478f37798af631ad49c3154420c24c6bbe0484c",
+                "reference": "e478f37798af631ad49c3154420c24c6bbe0484c",
                 "shasum": ""
             },
             "require": {
@@ -232,7 +232,7 @@
                 }
             ],
             "description": "Simple IO library",
-            "time": "2016-04-27 12:48:25"
+            "time": "2016-05-25 14:27:49"
         },
         {
             "name": "fkooman/json",

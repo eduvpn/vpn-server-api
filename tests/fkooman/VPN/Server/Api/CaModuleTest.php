@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\Ca;
+namespace fkooman\VPN\Server\Api;
 
 use fkooman\Rest\Service;
 use PHPUnit_Framework_TestCase;
@@ -29,6 +29,7 @@ use GuzzleHttp\Stream\Stream;
 use Psr\Log\NullLogger;
 use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
+use fkooman\VPN\Server\CrlFetcher;
 
 class CaModuleTest extends PHPUnit_Framework_TestCase
 {

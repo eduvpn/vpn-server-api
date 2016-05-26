@@ -22,10 +22,8 @@ use Base32\Base32;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
-use fkooman\IO\IO;
-use fkooman\VPN\Server\UserConfig\UserConfig;
-use fkooman\Json\Json;
-use fkooman\VPN\Server\Log\OtpLog;
+use fkooman\VPN\Server\OtpLog;
+use fkooman\VPN\Server\OtpSecret;
 
 openlog(
     basename($argv[0]),
@@ -66,20 +64,8 @@ try {
         new YamlFile(dirname(__DIR__).'/config/pools.yaml')
     );
 
-    // retrieve the user's configuration file
-    $io = new IO();
-    $userFile = sprintf('%s/users/%s', $poolsConfig->v('configDir'), $userId);
-    if (!$io->isFile($userFile)) {
-        $userConfig = new UserConfig([]);
-    } else {
-        $userConfig = new UserConfig(
-            Json::decode(
-                $io->readFile($userFile)
-            )
-        );
-    }
-
-    $otpSecret = $userConfig->getOtpSecret();
+    $otpSecrets = new OtpSecret($poolsConfig->v('configDir').'/users/otp_secrets');
+    $otpSecret = $otpSecrets->getOtpSecret($userId);
     if (false === $otpSecret) {
         throw new RuntimeException(sprintf('no OTP secret for user "%s" registered', $userId));
     }

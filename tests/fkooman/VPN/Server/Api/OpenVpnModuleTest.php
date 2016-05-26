@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\VPN\Server\OpenVpn;
+namespace fkooman\VPN\Server\Api;
 
 require_once __DIR__.'/Test/TestSocket.php';
 
@@ -29,6 +29,7 @@ use Psr\Log\NullLogger;
 use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
 use fkooman\VPN\Server\Pools;
+use fkooman\VPN\Server\OpenVpn\ServerManager;
 
 class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
 {

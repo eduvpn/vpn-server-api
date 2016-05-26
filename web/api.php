@@ -21,25 +21,27 @@ use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
-use fkooman\Rest\Service;
 use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
 use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
-use fkooman\VPN\Server\Ca\CaModule;
-use fkooman\VPN\Server\Ca\CrlFetcher;
-use fkooman\VPN\Server\UserConfig\UserConfigModule;
-use fkooman\VPN\Server\CnConfig\CnConfigModule;
-use fkooman\VPN\Server\Info\InfoModule;
-use fkooman\VPN\Server\Pools;
-use fkooman\VPN\Server\Log\ConnectionLog;
-use fkooman\VPN\Server\Log\LogModule;
-use fkooman\VPN\Server\OpenVpn\OpenVpnModule;
-use fkooman\VPN\Server\OpenVpn\ServerManager;
+use fkooman\Rest\Service;
+use fkooman\VPN\Server\Api\CaModule;
+use fkooman\VPN\Server\Api\CommonNamesModule;
+use fkooman\VPN\Server\Api\InfoModule;
+use fkooman\VPN\Server\Api\LogModule;
+use fkooman\VPN\Server\Api\OpenVpnModule;
+use fkooman\VPN\Server\Api\UsersModule;
+use fkooman\VPN\Server\ConnectionLog;
+use fkooman\VPN\Server\CrlFetcher;
+use fkooman\VPN\Server\Disable;
 use fkooman\VPN\Server\OpenVpn\ManagementSocket;
+use fkooman\VPN\Server\OpenVpn\ServerManager;
+use fkooman\VPN\Server\OtpSecret;
+use fkooman\VPN\Server\Pools;
+use GuzzleHttp\Client;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
-use GuzzleHttp\Client;
-use fkooman\IO\IO;
+
 
 try {
     $config = new Reader(
@@ -126,15 +128,17 @@ try {
     $aclClass = sprintf('fkooman\VPN\Server\Acl\%s', $aclMethod);
     $acl = new $aclClass($aclConfig);
 
-    $io = new IO();
+    $usersDisable = new Disable($poolsConfig->v('configDir').'/users/disabled');
+    $commonNamesDisable = new Disable($poolsConfig->v('configDir').'/common_names/disabled');
+    $otpSecrets = new OtpSecret($poolsConfig->v('configDir').'/users/otp_secrets');
 
     $authenticationPlugin = new AuthenticationPlugin();
     $authenticationPlugin->register($apiAuth, 'api');
     $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     $service->addModule(new LogModule($connectionLog));
     $service->addModule(new OpenVpnModule($serverManager));
-    $service->addModule(new UserConfigModule($poolsConfig->v('configDir').'/users', $logger, $io));
-    $service->addModule(new CnConfigModule($poolsConfig->v('configDir').'/common_names', $logger, $io));
+    $service->addModule(new CommonNamesModule($commonNamesDisable, $logger));
+    $service->addModule(new UsersModule($usersDisable, $otpSecrets, $logger));
     $service->addModule(new CaModule($crlFetcher, $logger));
     $service->addModule(new InfoModule($serverPools, $acl));
     $service->run()->send();

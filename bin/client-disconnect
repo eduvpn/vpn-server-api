@@ -20,7 +20,7 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\Json\Json;
-use fkooman\VPN\Server\Log\ConnectionLog;
+use fkooman\VPN\Server\ConnectionLog;
 
 openlog(
     basename($argv[0]),
