@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.0.2 (2016-05-27)
+- update `config/pools.yaml` a bit
+
 ## 8.0.1 (2016-05-26)
 - fix `bin/init` and `bin/housekeeping`
 
