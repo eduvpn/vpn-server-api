@@ -25,9 +25,6 @@ use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
 use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
 use fkooman\VPN\Server\Pools;
-use fkooman\VPN\Server\Acl\StaticAcl;
-use fkooman\Config\Reader;
-use fkooman\Config\ArrayReader;
 
 class InfoModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -49,18 +46,6 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                         'routes' => ['192.168.1.0/24', 'fd00:1010:1010::/48'],
                     ],
                 ]
-            ),
-            new StaticAcl(
-                new Reader(
-                    new ArrayReader(
-                        [
-                            'StaticAcl' => [
-                                'default' => ['foo', 'bar', 'baz'],
-                                'p2p' => ['foo'],
-                            ],
-                        ]
-                    )
-                )
             )
         );
 
@@ -227,21 +212,6 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
 
             ],
             $this->makeRequest('/info/server', 'portal')
-        );
-    }
-
-    public function testGetMembership()
-    {
-        $this->assertEquals(
-            [
-                'data' => [
-                    'acl' => [
-                        'default',
-                        'p2p',
-                    ],
-                ],
-            ],
-            $this->makeRequest('/info/users/acl/foo', 'portal')
         );
     }
 

@@ -97,10 +97,9 @@ class ServerManager
      */
     public function kill($commonName)
     {
-        $clientsKills = [];
+        $clientsKilled = 0;
         // loop over all pools
         foreach ($this->pools as $pool) {
-            $poolKill = 0;
             // loop over all instances
             foreach ($pool->getInstances() as $instance) {
                 // add all kills from this instance to poolKills
@@ -116,7 +115,7 @@ class ServerManager
 
                     $response = $this->managementSocket->command(sprintf('kill %s', $commonName));
                     if (0 === strpos($response[0], 'SUCCESS: ')) {
-                        ++$poolKill;
+                        ++$clientsKilled;
                     }
                     // close the socket connection
                     $this->managementSocket->close();
@@ -132,10 +131,8 @@ class ServerManager
                     );
                 }
             }
-            // we add the poolKill to the clientsKill array
-            $clientsKills[] = ['id' => $pool->getId(), 'killCount' => $poolKill];
         }
 
-        return $clientsKills;
+        return 0 !== $clientsKilled;
     }
 }

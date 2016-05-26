@@ -91,12 +91,7 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'data' => [
-                    'kill' => [
-                        [
-                            'id' => 'default',
-                            'killCount' => 1,
-                        ],
-                    ],
+                    'ok' => true,
                 ],
             ],
             $this->makeRequest('POST', '/openvpn/kill', ['common_name' => 'xyz'])

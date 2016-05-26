@@ -20,24 +20,18 @@ namespace fkooman\VPN\Server\Api;
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
-use fkooman\Http\JsonResponse;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use fkooman\VPN\Server\Pools;
-use fkooman\VPN\Server\AclInterface;
-use fkooman\VPN\Server\InputValidation;
+use fkooman\VPN\Server\ApiResponse;
 
 class InfoModule implements ServiceModuleInterface
 {
     /** @var \fkooman\VPN\Server\Pools */
     private $pools;
 
-    /** @var \fkooman\VPN\Server\AclInterface */
-    private $acl;
-
-    public function __construct(Pools $pools, AclInterface $acl)
+    public function __construct(Pools $pools)
     {
         $this->pools = $pools;
-        $this->acl = $acl;
     }
 
     public function init(Service $service)
@@ -50,16 +44,6 @@ class InfoModule implements ServiceModuleInterface
                 return $this->getInfo();
             }
         );
-
-        $service->get(
-            '/info/users/acl/:userId',
-            function ($userId, Request $request, TokenInfo $tokenInfo) {
-                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
-                InputValidation::userId($userId);
-
-                return $this->getUserInfo($userId);
-            }
-        );
     }
 
     private function getInfo()
@@ -69,27 +53,6 @@ class InfoModule implements ServiceModuleInterface
             $data[] = $pool->toArray();
         }
 
-        return self::getResponse('pools', $data);
-    }
-
-    private function getUserInfo($userId)
-    {
-        $memberOf = $this->acl->getGroups($userId);
-
-        return self::getResponse('acl', $memberOf);
-    }
-
-    private static function getResponse($key, $responseData)
-    {
-        $response = new JsonResponse();
-        $response->setBody(
-            [
-                'data' => [
-                    $key => $responseData,
-                ],
-            ]
-        );
-
-        return $response;
+        return new ApiResponse('pools', $data);
     }
 }

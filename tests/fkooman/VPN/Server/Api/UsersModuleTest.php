@@ -27,7 +27,10 @@ use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
 use fkooman\VPN\Server\Disable;
 use fkooman\IO\IO;
+use fkooman\VPN\Server\Acl\StaticAcl;
 use fkooman\VPN\Server\OtpSecret;
+use fkooman\Config\Reader;
+use fkooman\Config\ArrayReader;
 
 class UsersModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -45,6 +48,18 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $module = new UsersModule(
             new Disable($disabledConfigDir),
             new OtpSecret($otpSecretConfigDir),
+            new StaticAcl(
+                new Reader(
+                    new ArrayReader(
+                        [
+                            'StaticAcl' => [
+                                'default' => ['foo', 'bar', 'baz'],
+                                'p2p' => ['foo'],
+                            ],
+                        ]
+                    )
+                )
+            ),
             new NullLogger()
         );
 
@@ -167,7 +182,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'data' => [
-                    'otp_secrets' => ['foo'],
+                    'users' => ['foo'],
                 ],
             ],
             $this->makeRequest('GET', '/users/otp_secrets', 'admin')
@@ -227,6 +242,21 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                 ],
             ],
             $this->makeRequest('POST', '/users/otp_secrets/foo', 'portal', ['otp_secret' => 'ABCDEFGHIKJLMNOP'])
+        );
+    }
+
+    public function testGetGroups()
+    {
+        $this->assertEquals(
+            [
+                'data' => [
+                    'groups' => [
+                        'default',
+                        'p2p',
+                    ],
+                ],
+            ],
+            $this->makeRequest('GET', '/users/groups/foo', 'portal')
         );
     }
 

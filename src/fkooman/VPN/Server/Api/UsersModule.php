@@ -20,14 +20,13 @@ namespace fkooman\VPN\Server\Api;
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
-use fkooman\Http\JsonResponse;
 use Psr\Log\LoggerInterface;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
+use fkooman\VPN\Server\AclInterface;
 use fkooman\VPN\Server\Disable;
 use fkooman\VPN\Server\OtpSecret;
-
-// XXX think about otp_secrets vs otp_secret, and disable vs disabled
+use fkooman\VPN\Server\ApiResponse;
 
 class UsersModule implements ServiceModuleInterface
 {
@@ -37,13 +36,17 @@ class UsersModule implements ServiceModuleInterface
     /** @var \fkooman\VPN\Server\OtpSecret */
     private $otpSecret;
 
+    /** @var \fkooman\VPN\Server\AclInterface */
+    private $acl;
+
     /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
-    public function __construct(Disable $users, OtpSecret $otpSecret, LoggerInterface $logger)
+    public function __construct(Disable $users, OtpSecret $otpSecret, AclInterface $acl, LoggerInterface $logger)
     {
         $this->users = $users;
         $this->otpSecret = $otpSecret;
+        $this->acl = $acl;
         $this->logger = $logger;
     }
 
@@ -54,7 +57,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, TokenInfo $tokenInfo) {
                 $tokenInfo->getScope()->requireScope(['admin']);
 
-                return self::getResponse('users', $this->users->getDisabled());
+                return new ApiResponse('users', $this->users->getDisabled());
             }
         );
 
@@ -64,7 +67,7 @@ class UsersModule implements ServiceModuleInterface
                 $tokenInfo->getScope()->requireScope(['admin', 'portal']);
                 InputValidation::userId($userId);
 
-                return self::getResponse('disabled', $this->users->getDisable($userId));
+                return new ApiResponse('disabled', $this->users->getDisable($userId));
             }
         );
 
@@ -75,7 +78,7 @@ class UsersModule implements ServiceModuleInterface
                 InputValidation::userId($userId);
                 $this->logger->info(sprintf('disabling user "%s"', $userId));
 
-                return self::getResponse('ok', $this->users->setDisable($userId, true));
+                return new ApiResponse('ok', $this->users->setDisable($userId, true));
             }
         );
 
@@ -86,7 +89,7 @@ class UsersModule implements ServiceModuleInterface
                 InputValidation::userId($userId);
                 $this->logger->info(sprintf('enabling user "%s"', $userId));
 
-                return self::getResponse('ok', $this->users->setDisable($userId, false));
+                return new ApiResponse('ok', $this->users->setDisable($userId, false));
             }
         );
 
@@ -95,7 +98,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, TokenInfo $tokenInfo) {
                 $tokenInfo->getScope()->requireScope(['admin']);
 
-                return self::getResponse('otp_secrets', $this->otpSecret->getOtpSecrets());
+                return new ApiResponse('users', $this->otpSecret->getOtpSecrets());
             }
         );
 
@@ -107,7 +110,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $hasOtpSecret = false !== $this->otpSecret->getOtpSecret($userId);
 
-                return self::getResponse('otp_secret', $hasOtpSecret);
+                return new ApiResponse('otp_secret', $hasOtpSecret);
             }
         );
 
@@ -119,7 +122,7 @@ class UsersModule implements ServiceModuleInterface
                 $otpSecret = $request->getPostParameter('otp_secret');
                 InputValidation::otpSecret($otpSecret);
 
-                return self::getResponse('ok', $this->otpSecret->setOtpSecret($userId, $otpSecret));
+                return new ApiResponse('ok', $this->otpSecret->setOtpSecret($userId, $otpSecret));
             }
         );
 
@@ -129,22 +132,18 @@ class UsersModule implements ServiceModuleInterface
                 $tokenInfo->getScope()->requireScope(['admin']);
                 InputValidation::userId($userId);
 
-                return self::getResponse('ok', $this->otpSecret->setOtpSecret($userId, false));
+                return new ApiResponse('ok', $this->otpSecret->setOtpSecret($userId, false));
             }
         );
-    }
 
-    private static function getResponse($key, $responseData)
-    {
-        $response = new JsonResponse();
-        $response->setBody(
-            [
-                'data' => [
-                    $key => $responseData,
-                ],
-            ]
+        $service->get(
+            '/users/groups/:userId',
+            function ($userId, Request $request, TokenInfo $tokenInfo) {
+                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
+                InputValidation::userId($userId);
+
+                return new ApiResponse('groups', $this->acl->getGroups($userId));
+            }
         );
-
-        return $response;
     }
 }

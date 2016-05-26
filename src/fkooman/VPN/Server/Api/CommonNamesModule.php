@@ -20,11 +20,11 @@ namespace fkooman\VPN\Server\Api;
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
-use fkooman\Http\JsonResponse;
 use Psr\Log\LoggerInterface;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use fkooman\VPN\Server\Disable;
+use fkooman\VPN\Server\ApiResponse;
 
 class CommonNamesModule implements ServiceModuleInterface
 {
@@ -47,7 +47,7 @@ class CommonNamesModule implements ServiceModuleInterface
             function (Request $request, TokenInfo $tokenInfo) {
                 $tokenInfo->getScope()->requireScope(['admin', 'portal']);
 
-                return self::getResponse('common_names', $this->commonNames->getDisabled());
+                return new ApiResponse('common_names', $this->commonNames->getDisabled());
             }
         );
 
@@ -57,7 +57,7 @@ class CommonNamesModule implements ServiceModuleInterface
                 $tokenInfo->getScope()->requireScope(['admin', 'portal']);
                 InputValidation::commonName($commonName);
 
-                return self::getResponse('disabled', $this->commonNames->getDisable($commonName));
+                return new ApiResponse('disabled', $this->commonNames->getDisable($commonName));
             }
         );
 
@@ -68,7 +68,7 @@ class CommonNamesModule implements ServiceModuleInterface
                 InputValidation::commonName($commonName);
                 $this->logger->info(sprintf('disabling common_name "%s"', $commonName));
 
-                return self::getResponse('ok', $this->commonNames->setDisable($commonName, true));
+                return new ApiResponse('ok', $this->commonNames->setDisable($commonName, true));
 
             }
         );
@@ -80,22 +80,8 @@ class CommonNamesModule implements ServiceModuleInterface
                 InputValidation::commonName($commonName);
                 $this->logger->info(sprintf('enabling common_name "%s"', $commonName));
 
-                return self::getResponse('ok', $this->commonNames->setDisable($commonName, false));
+                return new ApiResponse('ok', $this->commonNames->setDisable($commonName, false));
             }
         );
-    }
-
-    private static function getResponse($key, $responseData)
-    {
-        $response = new JsonResponse();
-        $response->setBody(
-            [
-                'data' => [
-                    $key => $responseData,
-                ],
-            ]
-        );
-
-        return $response;
     }
 }

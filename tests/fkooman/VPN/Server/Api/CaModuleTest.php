@@ -78,7 +78,7 @@ class CaModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'data' => [
+               'data' => [
                     'ok' => true,
                 ],
             ],

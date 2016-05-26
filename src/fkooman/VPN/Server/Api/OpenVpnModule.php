@@ -20,10 +20,10 @@ namespace fkooman\VPN\Server\Api;
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
-use fkooman\Http\JsonResponse;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use fkooman\VPN\Server\OpenVpn\ServerManager;
+use fkooman\VPN\Server\ApiResponse;
 
 class OpenVpnModule implements ServiceModuleInterface
 {
@@ -42,7 +42,7 @@ class OpenVpnModule implements ServiceModuleInterface
             function (Request $request, TokenInfo $tokenInfo) {
                 $tokenInfo->getScope()->requireScope(['admin']);
 
-                return self::getResponse('connections', $this->serverManager->connections());
+                return new ApiResponse('connections', $this->serverManager->connections());
             }
         );
 
@@ -54,22 +54,9 @@ class OpenVpnModule implements ServiceModuleInterface
                 $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);
 
-                return self::getResponse('kill', $this->serverManager->kill($commonName));
+                // XXX make kill return bool
+                return new ApiResponse('ok', $this->serverManager->kill($commonName));
             }
         );
-    }
-
-    private static function getResponse($key, $responseData)
-    {
-        $response = new JsonResponse();
-        $response->setBody(
-            [
-                'data' => [
-                    $key => $responseData,
-                ],
-            ]
-        );
-
-        return $response;
     }
 }

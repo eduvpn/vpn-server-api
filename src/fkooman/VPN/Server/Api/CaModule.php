@@ -20,10 +20,10 @@ namespace fkooman\VPN\Server\Api;
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
-use fkooman\Http\JsonResponse;
 use Psr\Log\LoggerInterface;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use fkooman\VPN\Server\CrlFetcher;
+use fkooman\VPN\Server\ApiResponse;
 
 class CaModule implements ServiceModuleInterface
 {
@@ -49,22 +49,8 @@ class CaModule implements ServiceModuleInterface
                 // XXX error handling?
                 $this->crlFetcher->fetch();
 
-                return self::getResponse('ok', true);
+                return new ApiResponse('ok', true);
             }
         );
-    }
-
-    private static function getResponse($key, $responseData)
-    {
-        $response = new JsonResponse();
-        $response->setBody(
-            [
-                'data' => [
-                    $key => $responseData,
-                ],
-            ]
-        );
-
-        return $response;
     }
 }

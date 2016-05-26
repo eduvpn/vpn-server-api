@@ -137,9 +137,9 @@ try {
     $service->addModule(new LogModule($connectionLog));
     $service->addModule(new OpenVpnModule($serverManager));
     $service->addModule(new CommonNamesModule($commonNamesDisable, $logger));
-    $service->addModule(new UsersModule($usersDisable, $otpSecrets, $logger));
+    $service->addModule(new UsersModule($usersDisable, $otpSecrets, $acl, $logger));
     $service->addModule(new CaModule($crlFetcher, $logger));
-    $service->addModule(new InfoModule($serverPools, $acl));
+    $service->addModule(new InfoModule($serverPools));
     $service->run()->send();
 } catch (Exception $e) {
     // internal server error

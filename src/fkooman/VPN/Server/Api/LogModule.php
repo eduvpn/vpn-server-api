@@ -21,11 +21,11 @@ use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Http\Exception\BadRequestException;
-use fkooman\Http\JsonResponse;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use DateTime;
 use fkooman\VPN\Server\ConnectionLog;
+use fkooman\VPN\Server\ApiResponse;
 
 class LogModule implements ServiceModuleInterface
 {
@@ -64,22 +64,8 @@ class LogModule implements ServiceModuleInterface
                 $showDateUnixMin = strtotime('today', $showDateUnix);
                 $showDateUnixMax = strtotime('tomorrow', $showDateUnix);
 
-                return self::getResponse('log', $this->connectionLog->getConnectionHistory($showDateUnixMin, $showDateUnixMax));
+                return new ApiResponse('log', $this->connectionLog->getConnectionHistory($showDateUnixMin, $showDateUnixMax));
             }
         );
-    }
-
-    private static function getResponse($key, $responseData)
-    {
-        $response = new JsonResponse();
-        $response->setBody(
-            [
-                'data' => [
-                    $key => $responseData,
-                ],
-            ]
-        );
-
-        return $response;
     }
 }
