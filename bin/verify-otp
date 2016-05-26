@@ -48,9 +48,11 @@ try {
         $envData[$envKey] = $envValue;
     }
 
-    // for now we ignore the "username" field, either we require it to be
-    // the same as the CN, or maybe allow it to indicate the OTP method used, 
-    // e.g. 'totp|hotp|yubi'
+    // use username field to specify OTP type, for now we only support 'totp'
+    $otpType = $envData['username'];
+    if ('totp' !== $otpType) {
+        throw new RuntimeException(sprintf('invalid OTP type "%s" specified', $otpType));
+    }
 
     $otpKey = $envData['password'];
     // validate the OTP key
