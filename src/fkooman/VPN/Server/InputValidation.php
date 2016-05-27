@@ -75,6 +75,14 @@ class InputValidation
         }
     }
 
+    public static function vootToken($vootToken)
+    {
+        // XXX OAuth bearer tokens have a defined syntax!
+        if (!is_string($vootToken) || 0 >= strlen($vootToken)) {
+            throw new BadRequestException('voot token must be non-empty string');
+        }
+    }
+
     public static function ipAddress($ipAddress)
     {
         if (false === filter_var($ipAddress, FILTER_VALIDATE_IP)) {

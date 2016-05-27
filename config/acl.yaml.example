@@ -1,5 +1,6 @@
 aclMethod: StaticAcl
 #aclMethod: RemoteAcl
+#aclMethod: VootAcl
 
 StaticAcl:
     # mapping from "pool" to user IDs
@@ -9,3 +10,14 @@ StaticAcl:
 
 RemoteAcl:
     apiUrl: https://example.org/groups
+
+VootAcl:
+    apiUrl: https://voot.surfconext.nl/me/groups
+
+    # the directory where VOOT tokens are stored per user
+    tokenDir: /var/lib/vpn-server-api/users/voot_tokens
+
+    # the key is the VOOT group ID, the value is an array with pool IDs
+    aclMapping:
+        'urn:voot:group:one': [default]
+        'urn:voot:group:two': [default, other]

@@ -29,6 +29,7 @@ use fkooman\VPN\Server\Disable;
 use fkooman\IO\IO;
 use fkooman\VPN\Server\Acl\StaticAcl;
 use fkooman\VPN\Server\OtpSecret;
+use fkooman\VPN\Server\VootToken;
 use fkooman\Config\Reader;
 use fkooman\Config\ArrayReader;
 
@@ -42,12 +43,16 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $io = new IO();
         $disabledConfigDir = sprintf('%s/%s/users/disabled', sys_get_temp_dir(), $io->getRandom());
         $otpSecretConfigDir = sprintf('%s/%s/users/otp_secrets', sys_get_temp_dir(), $io->getRandom());
+        $vootTokenConfigDir = sprintf('%s/%s/users/voot_tokens', sys_get_temp_dir(), $io->getRandom());
+
         $io->writeFile(sprintf('%s/foo', $disabledConfigDir), null, true);
         $io->writeFile(sprintf('%s/foo', $otpSecretConfigDir), 'SECRET', true);
+        $io->writeFile(sprintf('%s/foo', $vootTokenConfigDir), 'TOKEN', true);
 
         $module = new UsersModule(
             new Disable($disabledConfigDir),
             new OtpSecret($otpSecretConfigDir),
+            new VootToken($vootTokenConfigDir),
             new StaticAcl(
                 new Reader(
                     new ArrayReader(
@@ -257,6 +262,30 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                 ],
             ],
             $this->makeRequest('GET', '/users/groups/foo', 'portal')
+        );
+    }
+
+    public function testSetVootToken()
+    {
+        $this->assertSame(
+            [
+                'data' => [
+                    'ok' => true,
+                ],
+            ],
+            $this->makeRequest('POST', '/users/voot_tokens/bar', 'portal', ['voot_token' => 'VOOTTOKEN'])
+        );
+    }
+
+    public function testGetVootToken()
+    {
+        $this->assertSame(
+            [
+                'data' => [
+                    'voot_token' => true,
+                ],
+            ],
+            $this->makeRequest('GET', '/users/voot_tokens/foo', 'portal')
         );
     }
 

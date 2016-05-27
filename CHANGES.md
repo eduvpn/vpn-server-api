@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.0.4 (...)
+- implement VootAcl backend
+
 ## 8.0.3 (2016-05-27)
 - cleanup `RemoteAcl`, make it more useful
 

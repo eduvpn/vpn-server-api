@@ -37,6 +37,7 @@ use fkooman\VPN\Server\OpenVpn\ManagementSocket;
 use fkooman\VPN\Server\OpenVpn\ServerManager;
 use fkooman\VPN\Server\OtpSecret;
 use fkooman\VPN\Server\Pools;
+use fkooman\VPN\Server\VootToken;
 use GuzzleHttp\Client;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\SyslogHandler;
@@ -129,7 +130,8 @@ try {
 
     $usersDisable = new Disable($poolsConfig->v('configDir').'/users/disabled');
     $commonNamesDisable = new Disable($poolsConfig->v('configDir').'/common_names/disabled');
-    $otpSecrets = new OtpSecret($poolsConfig->v('configDir').'/users/otp_secrets');
+    $otpSecret = new OtpSecret($poolsConfig->v('configDir').'/users/otp_secrets');
+    $vootToken = new VootToken($poolsConfig->v('configDir').'/users/voot_tokens');
 
     $authenticationPlugin = new AuthenticationPlugin();
     $authenticationPlugin->register($apiAuth, 'api');
@@ -137,7 +139,7 @@ try {
     $service->addModule(new LogModule($connectionLog));
     $service->addModule(new OpenVpnModule($serverManager));
     $service->addModule(new CommonNamesModule($commonNamesDisable, $logger));
-    $service->addModule(new UsersModule($usersDisable, $otpSecrets, $acl, $logger));
+    $service->addModule(new UsersModule($usersDisable, $otpSecret, $vootToken, $acl, $logger));
     $service->addModule(new CaModule($crlFetcher, $logger));
     $service->addModule(new InfoModule($serverPools));
     $service->run()->send();

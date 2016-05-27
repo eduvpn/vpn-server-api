@@ -26,6 +26,7 @@ use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use fkooman\VPN\Server\AclInterface;
 use fkooman\VPN\Server\Disable;
 use fkooman\VPN\Server\OtpSecret;
+use fkooman\VPN\Server\VootToken;
 use fkooman\VPN\Server\ApiResponse;
 
 class UsersModule implements ServiceModuleInterface
@@ -36,22 +37,29 @@ class UsersModule implements ServiceModuleInterface
     /** @var \fkooman\VPN\Server\OtpSecret */
     private $otpSecret;
 
+    /** @var \fkooman\VPN\Server\VootToken */
+    private $vootToken;
+
     /** @var \fkooman\VPN\Server\AclInterface */
     private $acl;
 
     /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
-    public function __construct(Disable $users, OtpSecret $otpSecret, AclInterface $acl, LoggerInterface $logger)
+    public function __construct(Disable $users, OtpSecret $otpSecret, VootToken $vootToken, AclInterface $acl, LoggerInterface $logger)
     {
         $this->users = $users;
         $this->otpSecret = $otpSecret;
+        $this->vootToken = $vootToken;
         $this->acl = $acl;
         $this->logger = $logger;
     }
 
     public function init(Service $service)
     {
+        //
+        // DISABLED
+        //
         $service->get(
             '/users/disabled',
             function (Request $request, TokenInfo $tokenInfo) {
@@ -93,6 +101,9 @@ class UsersModule implements ServiceModuleInterface
             }
         );
 
+        //
+        // OTP_SECRETS
+        //
         $service->get(
             '/users/otp_secrets',
             function (Request $request, TokenInfo $tokenInfo) {
@@ -136,6 +147,9 @@ class UsersModule implements ServiceModuleInterface
             }
         );
 
+        //
+        // GROUPS
+        //
         $service->get(
             '/users/groups/:userId',
             function ($userId, Request $request, TokenInfo $tokenInfo) {
@@ -143,6 +157,33 @@ class UsersModule implements ServiceModuleInterface
                 InputValidation::userId($userId);
 
                 return new ApiResponse('groups', $this->acl->getGroups($userId));
+            }
+        );
+
+        //
+        // VOOT_TOKENS
+        //
+        $service->get(
+            '/users/voot_tokens/:userId',
+            function ($userId, Request $request, TokenInfo $tokenInfo) {
+                $tokenInfo->getScope()->requireScope(['portal']);
+                InputValidation::userId($userId);
+
+                $hasVootToken = false !== $this->vootToken->getVootToken($userId);
+
+                return new ApiResponse('voot_token', $hasVootToken);
+            }
+        );
+
+        $service->post(
+            '/users/voot_tokens/:userId',
+            function ($userId, Request $request, TokenInfo $tokenInfo) {
+                $tokenInfo->getScope()->requireScope(['portal']);
+                InputValidation::userId($userId);
+                $vootToken = $request->getPostParameter('voot_token');
+                InputValidation::vootToken($vootToken);
+
+                return new ApiResponse('ok', $this->vootToken->setVootToken($userId, $vootToken));
             }
         );
     }
