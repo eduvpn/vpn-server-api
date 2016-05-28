@@ -62,7 +62,7 @@ class VootAcl implements AclInterface
 
         return self::applyMapping(
             $memberOf,
-            $this->configReader->v('VootAcl', 'aclMapping', false, [])
+            $aclMapping
         );
     }
 
