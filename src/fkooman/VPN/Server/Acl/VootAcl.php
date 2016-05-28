@@ -42,16 +42,34 @@ class VootAcl implements AclInterface
 
     public function getGroups($userId)
     {
-        $vootToken = new VootToken($this->configReader->v('VootAcl', 'tokenDir'));
+        $tokenDir = $this->configReader->v('VootAcl', 'tokenDir');
+        $apiUrl = $this->configReader->v('VootAcl', 'apiUrl');
+        $aclMapping = $this->configReader->v('VootAcl', 'aclMapping', false, []);
+
+        $vootToken = new VootToken($tokenDir);
         $bearerToken = $vootToken->getVootToken($userId);
+
         if (false === $bearerToken) {
+            // no Bearer token registered for this user, so assume user is not
+            // a member of any groups
             return [];
         }
 
-        try {
-            $apiUrl = $this->configReader->v('VootAcl', 'apiUrl');
+        // fetch the groups and extract the membership data
+        $memberOf = self::extractMembership(
+            $this->fetchGroups($apiUrl, $bearerToken)
+        );
 
-            $responseData = $this->client->get(
+        return self::applyMapping(
+            $memberOf,
+            $this->configReader->v('VootAcl', 'aclMapping', false, [])
+        );
+    }
+
+    private function fetchGroups($apiUrl, $bearerToken)
+    {
+        try {
+            return $this->client->get(
                 $apiUrl,
                 [
                     'headers' => [
@@ -59,42 +77,40 @@ class VootAcl implements AclInterface
                     ],
                 ]
             )->json();
-
-            if (!is_array($responseData)) {
-                return [];
-            }
-
-            $memberOf = [];
-            foreach ($responseData as $groupEntry) {
-                if (!is_array($groupEntry)) {
-                    continue;
-                }
-                if (!array_key_exists('id', $groupEntry)) {
-                    continue;
-                }
-                if (!is_string($groupEntry['id'])) {
-                    continue;
-                }
-                $memberOf[] = $groupEntry['id'];
-            }
-
-            // apply mapping
-            $groupMapping = $this->configReader->v('VootAcl', 'aclMapping', false, []);
-            if (!is_array($groupMapping)) {
-                return [];
-            }
-
-            $returnGroups = [];
-            foreach ($memberOf as $groupEntry) {
-                // check if it is available in the mapping
-                if (array_key_exists($groupEntry, $groupMapping)) {
-                    $returnGroups = array_merge($returnGroups, $groupMapping[$groupEntry]);
-                }
-            }
-
-            return $returnGroups;
         } catch (TransferException $e) {
             return [];
         }
+    }
+
+    private static function extractMembership(array $responseData)
+    {
+        $memberOf = [];
+        foreach ($responseData as $groupEntry) {
+            if (!is_array($groupEntry)) {
+                continue;
+            }
+            if (!array_key_exists('id', $groupEntry)) {
+                continue;
+            }
+            if (!is_string($groupEntry['id'])) {
+                continue;
+            }
+            $memberOf[] = $groupEntry['id'];
+        }
+
+        return $memberOf;
+    }
+
+    private static function applyMapping(array $memberOf, array $groupMapping)
+    {
+        $returnGroups = [];
+        foreach ($memberOf as $groupEntry) {
+            // check if it is available in the mapping
+            if (array_key_exists($groupEntry, $groupMapping)) {
+                $returnGroups = array_merge($returnGroups, $groupMapping[$groupEntry]);
+            }
+        }
+
+        return $returnGroups;
     }
 }
