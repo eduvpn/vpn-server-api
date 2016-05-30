@@ -31,7 +31,7 @@ openlog(
 );
 
 try {
-    // OpenVPN specifies a temporary file to write a configuration for that 
+    // OpenVPN specifies a temporary file to write a configuration for that
     // particular CN to
     if ($argc < 2) {
         throw new RuntimeException('temporary CN configuration file not specified');

@@ -86,7 +86,8 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                     ]
                 )
             ),
-            'api');
+            'api'
+        );
         $this->service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     }
 

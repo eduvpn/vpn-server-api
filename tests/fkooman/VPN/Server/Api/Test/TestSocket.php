@@ -21,7 +21,7 @@ use fkooman\VPN\Server\OpenVpn\ManagementSocketInterface;
 use fkooman\IO\IO;
 
 /**
- * Abstraction to use the OpenVPN management interface using a socket 
+ * Abstraction to use the OpenVPN management interface using a socket
  * connection.
  */
 class TestSocket implements ManagementSocketInterface

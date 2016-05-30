@@ -121,7 +121,7 @@ try {
             $config->v('api')
         ),
         ['realm' => 'VPN Server API']
-     );
+    );
 
     // ACL
     $aclMethod = $aclConfig->v('aclMethod');
