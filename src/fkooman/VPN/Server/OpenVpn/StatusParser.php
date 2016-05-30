@@ -22,7 +22,7 @@ namespace fkooman\VPN\Server\OpenVpn;
  *
  * NOTE: The OpenVPN instance MUST NOT have --duplicate-cn in the configuration
  * as we do not deal with multiple connections with the same CN, due to bugs in
- * udp6 status report where the client port is not mentioned in the 
+ * udp6 status report where the client port is not mentioned in the
  * 'Real Address' column
  */
 class StatusParser

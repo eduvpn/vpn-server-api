@@ -303,17 +303,17 @@ class Pool
     }
 
     /**
-     * Depending on the prefix we will divide it in a number of nets to 
+     * Depending on the prefix we will divide it in a number of nets to
      * balance the load over the instances, it is recommended to use a least
      * a /24.
-     * 
-     * A /24 or 'bigger' will be split in 4 networks, everything 'smaller'  
+     *
+     * A /24 or 'bigger' will be split in 4 networks, everything 'smaller'
      * will be either be split in 2 networks or remain 1 network.
      */
     private static function getNetCount($prefix)
     {
         switch ($prefix) {
-            case 32:    // 1 IP   
+            case 32:    // 1 IP
             case 31:    // 2 IPs
                 throw new RuntimeException('not enough available IPs in range');
             case 30:    // 4 IPs (1 usable for client, no splitting)

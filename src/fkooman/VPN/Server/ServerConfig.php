@@ -117,11 +117,11 @@ class ServerConfig
         if ($pool->getDefaultGateway()) {
             $routeConfig[] = 'push "redirect-gateway def1 bypass-dhcp"';
 
-            # for Windows clients we need this extra route to mark the TAP adapter as 
-            # trusted and as having "Internet" access to allow the user to set it to 
+            # for Windows clients we need this extra route to mark the TAP adapter as
+            # trusted and as having "Internet" access to allow the user to set it to
             # "Home" or "Work" to allow accessing file shares and printers
             # NOTE: this will break OS X tunnelblick because on disconnect it will
-            # remove all default routes, including the one set before the VPN 
+            # remove all default routes, including the one set before the VPN
             # was brought up
             #$routeConfig[] = 'push "route 0.0.0.0 0.0.0.0"';
 
@@ -129,11 +129,11 @@ class ServerConfig
             # See https://docs.openvpn.net/docs/openvpn-connect/openvpn-connect-ios-faq.html
             $routeConfig[] = 'push "redirect-gateway ipv6"';
 
-            # we use 2000::/3 instead of ::/0 because it seems to break on native IPv6 
+            # we use 2000::/3 instead of ::/0 because it seems to break on native IPv6
             # networks where the ::/0 default route already exists
             $routeConfig[] = 'push "route-ipv6 2000::/3"';
         } else {
-            // there may be some routes specified, push those, and not the default 
+            // there may be some routes specified, push those, and not the default
             foreach ($pool->getRoutes() as $route) {
                 if (6 === $route->getFamily()) {
                     // IPv6

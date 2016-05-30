@@ -157,7 +157,7 @@ class IP
 
     private function split6($networkCount)
     {
-        // NOTE: if networkCount == 1, then there will be one /64 returned, and not 
+        // NOTE: if networkCount == 1, then there will be one /64 returned, and not
         // the whole net!
         if (64 <= $this->getPrefix()) {
             throw new IPException('network too small to split up, must be bigger than /64');

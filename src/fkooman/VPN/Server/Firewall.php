@@ -156,7 +156,7 @@ class Firewall
     {
         $ingressPorts = ['tcp/22', 'tcp/80', 'tcp/443'];
 
-        // we only care about additional UDP ports, as we only want UDP and 
+        // we only care about additional UDP ports, as we only want UDP and
         // fallback to tcp/443
         foreach ($p as $pool) {
             foreach ($pool->getInstances() as $instance) {

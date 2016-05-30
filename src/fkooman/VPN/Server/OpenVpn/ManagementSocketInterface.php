@@ -22,12 +22,12 @@ interface ManagementSocketInterface
     /**
      * Open the socket.
      *
-     * @param string $socketAddress the socket to connect to, e.g.: 
+     * @param string $socketAddress the socket to connect to, e.g.:
      *                              "tcp://localhost:7505"
-     * @param int    $timeOut       the amount of time to wait before 
+     * @param int    $timeOut       the amount of time to wait before
      *                              giving up on trying to connect
      *
-     * @throws Exception\ServerSocketException if the socket cannot be opened 
+     * @throws Exception\ServerSocketException if the socket cannot be opened
      *                                         within timeout
      */
     public function open($socketAddress, $timeOut = 5);
@@ -39,7 +39,7 @@ interface ManagementSocketInterface
      *
      * @return array the response lines as array values
      *
-     * @throws Exception\ServerSocketException in case read/write fails or 
+     * @throws Exception\ServerSocketException in case read/write fails or
      *                                         socket is not open
      */
     public function command($command);

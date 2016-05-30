@@ -20,7 +20,7 @@ namespace fkooman\VPN\Server\OpenVpn;
 use fkooman\VPN\Server\OpenVpn\Exception\ManagementSocketException;
 
 /**
- * Abstraction to use the OpenVPN management interface using a socket 
+ * Abstraction to use the OpenVPN management interface using a socket
  * connection.
  */
 class ManagementSocket implements ManagementSocketInterface
@@ -36,7 +36,7 @@ class ManagementSocket implements ManagementSocketInterface
     /**
      * Connect to an OpenVPN management socket.
      *
-     * @param string $socketAddress the socket to connect to, e.g.: 
+     * @param string $socketAddress the socket to connect to, e.g.:
      *                              "tcp://localhost:7505"
      */
     public function open($socketAddress, $timeOut = 5)
@@ -47,7 +47,7 @@ class ManagementSocket implements ManagementSocketInterface
                 sprintf('%s (%s)', $errstr, $errno)
             );
         }
-        // turn off logging as the output may interfere with our management 
+        // turn off logging as the output may interfere with our management
         // session, we do not care about the output
         $this->command('log off');
     }

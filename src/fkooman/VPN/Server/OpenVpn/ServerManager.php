@@ -90,7 +90,7 @@ class ServerManager
     }
 
     /**
-     * Disconnect all clients with this CN from all pools and instances 
+     * Disconnect all clients with this CN from all pools and instances
      * managed by this service.
      *
      * @param string $commonName the CN to kill
