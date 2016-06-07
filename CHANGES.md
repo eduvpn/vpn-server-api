@@ -1,6 +1,6 @@
 # Changelog
 
-## 8.0.4 (...)
+## 8.0.4 (2016-06-07)
 - implement VootAcl backend
 
 ## 8.0.3 (2016-05-27)
