@@ -99,7 +99,7 @@ try {
         $acl = new $aclClass($aclConfig);
         $memberOf = $acl->getGroups($userId);
         if (!in_array($poolId, $memberOf)) {
-            syslog(LOG_INFO, sprintf('client not allowed, user is not a member of "%s"', $poolId));
+            syslog(LOG_INFO, sprintf('client not allowed, user "%s" is not a member of "%s"', $userId, $poolId));
             exit(1);
         }
     }

@@ -70,7 +70,7 @@ class VootToken
         }
 
         // set the token, if it is already set override
-        $this->io->writeFile($vootTokenFile, $vootToken, true);
+        $this->io->writeFile($vootTokenFile, $vootToken, true, 0751);
 
         return true;
     }

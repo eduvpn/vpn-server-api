@@ -87,7 +87,7 @@ class OtpSecret
             return false;
         }
 
-        $this->io->writeFile($otpSecretFile, $otpSecret, true);
+        $this->io->writeFile($otpSecretFile, $otpSecret, true, 0751);
 
         return true;
     }
