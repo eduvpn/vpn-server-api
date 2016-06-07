@@ -26,6 +26,7 @@ class InputValidation
     const DATE_PATTERN = '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/';
     const OTP_KEY_PATTERN = '/^[0-9]{6}$/';
     const OTP_SECRET_PATTERN = '/^[A-Z0-9]{16}$/';
+    const ACCESS_TOKEN_PATTERN = '/^[\x20-\x7E]+$/';
 
     public static function commonName($commonName)
     {
@@ -77,9 +78,11 @@ class InputValidation
 
     public static function vootToken($vootToken)
     {
-        // XXX OAuth bearer tokens have a defined syntax!
         if (!is_string($vootToken) || 0 >= strlen($vootToken)) {
             throw new BadRequestException('voot token must be non-empty string');
+        }
+        if (0 === preg_match(self::ACCESS_TOKEN_PATTERN, $vootToken)) {
+            throw new BadRequestException('invalid value for "vootToken"');
         }
     }
 
