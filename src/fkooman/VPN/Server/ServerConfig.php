@@ -102,6 +102,9 @@ class ServerConfig
                 // Pool ID
                 $serverConfig[] = sprintf('setenv POOL_ID %s', $pool->getId());
 
+                // Fix MTU
+                $serverConfig = array_merge($serverConfig, self::getFixMtu($pool, $instance));
+
                 sort($serverConfig, SORT_STRING);
 
                 $allConfig[sprintf('%s-%d', $pool->getId(), $i)] = $serverConfig;
@@ -244,6 +247,22 @@ class ServerConfig
 
         return [
             sprintf('proto %s', $proto),
+        ];
+    }
+
+    private static function getFixMtu(Pool $pool, Instance $instance)
+    {
+        if (!$pool->getFixMtu() || 'tcp' === $instance->getProto()) {
+            return [];
+        }
+
+        return [
+            'tun-mtu 1500',
+            'fragment 1300',
+            'mssfix',
+            'push "tun-mtu 1500"',
+            'push "fragment 1300"',
+            'push "mssfix"',
         ];
     }
 }
