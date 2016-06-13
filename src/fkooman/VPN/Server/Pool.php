@@ -74,9 +74,6 @@ class Pool
     /** @var bool */
     private $enableAcl;
 
-    /** @var bool */
-    private $fixMtu;
-
     public function __construct($poolNumber, array $poolData)
     {
         $this->setId(self::validate($poolData, 'id'));
@@ -95,7 +92,6 @@ class Pool
         $this->setListen(new IP(self::validate($poolData, 'listen', false, '::')));
         $this->setEnableLog(self::validate($poolData, 'enableLog', false, false));
         $this->setEnableAcl(self::validate($poolData, 'enableAcl', false, false));
-        $this->setFixMtu(self::validate($poolData, 'fixMtu', false, false));
         $this->populateInstances();
     }
 
@@ -274,16 +270,6 @@ class Pool
     public function getEnableAcl()
     {
         return $this->enableAcl;
-    }
-
-    public function setFixMtu($fixMtu)
-    {
-        $this->fixMtu = (bool) $fixMtu;
-    }
-
-    public function getFixMtu()
-    {
-        return $this->fixMtu;
     }
 
     private function populateInstances()
