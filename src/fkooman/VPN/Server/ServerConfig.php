@@ -46,7 +46,6 @@ class ServerConfig
                     'key /etc/openvpn/tls/server.key',
                     'dh /etc/openvpn/tls/dh.pem',
                     'tls-auth /etc/openvpn/tls/ta.key 0',
-                    'crl-verify /var/lib/vpn-server-api/ca.crl',
                     'client-connect /usr/bin/vpn-server-api-client-connect',
                     'client-disconnect /usr/bin/vpn-server-api-client-disconnect',
                     'push "comp-lzo no"',

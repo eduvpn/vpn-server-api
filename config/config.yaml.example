@@ -1,7 +1,3 @@
-# CRL
-crl:
-    path: /var/lib/vpn-server-api
-
 # API credentials
 api:
     vpn-user-portal:

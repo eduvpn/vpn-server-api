@@ -64,7 +64,7 @@ class CommonNamesModule implements ServiceModuleInterface
         $service->post(
             '/common_names/disabled/:commonName',
             function ($commonName, Request $request, TokenInfo $tokenInfo) {
-                $tokenInfo->getScope()->requireScope(['admin']);
+                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
                 InputValidation::commonName($commonName);
                 $this->logger->info(sprintf('disabling common_name "%s"', $commonName));
 
