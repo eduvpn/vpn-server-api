@@ -1,6 +1,6 @@
 # Changelog
 
-## 8.1.0 (...)
+## 8.1.0 (2016-07-09)
 - remove the CRL support, only support disabling configurations
 
 ## 8.0.5 (2016-06-07)
