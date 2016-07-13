@@ -58,8 +58,14 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                     new ArrayReader(
                         [
                             'StaticAcl' => [
-                                'default' => ['foo', 'bar', 'baz'],
-                                'p2p' => ['foo'],
+                                'default' => [
+                                    'displayName' => 'Default',
+                                    'members' => ['foo', 'bar', 'baz'],
+                                ],
+                                'p2p' => [
+                                    'displayName' => 'P2P',
+                                    'members' => ['foo'],
+                                ],
                             ],
                         ]
                     )
@@ -257,8 +263,14 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
             [
                 'data' => [
                     'groups' => [
-                        'default',
-                        'p2p',
+                        [
+                            'id' => 'default',
+                            'displayName' => 'Default',
+                        ],
+                        [
+                            'id' => 'p2p',
+                            'displayName' => 'P2P',
+                        ],
                     ],
                 ],
             ],

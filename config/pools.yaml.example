@@ -68,3 +68,6 @@ pools:
 
         # enable ACL for this pool (default: false)
         #enableAcl: true
+ 
+        # specify the identifier(s) of the groups that have access to this pool
+        #aclGroupList: [all]

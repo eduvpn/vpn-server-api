@@ -44,7 +44,6 @@ class VootAcl implements AclInterface
     {
         $tokenDir = $this->configReader->v('VootAcl', 'tokenDir');
         $apiUrl = $this->configReader->v('VootAcl', 'apiUrl');
-        $aclMapping = $this->configReader->v('VootAcl', 'aclMapping', false, []);
 
         $vootToken = new VootToken($tokenDir);
         $bearerToken = $vootToken->getVootToken($userId);
@@ -56,13 +55,8 @@ class VootAcl implements AclInterface
         }
 
         // fetch the groups and extract the membership data
-        $memberOf = self::extractMembership(
+        return self::extractMembership(
             $this->fetchGroups($apiUrl, $bearerToken)
-        );
-
-        return self::applyMapping(
-            $memberOf,
-            $aclMapping
         );
     }
 
@@ -95,22 +89,29 @@ class VootAcl implements AclInterface
             if (!is_string($groupEntry['id'])) {
                 continue;
             }
-            $memberOf[] = $groupEntry['id'];
+            $displayName = $groupEntry['id'];
+
+            // override displayName if one is set
+            if (array_key_exists('displayName', $groupEntry)) {
+                // check if it is multilanguage
+                if (is_string($groupEntry['displayName'])) {
+                    $displayName = $groupEntry['displayName'];
+                } else {
+                    // take english if available, otherwise first
+                    if (array_key_exists('en', $groupEntry['displayName'])) {
+                        $displayName = $groupEntry['displayName']['en'];
+                    } else {
+                        $displayName = array_values($groupEntry['displayName'])[0];
+                    }
+                }
+            }
+
+            $memberOf[] = [
+                'id' => $groupEntry['id'],
+                'displayName' => $displayName,
+            ];
         }
 
         return $memberOf;
-    }
-
-    private static function applyMapping(array $memberOf, array $groupMapping)
-    {
-        $returnGroups = [];
-        foreach ($memberOf as $groupEntry) {
-            // check if it is available in the mapping
-            if (array_key_exists($groupEntry, $groupMapping)) {
-                $returnGroups = array_merge($returnGroups, $groupMapping[$groupEntry]);
-            }
-        }
-
-        return $returnGroups;
     }
 }

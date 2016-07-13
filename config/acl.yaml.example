@@ -1,23 +1,21 @@
 aclMethod: StaticAcl
-#aclMethod: RemoteAcl
 #aclMethod: VootAcl
 
 StaticAcl:
-    # mapping from "pool" to user IDs
-    # below only user "me" can access the pool with ID "default" if "enableAcl" 
-    # is set to true in pools.yaml
-    default: [me]
-
-RemoteAcl:
-    apiUrl: https://example.org/groups
+    # three groups are defined here with identifiers 'all', 'students' and 
+    # 'employees'. The groups have a member list and a display name
+    all:
+        displayName: All
+        members: [foo, bar]
+    students:
+        displayName: Students
+        members: [foo]
+    employees:
+        displayName: Employees
+        members: [bar]
 
 VootAcl:
     apiUrl: https://voot.surfconext.nl/me/groups
 
     # the directory where VOOT tokens are stored per user
     tokenDir: /var/lib/vpn-server-api/users/voot_tokens
-
-    # the key is the VOOT group ID, the value is an array with pool IDs
-    aclMapping:
-        'urn:voot:group:one': [default]
-        'urn:voot:group:two': [default, other]

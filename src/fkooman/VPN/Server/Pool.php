@@ -74,6 +74,9 @@ class Pool
     /** @var bool */
     private $enableAcl;
 
+    /** @var array */
+    private $aclGroupList;
+
     public function __construct($poolNumber, array $poolData)
     {
         $this->setId(self::validate($poolData, 'id'));
@@ -92,6 +95,7 @@ class Pool
         $this->setListen(new IP(self::validate($poolData, 'listen', false, '::')));
         $this->setEnableLog(self::validate($poolData, 'enableLog', false, false));
         $this->setEnableAcl(self::validate($poolData, 'enableAcl', false, false));
+        $this->setAclGroupList(self::validate($poolData, 'aclGroupList', false, []));
         $this->populateInstances();
     }
 
@@ -272,6 +276,20 @@ class Pool
         return $this->enableAcl;
     }
 
+    public function setAclGroupList(array $aclGroupList)
+    {
+        foreach ($aclGroupList as $aclGroup) {
+            self::validateString($aclGroup);
+        }
+
+        $this->aclGroupList = array_values($aclGroupList);
+    }
+
+    public function getAclGroupList()
+    {
+        return $this->aclGroupList;
+    }
+
     private function populateInstances()
     {
         $instanceCount = self::getNetCount($this->getRange()->getPrefix());
@@ -349,6 +367,7 @@ class Pool
         }
 
         return [
+            'aclGroupList' => $this->getAclGroupList(),
             'clientToClient' => $this->getClientToClient(),
             'defaultGateway' => $this->getDefaultGateway(),
             'dns' => $dnsList,

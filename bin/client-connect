@@ -94,12 +94,14 @@ try {
 
     if ($pool->getEnableAcl()) {
         // ACL
+        $aclGroupList = $pool->getAclGroupList();
         $aclMethod = $aclConfig->v('aclMethod');
         $aclClass = sprintf('fkooman\VPN\Server\Acl\%s', $aclMethod);
         $acl = new $aclClass($aclConfig);
         $memberOf = $acl->getGroups($userId);
-        if (!in_array($poolId, $memberOf)) {
-            syslog(LOG_INFO, sprintf('client not allowed, user "%s" is not a member of "%s"', $userId, $poolId));
+
+        if (!isMember($memberOf, $aclGroupList)) {
+            syslog(LOG_INFO, sprintf('client not allowed, user "%s" is not a member of "%s"', $userId, implode(',', $aclGroupList)));
             exit(1);
         }
     }
@@ -125,4 +127,16 @@ try {
 } catch (Exception $e) {
     syslog(LOG_ERR, $e->getMessage());
     exit(66);
+}
+
+function isMember(array $memberOf, array $aclGroupList)
+{
+    // one of the groups must be listed in the pool ACL list
+    foreach ($memberOf as $memberGroup) {
+        if (in_array($memberGroup['id'], $aclGroupList)) {
+            return true;
+        }
+    }
+
+    return false;
 }

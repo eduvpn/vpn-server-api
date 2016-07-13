@@ -40,6 +40,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
         );
         $this->assertSame(
             [
+                'aclGroupList' => [],
                 'clientToClient' => false,
                 'defaultGateway' => false,
                 'dns' => array(
@@ -120,6 +121,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame(
             [
+                'aclGroupList' => [],
                 'clientToClient' => false,
                 'defaultGateway' => false,
                 'dns' => array(

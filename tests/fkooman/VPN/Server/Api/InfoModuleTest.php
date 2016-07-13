@@ -79,6 +79,7 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                 'data' => array(
                 'pools' => array(
                   0 => array(
+                    'aclGroupList' => [],
                     'clientToClient' => false,
                     'defaultGateway' => false,
                     'dns' => array(
@@ -151,6 +152,7 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                 'data' => array(
                 'pools' => array(
                   0 => array(
+                    'aclGroupList' => [],
                     'clientToClient' => false,
                     'defaultGateway' => false,
                     'dns' => array(

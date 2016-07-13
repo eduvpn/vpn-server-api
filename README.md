@@ -23,8 +23,7 @@ See the [documentation](https://github.com/eduvpn/documentation) repository.
     $ composer install
     $ cp config/config.yaml.example config/config.yaml
 
-Point `crl/path` to a writable directory, e.g. `data/` under the current 
-directory. The defaults in this file, and in the other files are for the 
+The defaults in this file, and in the other files are for the 
 production deployment setup and will not work well for development.
 
     $ cp config/pools.yaml.example config/pools.yaml

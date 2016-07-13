@@ -37,13 +37,28 @@ class StaticAcl implements AclInterface
         }
 
         $memberOf = [];
-        foreach ($this->userGroups as $groupId => $groupMembers) {
-            if (!is_array($groupMembers)) {
+        foreach ($this->userGroups as $groupId => $groupEntry) {
+            if (!is_array($groupEntry)) {
                 continue;
             }
-            if (in_array($userId, $groupMembers)) {
-                $memberOf[] = $groupId;
+            $displayName = $groupId;
+
+            if (!array_key_exists('members', $groupEntry)) {
+                continue;
             }
+
+            if (!in_array($userId, $groupEntry['members'])) {
+                continue;
+            }
+
+            if (array_key_exists('displayName', $groupEntry)) {
+                $displayName = $groupEntry['displayName'];
+            }
+
+            $memberOf[] = [
+                'id' => $groupId,
+                'displayName' => $displayName,
+            ];
         }
 
         return $memberOf;
