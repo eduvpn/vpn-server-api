@@ -1,6 +1,6 @@
 # Changelog
 
-## 8.2.0 (...)
+## 8.2.0 (2016-07-14)
 - redo group support to have identifiers and display names instead of just 
   identifiers and create mapping in the pool configuration
 - remove RemoteAcl for now
