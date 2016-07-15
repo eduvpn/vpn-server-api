@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.2.1 (...)
+- add `NoAcl` to not have an ACL by default
+
 ## 8.2.0 (2016-07-14)
 - redo group support to have identifiers and display names instead of just 
   identifiers and create mapping in the pool configuration

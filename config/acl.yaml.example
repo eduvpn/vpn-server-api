@@ -1,4 +1,5 @@
-aclMethod: StaticAcl
+aclMethod: NoAcl
+#aclMethod: StaticAcl
 #aclMethod: VootAcl
 
 StaticAcl:
