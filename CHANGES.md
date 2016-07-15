@@ -1,6 +1,6 @@
 # Changelog
 
-## 8.2.1 (...)
+## 8.2.1 (2016-07-15)
 - add `NoAcl` to not have an ACL by default
 
 ## 8.2.0 (2016-07-14)
