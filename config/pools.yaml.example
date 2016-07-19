@@ -22,7 +22,7 @@ configDir: /var/lib/vpn-server-api
 # The VPN server pools
 pools:
     default:
-        name: Default Pool
+        name: Secure Browsing
 
         # The address to listen on (default: ::)
         #listen: '::'
