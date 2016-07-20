@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.2.2 (...)
+- also expose `user_id` and `name` through connections API
+
 ## 8.2.1 (2016-07-15)
 - add `NoAcl` to not have an ACL by default
 

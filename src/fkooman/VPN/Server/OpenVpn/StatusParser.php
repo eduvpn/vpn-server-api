@@ -92,6 +92,8 @@ class StatusParser
             }
             $parsedClientList[$commonName] = array(
                 'common_name' => $commonName,
+                'user_id' => explode("_", $commonName, 2)[0],
+                'name' => explode("_", $commonName, 2)[1],
                 'real_address' => $parsedClient[2],
                 //'virtual_address' => $parsedClient[3],
                 'bytes_in' => intval($parsedClient[4]),
