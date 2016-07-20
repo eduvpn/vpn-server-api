@@ -68,6 +68,8 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                             'connections' => [
                                 [
                                     'common_name' => 'fkooman_samsung_i9300',
+                                    'user_id' => 'fkooman',
+                                    'name' => 'samsung_i9300',
                                     'real_address' => '91.64.87.183:43103',
                                     'bytes_in' => 18301,
                                     'bytes_out' => 30009,
