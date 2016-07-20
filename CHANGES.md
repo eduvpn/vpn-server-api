@@ -1,6 +1,6 @@
 # Changelog
 
-## 8.2.2 (...)
+## 8.2.2 (2016-07-20)
 - also expose `user_id` and `name` through connections API
 
 ## 8.2.1 (2016-07-15)
