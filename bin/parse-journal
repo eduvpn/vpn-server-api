@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * Parse the systemd journal.
+ *
+ * Usage:
+ *
+ * $ sudo journalctl \
+ *     -t vpn-server-api-client-connect \
+ *     -t vpn-server-api-client-disconnect \
+ *     | vpn-server-api-parse-journal
+ */
+
+#$clientConnectSyslogIdentifier = 'vpn-server-api-client-connect';
+#$clientDisconnectSyslogIdentifier = 'vpn-server-api-client-disconnect';
+$clientConnectSyslogIdentifier = 'client-connect';
+$clientDisconnectSyslogIdentifier = 'client-disconnect';
+
+$logData = [];
+
+// every line is a JSON object
+while ($jsonLine = fgets(STDIN)) {
+    $jsonData = json_decode($jsonLine, true);
+
+    if ($clientConnectSyslogIdentifier === $jsonData['SYSLOG_IDENTIFIER']) {
+        // handle connect data
+        $message = $jsonData['MESSAGE'];
+        $messageData = json_decode($message, true);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            // XXX if an error occurred decoding the message, it was 
+            // probably a log error message, ignore them for now
+            continue;
+        }
+        $logKey = sprintf('%s:%s', $messageData['common_name'], $messageData['time_unix']);
+        $logData[$logKey] = [
+            'v4' => $messageData['v4'],
+            'v6' => $messageData['v6'],
+            'connect_time' => $messageData['time_unix'],
+        ];
+    }
+
+    if ($clientDisconnectSyslogIdentifier === $jsonData['SYSLOG_IDENTIFIER']) {
+        // handle connect data
+        $message = $jsonData['MESSAGE'];
+        $messageData = json_decode($message, true);
+        if (JSON_ERROR_NONE !== json_last_error()) {
+            // XXX if an error occurred decoding the message, it was 
+            // probably a log error message, ignore them for now
+            continue;
+        }
+        $logKey = sprintf('%s:%s', $messageData['common_name'], $messageData['time_unix']);
+        if (!array_key_exists($logKey, $logData)) {
+            // XXX we did not find a matching connect entry... handle this somehow
+            continue;
+        }
+        $logData[$logKey] = array_merge(
+            $logData[$logKey],
+            [
+                'disconnect_time' => $messageData['disconnect_time_unix'],
+                'data_transferred' => $messageData['bytes_sent'] + $messageData['bytes_received'],
+            ]
+        );
+    }
+}
+
+var_dump($logData);
