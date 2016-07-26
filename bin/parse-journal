@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 /**
@@ -10,11 +11,8 @@
  *     -t vpn-server-api-client-disconnect \
  *     | vpn-server-api-parse-journal
  */
-
-#$clientConnectSyslogIdentifier = 'vpn-server-api-client-connect';
-#$clientDisconnectSyslogIdentifier = 'vpn-server-api-client-disconnect';
-$clientConnectSyslogIdentifier = 'client-connect';
-$clientDisconnectSyslogIdentifier = 'client-disconnect';
+$clientConnectSyslogIdentifier = 'vpn-server-api-client-connect';
+$clientDisconnectSyslogIdentifier = 'vpn-server-api-client-disconnect';
 
 $logData = [];
 
@@ -35,7 +33,7 @@ while ($jsonLine = fgets(STDIN)) {
         $logData[$logKey] = [
             'v4' => $messageData['v4'],
             'v6' => $messageData['v6'],
-            'connect_time' => $messageData['time_unix'],
+            'connect_time' => intval($messageData['time_unix']),
         ];
     }
 
@@ -63,4 +61,4 @@ while ($jsonLine = fgets(STDIN)) {
     }
 }
 
-var_dump($logData);
+echo json_encode($logData);
