@@ -1,5 +1,11 @@
 # Changelog
 
+## 8.2.3 (2016-08-02)
+- update firewall to block leakage of NTLM hash in case default gateway VPN 
+  configuration is used, see
+  https://medium.com/@ValdikSS/deanonymizing-windows-users-and-capturing-microsoft-and-vpn-accounts-f7e53fe73834
+- initial version of systemd journal parser for reworking logging
+
 ## 8.2.2 (2016-07-20)
 - also expose `user_id` and `name` through connections API
 

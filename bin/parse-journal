@@ -14,7 +14,12 @@
 $clientConnectSyslogIdentifier = 'vpn-server-api-client-connect';
 $clientDisconnectSyslogIdentifier = 'vpn-server-api-client-disconnect';
 
-$logData = [];
+$logData = [
+    'entries' => [],
+];
+
+$totalDataTransferred = 0;
+$uniqueUserList = [];
 
 // every line is a JSON object
 while ($jsonLine = fgets(STDIN)) {
@@ -29,8 +34,14 @@ while ($jsonLine = fgets(STDIN)) {
             // probably a log error message, ignore them for now
             continue;
         }
+        $commonName = $messageData['common_name'];
+        $userId = explode('_', $commonName, 2)[0];
+        if (!in_array($userId, $uniqueUserList)) {
+            $uniqueUserList[] = $userId;
+        }
+
         $logKey = sprintf('%s:%s', $messageData['common_name'], $messageData['time_unix']);
-        $logData[$logKey] = [
+        $logData['entries'][$logKey] = [
             'v4' => $messageData['v4'],
             'v6' => $messageData['v6'],
             'connect_time' => intval($messageData['time_unix']),
@@ -47,18 +58,25 @@ while ($jsonLine = fgets(STDIN)) {
             continue;
         }
         $logKey = sprintf('%s:%s', $messageData['common_name'], $messageData['time_unix']);
-        if (!array_key_exists($logKey, $logData)) {
+        if (!array_key_exists($logKey, $logData['entries'])) {
             // XXX we did not find a matching connect entry... handle this somehow
             continue;
         }
-        $logData[$logKey] = array_merge(
-            $logData[$logKey],
+        $dataTransferred = $messageData['bytes_sent'] + $messageData['bytes_received'];
+        $totalDataTransferred += $dataTransferred;
+
+        $logData['entries'][$logKey] = array_merge(
+            $logData['entries'][$logKey],
             [
                 'disconnect_time' => $messageData['disconnect_time_unix'],
-                'data_transferred' => $messageData['bytes_sent'] + $messageData['bytes_received'],
+                'data_transferred' => $dataTransferred,
             ]
         );
     }
 }
+
+$logData['total_data_transferred'] = $totalDataTransferred;
+$logData['unique_users'] = count($uniqueUserList);
+$logData['number_of_connections'] = count($logData['entries']);
 
 echo json_encode($logData);
