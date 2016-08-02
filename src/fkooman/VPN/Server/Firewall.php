@@ -135,6 +135,18 @@ class Firewall
                 }
                 if ($pool->getDefaultGateway()) {
                     // allow all traffic to the external interface
+
+                    // drop netbios
+                    // @see https://medium.com/@ValdikSS/deanonymizing-windows-users-and-capturing-microsoft-and-vpn-accounts-f7e53fe73834
+                    foreach (['tcp', 'udp'] as $proto) {
+                        $forwardChain[] = sprintf(
+                            '-A vpn-%s -o %s -m multiport -p %s --dports 137:139,445 -j REJECT --reject-with %s',
+                            $pool->getId(),
+                            $pool->getExtIf(),
+                            $proto,
+                            4 === $inetFamily ? 'icmp-host-prohibited' : 'icmp6-adm-prohibited');
+                    }
+
                     $forwardChain[] = sprintf('-A vpn-%s -o %s -j ACCEPT', $pool->getId(), $pool->getExtIf(), $srcNet);
                 } else {
                     // only allow certain traffic to the external interface
