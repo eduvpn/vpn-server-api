@@ -41,6 +41,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'aclGroupList' => [],
+                'blockSmb' => false,
                 'clientToClient' => false,
                 'defaultGateway' => false,
                 'dns' => array(
@@ -50,6 +51,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                 'enableAcl' => false,
                 'enableLog' => false,
                 'extIf' => 'eth0',
+                'forward6' => true,
                 'hostName' => 'vpn.example',
                 'id' => 'default',
                 'instances' => array(
@@ -122,6 +124,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'aclGroupList' => [],
+                'blockSmb' => false,
                 'clientToClient' => false,
                 'defaultGateway' => false,
                 'dns' => array(
@@ -131,6 +134,7 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                 'enableAcl' => false,
                 'enableLog' => false,
                 'extIf' => 'eth0',
+                'forward6' => true,
                 'hostName' => 'vpn.example',
                 'id' => 'default',
                 'instances' => array(

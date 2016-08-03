@@ -80,6 +80,7 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                 'pools' => array(
                   0 => array(
                     'aclGroupList' => [],
+                    'blockSmb' => false,
                     'clientToClient' => false,
                     'defaultGateway' => false,
                     'dns' => array(
@@ -89,6 +90,7 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                     'enableAcl' => false,
                     'enableLog' => false,
                     'extIf' => 'eth0',
+                    'forward6' => true,
                     'hostName' => 'vpn.example',
                     'id' => 'default',
                     'instances' => array(
@@ -153,6 +155,7 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                 'pools' => array(
                   0 => array(
                     'aclGroupList' => [],
+                    'blockSmb' => false,
                     'clientToClient' => false,
                     'defaultGateway' => false,
                     'dns' => array(
@@ -162,6 +165,7 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                     'enableAcl' => false,
                     'enableLog' => false,
                     'extIf' => 'eth0',
+                    'forward6' => true,
                     'hostName' => 'vpn.example',
                     'id' => 'default',
                     'instances' => array(

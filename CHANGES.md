@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.3.2 (2016-08-03)
+- fix unit tests
+
 ## 8.3.1 (2016-08-03)
 - expose blockSmb and forward6 also through Info API for the admin panel
 
