@@ -259,11 +259,6 @@ class Pool
         return $this->listen;
     }
 
-    public function getInstances()
-    {
-        return $this->instances;
-    }
-
     public function setEnableLog($enableLog)
     {
         $this->enableLog = (bool) $enableLog;
@@ -316,6 +311,11 @@ class Pool
     public function getForward6()
     {
         return $this->forward6;
+    }
+
+    public function getInstances()
+    {
+        return $this->instances;
     }
 
     private function populateInstances()
@@ -396,12 +396,14 @@ class Pool
 
         return [
             'aclGroupList' => $this->getAclGroupList(),
+            'blockSmb' => $this->getBlockSmb(),
             'clientToClient' => $this->getClientToClient(),
             'defaultGateway' => $this->getDefaultGateway(),
             'dns' => $dnsList,
             'enableAcl' => $this->getEnableAcl(),
             'enableLog' => $this->getEnableLog(),
             'extIf' => $this->getExtIf(),
+            'forward6' => $this->getForward6(),
             'hostName' => $this->getHostName(),
             'id' => $this->getId(),
             'instances' => $instancesList,

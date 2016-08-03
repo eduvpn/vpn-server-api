@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.3.1 (2016-08-03)
+- expose blockSmb and forward6 also through Info API for the admin panel
+
 ## 8.3.0 (2016-08-03)
 - redo a lot of the firewalling
 - allow dropping IPv6 to be configured in the  pools config
