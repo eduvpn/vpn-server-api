@@ -1,0 +1,64 @@
+#!/usr/bin/php
+<?php
+/**
+ * Copyright 2016 François Kooman <fkooman@tuxed.net>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+require_once dirname(__DIR__).'/vendor/autoload.php';
+
+// script to list who had a particular IP address within a time frame of
+// one hour before and one hour after the mentioned time
+
+function showHelp(array $argv)
+{
+    $helpText = [
+        sprintf('SYNTAX: %s [IP address] [datetime]', $argv[0]),
+        '',
+        'IP address     the IP address, IPv4 or IPv6, e.g.: 10.10.10.10',
+        'datetime       the datetime as a string, e.g. "Mon Jul 25 13:05:08 2016 UTC"',
+        '',
+    ];
+
+    echo implode(PHP_EOL, $helpText);
+}
+
+if (3 > $argc) {
+    showHelp($argv);
+    exit(1);
+}
+
+$ipAddress = $argv[1];
+// XXX normalize IP(v6) address
+$dateTime = strtotime($argv[2]);
+// XXX validate dateTime
+#echo $ipAddress . PHP_EOL . date('c', $dateTime) . PHP_EOL;
+
+// read the JSON from STDIN
+$jsonData = json_decode(fgets(STDIN), true);
+
+// loop through all entries
+foreach ($jsonData['entries'] as $commonName => $entry) {
+    $connectTime = $entry['connect_time'];
+    $disconnectTime = array_key_exists('disconnect_time', $entry) ? $entry['disconnect_time'] : time();
+
+    if ($connectTime <= $dateTime && $disconnectTime >= $dateTime) {
+        // XXX edge case?!
+        $v4 = $entry['v4'];
+        $v6 = $entry['v6'];
+        if ($v4 === $ipAddress || $v6 === $ipAddress) {
+            echo $commonName.PHP_EOL.date('c', $connectTime).PHP_EOL.date('c', $disconnectTime).PHP_EOL.PHP_EOL;
+            // XXX there could be more?! also show the exact connect/disconnect times!
+        }
+    }
+}
