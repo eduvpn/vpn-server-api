@@ -43,7 +43,11 @@ pools:
         # IPv6 range for clients, at least a /60 or bigger is required
         range6: 'fd00:4242:4242::/48'
 
-        # use VPN as default gateway (default: false)
+        # Forward IPv6 traffic
+        # disable this when VPN server has no IPv6 connection (default: true)
+        #forward6: false
+
+        # allow VPN to be used as default gateway (default: false)
         defaultGateway: true
 
         # Routes pushed to the clients, ignored when defaultGateway is true
@@ -71,3 +75,6 @@ pools:
  
         # specify the identifier(s) of the groups that have access to this pool
         #aclGroupList: [all]
+
+        # block outgoing SMB traffic (default: false)
+        #blockSmb: true

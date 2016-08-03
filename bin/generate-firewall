@@ -25,11 +25,10 @@ use fkooman\VPN\Server\Pools;
 function showHelp(array $argv)
 {
     $helpText = [
-        sprintf('SYNTAX: %s [--drop6] [--install]', $argv[0]),
-        PHP_EOL,
-        '--drop6    do not actually forward IPv6 traffic, reject it',
+        sprintf('SYNTAX: %s [--install]', $argv[0]),
+        '',
         '--install  install the firewall rules',
-        PHP_EOL,
+        '',
     ];
 
     echo implode(PHP_EOL, $helpText);
@@ -37,11 +36,11 @@ function showHelp(array $argv)
 
 try {
     $installFw = false;
-    $drop6 = false;
 
     for ($i = 1; $i < $argc; ++$i) {
-        if ('--drop6' === $argv[$i]) {
-            $drop6 = true;
+        if ('--help' === $argv[$i]) {
+            showHelp($argv);
+            exit(0);
         } elseif ('--install' === $argv[$i]) {
             $installFw = true;
         }
@@ -54,7 +53,7 @@ try {
     $p = new Pools($poolsConfig->v('pools'));
 
     $firewall = Firewall::getFirewall4($p);
-    $firewall6 = Firewall::getFirewall6($p, $drop6);
+    $firewall6 = Firewall::getFirewall6($p);
 
     if ($installFw) {
         if (false === @file_put_contents('/etc/sysconfig/iptables', $firewall)) {

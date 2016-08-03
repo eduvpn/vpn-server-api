@@ -1,5 +1,13 @@
 # Changelog
 
+## 8.3.0 (2016-08-03)
+- redo a lot of the firewalling
+- allow dropping IPv6 to be configured in the  pools config
+- allow smb dropping to be configured in the pools config as well
+- remove the `--reject6` parameter from generate-firewall
+- fix `--help` for generate-firewall
+- improve firewall testing
+
 ## 8.2.3 (2016-08-02)
 - update firewall to block leakage of NTLM hash in case default gateway VPN 
   configuration is used, see

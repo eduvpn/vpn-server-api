@@ -19,17 +19,17 @@ namespace fkooman\VPN\Server;
 
 class Firewall
 {
-    public static function getFirewall4(Pools $p, $disableForward = false, $asArray = false)
+    public static function getFirewall4(Pools $p, $asArray = false)
     {
-        return self::getFirewall($p, 4, $disableForward, $asArray);
+        return self::getFirewall($p, 4, $asArray);
     }
 
-    public static function getFirewall6(Pools $p, $disableForward = false, $asArray = false)
+    public static function getFirewall6(Pools $p, $asArray = false)
     {
-        return self::getFirewall($p, 6, $disableForward, $asArray);
+        return self::getFirewall($p, 6, $asArray);
     }
 
-    private static function getFirewall(Pools $p, $inetFamily, $disableForward, $asArray)
+    private static function getFirewall(Pools $p, $inetFamily, $asArray)
     {
         $firewall = [];
 
@@ -37,7 +37,7 @@ class Firewall
         $firewall = array_merge($firewall, self::getNat($p, $inetFamily));
 
         // FILTER
-        $firewall = array_merge($firewall, self::getFilter($p, $inetFamily, $disableForward));
+        $firewall = array_merge($firewall, self::getFilter($p, $inetFamily));
 
         if ($asArray) {
             return $firewall;
@@ -73,7 +73,7 @@ class Firewall
         return $nat;
     }
 
-    private static function getFilter(Pools $p, $inetFamily, $disableForward)
+    private static function getFilter(Pools $p, $inetFamily)
     {
         $filter = [
             '*filter',
@@ -86,7 +86,7 @@ class Firewall
         $filter = array_merge($filter, self::getInputChain($p, $inetFamily));
 
         // FORWARD
-        $filter = array_merge($filter, self::getForwardChain($p, $inetFamily, $disableForward));
+        $filter = array_merge($filter, self::getForwardChain($p, $inetFamily));
 
         $filter[] = 'COMMIT';
 
@@ -112,48 +112,45 @@ class Firewall
         return $inputChain;
     }
 
-    private static function getForwardChain(Pools $p, $inetFamily, $disableForward)
+    private static function getForwardChain(Pools $p, $inetFamily)
     {
         $forwardChain = [
             '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
         ];
 
-        if (!$disableForward) {
-            foreach ($p as $pool) {
-                if (4 === $inetFamily) {
-                    // get the IPv4 range
-                    $srcNet = $pool->getRange()->getAddressPrefix();
-                } else {
-                    // get the IPv6 range
-                    $srcNet = $pool->getRange6()->getAddressPrefix();
-                }
-                $forwardChain[] = sprintf('-N vpn-%s', $pool->getId());
-                $forwardChain[] = sprintf('-A FORWARD -i tun-%s+ -s %s -j vpn-%s', $pool->getId(), $srcNet, $pool->getId());
-                if ($pool->getClientToClient()) {
-                    // allow client-to-client
-                    $forwardChain[] = sprintf('-A vpn-%s -o tun-%s+ -d %s -j ACCEPT', $pool->getId(), $pool->getId(), $srcNet);
-                }
-                if ($pool->getDefaultGateway()) {
-                    // allow all traffic to the external interface
+        foreach ($p as $pool) {
+            if (6 === $inetFamily && !$pool->getForward6()) {
+                // IPv6 forwarding was disabled
+                continue;
+            }
 
-                    // drop netbios
-                    // @see https://medium.com/@ValdikSS/deanonymizing-windows-users-and-capturing-microsoft-and-vpn-accounts-f7e53fe73834
-                    foreach (['tcp', 'udp'] as $proto) {
-                        $forwardChain[] = sprintf(
-                            '-A vpn-%s -o %s -m multiport -p %s --dports 137:139,445 -j REJECT --reject-with %s',
-                            $pool->getId(),
-                            $pool->getExtIf(),
-                            $proto,
-                            4 === $inetFamily ? 'icmp-host-prohibited' : 'icmp6-adm-prohibited');
-                    }
+            if (4 === $inetFamily) {
+                // get the IPv4 range
+                $srcNet = $pool->getRange()->getAddressPrefix();
+            } else {
+                // get the IPv6 range
+                $srcNet = $pool->getRange6()->getAddressPrefix();
+            }
+            $forwardChain[] = sprintf('-N vpn-%s', $pool->getId());
 
-                    $forwardChain[] = sprintf('-A vpn-%s -o %s -j ACCEPT', $pool->getId(), $pool->getExtIf(), $srcNet);
-                } else {
-                    // only allow certain traffic to the external interface
-                    foreach ($pool->getRoutes() as $route) {
-                        if ($inetFamily === $route->getFamily()) {
-                            $forwardChain[] = sprintf('-A vpn-%s -o %s -d %s -j ACCEPT', $pool->getId(), $pool->getExtIf(), $route->getAddressPrefix());
-                        }
+            $forwardChain[] = sprintf('-A FORWARD -i tun-%s+ -s %s -j vpn-%s', $pool->getId(), $srcNet, $pool->getId());
+
+            // merge outgoing forwarding firewall rules to prevent certain
+            // traffic
+            $forwardChain = array_merge($forwardChain, self::getForwardFirewall($pool, $inetFamily));
+
+            if ($pool->getClientToClient()) {
+                // allow client-to-client
+                $forwardChain[] = sprintf('-A vpn-%s -o tun-%s+ -d %s -j ACCEPT', $pool->getId(), $pool->getId(), $srcNet);
+            }
+            if ($pool->getDefaultGateway()) {
+                // allow traffic to all outgoing destinations
+                $forwardChain[] = sprintf('-A vpn-%s -o %s -j ACCEPT', $pool->getId(), $pool->getExtIf(), $srcNet);
+            } else {
+                // only allow certain traffic to the external interface
+                foreach ($pool->getRoutes() as $route) {
+                    if ($inetFamily === $route->getFamily()) {
+                        $forwardChain[] = sprintf('-A vpn-%s -o %s -d %s -j ACCEPT', $pool->getId(), $pool->getExtIf(), $route->getAddressPrefix());
                     }
                 }
             }
@@ -162,6 +159,26 @@ class Firewall
         $forwardChain[] = sprintf('-A FORWARD -j REJECT --reject-with %s', 4 === $inetFamily ? 'icmp-host-prohibited' : 'icmp6-adm-prohibited');
 
         return $forwardChain;
+    }
+
+    private static function getForwardFirewall(Pool $pool, $inetFamily)
+    {
+        $forwardFirewall = [];
+
+        if ($pool->getBlockSmb()) {
+            // drop SMB outgoing traffic
+            // @see https://medium.com/@ValdikSS/deanonymizing-windows-users-and-capturing-microsoft-and-vpn-accounts-f7e53fe73834
+            foreach (['tcp', 'udp'] as $proto) {
+                $forwardFirewall[] = sprintf(
+                    '-A vpn-%s -o %s -m multiport -p %s --dports 137:139,445 -j REJECT --reject-with %s',
+                    $pool->getId(),
+                    $pool->getExtIf(),
+                    $proto,
+                    4 === $inetFamily ? 'icmp-host-prohibited' : 'icmp6-adm-prohibited');
+            }
+        }
+
+        return $forwardFirewall;
     }
 
     private static function getIngressPorts(Pools $p)

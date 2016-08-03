@@ -77,6 +77,12 @@ class Pool
     /** @var array */
     private $aclGroupList;
 
+    /** @var bool */
+    private $forward6;
+
+    /** @var bool */
+    private $blockSmb;
+
     public function __construct($poolNumber, array $poolData)
     {
         $this->setId(self::validate($poolData, 'id'));
@@ -96,6 +102,8 @@ class Pool
         $this->setEnableLog(self::validate($poolData, 'enableLog', false, false));
         $this->setEnableAcl(self::validate($poolData, 'enableAcl', false, false));
         $this->setAclGroupList(self::validate($poolData, 'aclGroupList', false, []));
+        $this->setBlockSmb(self::validate($poolData, 'blockSmb', false, false));
+        $this->setForward6(self::validate($poolData, 'forward6', false, true));
         $this->populateInstances();
     }
 
@@ -288,6 +296,26 @@ class Pool
     public function getAclGroupList()
     {
         return $this->aclGroupList;
+    }
+
+    public function setBlockSmb($blockSmb)
+    {
+        $this->blockSmb = (bool) $blockSmb;
+    }
+
+    public function getBlockSmb()
+    {
+        return $this->blockSmb;
+    }
+
+    public function setForward6($forward6)
+    {
+        $this->forward6 = (bool) $forward6;
+    }
+
+    public function getForward6()
+    {
+        return $this->forward6;
     }
 
     private function populateInstances()
