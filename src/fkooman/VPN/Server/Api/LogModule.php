@@ -60,6 +60,15 @@ class LogModule implements ServiceModuleInterface
                 return new ApiResponse('log', $this->get($dateTimeUnix, $ipAddress));
             }
         );
+
+        $service->get(
+            '/stats',
+            function (Request $request, TokenInfo $tokenInfo) {
+                $tokenInfo->getScope()->requireScope(['admin']);
+
+                return new ApiResponse('stats', Json::decodeFile(sprintf('%s/stats.json', $this->logPath)));
+            }
+        );
     }
 
     public function get($dateTimeUnix, $ipAddress)

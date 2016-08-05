@@ -78,17 +78,19 @@ try {
     }
 
     $totalTraffic = 0;
-    // convert the user list in unique user count for that day
-    foreach ($statsData as $day => $entry) {
-        $statsData[$day]['unique_user_count'] = count($entry['user_list']);
-        unset($statsData[$day]['user_list']);
+    // convert the user list in unique user count for that day and add some 
+    // more stuff
+    foreach ($statsData as $date => $entry) {
+        $statsData[$date]['date'] = $date;
+        $statsData[$date]['unique_user_count'] = count($entry['user_list']);
+        unset($statsData[$date]['user_list']);
         $totalTraffic += $entry['traffic'];
     }
 
     Json::encodeFile(
         $outFile,
         [
-            'days' => $statsData,
+            'days' => array_values($statsData),
             'total_traffic' => $totalTraffic,
         ]
     );
