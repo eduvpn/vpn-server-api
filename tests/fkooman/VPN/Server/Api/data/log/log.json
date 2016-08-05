@@ -6,10 +6,22 @@
             "disconnect_time": 1470383221,
             "v4": "10.73.218.66",
             "v6": "fdc6:6794:d2bf:1::1000"
+        },
+        "fkooman_i9300:1470384814": {
+            "connect_time": 1470384814,
+            "data_transferred": 31603,
+            "disconnect_time": 1470384938,
+            "v4": "10.73.218.66",
+            "v6": "fdc6:6794:d2bf:1::1000"
+        },
+        "fkooman_i9300:1470385131": {
+            "connect_time": 1470385131,
+            "v4": "10.73.218.66",
+            "v6": "fdc6:6794:d2bf:1::1000"
         }
     },
     "max_concurrent_users": 1,
-    "number_of_connections": 1,
-    "total_data_transferred": 43797,
+    "number_of_connections": 3,
+    "total_data_transferred": 75400,
     "unique_users": 1
 }

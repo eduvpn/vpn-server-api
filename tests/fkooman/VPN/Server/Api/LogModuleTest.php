@@ -96,6 +96,30 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testStillConnectedClient()
+    {
+        $dateTime = '2016-08-05T10:18:51+02:00';
+        $ipAddress = 'fdc6:6794:d2bf:1::1000';
+
+        $this->assertSame(
+            [
+                'data' => [
+                    'log' => [
+                        [
+                            'user_id' => 'fkooman',
+                            'v4' => '10.73.218.66',
+                            'v6' => 'fdc6:6794:d2bf:1::1000',
+                            'config_name' => 'i9300',
+                            'connect_time' => 1470385131,
+                            'disconnect_time' => null,  // is NULL
+                        ],
+                    ],
+                ],
+            ],
+            $this->makeRequest('/log', ['date_time' => $dateTime, 'ip_address' => $ipAddress])
+        );
+    }
+
     private function makeRequest($requestUri, array $queryBody = [])
     {
         return $this->service->run(
