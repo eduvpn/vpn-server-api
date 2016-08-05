@@ -92,6 +92,7 @@ try {
         [
             'days' => array_values($statsData),
             'total_traffic' => $totalTraffic,
+            'generated_at' => time(),
         ]
     );
 } catch (Exception $e) {
