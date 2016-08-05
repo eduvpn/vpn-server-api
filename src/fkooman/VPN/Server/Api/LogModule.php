@@ -69,9 +69,9 @@ class LogModule implements ServiceModuleInterface
         $logData = Json::decodeFile(sprintf('%s/log.json', $this->logPath));
         foreach ($logData['entries'] as $k => $v) {
             $connectTime = $v['connect_time'];
-            $disconnectTime = array_key_exists('disconnect_time', $v) ? $v['disconnect_time'] : time();
+            $disconnectTime = array_key_exists('disconnect_time', $v) ? $v['disconnect_time'] : null;
 
-            if ($connectTime <= $dateTimeUnix && $disconnectTime >= $dateTimeUnix) {
+            if ($connectTime <= $dateTimeUnix && (is_null($disconnectTime) || $disconnectTime >= $dateTimeUnix)) {
                 // XXX edge cases? still connected? just disconnected?
                 $v4 = $v['v4'];
                 $v6 = $v['v6'];
