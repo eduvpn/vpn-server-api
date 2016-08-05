@@ -3,6 +3,7 @@
 ## 8.4.0 (2016-08-05)
 - log handling completely redone, now parsing a JSON file exported by 
   journalctl
+- implement statistics
 
 ## 8.3.2 (2016-08-03)
 - fix unit tests
