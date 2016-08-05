@@ -24,8 +24,8 @@ class InputValidationTest extends PHPUnit_Framework_TestCase
 {
     public function testCommonName()
     {
-        InputValidation::commonName('foo_bar', true);
-        InputValidation::commonName('foo', true);
+        InputValidation::commonName('foo_bar');
+        InputValidation::commonName('foo');
     }
 
     /**
@@ -34,7 +34,7 @@ class InputValidationTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidCommonNameNull()
     {
-        InputValidation::commonName(null, true);
+        InputValidation::commonName(null);
     }
 
     /**
@@ -43,21 +43,21 @@ class InputValidationTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidCommonNameEmpty()
     {
-        InputValidation::commonName('', true);
+        InputValidation::commonName('');
     }
 
     public function testDate()
     {
-        InputValidation::date('2015-01-01', true);
+        InputValidation::dateTime('2015-01-01');
     }
 
     /**
      * @expectedException fkooman\Http\Exception\BadRequestException
-     * @expectedExceptionMessage invalid value for "date"
+     * @expectedExceptionMessage invalid date/time format
      */
     public function testInvalidDate()
     {
-        InputValidation::date('a2015-01-01', true);
+        InputValidation::dateTime('XYZ');
     }
 
     public function testOtpKey()

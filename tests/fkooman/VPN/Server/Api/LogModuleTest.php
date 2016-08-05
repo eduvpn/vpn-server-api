@@ -22,10 +22,8 @@ use fkooman\Rest\Service;
 use PHPUnit_Framework_TestCase;
 use fkooman\Http\Request;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
-use PDO;
 use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
-use fkooman\VPN\Server\ConnectionLog;
 
 class LogModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -34,33 +32,8 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $connectionLog = new ConnectionLog(new PDO('sqlite::memory:'));
-        $connectionLog->initDatabase();
-
-        $connectionLog->connect(
-            [
-                'common_name' => 'foo_vpn_ex_def',
-                'time_unix' => '1000000000',
-                'v4' => '10.42.42.2',
-                'v6' => 'fd00:4242:4242::2',
-            ]
-        );
-
-        $connectionLog->disconnect(
-            [
-                'common_name' => 'foo_vpn_ex_def',
-                'time_unix' => '1000000000',
-                'disconnect_time_unix' => '1000010000',
-                'v4' => '10.42.42.2',
-                'v6' => 'fd00:4242:4242::2',
-                'bytes_received' => '4843',
-                'bytes_sent' => '5317',
-            ]
-        );
-
-        $dateTime = $this->getMockBuilder('DateTime')->getMock();
-        $dateTime->method('getTimeStamp')->will($this->returnValue(1000020000));
-        $logModule = new LogModule($connectionLog, $dateTime);
+        $logDir = __DIR__.'/data/log';
+        $logModule = new LogModule($logDir);
 
         $this->service = new Service();
         $this->service->addModule($logModule);
@@ -71,7 +44,7 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
                     [
                         'vpn-user-portal' => [
                             'token' => 'aabbcc',
-                            'scope' => 'admin portal',
+                            'scope' => 'admin',
                         ],
                     ]
                 )
@@ -81,83 +54,62 @@ class LogModuleTest extends PHPUnit_Framework_TestCase
         $this->service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
     }
 
-    public function testGetLogHistory()
+    public function testGetLogEntry()
     {
+        $dateTime = '2016-08-05T09:44:18+02:00';
+        $ipAddress = 'fdc6:6794:d2bf:1::1000';
+
         $this->assertSame(
             [
                 'data' => [
                     'log' => [
                         [
-                            'common_name' => 'foo_vpn_ex_def',
-                            'time_unix' => '1000000000',
-                            'v4' => '10.42.42.2',
-                            'v6' => 'fd00:4242:4242::2',
-                            'bytes_received' => '4843',
-                            'bytes_sent' => '5317',
-                            'disconnect_time_unix' => '1000010000',
+                            'user_id' => 'fkooman',
+                            'v4' => '10.73.218.66',
+                            'v6' => 'fdc6:6794:d2bf:1::1000',
+                            'config_name' => 'i9300',
+                            'connect_time' => 1470383058,
+                            'disconnect_time' => 1470383221,
                         ],
                     ],
                 ],
             ],
-            $this->makeRequest('GET', sprintf('/log/%s', date('Y-m-d', 1000010001)))
+            $this->makeRequest('/log', ['date_time' => $dateTime, 'ip_address' => $ipAddress])
         );
     }
 
-    public function testGetLogHistoryForDate()
+    public function testGetNonExistingLogEntry()
     {
+        // wrong year...
+        $dateTime = '2015-08-05T09:44:18+02:00';
+        $ipAddress = 'fdc6:6794:d2bf:1::1000';
+
         $this->assertSame(
             [
                 'data' => [
                     'log' => [
+                        // is empty now!
                     ],
                 ],
             ],
-            $this->makeRequest('GET', sprintf('/log/%s', date('Y-m-d', 999888888)))
+            $this->makeRequest('/log', ['date_time' => $dateTime, 'ip_address' => $ipAddress])
         );
     }
 
-    public function testGetLogHistoryForDateOutOfRange()
+    private function makeRequest($requestUri, array $queryBody = [])
     {
-        $this->assertSame(
-            [
-                'error' => 'invalid date range',
-            ],
-            $this->makeRequest('GET', sprintf('/log/%s', date('Y-m-d', 1234567890)))
-        );
-    }
-
-    private function makeRequest($requestMethod, $requestUri, array $queryBody = [])
-    {
-        if ('GET' === $requestMethod || 'DELETE' === $requestMethod) {
-            return $this->service->run(
-                new Request(
-                    array(
-                        'SERVER_NAME' => 'www.example.org',
-                        'SERVER_PORT' => 80,
-                        'REQUEST_METHOD' => $requestMethod,
-                        'REQUEST_URI' => sprintf('%s?%s', $requestUri, http_build_query($queryBody)),
-                        'PATH_INFO' => $requestUri,
-                        'QUERY_STRING' => http_build_query($queryBody),
-                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', 'aabbcc'),
-                    )
+        return $this->service->run(
+            new Request(
+                array(
+                    'SERVER_NAME' => 'www.example.org',
+                    'SERVER_PORT' => 80,
+                    'REQUEST_METHOD' => 'GET',
+                    'REQUEST_URI' => sprintf('%s?%s', $requestUri, http_build_query($queryBody)),
+                    'PATH_INFO' => $requestUri,
+                    'QUERY_STRING' => http_build_query($queryBody),
+                    'HTTP_AUTHORIZATION' => sprintf('Bearer %s', 'aabbcc'),
                 )
-            )->getBody();
-        } else {
-            // POST
-            return $this->service->run(
-                new Request(
-                    array(
-                        'SERVER_NAME' => 'www.example.org',
-                        'SERVER_PORT' => 80,
-                        'REQUEST_METHOD' => $requestMethod,
-                        'REQUEST_URI' => $requestUri,
-                        'PATH_INFO' => $requestUri,
-                        'QUERY_STRING' => '',
-                        'HTTP_AUTHORIZATION' => sprintf('Bearer %s', 'aabbcc'),
-                    ),
-                    $queryBody
-                )
-            )->getBody();
-        }
+            )
+        )->getBody();
     }
 }

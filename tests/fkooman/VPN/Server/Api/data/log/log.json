@@ -1,0 +1,15 @@
+{
+    "entries": {
+        "fkooman_i9300:1470383058": {
+            "connect_time": 1470383058,
+            "data_transferred": 43797,
+            "disconnect_time": 1470383221,
+            "v4": "10.73.218.66",
+            "v6": "fdc6:6794:d2bf:1::1000"
+        }
+    },
+    "max_concurrent_users": 1,
+    "number_of_connections": 1,
+    "total_data_transferred": 43797,
+    "unique_users": 1
+}

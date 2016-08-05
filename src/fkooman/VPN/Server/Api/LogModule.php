@@ -20,24 +20,23 @@ namespace fkooman\VPN\Server\Api;
 use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
-use fkooman\Http\Exception\BadRequestException;
 use fkooman\VPN\Server\InputValidation;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use DateTime;
-use fkooman\VPN\Server\ConnectionLog;
 use fkooman\VPN\Server\ApiResponse;
+use fkooman\Json\Json;
 
 class LogModule implements ServiceModuleInterface
 {
-    /** @var ConnectionLog */
-    private $connectionLog;
+    /** @var string */
+    private $logPath;
 
     /** @var \DateTime */
     private $dateTime;
 
-    public function __construct(ConnectionLog $connectionLog, DateTime $dateTime = null)
+    public function __construct($logPath, DateTime $dateTime = null)
     {
-        $this->connectionLog = $connectionLog;
+        $this->logPath = $logPath;
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
@@ -47,25 +46,54 @@ class LogModule implements ServiceModuleInterface
     public function init(Service $service)
     {
         $service->get(
-            '/log/:showDate',
-            function (Request $request, TokenInfo $tokenInfo, $showDate) {
+            '/log',
+            function (Request $request, TokenInfo $tokenInfo) {
                 $tokenInfo->getScope()->requireScope(['admin']);
 
-                InputValidation::date($showDate);
+                $dateTime = $request->getUrl()->getQueryParameter('date_time');
+                InputValidation::dateTime($dateTime);
+                $dateTimeUnix = strtotime($dateTime);
 
-                $showDateUnix = strtotime($showDate);
-                $minDate = strtotime('today -31 days', $this->dateTime->getTimeStamp());
-                $maxDate = strtotime('tomorrow', $this->dateTime->getTimeStamp());
+                $ipAddress = $request->getUrl()->getQueryParameter('ip_address');
+                InputValidation::ipAddress($ipAddress);
 
-                if ($showDateUnix < $minDate || $showDateUnix >= $maxDate) {
-                    throw new BadRequestException('invalid date range');
-                }
-
-                $showDateUnixMin = strtotime('today', $showDateUnix);
-                $showDateUnixMax = strtotime('tomorrow', $showDateUnix);
-
-                return new ApiResponse('log', $this->connectionLog->getConnectionHistory($showDateUnixMin, $showDateUnixMax));
+                return new ApiResponse('log', $this->get($dateTimeUnix, $ipAddress));
             }
         );
+    }
+
+    public function get($dateTimeUnix, $ipAddress)
+    {
+        $returnData = [];
+
+        $logData = Json::decodeFile(sprintf('%s/log.json', $this->logPath));
+        foreach ($logData['entries'] as $k => $v) {
+            $connectTime = $v['connect_time'];
+            $disconnectTime = array_key_exists('disconnect_time', $v) ? $v['disconnect_time'] : time();
+
+            if ($connectTime <= $dateTimeUnix && $disconnectTime >= $dateTimeUnix) {
+                // XXX edge cases? still connected? just disconnected?
+                $v4 = $v['v4'];
+                $v6 = $v['v6'];
+                if ($v4 === $ipAddress || $v6 === $ipAddress) {
+                    $commonName = explode(':', $k, 2)[0];
+                    $userId = explode('_', $commonName, 2)[0];
+                    $configName = explode('_', $commonName, 2)[1];
+
+                    $returnData[] = [
+                        // XXX deal with still connected
+                        'user_id' => $userId,
+                        'v4' => $v4,
+                        'v6' => $v6,
+                        'config_name' => $configName,
+                        'connect_time' => $connectTime,
+                        'disconnect_time' => $disconnectTime,
+                    ];
+                }
+            }
+        }
+        // XXX could there actually be multiple results?
+
+        return $returnData;
     }
 }

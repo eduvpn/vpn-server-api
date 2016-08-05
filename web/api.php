@@ -29,7 +29,6 @@ use fkooman\VPN\Server\Api\InfoModule;
 use fkooman\VPN\Server\Api\LogModule;
 use fkooman\VPN\Server\Api\OpenVpnModule;
 use fkooman\VPN\Server\Api\UsersModule;
-use fkooman\VPN\Server\ConnectionLog;
 use fkooman\VPN\Server\Disable;
 use fkooman\VPN\Server\OpenVpn\ManagementSocket;
 use fkooman\VPN\Server\OpenVpn\ServerManager;
@@ -55,10 +54,6 @@ try {
     );
 
     $serverPools = new Pools($poolsConfig->v('pools'));
-
-    $logConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/log.yaml')
-    );
 
     $client = new Client(
         [
@@ -88,21 +83,6 @@ try {
     // handles the connection to the various OpenVPN instances
     $serverManager = new ServerManager($serverPools, $managementSocket, $logger);
 
-    // handles the connection history log
-    try {
-        $db = new PDO(
-            $logConfig->v('log', 'dsn'),
-            $logConfig->v('log', 'username', false),
-            $logConfig->v('log', 'password', false)
-        );
-        $connectionLog = new ConnectionLog($db);
-    } catch (PDOException $e) {
-        // unable to connect to database, so we continue without being able
-        // to view the log
-        syslog(LOG_ERR, $e->__toString());
-        $connectionLog = null;
-    }
-
     // http request router
     $service = new Service();
 
@@ -127,7 +107,7 @@ try {
     $authenticationPlugin = new AuthenticationPlugin();
     $authenticationPlugin->register($apiAuth, 'api');
     $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
-    $service->addModule(new LogModule($connectionLog));
+    $service->addModule(new LogModule($poolsConfig->v('configDir')));
     $service->addModule(new OpenVpnModule($serverManager));
     $service->addModule(new CommonNamesModule($commonNamesDisable, $logger));
     $service->addModule(new UsersModule($usersDisable, $otpSecret, $vootToken, $acl, $logger));

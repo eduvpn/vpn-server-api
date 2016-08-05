@@ -19,8 +19,6 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
-use fkooman\VPN\Server\ConnectionLog;
-use fkooman\Json\Json;
 use fkooman\VPN\Server\Pools;
 use fkooman\VPN\Server\Disable;
 
@@ -63,10 +61,6 @@ try {
     // read configuration
     $poolsConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/pools.yaml')
-    );
-
-    $logConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/log.yaml')
     );
 
     $aclConfig = new Reader(
@@ -114,16 +108,7 @@ try {
         'time_unix' => $envData['time_unix'],
         'dev' => $envData['dev'],
     );
-    syslog(LOG_INFO, Json::encode($logData));
-
-    $db = new PDO(
-        $logConfig->v('log', 'dsn'),
-        $logConfig->v('log', 'username', false),
-        $logConfig->v('log', 'password', false)
-    );
-
-    $connectionLog = new ConnectionLog($db);
-    $connectionLog->connect($logData);
+    syslog(LOG_INFO, json_encode($logData));
 } catch (Exception $e) {
     syslog(LOG_ERR, $e->getMessage());
     exit(66);

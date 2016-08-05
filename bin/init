@@ -19,22 +19,12 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
-use fkooman\VPN\Server\ConnectionLog;
 use fkooman\VPN\Server\OtpLog;
 
 try {
     $config = new Reader(
         new YamlFile(dirname(__DIR__).'/config/log.yaml')
     );
-
-    $db = new PDO(
-        $config->v('log', 'dsn'),
-        $config->v('log', 'username', false),
-        $config->v('log', 'password', false)
-    );
-
-    $connectionLog = new ConnectionLog($db);
-    $connectionLog->initDatabase();
 
     $db = new PDO(
         $config->v('otp', 'dsn'),

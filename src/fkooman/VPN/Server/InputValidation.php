@@ -23,7 +23,6 @@ class InputValidation
 {
     const COMMON_NAME_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
     const USER_ID_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
-    const DATE_PATTERN = '/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/';
     const OTP_KEY_PATTERN = '/^[0-9]{6}$/';
     const OTP_SECRET_PATTERN = '/^[A-Z0-9]{16}$/';
     const ACCESS_TOKEN_PATTERN = '/^[\x20-\x7E]+$/';
@@ -45,13 +44,6 @@ class InputValidation
         }
         if ('..' === $userId) {
             throw new BadRequestException('"user_id" cannot be ".."');
-        }
-    }
-
-    public static function date($date)
-    {
-        if (0 === preg_match(self::DATE_PATTERN, $date)) {
-            throw new BadRequestException('invalid value for "date"');
         }
     }
 
@@ -83,6 +75,13 @@ class InputValidation
         }
         if (0 === preg_match(self::ACCESS_TOKEN_PATTERN, $vootToken)) {
             throw new BadRequestException('invalid value for "vootToken"');
+        }
+    }
+
+    public static function dateTime($dateTime)
+    {
+        if (false === strtotime($dateTime)) {
+            throw new BadRequestException('invalid date/time format');
         }
     }
 

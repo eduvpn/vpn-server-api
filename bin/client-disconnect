@@ -15,13 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-require_once dirname(__DIR__).'/vendor/autoload.php';
-
-use fkooman\Config\Reader;
-use fkooman\Config\YamlFile;
-use fkooman\Json\Json;
-use fkooman\VPN\Server\ConnectionLog;
-
 openlog(
     basename($argv[0]),
     LOG_PERROR,
@@ -29,11 +22,6 @@ openlog(
 );
 
 try {
-    // read configuration
-    $logConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/log.yaml')
-    );
-
     $envData = [];
     $envKeys = [
         'common_name',
@@ -63,15 +51,7 @@ try {
         'bytes_sent' => $envData['bytes_sent'],
     );
 
-    syslog(LOG_INFO, Json::encode($logData));
-
-    $db = new PDO(
-        $logConfig->v('log', 'dsn'),
-        $logConfig->v('log', 'username', false),
-        $logConfig->v('log', 'password', false)
-    );
-    $connectionLog = new ConnectionLog($db);
-    $connectionLog->disconnect($logData);
+    syslog(LOG_INFO, json_encode($logData));
 } catch (Exception $e) {
     syslog(LOG_ERR, $e->getMessage());
     exit(66);
