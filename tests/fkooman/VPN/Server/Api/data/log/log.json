@@ -1,27 +1,29 @@
 {
-    "entries": {
-        "fkooman_i9300:1470383058": {
+    "entries": [
+        {
+            "config_name": "i9300",
             "connect_time": 1470383058,
-            "data_transferred": 43797,
             "disconnect_time": 1470383221,
+            "traffic": 43797,
+            "user_id": "fkooman",
             "v4": "10.73.218.66",
             "v6": "fdc6:6794:d2bf:1::1000"
         },
-        "fkooman_i9300:1470384814": {
+        {
+            "config_name": "i9300",
             "connect_time": 1470384814,
-            "data_transferred": 31603,
             "disconnect_time": 1470384938,
+            "traffic": 31603,
+            "user_id": "fkooman",
             "v4": "10.73.218.66",
             "v6": "fdc6:6794:d2bf:1::1000"
         },
-        "fkooman_i9300:1470385131": {
+        {
+            "config_name": "i9300",
             "connect_time": 1470385131,
+            "user_id": "fkooman",
             "v4": "10.73.218.66",
             "v6": "fdc6:6794:d2bf:1::1000"
         }
-    },
-    "max_concurrent_users": 1,
-    "number_of_connections": 3,
-    "total_data_transferred": 75400,
-    "unique_users": 1
+    ]
 }

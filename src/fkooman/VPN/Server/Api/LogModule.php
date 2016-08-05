@@ -76,16 +76,12 @@ class LogModule implements ServiceModuleInterface
                 $v4 = $v['v4'];
                 $v6 = $v['v6'];
                 if ($v4 === $ipAddress || $v6 === $ipAddress) {
-                    $commonName = explode(':', $k, 2)[0];
-                    $userId = explode('_', $commonName, 2)[0];
-                    $configName = explode('_', $commonName, 2)[1];
-
                     $returnData[] = [
                         // XXX deal with still connected
-                        'user_id' => $userId,
+                        'user_id' => $v['user_id'],
                         'v4' => $v4,
                         'v6' => $v6,
-                        'config_name' => $configName,
+                        'config_name' => $v['config_name'],
                         'connect_time' => $connectTime,
                         'disconnect_time' => $disconnectTime,
                     ];
