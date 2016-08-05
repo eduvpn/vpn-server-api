@@ -34,6 +34,8 @@ $logData = [
     'entries' => [],
 ];
 
+$firstEntry = -1;
+$lastEntry = -1;
 $maxConcurrentUsers = 0;
 $concurrentUsers = 0;
 $totalDataTransferred = 0;
@@ -66,11 +68,19 @@ while ($jsonLine = fgets(STDIN)) {
             $uniqueUserList[] = $userId;
         }
 
+        $connectTime = intval($messageData['time_unix']);
+        if (-1 === $firstEntry || $connectTime < $firstEntry) {
+            $firstEntry = $connectTime;
+        }
+        if (-1 === $lastEntry || $connectTime > $lastEntry) {
+            $lastEntry = $connectTime;
+        }
+
         $logKey = sprintf('%s:%s', $messageData['common_name'], $messageData['time_unix']);
         $logData['entries'][$logKey] = [
             'v4' => $messageData['v4'],
             'v6' => $messageData['v6'],
-            'connect_time' => intval($messageData['time_unix']),
+            'connect_time' => $connectTime,
         ];
     }
 
@@ -109,5 +119,7 @@ $logData['total_data_transferred'] = $totalDataTransferred;
 $logData['unique_users'] = count($uniqueUserList);
 $logData['number_of_connections'] = count($logData['entries']);
 $logData['max_concurrent_users'] = $maxConcurrentUsers;
+$logData['first_entry'] = $firstEntry;
+$logData['last_entry'] = $lastEntry;
 
 echo json_encode($logData);
