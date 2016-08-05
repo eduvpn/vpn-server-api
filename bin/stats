@@ -1,0 +1,98 @@
+#!/usr/bin/php
+<?php
+/**
+ * Copyright 2016 François Kooman <fkooman@tuxed.net>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+require_once dirname(__DIR__).'/vendor/autoload.php';
+
+use fkooman\Json\Json;
+
+function showHelp(array $argv)
+{
+    $helpText = [
+        sprintf('SYNTAX: %s [IN log] [OUT stats]', $argv[0]),
+        '',
+        'IN log       the JSON file to read from as written by parse-journal',
+        'OUT stats    the JSON file to write to',
+        '',
+    ];
+
+    echo implode(PHP_EOL, $helpText);
+}
+
+for ($i = 1; $i < $argc; ++$i) {
+    if ('--help' === $argv[$i]) {
+        showHelp($argv);
+        exit(0);
+    }
+}
+
+if (3 > $argc) {
+    showHelp($argv);
+    exit(1);
+}
+
+$inFile = $argv[1];
+$outFile = $argv[2];
+
+$statsData = [];
+
+try {
+    $logData = Json::decodeFile($inFile);
+
+    foreach ($logData['entries'] as $entry) {
+        $dateOfConnection = date('Y-m-d', $entry['connect_time']);
+        if (!array_key_exists($dateOfConnection, $statsData)) {
+            $statsData[$dateOfConnection] = [];
+        }
+        if (!array_key_exists('number_of_connections', $statsData[$dateOfConnection])) {
+            $statsData[$dateOfConnection]['number_of_connections'] = 0;
+        }
+        if (!array_key_exists('traffic', $statsData[$dateOfConnection])) {
+            $statsData[$dateOfConnection]['traffic'] = 0;
+        }
+        if (!array_key_exists('user_list', $statsData[$dateOfConnection])) {
+            $statsData[$dateOfConnection]['user_list'] = [];
+        }
+
+        ++$statsData[$dateOfConnection]['number_of_connections'];
+        if (array_key_exists('traffic', $entry)) {
+            // when client is still connected, it won't have a 'traffic' entry
+            $statsData[$dateOfConnection]['traffic'] += $entry['traffic'];
+        }
+        if (!in_array($entry['user_id'], $statsData[$dateOfConnection]['user_list'])) {
+            $statsData[$dateOfConnection]['user_list'][] = $entry['user_id'];
+        }
+    }
+
+    $totalTraffic = 0;
+    // convert the user list in unique user count for that day
+    foreach ($statsData as $day => $entry) {
+        $statsData[$day]['unique_user_count'] = count($entry['user_list']);
+        unset($statsData[$day]['user_list']);
+        $totalTraffic += $entry['traffic'];
+    }
+
+    Json::encodeFile(
+        $outFile,
+        [
+            'days' => $statsData,
+            'total_traffic' => $totalTraffic,
+        ]
+    );
+} catch (Exception $e) {
+    echo $e->getMessage().PHP_EOL;
+    exit(1);
+}

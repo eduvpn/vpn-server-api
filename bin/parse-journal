@@ -30,16 +30,7 @@
 $clientConnectSyslogIdentifier = 'vpn-server-api-client-connect';
 $clientDisconnectSyslogIdentifier = 'vpn-server-api-client-disconnect';
 
-$logData = [
-    'entries' => [],
-];
-
-$firstEntry = -1;
-$lastEntry = -1;
-$maxConcurrentUsers = 0;
-$concurrentUsers = 0;
-$totalDataTransferred = 0;
-$uniqueUserList = [];
+$logData = [];
 
 // every line is a JSON object
 while ($jsonLine = fgets(STDIN)) {
@@ -57,30 +48,17 @@ while ($jsonLine = fgets(STDIN)) {
             continue;
         }
 
-        ++$concurrentUsers;
-        if ($concurrentUsers > $maxConcurrentUsers) {
-            $maxConcurrentUsers = $concurrentUsers;
-        }
-
         $commonName = $messageData['common_name'];
         $userId = explode('_', $commonName, 2)[0];
-        if (!in_array($userId, $uniqueUserList)) {
-            $uniqueUserList[] = $userId;
-        }
-
-        $connectTime = intval($messageData['time_unix']);
-        if (-1 === $firstEntry || $connectTime < $firstEntry) {
-            $firstEntry = $connectTime;
-        }
-        if (-1 === $lastEntry || $connectTime > $lastEntry) {
-            $lastEntry = $connectTime;
-        }
+        $configName = explode('_', $commonName, 2)[1];
 
         $logKey = sprintf('%s:%s', $messageData['common_name'], $messageData['time_unix']);
-        $logData['entries'][$logKey] = [
+        $logData[$logKey] = [
+            'user_id' => $userId,
+            'config_name' => $configName,
             'v4' => $messageData['v4'],
             'v6' => $messageData['v6'],
-            'connect_time' => $connectTime,
+            'connect_time' => intval($messageData['time_unix']),
         ];
     }
 
@@ -95,31 +73,26 @@ while ($jsonLine = fgets(STDIN)) {
             continue;
         }
 
-        --$concurrentUsers;
-
         $logKey = sprintf('%s:%s', $messageData['common_name'], $messageData['time_unix']);
-        if (!array_key_exists($logKey, $logData['entries'])) {
-            // XXX we did not find a matching connect entry... handle this somehow
+        if (!array_key_exists($logKey, $logData)) {
+            // XXX we did not find a matching connect entry...
+            // just ignore it
             continue;
         }
         $dataTransferred = $messageData['bytes_sent'] + $messageData['bytes_received'];
-        $totalDataTransferred += $dataTransferred;
 
-        $logData['entries'][$logKey] = array_merge(
-            $logData['entries'][$logKey],
+        $logData[$logKey] = array_merge(
+            $logData[$logKey],
             [
                 'disconnect_time' => $messageData['disconnect_time_unix'],
-                'data_transferred' => $dataTransferred,
+                'traffic' => $dataTransferred,
             ]
         );
     }
 }
 
-$logData['total_data_transferred'] = $totalDataTransferred;
-$logData['unique_users'] = count($uniqueUserList);
-$logData['number_of_connections'] = count($logData['entries']);
-$logData['max_concurrent_users'] = $maxConcurrentUsers;
-$logData['first_entry'] = $firstEntry;
-$logData['last_entry'] = $lastEntry;
-
-echo json_encode($logData);
+echo json_encode(
+    [
+        'entries' => array_values($logData),
+    ]
+);
