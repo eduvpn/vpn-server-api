@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.4.1 (2016-08-08)
+- add max concurrent connection count to stats report and also its timestamp
+
 ## 8.4.0 (2016-08-05)
 - log handling completely redone, now parsing a JSON file exported by 
   journalctl
