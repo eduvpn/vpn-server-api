@@ -27,6 +27,21 @@
  *     -t vpn-server-api-client-disconnect \
  *     | vpn-server-api-parse-journal
  */
+
+/**
+ * Due to not wanting to store all user data forever, we have a log window 
+ * after which log entries disappear from the system, this can result in some
+ * issues. The log window is typically 1 month.
+ *
+ * LIMITATIONS:
+ *
+ * - if a client connected before this logging window started, it is not 
+ *   visible in the logs;
+ * - if a client stays connected for the whole logging window, it is not 
+ *   available in the log at all;
+ * - if a client was connected before the logging window started and 
+ *   disconnected during, it is not added to the log;
+ */
 $clientConnectSyslogIdentifier = 'vpn-server-api-client-connect';
 $clientDisconnectSyslogIdentifier = 'vpn-server-api-client-disconnect';
 

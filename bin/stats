@@ -78,8 +78,8 @@ try {
     }
 
     $totalTraffic = 0;
-    // convert the user list in unique user count for that day and add some 
-    // more stuff
+    // convert the user list in unique user count for that day, rework array
+    // key and determine total amount of traffic
     foreach ($statsData as $date => $entry) {
         $statsData[$date]['date'] = $date;
         $statsData[$date]['unique_user_count'] = count($entry['user_list']);
