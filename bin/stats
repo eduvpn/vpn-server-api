@@ -52,6 +52,8 @@ $statsData = [];
 try {
     $logData = Json::decodeFile($inFile);
 
+    $timeConnection = [];
+
     foreach ($logData['entries'] as $entry) {
         $dateOfConnection = date('Y-m-d', $entry['connect_time']);
         if (!array_key_exists($dateOfConnection, $statsData)) {
@@ -71,9 +73,43 @@ try {
         if (array_key_exists('traffic', $entry)) {
             // when client is still connected, it won't have a 'traffic' entry
             $statsData[$dateOfConnection]['traffic'] += $entry['traffic'];
+
+            $connectTime = $entry['connect_time'];
+            $disconnectTime = $entry['disconnect_time'];
+
+            // add it to table to be able to determine max concurrent connection
+            // count
+            if (!array_key_exists($connectTime, $timeConnection)) {
+                $timeConnection[$connectTime] = [];
+            }
+            $timeConnection[$connectTime][] = 'C';
+
+            if (!array_key_exists($disconnectTime, $timeConnection)) {
+                $timeConnection[$disconnectTime] = [];
+            }
+            $timeConnection[$disconnectTime][] = 'D';
         }
         if (!in_array($entry['user_id'], $statsData[$dateOfConnection]['user_list'])) {
             $statsData[$dateOfConnection]['user_list'][] = $entry['user_id'];
+        }
+    }
+
+    ksort($timeConnection);
+
+    $maxConcurrentConnections = 0;
+    $maxConcurrentConnectionsTime = 0;
+    $concurrentConnections = 0;
+    foreach ($timeConnection as $unixTime => $eventArray) {
+        foreach ($eventArray as $event) {
+            if ('C' === $event) {
+                ++$concurrentConnections;
+                if ($concurrentConnections > $maxConcurrentConnections) {
+                    $maxConcurrentConnections = $concurrentConnections;
+                    $maxConcurrentConnectionsTime = $unixTime;
+                }
+            } else {
+                --$concurrentConnections;
+            }
         }
     }
 
@@ -93,6 +129,8 @@ try {
             'days' => array_values($statsData),
             'total_traffic' => $totalTraffic,
             'generated_at' => time(),
+            'max_concurrent_connections' => $maxConcurrentConnections,
+            'max_concurrent_connections_time' => $maxConcurrentConnectionsTime,
         ]
     );
 } catch (Exception $e) {
