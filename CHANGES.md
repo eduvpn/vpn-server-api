@@ -2,6 +2,7 @@
 
 ## 8.4.1 (2016-08-08)
 - add max concurrent connection count to stats report and also its timestamp
+- also add begin/end time of statistics
 
 ## 8.4.0 (2016-08-05)
 - log handling completely redone, now parsing a JSON file exported by 
