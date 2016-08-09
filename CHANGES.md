@@ -1,5 +1,8 @@
 # Changelog
 
+## 8.4.2 (2016-08-09)
+- add number of unique users to the statistics
+
 ## 8.4.1 (2016-08-08)
 - add max concurrent connection count to stats report and also its timestamp
 - also add begin/end time of statistics

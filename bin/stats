@@ -53,6 +53,7 @@ try {
     $logData = Json::decodeFile($inFile);
 
     $timeConnection = [];
+    $uniqueUsers = [];
 
     foreach ($logData['entries'] as $entry) {
         $dateOfConnection = date('Y-m-d', $entry['connect_time']);
@@ -91,6 +92,11 @@ try {
         }
         if (!in_array($entry['user_id'], $statsData[$dateOfConnection]['user_list'])) {
             $statsData[$dateOfConnection]['user_list'][] = $entry['user_id'];
+        }
+
+        // global unique user list
+        if (!in_array($entry['user_id'], $uniqueUsers)) {
+            $uniqueUsers[] = $entry['user_id'];
         }
     }
 
@@ -137,6 +143,7 @@ try {
             'max_concurrent_connections_time' => $maxConcurrentConnectionsTime,
             'first_entry' => $firstEntryTime,
             'last_entry' => $lastEntryTime,
+            'unique_users' => count($uniqueUsers),
         ]
     );
 } catch (Exception $e) {
