@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 namespace fkooman\VPN\Server\Api;
 
 use fkooman\Http\Request;
@@ -69,7 +68,6 @@ class CommonNamesModule implements ServiceModuleInterface
                 $this->logger->info(sprintf('disabling common_name "%s"', $commonName));
 
                 return new ApiResponse('ok', $this->commonNames->setDisable($commonName, true));
-
             }
         );
 

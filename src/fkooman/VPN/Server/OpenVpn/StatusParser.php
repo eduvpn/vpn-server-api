@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 namespace fkooman\VPN\Server\OpenVpn;
 
 /**
@@ -29,18 +28,18 @@ class StatusParser
 {
     public static function parse(array $statusData)
     {
-        #TITLE,OpenVPN 2.3.9 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Dec 16 2015
-        #TIME,Wed Dec 23 12:52:08 2015,1450875128
-        #HEADER,CLIENT_LIST,Common Name,Real Address,Virtual Address,Bytes Received,Bytes Sent,Connected Since,Connected Since (time_t),Username
-        #CLIENT_LIST,fkooman_ziptest,::ffff:91.64.87.183,10.42.42.2,127707,127903,Wed Dec 23 12:49:15 2015,1450874955,UNDEF
-        #CLIENT_LIST,sebas_tuxed_SGS6,::ffff:83.83.194.107,10.42.42.3,127229,180419,Wed Dec 23 12:05:28 2015,1450872328,UNDEF
-        #HEADER,ROUTING_TABLE,Virtual Address,Common Name,Real Address,Last Ref,Last Ref (time_t)
-        #ROUTING_TABLE,10.42.42.2,fkooman_ziptest,::ffff:91.64.87.183,Wed Dec 23 12:52:07 2015,1450875127
-        #ROUTING_TABLE,fd00:4242:4242::1000,fkooman_ziptest,::ffff:91.64.87.183,Wed Dec 23 12:50:42 2015,1450875042
-        #ROUTING_TABLE,fd00:4242:4242::1001,sebas_tuxed_SGS6,::ffff:83.83.194.107,Wed Dec 23 12:28:53 2015,1450873733
-        #ROUTING_TABLE,10.42.42.3,sebas_tuxed_SGS6,::ffff:83.83.194.107,Wed Dec 23 12:50:46 2015,1450875046
-        #GLOBAL_STATS,Max bcast/mcast queue length,0
-        #END
+        //TITLE,OpenVPN 2.3.9 x86_64-redhat-linux-gnu [SSL (OpenSSL)] [LZO] [EPOLL] [PKCS11] [MH] [IPv6] built on Dec 16 2015
+        //TIME,Wed Dec 23 12:52:08 2015,1450875128
+        //HEADER,CLIENT_LIST,Common Name,Real Address,Virtual Address,Bytes Received,Bytes Sent,Connected Since,Connected Since (time_t),Username
+        //CLIENT_LIST,fkooman_ziptest,::ffff:91.64.87.183,10.42.42.2,127707,127903,Wed Dec 23 12:49:15 2015,1450874955,UNDEF
+        //CLIENT_LIST,sebas_tuxed_SGS6,::ffff:83.83.194.107,10.42.42.3,127229,180419,Wed Dec 23 12:05:28 2015,1450872328,UNDEF
+        //HEADER,ROUTING_TABLE,Virtual Address,Common Name,Real Address,Last Ref,Last Ref (time_t)
+        //ROUTING_TABLE,10.42.42.2,fkooman_ziptest,::ffff:91.64.87.183,Wed Dec 23 12:52:07 2015,1450875127
+        //ROUTING_TABLE,fd00:4242:4242::1000,fkooman_ziptest,::ffff:91.64.87.183,Wed Dec 23 12:50:42 2015,1450875042
+        //ROUTING_TABLE,fd00:4242:4242::1001,sebas_tuxed_SGS6,::ffff:83.83.194.107,Wed Dec 23 12:28:53 2015,1450873733
+        //ROUTING_TABLE,10.42.42.3,sebas_tuxed_SGS6,::ffff:83.83.194.107,Wed Dec 23 12:50:46 2015,1450875046
+        //GLOBAL_STATS,Max bcast/mcast queue length,0
+        //END
 
         // for now, we log all statusData to get a good corpus for writing
         // tests
@@ -80,9 +79,9 @@ class StatusParser
 
     private static function parseClientList(array $clientList)
     {
-        #HEADER,CLIENT_LIST,Common Name,Real Address,Virtual Address,Bytes Received,Bytes Sent,Connected Since,Connected Since (time_t),Username
-        #CLIENT_LIST,fkooman_ziptest,::ffff:91.64.87.183,10.42.42.2,127707,127903,Wed Dec 23 12:49:15 2015,1450874955,UNDEF
-        #CLIENT_LIST,sebas_tuxed_SGS6,::ffff:83.83.194.107,10.42.42.3,127229,180419,Wed Dec 23 12:05:28 2015,1450872328,UNDEF
+        //HEADER,CLIENT_LIST,Common Name,Real Address,Virtual Address,Bytes Received,Bytes Sent,Connected Since,Connected Since (time_t),Username
+        //CLIENT_LIST,fkooman_ziptest,::ffff:91.64.87.183,10.42.42.2,127707,127903,Wed Dec 23 12:49:15 2015,1450874955,UNDEF
+        //CLIENT_LIST,sebas_tuxed_SGS6,::ffff:83.83.194.107,10.42.42.3,127229,180419,Wed Dec 23 12:05:28 2015,1450872328,UNDEF
         $parsedClientList = array();
         for ($i = 1; $i < sizeof($clientList); ++$i) {
             $parsedClient = str_getcsv($clientList[$i]);
@@ -107,11 +106,11 @@ class StatusParser
 
     private static function parseRoutingTable(array $routingTable)
     {
-        #HEADER,ROUTING_TABLE,Virtual Address,Common Name,Real Address,Last Ref,Last Ref (time_t)
-        #ROUTING_TABLE,10.42.42.2,fkooman_ziptest,::ffff:91.64.87.183,Wed Dec 23 12:52:07 2015,1450875127
-        #ROUTING_TABLE,fd00:4242:4242::1000,fkooman_ziptest,::ffff:91.64.87.183,Wed Dec 23 12:50:42 2015,1450875042
-        #ROUTING_TABLE,fd00:4242:4242::1001,sebas_tuxed_SGS6,::ffff:83.83.194.107,Wed Dec 23 12:28:53 2015,1450873733
-        #ROUTING_TABLE,10.42.42.3,sebas_tuxed_SGS6,::ffff:83.83.194.107,Wed Dec 23 12:50:46 2015,1450875046
+        //HEADER,ROUTING_TABLE,Virtual Address,Common Name,Real Address,Last Ref,Last Ref (time_t)
+        //ROUTING_TABLE,10.42.42.2,fkooman_ziptest,::ffff:91.64.87.183,Wed Dec 23 12:52:07 2015,1450875127
+        //ROUTING_TABLE,fd00:4242:4242::1000,fkooman_ziptest,::ffff:91.64.87.183,Wed Dec 23 12:50:42 2015,1450875042
+        //ROUTING_TABLE,fd00:4242:4242::1001,sebas_tuxed_SGS6,::ffff:83.83.194.107,Wed Dec 23 12:28:53 2015,1450873733
+        //ROUTING_TABLE,10.42.42.3,sebas_tuxed_SGS6,::ffff:83.83.194.107,Wed Dec 23 12:50:46 2015,1450875046
         $parsedRoutingTable = array();
         for ($i = 1; $i < sizeof($routingTable); ++$i) {
             $parsedRoute = str_getcsv($routingTable[$i]);

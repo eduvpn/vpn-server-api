@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 namespace fkooman\VPN\Server;
 
 class ServerConfig
@@ -75,9 +74,9 @@ class ServerConfig
                 // Script Security
                 $serverConfig[] = sprintf('script-security %d', $pool->getTwoFactor() ? 3 : 2);
 
-                # increase the renegotiation time to 8h from the default of 1h when
-                # using 2FA, otherwise the user will be asked for the 2FA key every
-                # hour
+                // increase the renegotiation time to 8h from the default of 1h when
+                // using 2FA, otherwise the user will be asked for the 2FA key every
+                // hour
                 $serverConfig[] = sprintf('reneg-sec %d', $pool->getTwoFactor() ? 28800 : 3600);
 
                 // Management
@@ -116,20 +115,20 @@ class ServerConfig
         if ($pool->getDefaultGateway()) {
             $routeConfig[] = 'push "redirect-gateway def1 bypass-dhcp"';
 
-            # for Windows clients we need this extra route to mark the TAP adapter as
-            # trusted and as having "Internet" access to allow the user to set it to
-            # "Home" or "Work" to allow accessing file shares and printers
-            # NOTE: this will break OS X tunnelblick because on disconnect it will
-            # remove all default routes, including the one set before the VPN
-            # was brought up
-            #$routeConfig[] = 'push "route 0.0.0.0 0.0.0.0"';
+            // for Windows clients we need this extra route to mark the TAP adapter as
+            // trusted and as having "Internet" access to allow the user to set it to
+            // "Home" or "Work" to allow accessing file shares and printers
+            // NOTE: this will break OS X tunnelblick because on disconnect it will
+            // remove all default routes, including the one set before the VPN
+            // was brought up
+            //$routeConfig[] = 'push "route 0.0.0.0 0.0.0.0"';
 
-            # for iOS we need this OpenVPN 2.4 "ipv6" flag to redirect-gateway
-            # See https://docs.openvpn.net/docs/openvpn-connect/openvpn-connect-ios-faq.html
+            // for iOS we need this OpenVPN 2.4 "ipv6" flag to redirect-gateway
+            // See https://docs.openvpn.net/docs/openvpn-connect/openvpn-connect-ios-faq.html
             $routeConfig[] = 'push "redirect-gateway ipv6"';
 
-            # we use 2000::/3 instead of ::/0 because it seems to break on native IPv6
-            # networks where the ::/0 default route already exists
+            // we use 2000::/3 instead of ::/0 because it seems to break on native IPv6
+            // networks where the ::/0 default route already exists
             $routeConfig[] = 'push "route-ipv6 2000::/3"';
         } else {
             // there may be some routes specified, push those, and not the default
@@ -159,7 +158,7 @@ class ServerConfig
             $dnsEntries[] = sprintf('push "dhcp-option DNS %s"', $dnsAddress->getAddress());
         }
 
-        # prevent DNS leakage on Windows
+        // prevent DNS leakage on Windows
         $dnsEntries[] = 'push "block-outside-dns"';
 
         return $dnsEntries;

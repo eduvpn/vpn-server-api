@@ -32,7 +32,7 @@ $certFile = sprintf('%s/server.crt', $tlsDir);
 $keyFile = sprintf('%s/server.key', $tlsDir);
 $taFile = sprintf('%s/ta.key', $tlsDir);
 
-# the size of the DH prime
+// the size of the DH prime
 $dhLength = 3072;
 
 function showHelp(array $argv)

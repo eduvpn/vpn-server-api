@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 namespace fkooman\VPN\Server;
 
 interface AclInterface
@@ -24,7 +23,7 @@ interface AclInterface
      *
      * @param string userId the userID of the user to request the groups of
      *
-     * @return array the groups as an array containing the keys "id" and 
+     * @return array the groups as an array containing the keys "id" and
      *               "displayName", empty array if no groups are available for this user
      */
     public function getGroups($userId);

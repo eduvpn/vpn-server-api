@@ -29,17 +29,17 @@
  */
 
 /**
- * Due to not wanting to store all user data forever, we have a log window 
+ * Due to not wanting to store all user data forever, we have a log window
  * after which log entries disappear from the system, this can result in some
  * issues. The log window is typically 1 month.
  *
  * LIMITATIONS:
  *
- * - if a client connected before this logging window started, it is not 
+ * - if a client connected before this logging window started, it is not
  *   visible in the logs;
- * - if a client stays connected for the whole logging window, it is not 
+ * - if a client stays connected for the whole logging window, it is not
  *   available in the log at all;
- * - if a client was connected before the logging window started and 
+ * - if a client was connected before the logging window started and
  *   disconnected during, it is not added to the log;
  */
 $clientConnectSyslogIdentifier = 'vpn-server-api-client-connect';
@@ -57,7 +57,7 @@ while ($jsonLine = fgets(STDIN)) {
         $message = $jsonData['MESSAGE'];
         $messageData = json_decode($message, true);
         if (JSON_ERROR_NONE !== json_last_error()) {
-            // XXX if an error occurred decoding the message, it was 
+            // XXX if an error occurred decoding the message, it was
             // probably a log error message, ignore them for now, but later we
             // will need them as well!
             continue;
@@ -82,7 +82,7 @@ while ($jsonLine = fgets(STDIN)) {
         $message = $jsonData['MESSAGE'];
         $messageData = json_decode($message, true);
         if (JSON_ERROR_NONE !== json_last_error()) {
-            // XXX if an error occurred decoding the message, it was 
+            // XXX if an error occurred decoding the message, it was
             // probably a log error message, ignore them for now, but later we
             // will need them as well!
             continue;
