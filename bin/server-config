@@ -85,8 +85,8 @@ try {
         new YamlFile(dirname(__DIR__).'/config/pools.yaml')
     );
 
-    $mainConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/config.yaml')
+    $apiConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/api.yaml')
     );
 
     if (!$reUse) {
@@ -95,13 +95,13 @@ try {
             [
                 'defaults' => [
                     'headers' => [
-                        'Authorization' => sprintf('Bearer %s', $mainConfig->v('remoteApi', 'vpn-ca-api', 'token')),
+                        'Authorization' => sprintf('Bearer %s', $apiConfig->v('remoteApi', 'vpn-ca-api', 'token')),
                     ],
                 ],
             ]
         );
 
-        $requestUri = $mainConfig->v('remoteApi', 'vpn-ca-api', 'uri');
+        $requestUri = $apiConfig->v('remoteApi', 'vpn-ca-api', 'uri');
 
         $configData = $client->post(
             $requestUri.'/certificate/',

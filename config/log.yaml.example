@@ -1,5 +1,0 @@
-# The OTP database containing a log of used OTP keys to prevent replay
-otp:
-    dsn: 'sqlite:/var/lib/openvpn/otp.sqlite'
-    #username: foo
-    #password: bar

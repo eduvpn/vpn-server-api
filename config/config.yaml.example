@@ -1,15 +1,11 @@
-# API credentials
-api:
-    vpn-user-portal:
-        scope: portal
-        token: uvwxyz
-    vpn-admin-portal:
-        scope: admin
-        token: uuvvww
+#
+# VPN Server Api Configuration
+#
 
-# API credentials for access to remote services
-remoteApi:
-    # required to fetch the CRL and server config
-    vpn-ca-api:
-        uri: 'http://localhost:8008/api.php'
-        token: aabbcc
+dataDir: /var/lib/vpn-server-api
+
+# the datadir where the VPN server can write
+vpnDataDir: /var/lib/openvpn
+
+# enable multi instance (default: false)
+#multiInstance: true

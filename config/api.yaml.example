@@ -1,0 +1,15 @@
+# API credentials
+api:
+    vpn-user-portal:
+        scope: portal
+        token: uvwxyz
+    vpn-admin-portal:
+        scope: admin
+        token: uuvvww
+
+# API credentials for access to remote services
+remoteApi:
+    # required to obtain server certificates
+    vpn-ca-api:
+        uri: 'http://localhost:8008/api.php'
+        token: aabbcc

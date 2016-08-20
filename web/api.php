@@ -41,8 +41,8 @@ use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
 
 try {
-    $config = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/config.yaml')
+    $apiConfig = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/api.yaml')
     );
 
     $poolsConfig = new Reader(
@@ -61,7 +61,7 @@ try {
                 'headers' => [
                     'Authorization' => sprintf(
                         'Bearer %s',
-                        $config->v(
+                        $apiConfig->v(
                             'remoteApi',
                             'vpn-ca-api',
                             'token'
@@ -89,7 +89,7 @@ try {
     // API authentication
     $apiAuth = new BearerAuthentication(
         new ArrayBearerValidator(
-            $config->v('api')
+            $apiConfig->v('api')
         ),
         ['realm' => 'VPN Server API']
     );

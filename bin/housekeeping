@@ -22,16 +22,12 @@ use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 
 try {
-    $config = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/log.yaml')
+    $configReader = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
+    $vpnDataDir = $configReader->v('vpnDataDir');
 
-    $db = new PDO(
-        $config->v('otp', 'dsn'),
-        $config->v('otp', 'username', false),
-        $config->v('otp', 'password', false)
-    );
-
+    $db = new PDO(sprintf('sqlite://%s/otp.sqlite', $vpnDataDir));
     $otpLog = new OtpLog($db);
 
     // remove all OTP key entries that are older than 5 minutes

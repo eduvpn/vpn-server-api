@@ -34,6 +34,7 @@ openlog(
 try {
     $envData = [];
     $envKeys = [
+        'POOL_ID',
         'common_name',
         'username',
         'password',
@@ -61,6 +62,11 @@ try {
     $commonName = $envData['common_name'];
     $userId = substr($commonName, 0, strpos($commonName, '_'));
 
+    $configReader = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/config.yaml')
+    );
+    $vpnDataDir = $configReader->v('vpnDataDir');
+
     // obtain the OTP secret from the CN's configuration
     $poolsConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/pools.yaml')
@@ -74,16 +80,7 @@ try {
 
     $otp = new Otp();
     if ($otp->checkTotp(Base32::decode($otpSecret), $otpKey)) {
-        $logConfig = new Reader(
-            new YamlFile(dirname(__DIR__).'/config/log.yaml')
-        );
-
-        $db = new PDO(
-            $logConfig->v('otp', 'dsn'),
-            $logConfig->v('otp', 'username', false),
-            $logConfig->v('otp', 'password', false)
-        );
-
+        $db = new PDO(sprintf('sqlite://%s/otp.sqlite', $vpnDataDir));
         $otpLog = new OtpLog($db);
         if (false === $otpLog->record($userId, $otpKey, time())) {
             throw new RuntimeException(sprintf('OTP for user "%s" valid, but was replayed', $userId));
