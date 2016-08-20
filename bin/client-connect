@@ -33,7 +33,6 @@ try {
     $envKeys = [
         'common_name',
         'time_unix',
-        'dev',
         'ifconfig_pool_remote_ip',
         'ifconfig_pool_remote_ip6',
         'POOL_ID',
@@ -95,11 +94,11 @@ try {
 
     // log the connection
     $logData = array(
+        'pool_id' => $envData['POOL_ID'],
         'common_name' => $commonName,
         'v4' => $envData['ifconfig_pool_remote_ip'],
         'v6' => $envData['ifconfig_pool_remote_ip6'],
         'time_unix' => $envData['time_unix'],
-        'dev' => $envData['dev'],
     );
     syslog(LOG_INFO, json_encode($logData));
 } catch (Exception $e) {
