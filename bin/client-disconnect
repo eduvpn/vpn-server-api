@@ -30,7 +30,6 @@ try {
         'ifconfig_pool_remote_ip6',
         'bytes_received',
         'bytes_sent',
-        'dev',
     ];
 
     foreach ($envKeys as $envKey) {
