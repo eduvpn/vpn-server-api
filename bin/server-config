@@ -26,8 +26,7 @@ use GuzzleHttp\Client;
 use fkooman\IO\IO;
 
 // the size of the DH prime
-$dhLength = 1024;
-//$dhLength = 3072;
+$dhLength = 3072;
 $openVpnConfigDir = '/etc/openvpn';
 
 function showHelp(array $argv)
