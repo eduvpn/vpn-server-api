@@ -31,11 +31,12 @@ openlog(
 try {
     $envData = [];
     $envKeys = [
+        'INSTANCE_ID',
+        'POOL_ID',
         'common_name',
         'time_unix',
         'ifconfig_pool_remote_ip',
         'ifconfig_pool_remote_ip6',
-        'POOL_ID',
     ];
 
     // read environment variables
@@ -47,22 +48,28 @@ try {
         $envData[$envKey] = $envValue;
     }
 
-    $commonName = $envData['common_name'];
-    $userId = substr($commonName, 0, strpos($commonName, '_'));
-
     $configReader = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
-    $dataDir = $configReader->v('dataDir');
+
+    $instanceId = $envData['INSTANCE_ID'];
+    $multiInstance = $configReader->v('multiInstance', false, false);
+    if ($multiInstance) {
+        $dataDir = sprintf('%s/%s', $dataDir, $instanceId);
+        $poolsConfigFile = sprintf('%s/config/%s/pools.yaml', dirname(__DIR__), $instanceId);
+        $aclConfigFile = sprintf('%s/config/%s/acl.yaml', dirname(__DIR__), $instanceId);
+    } else {
+        $dataDir = $configReader->v('dataDir');
+        $poolsConfigFile = sprintf('%s/config/pools.yaml', dirname(__DIR__));
+        $aclConfigFile = sprintf('%s/config/acl.yaml', dirname(__DIR__));
+    }
+
+    $commonName = $envData['common_name'];
+    $userId = substr($commonName, 0, strpos($commonName, '_'));
 
     // read configuration
-    $poolsConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/pools.yaml')
-    );
-
-    $aclConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/acl.yaml')
-    );
+    $poolsConfig = new Reader(new YamlFile($poolsConfigFile));
+    $aclConfig = new Reader(new YamlFile($aclConfigFile));
 
     // user disabled?
     $userDisable = new Disable($dataDir.'/users/disabled');
@@ -99,6 +106,7 @@ try {
 
     // log the connection
     $logData = array(
+        'instance_id' => $envData['INSTANCE_ID'],
         'pool_id' => $envData['POOL_ID'],
         'common_name' => $commonName,
         'v4' => $envData['ifconfig_pool_remote_ip'],

@@ -30,6 +30,7 @@ try {
         'ifconfig_pool_remote_ip6',
         'bytes_received',
         'bytes_sent',
+        'INSTANCE_ID',
         'POOL_ID',
     ];
 
@@ -42,6 +43,7 @@ try {
     }
 
     $logData = array(
+        'instance_id' => $envData['INSTANCE_ID'],
         'pool_id' => $envData['POOL_ID'],
         'common_name' => $envData['common_name'],
         'v4' => $envData['ifconfig_pool_remote_ip'],

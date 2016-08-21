@@ -26,7 +26,9 @@ use GuzzleHttp\Client;
 use fkooman\IO\IO;
 
 // the size of the DH prime
-$dhLength = 3072;
+$dhLength = 1024;
+//$dhLength = 3072;
+$openVpnConfigDir = '/etc/openvpn';
 
 function showHelp(array $argv)
 {
@@ -36,10 +38,11 @@ function showHelp(array $argv)
             sprintf('SYNTAX: %s [--instance domain.tld] [--reuse] [--generate CN]', $argv[0]),
             '',
             '--instance domain.tld   the instance to initialize in case of multi instance',
-            '                        deploy',
-
+            '                        deploys',
+            '',
             '--reuse                 use the existing keys and certificates instead of',
             '                        generating again',
+            '',
             '--generate CN           generate a new certificate/DH params for the server',
             '                        with given CN',
             '',
@@ -82,18 +85,22 @@ try {
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
 
-    $poolsConfigFile = sprintf('%s/config/pools.yaml', dirname(__DIR__));
-    $apiConfigFile = sprintf('%s/config/api.yaml', dirname(__DIR__));
-    $tlsDir = '/etc/openvpn/tls';
+    $multiInstance = $configReader->v('multiInstance', false, false);
 
-    if ($configReader->v('multiInstance', false, false)) {
+    if ($multiInstance) {
         // multi instance
         if (is_null($instanceId)) {
             throw new RuntimeException('multi instance configuration, instance must be specified, see --help');
         }
-        $tlsDir = sprintf('%s/%s', $tlsDir, $instanceId);
         $poolsConfigFile = sprintf('%s/config/%s/pools.yaml', dirname(__DIR__), $instanceId);
         $apiConfigFile = sprintf('%s/config/%s/api.yaml', dirname(__DIR__), $instanceId);
+        $tlsDir = sprintf('%s/tls/%s', $openVpnConfigDir, $instanceId);
+    } else {
+        // single instance
+        $instanceId = 'default';
+        $poolsConfigFile = sprintf('%s/config/pools.yaml', dirname(__DIR__));
+        $apiConfigFile = sprintf('%s/config/api.yaml', dirname(__DIR__));
+        $tlsDir = sprintf('%s/tls', $openVpnConfigDir);
     }
 
     // cert/key file paths
@@ -103,7 +110,7 @@ try {
     $keyFile = sprintf('%s/server.key', $tlsDir);
     $taFile = sprintf('%s/ta.key', $tlsDir);
 
-    if (false === $reUse && null === $commonName) {
+    if (false === $reUse && is_null($commonName)) {
         throw new Exception('must specificy either --generate CN or --reuse flag, see --help');
     }
 
@@ -157,9 +164,10 @@ try {
     $serverConfigurations = ServerConfig::getConfig($instanceId, new Pools($poolsConfig->v('pools')));
     //var_export($serverConfigurations);
     foreach ($serverConfigurations as $k => $serverConfig) {
-        $configFile = sprintf('/etc/openvpn/server-%s.conf', $k);
-        if (!is_null($instanceId)) {
+        if ($multiInstance) {
             $configFile = sprintf('/etc/openvpn/server-%s-%s.conf', $instanceId, $k);
+        } else {
+            $configFile = sprintf('/etc/openvpn/server-%s.conf', $k);
         }
         $io->writeFile($configFile, implode(PHP_EOL, $serverConfig), true);
         // set correct file permissions

@@ -21,17 +21,15 @@ class ServerConfig
     /**
      * Get the server configuration.
      *
-     * @param string|null $instanceId the instance ID, may be null in case we
-     *                                run in single instance configuration
-     * @param Pools       $pools      the VPN pools for this instance
+     * @param string $instanceId the instance ID
+     * @param Pools  $pools      the VPN pools for this instance
      */
     public static function getConfig($instanceId, Pools $pools)
     {
         $allConfig = [];
-
         $tlsDir = '/etc/openvpn/tls';
-        if (!is_null($instanceId)) {
-            $tlsDir = sprintf('%s/%s', $tlsDir, $instanceId);
+        if ('default' !== $instanceId) {
+            $tlsDir = sprintf('/etc/openvpn/tls/%s', $instanceId);
         }
 
         foreach ($pools as $pool) {
@@ -110,10 +108,7 @@ class ServerConfig
                 $serverConfig = array_merge($serverConfig, self::getLog($pool));
 
                 // Instance ID
-                if (!is_null($instanceId)) {
-                    // only in multi instance configuration
-                    $serverConfig[] = sprintf('setenv INSTANCE_ID %s', $instanceId);
-                }
+                $serverConfig[] = sprintf('setenv INSTANCE_ID %s', $instanceId);
 
                 // Pool ID
                 $serverConfig[] = sprintf('setenv POOL_ID %s', $pool->getId());
