@@ -21,11 +21,48 @@ use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\OtpLog;
 
+function showHelp(array $argv)
+{
+    return implode(
+        PHP_EOL,
+        [
+            sprintf('SYNTAX: %s [--instance domain.tld]', $argv[0]),
+            '',
+            '--instance domain.tld      the instance to initialize in case of multi instance',
+            '                           deploy',
+            '',
+        ]
+    );
+}
+
 try {
+    $instanceId = null;
+
+    for ($i = 0; $i < $argc; ++$i) {
+        if ('--help' == $argv[$i] || '-h' === $argv[$i]) {
+            echo showHelp($argv);
+            exit(0);
+        }
+        if ('--instance' === $argv[$i] || '-i' === $argv[$i]) {
+            if (array_key_exists($i + 1, $argv)) {
+                $instanceId = $argv[$i + 1];
+                ++$i;
+            }
+        }
+    }
+
     $configReader = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
     $vpnDataDir = $configReader->v('vpnDataDir');
+
+    if ($configReader->v('multiInstance', false, false)) {
+        // need instance
+        if (is_null($instanceId)) {
+            throw new RuntimeException('multi instance configuration, instance must be specified, see --help');
+        }
+        $vpnDataDir = sprintf('%s/%s', $vpnDataDir, $instanceId);
+    }
 
     $db = new PDO(sprintf('sqlite://%s/otp.sqlite', $vpnDataDir));
     $otpLog = new OtpLog($db);
