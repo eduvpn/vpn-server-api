@@ -24,6 +24,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
     public function testDefault()
     {
         $serverConfig = ServerConfig::getConfig(
+            null,
             new Pools(
                 [
                     'default' => [
