@@ -24,7 +24,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
     public function testDefault()
     {
         $serverConfig = ServerConfig::getConfig(
-            null,
+            'default',
             new Pools(
                 [
                     'default' => [
@@ -75,6 +75,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
                     'script-security 2',
                     'server 10.42.42.0 255.255.255.192',
                     'server-ipv6 fd00:4242:4242::/64',
+                    'setenv INSTANCE_ID default',
                     'setenv POOL_ID default',
                     'tls-auth /etc/openvpn/tls/ta.key 0',
                     'tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA',
@@ -114,6 +115,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
                     'script-security 2',
                     'server 10.42.42.64 255.255.255.192',
                     'server-ipv6 fd00:4242:4242:1::/64',
+                    'setenv INSTANCE_ID default',
                     'setenv POOL_ID default',
                     'tcp-nodelay',
                     'tls-auth /etc/openvpn/tls/ta.key 0',
