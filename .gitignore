@@ -1,3 +1,4 @@
 /vendor
-/config/*.yaml
 /data
+/config/*.yaml
+/config/*/*.yaml
