@@ -34,6 +34,7 @@ openlog(
 try {
     $envData = [];
     $envKeys = [
+        'INSTANCE_ID',
         'POOL_ID',
         'common_name',
         'username',
@@ -65,13 +66,24 @@ try {
     $configReader = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
+
     $dataDir = $configReader->v('dataDir');
     $vpnDataDir = $configReader->v('vpnDataDir');
 
+    $multiInstance = $configReader->v('multiInstance', false, false);
+    if ($multiInstance) {
+        // multi instance
+        $instanceId = $envData['INSTANCE_ID'];
+        $dataDir = sprintf('%s/%s', $dataDir, $instanceId);
+        $vpnDataDir = sprintf('%s/%s', $vpnDataDir, $instanceId);
+        $poolsConfigFile = sprintf('%s/config/%s/pools.yaml', dirname(__DIR__), $instanceId);
+    } else {
+        // single instance
+        $poolsConfigFile = sprintf('%s/config/pools.yaml', dirname(__DIR__));
+    }
+
     // obtain the OTP secret from the CN's configuration
-    $poolsConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/pools.yaml')
-    );
+    $poolsConfig = new Reader(new YamlFile($poolsConfigFile));
 
     $otpSecrets = new OtpSecret($dataDir.'/users/otp_secrets');
     $otpSecret = $otpSecrets->getOtpSecret($userId);
