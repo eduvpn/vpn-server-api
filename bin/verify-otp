@@ -65,6 +65,7 @@ try {
     $configReader = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
+    $dataDir = $configReader->v('dataDir');
     $vpnDataDir = $configReader->v('vpnDataDir');
 
     // obtain the OTP secret from the CN's configuration
@@ -72,7 +73,7 @@ try {
         new YamlFile(dirname(__DIR__).'/config/pools.yaml')
     );
 
-    $otpSecrets = new OtpSecret($poolsConfig->v('configDir').'/users/otp_secrets');
+    $otpSecrets = new OtpSecret($dataDir.'/users/otp_secrets');
     $otpSecret = $otpSecrets->getOtpSecret($userId);
     if (false === $otpSecret) {
         throw new RuntimeException(sprintf('no OTP secret for user "%s" registered', $userId));

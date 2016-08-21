@@ -41,6 +41,11 @@ use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
 
 try {
+    $configReader = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/config.yaml')
+    );
+    $dataDir = $configReader->v('dataDir');
+
     $apiConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/api.yaml')
     );
@@ -99,15 +104,15 @@ try {
     $aclClass = sprintf('fkooman\VPN\Server\Acl\%s', $aclMethod);
     $acl = new $aclClass($aclConfig);
 
-    $usersDisable = new Disable($poolsConfig->v('configDir').'/users/disabled');
-    $commonNamesDisable = new Disable($poolsConfig->v('configDir').'/common_names/disabled');
-    $otpSecret = new OtpSecret($poolsConfig->v('configDir').'/users/otp_secrets');
-    $vootToken = new VootToken($poolsConfig->v('configDir').'/users/voot_tokens');
+    $usersDisable = new Disable($dataDir.'/users/disabled');
+    $commonNamesDisable = new Disable($dataDir.'/common_names/disabled');
+    $otpSecret = new OtpSecret($dataDir.'/users/otp_secrets');
+    $vootToken = new VootToken($dataDir.'/users/voot_tokens');
 
     $authenticationPlugin = new AuthenticationPlugin();
     $authenticationPlugin->register($apiAuth, 'api');
     $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
-    $service->addModule(new LogModule($poolsConfig->v('configDir')));
+    $service->addModule(new LogModule($dataDir));
     $service->addModule(new OpenVpnModule($serverManager));
     $service->addModule(new CommonNamesModule($commonNamesDisable, $logger));
     $service->addModule(new UsersModule($usersDisable, $otpSecret, $vootToken, $acl, $logger));

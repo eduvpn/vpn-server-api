@@ -50,6 +50,11 @@ try {
     $commonName = $envData['common_name'];
     $userId = substr($commonName, 0, strpos($commonName, '_'));
 
+    $configReader = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/config.yaml')
+    );
+    $dataDir = $configReader->v('dataDir');
+
     // read configuration
     $poolsConfig = new Reader(
         new YamlFile(dirname(__DIR__).'/config/pools.yaml')
@@ -60,14 +65,14 @@ try {
     );
 
     // user disabled?
-    $userDisable = new Disable($poolsConfig->v('configDir').'/users/disabled');
+    $userDisable = new Disable($dataDir.'/users/disabled');
     if ($userDisable->getDisable($userId)) {
         syslog(LOG_INFO, sprintf('client not allowed, user "%s" is disabled', $userId));
         exit(1);
     }
 
     // common name disabled?
-    $commonNameDisable = new Disable($poolsConfig->v('configDir').'/common_names/disabled');
+    $commonNameDisable = new Disable($dataDir.'/common_names/disabled');
     if ($commonNameDisable->getDisable($commonName)) {
         syslog(LOG_INFO, sprintf('client not allowed, CN "%s" is disabled', $commonName));
         exit(1);
