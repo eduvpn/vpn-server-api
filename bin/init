@@ -55,7 +55,6 @@ try {
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
     $vpnDataDir = $configReader->v('vpnDataDir');
-
     if ($configReader->v('multiInstance', false, false)) {
         // need instance
         if (is_null($instanceId)) {
@@ -64,10 +63,16 @@ try {
         $vpnDataDir = sprintf('%s/%s', $vpnDataDir, $instanceId);
     }
 
+    // create VPN directory if it does not yet exist
+    if (!file_exists($vpnDataDir)) {
+        if (false === @mkdir($vpnDataDir, 0700, true)) {
+            throw new RuntimeException(sprintf('unable to create directory "%s"', $vpnDataDir));
+        }
+    }
     $db = new PDO(sprintf('sqlite://%s/otp.sqlite', $vpnDataDir));
     $otpLog = new OtpLog($db);
     $otpLog->initDatabase();
 } catch (Exception $e) {
-    echo $e->getMessage().PHP_EOL;
+    echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
 }

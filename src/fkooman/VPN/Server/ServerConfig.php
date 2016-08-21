@@ -18,9 +18,21 @@ namespace fkooman\VPN\Server;
 
 class ServerConfig
 {
-    public static function getConfig(Pools $pools)
+    /**
+     * Get the server configuration.
+     *
+     * @param string|null $instanceId the instance ID, may be null in case we
+     *                                run in single instance configuration
+     * @param Pools       $pools      the VPN pools for this instance
+     */
+    public static function getConfig($instanceId, Pools $pools)
     {
         $allConfig = [];
+
+        $tlsDir = '/etc/openvpn/tls';
+        if (!is_null($instanceId)) {
+            $tlsDir = sprintf('%s/%s', $tlsDir, $instanceId);
+        }
 
         foreach ($pools as $pool) {
             foreach ($pool->getInstances() as $i => $instance) {
@@ -40,11 +52,11 @@ class ServerConfig
                     'tls-cipher TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-256-CBC-SHA',
                     'auth SHA256',
                     'cipher AES-256-CBC',
-                    'ca /etc/openvpn/tls/ca.crt',
-                    'cert /etc/openvpn/tls/server.crt',
-                    'key /etc/openvpn/tls/server.key',
-                    'dh /etc/openvpn/tls/dh.pem',
-                    'tls-auth /etc/openvpn/tls/ta.key 0',
+                    sprintf('ca %s/ca.crt', $tlsDir),
+                    sprintf('cert %s/server.crt', $tlsDir),
+                    sprintf('key %s/server.key', $tlsDir),
+                    sprintf('dh %s/dh.pem', $tlsDir),
+                    sprintf('tls-auth %s/ta.key 0', $tlsDir),
                     'client-connect /usr/bin/vpn-server-api-client-connect',
                     'client-disconnect /usr/bin/vpn-server-api-client-disconnect',
                     'push "comp-lzo no"',
@@ -96,6 +108,12 @@ class ServerConfig
 
                 // Log
                 $serverConfig = array_merge($serverConfig, self::getLog($pool));
+
+                // Instance ID
+                if (!is_null($instanceId)) {
+                    // only in multi instance configuration
+                    $serverConfig[] = sprintf('setenv INSTANCE_ID %s', $instanceId);
+                }
 
                 // Pool ID
                 $serverConfig[] = sprintf('setenv POOL_ID %s', $pool->getId());

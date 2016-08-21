@@ -25,13 +25,6 @@ use fkooman\Config\YamlFile;
 use GuzzleHttp\Client;
 use fkooman\IO\IO;
 
-$tlsDir = '/etc/openvpn/tls';
-$dhFile = sprintf('%s/dh.pem', $tlsDir);
-$caFile = sprintf('%s/ca.crt', $tlsDir);
-$certFile = sprintf('%s/server.crt', $tlsDir);
-$keyFile = sprintf('%s/server.key', $tlsDir);
-$taFile = sprintf('%s/ta.key', $tlsDir);
-
 // the size of the DH prime
 $dhLength = 3072;
 
@@ -40,12 +33,15 @@ function showHelp(array $argv)
     return implode(
         PHP_EOL,
         [
-            sprintf('SYNTAX: %s [--reuse] [--generate CN]', $argv[0]),
+            sprintf('SYNTAX: %s [--instance domain.tld] [--reuse] [--generate CN]', $argv[0]),
             '',
-            '--reuse        use the existing keys and certificates instead of generating',
-            '               again',
-            '--generate CN  generate a new certificate/DH params for the server with given',
-            '               CN',
+            '--instance domain.tld   the instance to initialize in case of multi instance',
+            '                        deploy',
+
+            '--reuse                 use the existing keys and certificates instead of',
+            '                        generating again',
+            '--generate CN           generate a new certificate/DH params for the server',
+            '                        with given CN',
             '',
         ]
     );
@@ -54,40 +50,65 @@ function showHelp(array $argv)
 $io = new IO();
 
 try {
+    $instanceId = null;
     $reUse = false;
     $commonName = null;
     $showHelp = false;
 
     for ($i = 1; $i < $argc; ++$i) {
         if ('--help' === $argv[$i]) {
-            $showHelp = true;
-        } elseif ('--reuse' === $argv[$i]) {
+            echo showHelp($argv);
+            exit(0);
+        }
+        if ('--reuse' === $argv[$i]) {
             $reUse = true;
-        } elseif ('--generate' === $argv[$i]) {
+        }
+        if ('--generate' === $argv[$i]) {
             if (array_key_exists($i + 1, $argv)) {
                 $commonName = $argv[$i + 1];
+                ++$i;
+            }
+        }
+        if ('--instance' === $argv[$i] || '-i' === $argv[$i]) {
+            if (array_key_exists($i + 1, $argv)) {
+                $instanceId = $argv[$i + 1];
+                ++$i;
             }
         }
     }
 
-    if ($showHelp) {
-        echo showHelp($argv);
+    // check if we have multi instance
+    $configReader = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/config.yaml')
+    );
 
-        return;
+    $poolsConfigFile = sprintf('%s/config/pools.yaml', dirname(__DIR__));
+    $apiConfigFile = sprintf('%s/config/api.yaml', dirname(__DIR__));
+    $tlsDir = '/etc/openvpn/tls';
+
+    if ($configReader->v('multiInstance', false, false)) {
+        // multi instance
+        if (is_null($instanceId)) {
+            throw new RuntimeException('multi instance configuration, instance must be specified, see --help');
+        }
+        $tlsDir = sprintf('%s/%s', $tlsDir, $instanceId);
+        $poolsConfigFile = sprintf('%s/config/%s/pools.yaml', dirname(__DIR__), $instanceId);
+        $apiConfigFile = sprintf('%s/config/%s/api.yaml', dirname(__DIR__), $instanceId);
     }
+
+    // cert/key file paths
+    $dhFile = sprintf('%s/dh.pem', $tlsDir);
+    $caFile = sprintf('%s/ca.crt', $tlsDir);
+    $certFile = sprintf('%s/server.crt', $tlsDir);
+    $keyFile = sprintf('%s/server.key', $tlsDir);
+    $taFile = sprintf('%s/ta.key', $tlsDir);
 
     if (false === $reUse && null === $commonName) {
-        echo showHelp($argv);
-        throw new Exception('must specificy either CN or --reuse flag');
+        throw new Exception('must specificy either --generate CN or --reuse flag, see --help');
     }
 
-    $poolsConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/pools.yaml')
-    );
-
-    $apiConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/api.yaml')
-    );
+    $poolsConfig = new Reader(new YamlFile($poolsConfigFile));
+    $apiConfig = new Reader(new YamlFile($apiConfigFile));
 
     if (!$reUse) {
         // get a new certificate, and also generate a new DH
@@ -133,10 +154,13 @@ try {
         }
     }
 
-    $serverConfigurations = ServerConfig::getConfig(new Pools($poolsConfig->v('pools')));
+    $serverConfigurations = ServerConfig::getConfig($instanceId, new Pools($poolsConfig->v('pools')));
     //var_export($serverConfigurations);
     foreach ($serverConfigurations as $k => $serverConfig) {
         $configFile = sprintf('/etc/openvpn/server-%s.conf', $k);
+        if (!is_null($instanceId)) {
+            $configFile = sprintf('/etc/openvpn/server-%s-%s.conf', $instanceId, $k);
+        }
         $io->writeFile($configFile, implode(PHP_EOL, $serverConfig), true);
         // set correct file permissions
         chmod($configFile, 0600);

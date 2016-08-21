@@ -17,8 +17,6 @@
 # 
 # and restart the instances/firewall to activate the new configuration!
 
-configDir: /var/lib/vpn-server-api
-
 # The VPN server pools
 pools:
     default:
