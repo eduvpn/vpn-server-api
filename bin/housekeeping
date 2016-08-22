@@ -21,17 +21,32 @@ use fkooman\VPN\Server\OtpLog;
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 
+function cleanupOtp($dbPath)
+{
+    $db = new PDO($dbPath);
+    $otpLog = new OtpLog($db);
+    // remove all OTP key entries that are older than 5 minutes
+    $otpLog->housekeeping(strtotime('now -5 minutes'));
+}
+
 try {
     $configReader = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
     $vpnDataDir = $configReader->v('vpnDataDir');
 
-    $db = new PDO(sprintf('sqlite://%s/otp.sqlite', $vpnDataDir));
-    $otpLog = new OtpLog($db);
+    if ($configReader->v('multiInstance', false, false)) {
+        // find all instances
+        $pattern = sprintf('%s/config/*', dirname(__DIR__));
 
-    // remove all OTP key entries that are older than 5 minutes
-    $otpLog->housekeeping(strtotime('now -5 minutes'));
+        foreach (glob($pattern, GLOB_ONLYDIR) as $instanceId) {
+            $dbPath = sprintf('sqlite://%s/%s/otp.sqlite', $vpnDataDir, $instanceDir);
+            cleanupOtp($dbPath);
+        }
+    } else {
+        $dbPath = sprintf('sqlite://%s/otp.sqlite', $vpnDataDir);
+        cleanupOtp($dbPath);
+    }
 } catch (Exception $e) {
     echo $e->getMessage().PHP_EOL;
     exit(1);

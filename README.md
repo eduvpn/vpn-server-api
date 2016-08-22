@@ -31,9 +31,9 @@ production deployment setup and will not work well for development.
 Point `configDir` to a writable directory, and optionally modify
 the IP configuration.
 
-    $ cp config/log.yaml.example config/log.yaml
+    $ cp config/api.yaml.example config/api.yaml
 
-Point `log/dsn` to a writable file.
+Initialize
 
     $ mkdir data
     $ php bin/init
@@ -43,7 +43,7 @@ Point `log/dsn` to a writable file.
 
 The API is protected using Bearer tokens. There are various "clients" 
 configured as can be seen in the configuration file together with their 
-permissions. See `config/config.yaml` for the defaults.
+permissions. See `config/api.yaml` for the defaults.
 
 # License
 Licensed under the Apache License, Version 2.0;
