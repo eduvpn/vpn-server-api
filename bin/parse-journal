@@ -68,7 +68,7 @@ while ($jsonLine = fgets(STDIN)) {
         $configName = explode('_', $commonName, 2)[1];
 
         // instance id was not always available...
-        $instanceId = array_key_exists('instance_id', $messageData['instance_id']) ? $messageData['instance_id'] : 'default';
+        $instanceId = array_key_exists('instance_id', $messageData) ? $messageData['instance_id'] : 'default';
         $poolId = $messageData['pool_id'];
 
         $logKey = sprintf('%s:%s:%s:%s', $instanceId, $poolId, $messageData['common_name'], $messageData['time_unix']);
@@ -95,7 +95,7 @@ while ($jsonLine = fgets(STDIN)) {
         }
 
         // instance id was not always available...
-        $instanceId = array_key_exists('instance_id', $messageData['instance_id']) ? $messageData['instance_id'] : 'default';
+        $instanceId = array_key_exists('instance_id', $messageData) ? $messageData['instance_id'] : 'default';
         $poolId = $messageData['pool_id'];
 
         $logKey = sprintf('%s:%s:%s:%s', $instanceId, $poolId, $messageData['common_name'], $messageData['time_unix']);
