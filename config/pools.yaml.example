@@ -19,8 +19,8 @@
 
 # The VPN server pools
 pools:
-    default:
-        name: Secure Browsing
+    internet:
+        name: Internet
 
         # The address to listen on (default: ::)
         #listen: '::'

@@ -23,7 +23,7 @@ use PHPUnit_Framework_TestCase;
 
 class FirewallTest extends PHPUnit_Framework_TestCase
 {
-    private function getPoolsConfig($poolId = 'default', array $configOverride = [])
+    private function getPoolsConfig($poolId = 'internet', array $configOverride = [])
     {
         $poolsConfigReader = new Reader(
            new YamlFile(dirname(dirname(dirname(dirname(__DIR__)))).'/config/pools.yaml.example')
@@ -61,9 +61,9 @@ class FirewallTest extends PHPUnit_Framework_TestCase
                 '-A INPUT -m state --state NEW -m udp -p udp --dport 1196 -j ACCEPT',
                 '-A INPUT -j REJECT --reject-with icmp-host-prohibited',
                 '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
-                '-N vpn-default',
-                '-A FORWARD -i tun-default+ -s 10.42.42.0/24 -j vpn-default',
-                '-A vpn-default -o eth0 -j ACCEPT',
+                '-N vpn-internet',
+                '-A FORWARD -i tun-internet+ -s 10.42.42.0/24 -j vpn-internet',
+                '-A vpn-internet -o eth0 -j ACCEPT',
                 '-A FORWARD -j REJECT --reject-with icmp-host-prohibited',
                 'COMMIT',
             ],
@@ -94,9 +94,9 @@ class FirewallTest extends PHPUnit_Framework_TestCase
                 '-A INPUT -m state --state NEW -m udp -p udp --dport 1196 -j ACCEPT',
                 '-A INPUT -j REJECT --reject-with icmp6-adm-prohibited',
                 '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
-                '-N vpn-default',
-                '-A FORWARD -i tun-default+ -s fd00:4242:4242::/48 -j vpn-default',
-                '-A vpn-default -o eth0 -j ACCEPT',
+                '-N vpn-internet',
+                '-A FORWARD -i tun-internet+ -s fd00:4242:4242::/48 -j vpn-internet',
+                '-A vpn-internet -o eth0 -j ACCEPT',
                 '-A FORWARD -j REJECT --reject-with icmp6-adm-prohibited',
                 'COMMIT',
             ],
@@ -130,15 +130,15 @@ class FirewallTest extends PHPUnit_Framework_TestCase
                 '-A INPUT -m state --state NEW -m udp -p udp --dport 1196 -j ACCEPT',
                 '-A INPUT -j REJECT --reject-with icmp-host-prohibited',
                 '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
-                '-N vpn-default',
-                '-A FORWARD -i tun-default+ -s 10.42.42.0/24 -j vpn-default',
-                '-A vpn-default -o eth0 -m multiport -p tcp --dports 137:139,445 -j REJECT --reject-with icmp-host-prohibited',
-                '-A vpn-default -o eth0 -m multiport -p udp --dports 137:139,445 -j REJECT --reject-with icmp-host-prohibited',
-                '-A vpn-default -o eth0 -j ACCEPT',
+                '-N vpn-internet',
+                '-A FORWARD -i tun-internet+ -s 10.42.42.0/24 -j vpn-internet',
+                '-A vpn-internet -o eth0 -m multiport -p tcp --dports 137:139,445 -j REJECT --reject-with icmp-host-prohibited',
+                '-A vpn-internet -o eth0 -m multiport -p udp --dports 137:139,445 -j REJECT --reject-with icmp-host-prohibited',
+                '-A vpn-internet -o eth0 -j ACCEPT',
                 '-A FORWARD -j REJECT --reject-with icmp-host-prohibited',
                 'COMMIT',
             ],
-            Firewall::getFirewall4($this->getPoolsConfig('default', ['blockSmb' => true]), true)
+            Firewall::getFirewall4($this->getPoolsConfig('internet', ['blockSmb' => true]), true)
         );
     }
 
@@ -168,13 +168,13 @@ class FirewallTest extends PHPUnit_Framework_TestCase
                 '-A INPUT -m state --state NEW -m udp -p udp --dport 1196 -j ACCEPT',
                 '-A INPUT -j REJECT --reject-with icmp-host-prohibited',
                 '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
-                '-N vpn-default',
-                '-A FORWARD -i tun-default+ -s 10.42.42.0/24 -j vpn-default',
-                '-A vpn-default -o eth0 -j ACCEPT',
+                '-N vpn-internet',
+                '-A FORWARD -i tun-internet+ -s 10.42.42.0/24 -j vpn-internet',
+                '-A vpn-internet -o eth0 -j ACCEPT',
                 '-A FORWARD -j REJECT --reject-with icmp-host-prohibited',
                 'COMMIT',
             ],
-            Firewall::getFirewall4($this->getPoolsConfig('default', ['forward6' => false]), true)
+            Firewall::getFirewall4($this->getPoolsConfig('internet', ['forward6' => false]), true)
         );
 
         $this->assertSame(
@@ -204,7 +204,7 @@ class FirewallTest extends PHPUnit_Framework_TestCase
                 '-A FORWARD -j REJECT --reject-with icmp6-adm-prohibited',
                 'COMMIT',
             ],
-            Firewall::getFirewall6($this->getPoolsConfig('default', ['forward6' => false]), true)
+            Firewall::getFirewall6($this->getPoolsConfig('internet', ['forward6' => false]), true)
         );
     }
 
@@ -234,15 +234,15 @@ class FirewallTest extends PHPUnit_Framework_TestCase
                 '-A INPUT -m state --state NEW -m udp -p udp --dport 1196 -j ACCEPT',
                 '-A INPUT -j REJECT --reject-with icmp-host-prohibited',
                 '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
-                '-N vpn-default',
-                '-A FORWARD -i tun-default+ -s 10.42.42.0/24 -j vpn-default',
-                '-A vpn-default -o eth0 -d 192.168.42.0/24 -j ACCEPT',
+                '-N vpn-internet',
+                '-A FORWARD -i tun-internet+ -s 10.42.42.0/24 -j vpn-internet',
+                '-A vpn-internet -o eth0 -d 192.168.42.0/24 -j ACCEPT',
                 '-A FORWARD -j REJECT --reject-with icmp-host-prohibited',
                 'COMMIT',
             ],
             Firewall::getFirewall4(
                 $this->getPoolsConfig(
-                    'default',
+                    'internet',
                     [
                         'defaultGateway' => false,
                         'routes' => [
@@ -279,15 +279,15 @@ class FirewallTest extends PHPUnit_Framework_TestCase
                 '-A INPUT -m state --state NEW -m udp -p udp --dport 1196 -j ACCEPT',
                 '-A INPUT -j REJECT --reject-with icmp6-adm-prohibited',
                 '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
-                '-N vpn-default',
-                '-A FORWARD -i tun-default+ -s fd00:4242:4242::/48 -j vpn-default',
-                '-A vpn-default -o eth0 -d fd00:1234:1234::/48 -j ACCEPT',
+                '-N vpn-internet',
+                '-A FORWARD -i tun-internet+ -s fd00:4242:4242::/48 -j vpn-internet',
+                '-A vpn-internet -o eth0 -d fd00:1234:1234::/48 -j ACCEPT',
                 '-A FORWARD -j REJECT --reject-with icmp6-adm-prohibited',
                 'COMMIT',
             ],
             Firewall::getFirewall6(
                 $this->getPoolsConfig(
-                    'default',
+                    'internet',
                     [
                         'defaultGateway' => false,
                         'routes' => [
