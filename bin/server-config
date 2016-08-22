@@ -25,8 +25,6 @@ use fkooman\Config\YamlFile;
 use GuzzleHttp\Client;
 use fkooman\IO\IO;
 
-// the size of the DH prime
-$dhLength = 3072;
 $openVpnConfigDir = '/etc/openvpn';
 
 function showHelp(array $argv)
@@ -52,6 +50,8 @@ function showHelp(array $argv)
 $io = new IO();
 
 try {
+    // the size of the DH prime
+    $dhLength = 3072;
     $instanceId = null;
     $reUse = false;
     $commonName = null;
@@ -74,6 +74,12 @@ try {
         if ('--instance' === $argv[$i] || '-i' === $argv[$i]) {
             if (array_key_exists($i + 1, $argv)) {
                 $instanceId = $argv[$i + 1];
+                ++$i;
+            }
+        }
+        if ('--dh' === $argv[$i]) {
+            if (array_key_exists($i + 1, $argv)) {
+                $dhLength = intval($argv[$i + 1]);
                 ++$i;
             }
         }
