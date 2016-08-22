@@ -31,6 +31,20 @@ openlog(
     LOG_USER
 );
 
+function logError($instanceId, $poolId, $userId, $logMessage)
+{
+    $logData = [
+        'instance_id' => $instanceId,
+        'pool_id' => $poolId,
+        'user_id' => $userId,
+        'ok' => false,
+        'msg' => $logMessage,
+    ];
+
+    syslog(LOG_ERR, json_encode($logData));
+    exit(1);
+}
+
 try {
     $envData = [];
     $envKeys = [
@@ -50,18 +64,21 @@ try {
         $envData[$envKey] = $envValue;
     }
 
+    $instanceId = $envData['INSTANCE_ID'];
+    $poolId = $envData['POOL_ID'];
+
+    $commonName = $envData['common_name'];
+    $userId = substr($commonName, 0, strpos($commonName, '_'));
+
     // use username field to specify OTP type, for now we only support 'totp'
     $otpType = $envData['username'];
     if ('totp' !== $otpType) {
-        throw new RuntimeException(sprintf('invalid OTP type "%s" specified', $otpType));
+        logError($instanceId, $poolId, $userId, 'invalid OTP type specified in username field');
     }
 
     $otpKey = $envData['password'];
     // validate the OTP key
     InputValidation::otpKey($otpKey);
-
-    $commonName = $envData['common_name'];
-    $userId = substr($commonName, 0, strpos($commonName, '_'));
 
     $configReader = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
@@ -73,7 +90,6 @@ try {
     $multiInstance = $configReader->v('multiInstance', false, false);
     if ($multiInstance) {
         // multi instance
-        $instanceId = $envData['INSTANCE_ID'];
         $dataDir = sprintf('%s/%s', $dataDir, $instanceId);
         $vpnDataDir = sprintf('%s/%s', $vpnDataDir, $instanceId);
         $poolsConfigFile = sprintf('%s/config/%s/pools.yaml', dirname(__DIR__), $instanceId);
@@ -88,7 +104,7 @@ try {
     $otpSecrets = new OtpSecret($dataDir.'/users/otp_secrets');
     $otpSecret = $otpSecrets->getOtpSecret($userId);
     if (false === $otpSecret) {
-        throw new RuntimeException(sprintf('no OTP secret for user "%s" registered', $userId));
+        logError($instanceId, $poolId, $userId, 'no OTP secret registered');
     }
 
     $otp = new Otp();
@@ -96,12 +112,18 @@ try {
         $db = new PDO(sprintf('sqlite://%s/otp.sqlite', $vpnDataDir));
         $otpLog = new OtpLog($db);
         if (false === $otpLog->record($userId, $otpKey, time())) {
-            throw new RuntimeException(sprintf('OTP for user "%s" valid, but was replayed', $userId));
+            logError($instanceId, $poolId, $userId, 'OTP replayed');
         }
-        syslog(LOG_INFO, sprintf('OTP for user "%s" valid', $userId));
-        exit(0);
+
+        $logData = [
+            'instance_id' => $instanceId,
+            'pool_id' => $poolId,
+            'user_id' => $userId,
+            'ok' => true,
+        ];
+        syslog(LOG_INFO, json_encode($logData));
     } else {
-        throw new RuntimeException(sprintf('invalid OTP key from user "%s"', $userId));
+        logError($instanceId, $poolId, $userId, 'invalid OTP key');
     }
 } catch (Exception $e) {
     syslog(LOG_ERR, $e->getMessage());
