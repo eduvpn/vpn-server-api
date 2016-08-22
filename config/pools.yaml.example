@@ -20,7 +20,7 @@
 # The VPN server pools
 pools:
     internet:
-        name: Internet
+        name: Internet Access
 
         # The address to listen on (default: ::)
         #listen: '::'
