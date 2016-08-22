@@ -36,10 +36,10 @@ pools:
         useNat: true
 
         # IPv4 range for clients, at least a /29 is required
-        range: 10.42.42.0/24
+        range: 10.93.163.0/24
 
         # IPv6 range for clients, at least a /60 or bigger is required
-        range6: 'fd00:4242:4242::/48'
+        range6: 'fdbc:dfcc:f434:e740::/60'
 
         # Forward IPv6 traffic
         # disable this when VPN server has no IPv6 connection (default: true)
