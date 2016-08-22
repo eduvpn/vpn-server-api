@@ -40,7 +40,8 @@ try {
         $pattern = sprintf('%s/config/*', dirname(__DIR__));
 
         foreach (glob($pattern, GLOB_ONLYDIR) as $instanceId) {
-            $dbPath = sprintf('sqlite://%s/%s/otp.sqlite', $vpnDataDir, $instanceDir);
+            $instanceId = basename($instanceId);
+            $dbPath = sprintf('sqlite://%s/%s/otp.sqlite', $vpnDataDir, $instanceId);
             cleanupOtp($dbPath);
         }
     } else {
@@ -48,6 +49,6 @@ try {
         cleanupOtp($dbPath);
     }
 } catch (Exception $e) {
-    echo $e->getMessage().PHP_EOL;
+    echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
 }
