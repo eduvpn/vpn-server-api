@@ -115,6 +115,7 @@ class Firewall
     private static function getForwardChain(Pools $p, $inetFamily)
     {
         $forwardChain = [
+            //sprintf('-A FORWARD -p %s -j ACCEPT', 4 === $inetFamily ? 'icmp' : 'ipv6-icmp'),
             '-A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT',
         ];
 
@@ -185,8 +186,8 @@ class Firewall
     {
         $ingressPorts = ['tcp/22', 'tcp/80', 'tcp/443'];
 
-        // we only care about additional UDP ports, as we only want UDP and
-        // fallback to tcp/443
+        // we only care about additional UDP ports to connect to the OpenVPN
+        // instances, as we only want UDP and fallback to tcp/443
         foreach ($p as $pool) {
             foreach ($pool->getInstances() as $instance) {
                 if ('udp' === $instance->getProto()) {
