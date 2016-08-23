@@ -144,7 +144,6 @@ try {
             }
         }
         $logFile = sprintf('%s/log.json', $dataDir);
-        echo $logFile.PHP_EOL;
         if (false === @file_put_contents($logFile, $jsonLog)) {
             throw new RuntimeException(sprintf('unable to write log to "%s"', $logFile));
         }
