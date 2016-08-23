@@ -15,8 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+require_once dirname(__DIR__).'/vendor/autoload.php';
 
-/**
+use fkooman\Config\Reader;
+use fkooman\Config\YamlFile;
+
+/*
  * Parse the systemd journal.
  *
  * Usage:
@@ -28,7 +32,7 @@
  *     | vpn-server-api-parse-journal
  */
 
-/**
+/*
  * Due to not wanting to store all user data forever, we have a log window
  * after which log entries disappear from the system, this can result in some
  * issues. The log window is typically 1 month.
@@ -45,79 +49,107 @@
 $clientConnectSyslogIdentifier = 'vpn-server-api-client-connect';
 $clientDisconnectSyslogIdentifier = 'vpn-server-api-client-disconnect';
 
-$logData = [];
+try {
+    $logData = [];
 
-// every line is a JSON object
-while ($jsonLine = fgets(STDIN)) {
-    $jsonData = json_decode($jsonLine, true);
+    // every line is a JSON object
+    while ($jsonLine = fgets(STDIN)) {
+        $jsonData = json_decode($jsonLine, true);
 
-    if ($clientConnectSyslogIdentifier === $jsonData['SYSLOG_IDENTIFIER']) {
+        if ($clientConnectSyslogIdentifier === $jsonData['SYSLOG_IDENTIFIER']) {
 
-        // handle connect data
-        $message = $jsonData['MESSAGE'];
-        $messageData = json_decode($message, true);
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            // XXX if an error occurred decoding the message, it was
-            // probably a log error message, ignore them for now, but later we
-            // will need them as well!
-            continue;
+            // handle connect data
+            $message = $jsonData['MESSAGE'];
+            $messageData = json_decode($message, true);
+            if (JSON_ERROR_NONE !== json_last_error()) {
+                // XXX if an error occurred decoding the message, it was
+                // probably a log error message, ignore them for now, but later we
+                // will need them as well!
+                continue;
+            }
+
+            $commonName = $messageData['common_name'];
+            $userId = explode('_', $commonName, 2)[0];
+            $configName = explode('_', $commonName, 2)[1];
+
+            // instance_id/pool_id was not always available...
+            $instanceId = array_key_exists('instance_id', $messageData) ? $messageData['instance_id'] : 'default';
+            $poolId = array_key_exists('pool_id', $messageData) ? $messageData['pool_id'] : 'default';
+
+            $logKey = sprintf('%s:%s:%s', $poolId, $messageData['common_name'], $messageData['time_unix']);
+            $logData[$instanceId][$logKey] = [
+                'instance_id' => $instanceId,
+                'pool_id' => $poolId,
+                'user_id' => $userId,
+                'config_name' => $configName,
+                'v4' => $messageData['v4'],
+                'v6' => $messageData['v6'],
+                'connect_time' => intval($messageData['time_unix']),
+            ];
         }
 
-        $commonName = $messageData['common_name'];
-        $userId = explode('_', $commonName, 2)[0];
-        $configName = explode('_', $commonName, 2)[1];
+        if ($clientDisconnectSyslogIdentifier === $jsonData['SYSLOG_IDENTIFIER']) {
+            // handle connect data
+            $message = $jsonData['MESSAGE'];
+            $messageData = json_decode($message, true);
+            if (JSON_ERROR_NONE !== json_last_error()) {
+                // XXX if an error occurred decoding the message, it was
+                // probably a log error message, ignore them for now, but later we
+                // will need them as well!
+                continue;
+            }
 
-        // instance_id/pool_id was not always available...
-        $instanceId = array_key_exists('instance_id', $messageData) ? $messageData['instance_id'] : 'default';
-        $poolId = array_key_exists('pool_id', $messageData) ? $messageData['pool_id'] : 'default';
+            // instance_id/pool_id was not always available...
+            $instanceId = array_key_exists('instance_id', $messageData) ? $messageData['instance_id'] : 'default';
+            $poolId = array_key_exists('pool_id', $messageData) ? $messageData['pool_id'] : 'default';
 
-        $logKey = sprintf('%s:%s:%s:%s', $instanceId, $poolId, $messageData['common_name'], $messageData['time_unix']);
-        $logData[$logKey] = [
-            'instance_id' => $instanceId,
-            'pool_id' => $poolId,
-            'user_id' => $userId,
-            'config_name' => $configName,
-            'v4' => $messageData['v4'],
-            'v6' => $messageData['v6'],
-            'connect_time' => intval($messageData['time_unix']),
-        ];
+            $logKey = sprintf('%s:%s:%s', $poolId, $messageData['common_name'], $messageData['time_unix']);
+            // XXX what if instanceId key does not exist?
+            if (!array_key_exists($logKey, $logData[$instanceId])) {
+                // XXX we did not find a matching connect entry...
+                // just ignore it
+                continue;
+            }
+            $dataTransferred = $messageData['bytes_sent'] + $messageData['bytes_received'];
+
+            $logData[$instanceId][$logKey] = array_merge(
+                $logData[$instanceId][$logKey],
+                [
+                    'disconnect_time' => $messageData['disconnect_time_unix'],
+                    'traffic' => $dataTransferred,
+                ]
+            );
+        }
     }
 
-    if ($clientDisconnectSyslogIdentifier === $jsonData['SYSLOG_IDENTIFIER']) {
-        // handle connect data
-        $message = $jsonData['MESSAGE'];
-        $messageData = json_decode($message, true);
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            // XXX if an error occurred decoding the message, it was
-            // probably a log error message, ignore them for now, but later we
-            // will need them as well!
-            continue;
+    $configReader = new Reader(
+        new YamlFile(sprintf('%s/config/config.yaml', dirname(__DIR__)))
+    );
+
+    foreach ($logData as $instanceId => $logEntries) {
+        $dataDir = $configReader->v('dataDir');
+        if ($configReader->v('multiInstance', false, false)) {
+            $dataDir = sprintf('%s/%s', $dataDir, $instanceId);
         }
 
-        // instance_id/pool_id was not always available...
-        $instanceId = array_key_exists('instance_id', $messageData) ? $messageData['instance_id'] : 'default';
-        $poolId = array_key_exists('pool_id', $messageData) ? $messageData['pool_id'] : 'default';
-
-        $logKey = sprintf('%s:%s:%s:%s', $instanceId, $poolId, $messageData['common_name'], $messageData['time_unix']);
-        if (!array_key_exists($logKey, $logData)) {
-            // XXX we did not find a matching connect entry...
-            // just ignore it
-            continue;
-        }
-        $dataTransferred = $messageData['bytes_sent'] + $messageData['bytes_received'];
-
-        $logData[$logKey] = array_merge(
-            $logData[$logKey],
+        $jsonLog = json_encode(
             [
-                'disconnect_time' => $messageData['disconnect_time_unix'],
-                'traffic' => $dataTransferred,
+                'entries' => array_values($logEntries),
             ]
         );
-    }
-}
 
-echo json_encode(
-    [
-        'entries' => array_values($logData),
-    ]
-);
+        if (!file_exists($dataDir)) {
+            if (false === @mkdir($dataDir, 0700, true)) {
+                throw new RuntimeException(sprintf('unable to create directory "%s"', $dataDir));
+            }
+        }
+        $logFile = sprintf('%s/log.json', $dataDir);
+        echo $logFile.PHP_EOL;
+        if (false === @file_put_contents($logFile, $jsonLog)) {
+            throw new RuntimeException(sprintf('unable to write log to "%s"', $logFile));
+        }
+    }
+} catch (Exception $e) {
+    echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
+    exit(1);
+}
