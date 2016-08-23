@@ -64,6 +64,7 @@ class Firewall
                     // get the IPv6 range
                     $srcNet = $pool->getRange6()->getAddressPrefix();
                 }
+                // -i (--in-interface) cannot be specified for POSTROUTING
                 $nat[] = sprintf('-A POSTROUTING -s %s -o %s -j MASQUERADE', $srcNet, $pool->getExtIf());
             }
         }
