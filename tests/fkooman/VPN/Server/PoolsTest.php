@@ -55,7 +55,6 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                 'id' => 'default',
                 'instances' => array(
                   0 => array(
-                    'dev' => 'tun-default-0',
                     'managementPort' => 11940,
                     'port' => 1194,
                     'proto' => 'udp',
@@ -63,7 +62,6 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                     'range6' => 'fd00:4242:4242::/64',
                   ),
                   1 => array(
-                    'dev' => 'tun-default-1',
                     'managementPort' => 11941,
                     'port' => 1195,
                     'proto' => 'udp',
@@ -71,7 +69,6 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                     'range6' => 'fd00:4242:4242:1::/64',
                   ),
                   2 => array(
-                    'dev' => 'tun-default-2',
                     'managementPort' => 11942,
                     'port' => 1196,
                     'proto' => 'udp',
@@ -79,7 +76,6 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                     'range6' => 'fd00:4242:4242:2::/64',
                   ),
                   3 => array(
-                    'dev' => 'tun-default-3',
                     'managementPort' => 11943,
                     'port' => 1194,
                     'proto' => 'tcp',
@@ -138,7 +134,6 @@ class PoolsTest extends PHPUnit_Framework_TestCase
                 'id' => 'default',
                 'instances' => array(
                     array(
-                        'dev' => 'tun-default-0',
                         'managementPort' => 11940,
                         'port' => 1194,
                         'proto' => 'udp',

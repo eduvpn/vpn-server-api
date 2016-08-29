@@ -40,8 +40,6 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
             )
         );
 
-//        var_export($serverConfig);
-
         $this->assertSame(
             [
                 'default-0' => array(
@@ -53,7 +51,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
                     'client-connect /usr/bin/vpn-server-api-client-connect',
                     'client-disconnect /usr/bin/vpn-server-api-client-disconnect',
                     'comp-lzo no',
-                    'dev tun-default-0',
+                    'dev tun-default-default-0',
                     'dh /etc/openvpn/tls/dh.pem',
                     'group openvpn',
                     'keepalive 10 60',
@@ -93,7 +91,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
                     'client-connect /usr/bin/vpn-server-api-client-connect',
                     'client-disconnect /usr/bin/vpn-server-api-client-disconnect',
                     'comp-lzo no',
-                    'dev tun-default-1',
+                    'dev tun-default-default-1',
                     'dh /etc/openvpn/tls/dh.pem',
                     'group openvpn',
                     'keepalive 10 60',

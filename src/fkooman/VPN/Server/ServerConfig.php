@@ -96,7 +96,7 @@ class ServerConfig
                 $serverConfig = array_merge($serverConfig, self::getListen($pool, $instance));
 
                 // Dev
-                $serverConfig[] = sprintf('dev %s', $instance->getDev());
+                $serverConfig[] = sprintf('dev tun-%s-%s-%s', $instanceId, $pool->getId(), $i);
 
                 // Proto
                 $serverConfig = array_merge($serverConfig, self::getProto($pool, $instance));

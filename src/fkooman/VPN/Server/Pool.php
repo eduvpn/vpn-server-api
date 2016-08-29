@@ -338,7 +338,6 @@ class Pool
                 [
                     'range' => $splitRange[$i],
                     'range6' => $splitRange6[$i],
-                    'dev' => sprintf('tun-%s-%d', $this->getId(), $i),
                     'proto' => $proto,
                     'port' => $port,
                     'managementPort' => 11940 + $i,

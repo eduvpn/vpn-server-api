@@ -29,9 +29,6 @@ class Instance
     /** @var string */
     private $proto;
 
-    /** @var string */
-    private $dev;
-
     /** @var int */
     private $managementPort;
 
@@ -43,7 +40,6 @@ class Instance
         $this->setRange($instanceData['range']);
         $this->setRange6($instanceData['range6']);
         $this->setProto($instanceData['proto']);
-        $this->setDev($instanceData['dev']);
         $this->setManagementPort($instanceData['managementPort']);
         $this->setPort($instanceData['port']);
     }
@@ -86,22 +82,6 @@ class Instance
         return $this->proto;
     }
 
-    public function setDev($dev)
-    {
-        if (!is_string($dev)) {
-            throw new InvalidArgumentException('parameter must be string');
-        }
-        if (0 !== strpos($dev, 'tun-')) {
-            throw new InstanceException('dev must start with "tun-"');
-        }
-        $this->dev = $dev;
-    }
-
-    public function getDev()
-    {
-        return $this->dev;
-    }
-
     public function setManagementPort($managementPort)
     {
         if (!is_int($managementPort)) {
@@ -137,7 +117,6 @@ class Instance
     public function toArray()
     {
         return [
-            'dev' => $this->getDev(),
             'managementPort' => $this->getManagementPort(),
             'port' => $this->getPort(),
             'proto' => $this->getProto(),
