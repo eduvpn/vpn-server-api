@@ -24,24 +24,26 @@ use fkooman\VPN\Server\Pools;
 
 function showHelp(array $argv)
 {
-    $helpText = [
-        sprintf('SYNTAX: %s [--install]', $argv[0]),
-        '',
-        '--install  install the firewall rules',
-        '',
-    ];
-
-    echo implode(PHP_EOL, $helpText);
+    return implode(
+        PHP_EOL,
+        [
+            sprintf('SYNTAX: %s [--install]', $argv[0]),
+            '',
+            '--install  install the firewall rules',
+            '',
+        ]
+    );
 }
 
 try {
     $installFw = false;
 
     for ($i = 1; $i < $argc; ++$i) {
-        if ('--help' === $argv[$i]) {
-            showHelp($argv);
+        if ('--help' === $argv[$i] || '-h' === $argv[$i]) {
+            echo showHelp($argv);
             exit(0);
-        } elseif ('--install' === $argv[$i]) {
+        }
+        if ('--install' === $argv[$i] || '-i' === $argv[$i]) {
             $installFw = true;
         }
     }
