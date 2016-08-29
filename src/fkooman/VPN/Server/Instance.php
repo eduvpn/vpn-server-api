@@ -30,9 +30,6 @@ class Instance
     private $proto;
 
     /** @var int */
-    private $managementPort;
-
-    /** @var int */
     private $port;
 
     public function __construct(array $instanceData)
@@ -40,7 +37,6 @@ class Instance
         $this->setRange($instanceData['range']);
         $this->setRange6($instanceData['range6']);
         $this->setProto($instanceData['proto']);
-        $this->setManagementPort($instanceData['managementPort']);
         $this->setPort($instanceData['port']);
     }
 
@@ -82,22 +78,6 @@ class Instance
         return $this->proto;
     }
 
-    public function setManagementPort($managementPort)
-    {
-        if (!is_int($managementPort)) {
-            throw new InvalidArgumentException('parameter must be int');
-        }
-        if (1024 >= $managementPort || 65536 <= $managementPort) {
-            throw new InstanceException('invalid port, must be positive integer between 1025 and 65535');
-        }
-        $this->managementPort = $managementPort;
-    }
-
-    public function getManagementPort()
-    {
-        return $this->managementPort;
-    }
-
     public function setPort($port)
     {
         if (!is_int($port)) {
@@ -117,7 +97,6 @@ class Instance
     public function toArray()
     {
         return [
-            'managementPort' => $this->getManagementPort(),
             'port' => $this->getPort(),
             'proto' => $this->getProto(),
             'range' => $this->getRange()->getAddressPrefix(),

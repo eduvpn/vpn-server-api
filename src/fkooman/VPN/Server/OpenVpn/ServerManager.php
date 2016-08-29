@@ -52,7 +52,7 @@ class ServerManager
         foreach ($this->pools as $pool) {
             $poolConnections = [];
             // loop over all instances
-            foreach ($pool->getInstances() as $instance) {
+            foreach ($pool->getInstances() as $i => $instance) {
                 // add all connections from this instance to poolConnections
                 try {
                     // open the socket connection
@@ -60,7 +60,7 @@ class ServerManager
                         sprintf(
                             'tcp://%s:%d',
                             $pool->getManagementIp()->getAddress(),
-                            $instance->getManagementPort()
+                            11940 + $i
                         )
                     );
                     $poolConnections = array_merge(
@@ -75,7 +75,7 @@ class ServerManager
                         sprintf(
                             'error with socket "%s:%s", message: "%s"',
                             $pool->getManagementIp()->getAddress(),
-                            $instance->getManagementPort(),
+                            11940 + $i,
                             $e->getMessage()
                         )
                     );
@@ -100,7 +100,7 @@ class ServerManager
         // loop over all pools
         foreach ($this->pools as $pool) {
             // loop over all instances
-            foreach ($pool->getInstances() as $instance) {
+            foreach ($pool->getInstances() as $i => $instance) {
                 // add all kills from this instance to poolKills
                 try {
                     // open the socket connection
@@ -108,7 +108,7 @@ class ServerManager
                         sprintf(
                             'tcp://%s:%d',
                             $pool->getManagementIp()->getAddress(),
-                            $instance->getManagementPort()
+                            11940 + $i
                         )
                     );
 
@@ -124,7 +124,7 @@ class ServerManager
                         sprintf(
                             'error with socket "%s:%s", message: "%s"',
                             $pool->getManagementIp()->getAddress(),
-                            $instance->getManagementPort(),
+                            11940 + $i,
                             $e->getMessage()
                         )
                     );

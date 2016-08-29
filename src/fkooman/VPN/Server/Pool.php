@@ -340,7 +340,6 @@ class Pool
                     'range6' => $splitRange6[$i],
                     'proto' => $proto,
                     'port' => $port,
-                    'managementPort' => 11940 + $i,
                 ]
             );
         }

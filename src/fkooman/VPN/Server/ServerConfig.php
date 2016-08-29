@@ -90,7 +90,7 @@ class ServerConfig
                 $serverConfig[] = sprintf('reneg-sec %d', $pool->getTwoFactor() ? 28800 : 3600);
 
                 // Management
-                $serverConfig[] = sprintf('management %s %d', $pool->getManagementIp()->getAddress(), $instance->getManagementPort());
+                $serverConfig[] = sprintf('management %s %d', $pool->getManagementIp()->getAddress(), 11940 + $i);
 
                 // Listen
                 $serverConfig = array_merge($serverConfig, self::getListen($pool, $instance));
