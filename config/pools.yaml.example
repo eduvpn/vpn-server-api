@@ -22,7 +22,14 @@ pools:
     internet:
         name: Internet Access
 
+        # the management IP (default: 127.42.1.0)
+        # this IP MUST be set to a unique value in multi pool or multi 
+        # instance configurations, use a "loopback" address!
+        #managementIp: 127.42.1.0
+
         # The address to listen on (default: ::)
+        # this IP *MUST* be set to a unique value in multi pool or multi
+        # instance configurations, and MUST be publically reachable
         #listen: '::'
 
         # the hostName to advertise to clients to connect to this pool

@@ -48,14 +48,38 @@ try {
         }
     }
 
-    $poolsConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/pools.yaml')
+    $instanceList = [];
+
+    $configReader = new Reader(
+        new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
+    if ($configReader->v('multiInstance', false, false)) {
+        // add all instances to instanceList
 
-    $p = new Pools($poolsConfig->v('pools'));
+        // find all instances
+        $pattern = sprintf('%s/config/*', dirname(__DIR__));
 
-    $firewall = Firewall::getFirewall4($p);
-    $firewall6 = Firewall::getFirewall6($p);
+        foreach (glob($pattern, GLOB_ONLYDIR) as $instanceId) {
+            $instanceId = basename($instanceId);
+
+            $poolsConfigFile = sprintf('%s/config/%s/pools.yaml', dirname(__DIR__), $instanceId);
+
+            $poolsConfig = new Reader(new YamlFile($poolsConfigFile));
+            $p = new Pools($poolsConfig->v('pools'));
+            $instanceList[$instanceId] = $p;
+        }
+    } else {
+        // single instance
+        $poolsConfig = new Reader(
+            new YamlFile(dirname(__DIR__).'/config/pools.yaml')
+        );
+
+        $p = new Pools($poolsConfig->v('pools'));
+        $instanceList['default'] = $p;
+    }
+
+    $firewall = Firewall::getFirewall4($instanceList);
+    $firewall6 = Firewall::getFirewall6($instanceList);
 
     if ($installFw) {
         if (false === @file_put_contents('/etc/sysconfig/iptables', $firewall)) {

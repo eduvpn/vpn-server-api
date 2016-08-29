@@ -82,7 +82,7 @@ class Pool
     /** @var bool */
     private $blockSmb;
 
-    public function __construct($poolNumber, array $poolData)
+    public function __construct(array $poolData)
     {
         $this->setId(self::validate($poolData, 'id'));
         $this->setName(self::validate($poolData, 'name', false, $this->getId()));
@@ -96,7 +96,7 @@ class Pool
         $this->setExtIf(self::validate($poolData, 'extIf'));
         $this->setTwoFactor(self::validate($poolData, 'twoFactor', false, false));
         $this->setClientToClient(self::validate($poolData, 'clientToClient', false, false));
-        $this->setManagementIp(new IP(sprintf('127.42.%d.1', $poolNumber)));
+        $this->setManagementIp(new IP(self::validate($poolData, 'managementIp', false, '127.42.0.1')));
         $this->setListen(new IP(self::validate($poolData, 'listen', false, '::')));
         $this->setEnableLog(self::validate($poolData, 'enableLog', false, false));
         $this->setEnableAcl(self::validate($poolData, 'enableAcl', false, false));

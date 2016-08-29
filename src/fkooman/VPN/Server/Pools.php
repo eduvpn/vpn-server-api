@@ -23,11 +23,9 @@ class Pools extends ArrayObject
     public function __construct(array $poolsData)
     {
         $poolList = [];
-        $i = 0;
         foreach ($poolsData as $poolId => $poolData) {
             $poolData['id'] = $poolId;
-            $poolList[$poolId] = new Pool($i, $poolData);
-            ++$i;
+            $poolList[$poolId] = new Pool($poolData);
         }
         parent::__construct($poolList, ArrayObject::STD_PROP_LIST);
     }
