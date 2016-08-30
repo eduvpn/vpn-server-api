@@ -71,8 +71,22 @@ try {
             $commonName = $messageData['common_name'];
             $userId = explode('_', $commonName, 2)[0];
             $configName = explode('_', $commonName, 2)[1];
-            $instanceName = $messageData['instance_name'];
-            $poolId = $messageData['pool_id'];
+
+            // we have a history of changing log format, only 'instance_name'
+            // is currently used, we can get rid of instance_id and the
+            // default option soon
+            if (array_key_exists('instance_name', $messageData)) {
+                $instanceName = $messageData['instance_name'];
+            } elseif (array_key_exists('instance_id', $messageData)) {
+                $instanceName = $messageData['instance_id'];
+            } else {
+                $instanceName = 'default';
+            }
+            if (array_key_exists('pool_id', $messageData)) {
+                $poolId = $messageData['pool_id'];
+            } else {
+                $poolId = 'default';
+            }
 
             $logKey = sprintf('%s:%s:%s', $poolId, $messageData['common_name'], $messageData['time_unix']);
             $logData[$instanceName][$logKey] = [
@@ -97,8 +111,21 @@ try {
                 continue;
             }
 
-            $instanceName = $messageData['instance_name'];
-            $poolId = $messageData['pool_id'];
+            // we have a history of changing log format, only 'instance_name'
+            // is currently used, we can get rid of instance_id and the
+            // default option soon
+            if (array_key_exists('instance_name', $messageData)) {
+                $instanceName = $messageData['instance_name'];
+            } elseif (array_key_exists('instance_id', $messageData)) {
+                $instanceName = $messageData['instance_id'];
+            } else {
+                $instanceName = 'default';
+            }
+            if (array_key_exists('pool_id', $messageData)) {
+                $poolId = $messageData['pool_id'];
+            } else {
+                $poolId = 'default';
+            }
 
             $logKey = sprintf('%s:%s:%s', $poolId, $messageData['common_name'], $messageData['time_unix']);
             // XXX what if instanceName key does not exist?
