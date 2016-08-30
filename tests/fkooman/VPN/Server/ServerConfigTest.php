@@ -24,7 +24,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
     public function testDefault()
     {
         $serverConfig = ServerConfig::getConfig(
-            0,
+            33,
             'vpn.example',
             new Pools(
                 [
@@ -52,7 +52,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
                     'client-connect /usr/bin/vpn-server-api-client-connect',
                     'client-disconnect /usr/bin/vpn-server-api-client-disconnect',
                     'comp-lzo no',
-                    'dev t-0-default-0',
+                    'dev t-33-default-0',
                     'dev-type tun',
                     'dh /etc/openvpn/tls/vpn.example/dh.pem',
                     'group openvpn',
@@ -60,7 +60,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
                     'key /etc/openvpn/tls/vpn.example/server.key',
                     'local ::',
                     'log /dev/null',
-                    'management 127.42.0.1 11940',
+                    'management 127.42.0.33 11940',
                     'max-clients 61',
                     'persist-key',
                     'persist-tun',
@@ -93,7 +93,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
                     'client-connect /usr/bin/vpn-server-api-client-connect',
                     'client-disconnect /usr/bin/vpn-server-api-client-disconnect',
                     'comp-lzo no',
-                    'dev t-0-default-1',
+                    'dev t-33-default-1',
                     'dev-type tun',
                     'dh /etc/openvpn/tls/vpn.example/dh.pem',
                     'group openvpn',
@@ -101,7 +101,7 @@ class ServerConfigTest extends PHPUnit_Framework_TestCase
                     'key /etc/openvpn/tls/vpn.example/server.key',
                     'local 127.42.0.1',
                     'log /dev/null',
-                    'management 127.42.0.1 11941',
+                    'management 127.42.0.33 11941',
                     'max-clients 61',
                     'persist-key',
                     'persist-tun',

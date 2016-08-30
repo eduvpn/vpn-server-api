@@ -88,14 +88,14 @@ class ServerConfig
                 $serverConfig[] = sprintf('reneg-sec %d', $pool->getTwoFactor() ? 28800 : 3600);
 
                 // Management
-                $serverConfig[] = sprintf('management %s %d', $pool->getManagementIp()->getAddress(), 11940 + $i);
+                $serverConfig[] = sprintf('management 127.42.0.%d %d', $instanceId, 11940 + $i);
 
                 // Listen
                 $serverConfig = array_merge($serverConfig, self::getListen($pool, $instance));
 
                 // Dev
                 $serverConfig[] = sprintf('dev t-%s-%s-%s', $instanceId, $pool->getId(), $i);
-        
+
                 // Dev Type
                 $serverConfig[] = 'dev-type tun';
 
