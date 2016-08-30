@@ -26,18 +26,10 @@ try {
         new YamlFile(sprintf('%s/config/config.yaml', dirname(__DIR__)))
     );
     $dataDirs = [];
-    if ($configReader->v('multiInstance', false, false)) {
-        // multi instance
-        // find all instances
-        $pattern = sprintf('%s/config/*', dirname(__DIR__));
 
-        foreach (glob($pattern, GLOB_ONLYDIR) as $instanceId) {
-            $instanceId = basename($instanceId);
-            $dataDirs[] = sprintf('%s/%s', $configReader->v('dataDir'), $instanceId);
-        }
-    } else {
-        // single instance
-        $dataDirs[] = $configReader->v('dataDir');
+    foreach ($configReader->v('instanceList') as $instance) {
+        $instanceName = $instance['hostName'];
+        $dataDirs[] = sprintf('%s/%s', $configReader->v('dataDir'), $instanceName);
     }
 
     foreach ($dataDirs as $dataDir) {

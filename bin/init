@@ -20,6 +20,7 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use fkooman\VPN\Server\OtpLog;
+use fkooman\VPN\Server\Utils;
 
 function showHelp(array $argv)
 {
@@ -36,32 +37,33 @@ function showHelp(array $argv)
 }
 
 try {
-    $instanceId = null;
+    $instanceName = null;
 
     for ($i = 0; $i < $argc; ++$i) {
         if ('--help' == $argv[$i] || '-h' === $argv[$i]) {
             echo showHelp($argv);
             exit(0);
         }
+
         if ('--instance' === $argv[$i] || '-i' === $argv[$i]) {
             if (array_key_exists($i + 1, $argv)) {
-                $instanceId = $argv[$i + 1];
+                $instanceName = $argv[$i + 1];
                 ++$i;
             }
         }
     }
 
+    if (is_null($instanceName)) {
+        throw new RuntimeException('instance must be specified, see --help');
+    }
+
     $configReader = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
-    $vpnDataDir = $configReader->v('vpnDataDir');
-    if ($configReader->v('multiInstance', false, false)) {
-        // need instance
-        if (is_null($instanceId)) {
-            throw new RuntimeException('multi instance configuration, instance must be specified, see --help');
-        }
-        $vpnDataDir = sprintf('%s/%s', $vpnDataDir, $instanceId);
+    if(false === Utils::nameToInstanceId($configReader->v('instanceList'), $instanceName)) {
+        throw new RuntimeException(sprintf('instance "%s" does not exist', $instanceName));
     }
+    $vpnDataDir = sprintf('%s/%s', $configReader->v('vpnDataDir'), $instanceName);
 
     // create VPN directory if it does not yet exist
     if (!file_exists($vpnDataDir)) {

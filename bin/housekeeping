@@ -35,17 +35,9 @@ try {
     );
     $vpnDataDir = $configReader->v('vpnDataDir');
 
-    if ($configReader->v('multiInstance', false, false)) {
-        // find all instances
-        $pattern = sprintf('%s/config/*', dirname(__DIR__));
-
-        foreach (glob($pattern, GLOB_ONLYDIR) as $instanceId) {
-            $instanceId = basename($instanceId);
-            $dbPath = sprintf('sqlite://%s/%s/otp.sqlite', $vpnDataDir, $instanceId);
-            cleanupOtp($dbPath);
-        }
-    } else {
-        $dbPath = sprintf('sqlite://%s/otp.sqlite', $vpnDataDir);
+    foreach ($configReader->v('instanceList') as $instance) {
+        $instanceName = $instance['hostName'];
+        $dbPath = sprintf('sqlite://%s/%s/otp.sqlite', $vpnDataDir, $instanceName);
         cleanupOtp($dbPath);
     }
 } catch (Exception $e) {

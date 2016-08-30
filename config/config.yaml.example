@@ -7,5 +7,13 @@ dataDir: /var/lib/vpn-server-api
 # the datadir where the VPN server can write
 vpnDataDir: /var/lib/openvpn
 
-# enable multi instance (default: false)
-#multiInstance: true
+# A list of active instances
+instanceList:
+    # All instance MUST have a unique instance ID between 0 and 255 to keep 
+    # track of its running OpenVPN processes
+    - instanceId: 0
+      hostName: vpn.example
+
+#    - instanceId: 55
+#      hostName: my.vpn.example.org
+

@@ -31,7 +31,7 @@ openlog(
 try {
     $envData = [];
     $envKeys = [
-        'INSTANCE_ID',
+        'INSTANCE_NAME',
         'POOL_ID',
         'common_name',
         'time_unix',
@@ -51,18 +51,11 @@ try {
     $configReader = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
-
-    $instanceId = $envData['INSTANCE_ID'];
-    $multiInstance = $configReader->v('multiInstance', false, false);
-    if ($multiInstance) {
-        $dataDir = sprintf('%s/%s', $dataDir, $instanceId);
-        $poolsConfigFile = sprintf('%s/config/%s/pools.yaml', dirname(__DIR__), $instanceId);
-        $aclConfigFile = sprintf('%s/config/%s/acl.yaml', dirname(__DIR__), $instanceId);
-    } else {
-        $dataDir = $configReader->v('dataDir');
-        $poolsConfigFile = sprintf('%s/config/pools.yaml', dirname(__DIR__));
-        $aclConfigFile = sprintf('%s/config/acl.yaml', dirname(__DIR__));
-    }
+    $dataDir = $configReader->v('dataDir');
+    $instanceName = $envData['INSTANCE_NAME'];
+    $dataDir = sprintf('%s/%s', $dataDir, $instanceName);
+    $poolsConfigFile = sprintf('%s/config/%s/pools.yaml', dirname(__DIR__), $instanceName);
+    $aclConfigFile = sprintf('%s/config/%s/acl.yaml', dirname(__DIR__), $instanceName);
 
     $commonName = $envData['common_name'];
     $userId = substr($commonName, 0, strpos($commonName, '_'));
@@ -106,7 +99,7 @@ try {
 
     // log the connection
     $logData = array(
-        'instance_id' => $envData['INSTANCE_ID'],
+        'instance_name' => $instanceName,
         'pool_id' => $envData['POOL_ID'],
         'common_name' => $commonName,
         'v4' => $envData['ifconfig_pool_remote_ip'],

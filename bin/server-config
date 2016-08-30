@@ -24,6 +24,7 @@ use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
 use GuzzleHttp\Client;
 use fkooman\IO\IO;
+use fkooman\VPN\Server\Utils;
 
 $openVpnConfigDir = '/etc/openvpn';
 
@@ -52,7 +53,7 @@ $io = new IO();
 try {
     // the size of the DH prime
     $dhLength = 3072;
-    $instanceId = null;
+    $instanceName = null;
     $reUse = false;
     $commonName = null;
     $showHelp = false;
@@ -73,7 +74,7 @@ try {
         }
         if ('--instance' === $argv[$i] || '-i' === $argv[$i]) {
             if (array_key_exists($i + 1, $argv)) {
-                $instanceId = $argv[$i + 1];
+                $instanceName = $argv[$i + 1];
                 ++$i;
             }
         }
@@ -85,28 +86,22 @@ try {
         }
     }
 
-    // check if we have multi instance
     $configReader = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
 
-    $multiInstance = $configReader->v('multiInstance', false, false);
-
-    if ($multiInstance) {
-        // multi instance
-        if (is_null($instanceId)) {
-            throw new RuntimeException('multi instance configuration, instance must be specified, see --help');
-        }
-        $poolsConfigFile = sprintf('%s/config/%s/pools.yaml', dirname(__DIR__), $instanceId);
-        $apiConfigFile = sprintf('%s/config/%s/api.yaml', dirname(__DIR__), $instanceId);
-        $tlsDir = sprintf('%s/tls/%s', $openVpnConfigDir, $instanceId);
-    } else {
-        // single instance
-        $instanceId = 'default';
-        $poolsConfigFile = sprintf('%s/config/pools.yaml', dirname(__DIR__));
-        $apiConfigFile = sprintf('%s/config/api.yaml', dirname(__DIR__));
-        $tlsDir = sprintf('%s/tls', $openVpnConfigDir);
+    if (is_null($instanceName)) {
+        throw new RuntimeException('instance must be specified, see --help');
     }
+
+    $instanceId = Utils::nameToInstanceId($configReader->v('instanceList'), $instanceName);
+    if (false === $instanceId) {
+        throw new RuntimeException(sprintf('instance "%s" does not exist', $instanceName));
+    }
+
+    $poolsConfigFile = sprintf('%s/config/%s/pools.yaml', dirname(__DIR__), $instanceName);
+    $apiConfigFile = sprintf('%s/config/%s/api.yaml', dirname(__DIR__), $instanceName);
+    $tlsDir = sprintf('%s/tls/%s', $openVpnConfigDir, $instanceName);
 
     // cert/key file paths
     $dhFile = sprintf('%s/dh.pem', $tlsDir);
@@ -166,14 +161,10 @@ try {
         }
     }
 
-    $serverConfigurations = ServerConfig::getConfig($instanceId, new Pools($poolsConfig->v('pools')));
+    $serverConfigurations = ServerConfig::getConfig($instanceId, $instanceName, new Pools($poolsConfig->v('pools')));
     //var_export($serverConfigurations);
     foreach ($serverConfigurations as $k => $serverConfig) {
-        if ($multiInstance) {
-            $configFile = sprintf('/etc/openvpn/server-%s-%s.conf', $instanceId, $k);
-        } else {
-            $configFile = sprintf('/etc/openvpn/server-%s.conf', $k);
-        }
+        $configFile = sprintf('/etc/openvpn/server-%s-%s.conf', $instanceName, $k);
         $io->writeFile($configFile, implode(PHP_EOL, $serverConfig), true);
         // set correct file permissions
         chmod($configFile, 0600);

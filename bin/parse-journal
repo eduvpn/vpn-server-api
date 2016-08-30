@@ -71,14 +71,12 @@ try {
             $commonName = $messageData['common_name'];
             $userId = explode('_', $commonName, 2)[0];
             $configName = explode('_', $commonName, 2)[1];
-
-            // instance_id/pool_id was not always available...
-            $instanceId = array_key_exists('instance_id', $messageData) ? $messageData['instance_id'] : 'default';
-            $poolId = array_key_exists('pool_id', $messageData) ? $messageData['pool_id'] : 'default';
+            $instanceName = $messageData['instance_name'];
+            $poolId = $messageData['pool_id'];
 
             $logKey = sprintf('%s:%s:%s', $poolId, $messageData['common_name'], $messageData['time_unix']);
-            $logData[$instanceId][$logKey] = [
-                'instance_id' => $instanceId,
+            $logData[$instanceName][$logKey] = [
+                'instance_name' => $instanceName,
                 'pool_id' => $poolId,
                 'user_id' => $userId,
                 'config_name' => $configName,
@@ -99,21 +97,20 @@ try {
                 continue;
             }
 
-            // instance_id/pool_id was not always available...
-            $instanceId = array_key_exists('instance_id', $messageData) ? $messageData['instance_id'] : 'default';
-            $poolId = array_key_exists('pool_id', $messageData) ? $messageData['pool_id'] : 'default';
+            $instanceName = $messageData['instance_name'];
+            $poolId = $messageData['pool_id'];
 
             $logKey = sprintf('%s:%s:%s', $poolId, $messageData['common_name'], $messageData['time_unix']);
-            // XXX what if instanceId key does not exist?
-            if (!array_key_exists($logKey, $logData[$instanceId])) {
+            // XXX what if instanceName key does not exist?
+            if (!array_key_exists($logKey, $logData[$instanceName])) {
                 // XXX we did not find a matching connect entry...
                 // just ignore it
                 continue;
             }
             $dataTransferred = $messageData['bytes_sent'] + $messageData['bytes_received'];
 
-            $logData[$instanceId][$logKey] = array_merge(
-                $logData[$instanceId][$logKey],
+            $logData[$instanceName][$logKey] = array_merge(
+                $logData[$instanceName][$logKey],
                 [
                     'disconnect_time' => $messageData['disconnect_time_unix'],
                     'traffic' => $dataTransferred,
@@ -126,11 +123,8 @@ try {
         new YamlFile(sprintf('%s/config/config.yaml', dirname(__DIR__)))
     );
 
-    foreach ($logData as $instanceId => $logEntries) {
-        $dataDir = $configReader->v('dataDir');
-        if ($configReader->v('multiInstance', false, false)) {
-            $dataDir = sprintf('%s/%s', $dataDir, $instanceId);
-        }
+    foreach ($logData as $instanceName => $logEntries) {
+        $dataDir = sprintf('%s/%s', $configReader->v('dataDir'), $instanceName);
 
         $jsonLog = json_encode(
             [

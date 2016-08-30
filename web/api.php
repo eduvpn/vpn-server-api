@@ -19,6 +19,7 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use fkooman\Config\Reader;
 use fkooman\Config\YamlFile;
+use fkooman\Http\Request;
 use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
 use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
@@ -39,24 +40,29 @@ use GuzzleHttp\Client;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\SyslogHandler;
 use Monolog\Logger;
+use fkooman\VPN\Server\Utils;
 
 try {
+    $request = new Request($_SERVER);
+
     $configReader = new Reader(
         new YamlFile(dirname(__DIR__).'/config/config.yaml')
     );
     $dataDir = $configReader->v('dataDir');
 
-    $apiConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/api.yaml')
-    );
+    $instanceName = $request->getUrl()->getHost();
+    if (false === Utils::nameToInstanceId($configReader->v('instanceList'), $instanceName)) {
+        throw new RuntimeException(sprintf('instance "%s" does not exist', $instanceName));
+    }
 
-    $poolsConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/pools.yaml')
-    );
+    $dataDir = sprintf('%s/%s', $dataDir, $instanceName);
+    $apiConfigFile = sprintf('%s/config/%s/api.yaml', dirname(__DIR__), $instanceName);
+    $poolsConfigFile = sprintf('%s/config/%s/pools.yaml', dirname(__DIR__), $instanceName);
+    $aclConfigFile = sprintf('%s/config/%s/acl.yaml', dirname(__DIR__), $instanceName);
 
-    $aclConfig = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/acl.yaml')
-    );
+    $apiConfig = new Reader(new YamlFile($apiConfigFile));
+    $poolsConfig = new Reader(new YamlFile($poolsConfigFile));
+    $aclConfig = new Reader(new YamlFile($aclConfigFile));
 
     $serverPools = new Pools($poolsConfig->v('pools'));
 
@@ -117,7 +123,7 @@ try {
     $service->addModule(new CommonNamesModule($commonNamesDisable, $logger));
     $service->addModule(new UsersModule($usersDisable, $otpSecret, $vootToken, $acl, $logger));
     $service->addModule(new InfoModule($serverPools));
-    $service->run()->send();
+    $service->run($request)->send();
 } catch (Exception $e) {
     // internal server error
     syslog(LOG_ERR, $e->__toString());
