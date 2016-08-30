@@ -140,7 +140,7 @@ class Firewall
             }
             $forwardChain[] = sprintf('-N vpn-%s-%s', $instanceId, $pool->getId());
 
-            $forwardChain[] = sprintf('-A FORWARD -i tun-%s-%s+ -s %s -j vpn-%s-%s', $instanceId, $pool->getId(), $srcNet, $instanceId, $pool->getId());
+            $forwardChain[] = sprintf('-A FORWARD -i t-%s-%s+ -s %s -j vpn-%s-%s', $instanceId, $pool->getId(), $srcNet, $instanceId, $pool->getId());
 
             // merge outgoing forwarding firewall rules to prevent certain
             // traffic
@@ -148,7 +148,7 @@ class Firewall
 
             if ($pool->getClientToClient()) {
                 // allow client-to-client
-                $forwardChain[] = sprintf('-A vpn-%s-%s -o tun-%s-%s+ -d %s -j ACCEPT', $instanceId, $pool->getId(), $instanceId, $pool->getId(), $srcNet);
+                $forwardChain[] = sprintf('-A vpn-%s-%s -o t-%s-%s+ -d %s -j ACCEPT', $instanceId, $pool->getId(), $instanceId, $pool->getId(), $srcNet);
             }
             if ($pool->getDefaultGateway()) {
                 // allow traffic to all outgoing destinations
