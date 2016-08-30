@@ -95,6 +95,9 @@ class ServerConfig
 
                 // Dev
                 $serverConfig[] = sprintf('dev t-%s-%s-%s', $instanceId, $pool->getId(), $i);
+        
+                // Dev Type
+                $serverConfig[] = 'dev-type tun';
 
                 // Proto
                 $serverConfig = array_merge($serverConfig, self::getProto($pool, $instance));
