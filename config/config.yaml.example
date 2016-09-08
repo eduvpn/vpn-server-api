@@ -1,19 +1,11 @@
-#
-# VPN Server Api Configuration
-#
+instanceNumber: 1
 
-dataDir: /var/lib/vpn-server-api
-
-# the datadir where the VPN server can write
-vpnDataDir: /var/lib/openvpn
-
-# A list of active instances
-instanceList:
-    # All instance MUST have a unique instance ID between 0 and 255 to keep 
-    # track of its running OpenVPN processes
-    - instanceId: 0
-      hostName: vpn.example
-
-#    - instanceId: 55
-#      hostName: my.vpn.example.org
-
+vpnPools:
+    internet:
+        extIf: eth0
+        listen: 0.0.0.0
+        range: 10.0.0.0/24
+        range6: 'fd00:4242:4242::/48'
+        useNat: true
+        defaultGateway: true
+        dns: [8.8.8.8, 8.8.4.4]

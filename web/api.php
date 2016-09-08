@@ -1,132 +1,106 @@
 <?php
-
 /**
- * Copyright 2016 François Kooman <fkooman@tuxed.net>.
+ *  Copyright (C) 2016 SURFnet.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-require_once dirname(__DIR__).'/vendor/autoload.php';
+require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
-use fkooman\Config\Reader;
-use fkooman\Config\YamlFile;
 use fkooman\Http\Request;
 use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
 use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
 use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
 use fkooman\Rest\Service;
-use fkooman\VPN\Server\Api\CommonNamesModule;
-use fkooman\VPN\Server\Api\InfoModule;
-use fkooman\VPN\Server\Api\LogModule;
-use fkooman\VPN\Server\Api\OpenVpnModule;
-use fkooman\VPN\Server\Api\UsersModule;
-use fkooman\VPN\Server\Disable;
-use fkooman\VPN\Server\OpenVpn\ManagementSocket;
-use fkooman\VPN\Server\OpenVpn\ServerManager;
-use fkooman\VPN\Server\OtpSecret;
-use fkooman\VPN\Server\Pools;
-use fkooman\VPN\Server\VootToken;
-use GuzzleHttp\Client;
-use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\SyslogHandler;
-use Monolog\Logger;
-use fkooman\VPN\Server\Utils;
+use SURFnet\VPN\Server\Config;
+use SURFnet\VPN\Server\Logger;
+use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Server\Api\CommonNamesModule;
+use SURFnet\VPN\Server\Api\InfoModule;
+use SURFnet\VPN\Server\Api\LogModule;
+use SURFnet\VPN\Server\Api\OpenVpnModule;
+use SURFnet\VPN\Server\Api\UsersModule;
+use SURFnet\VPN\Server\Api\Users;
+use SURFnet\VPN\Server\Api\CommonNames;
+use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
+use SURFnet\VPN\Server\OpenVpn\ServerManager;
+
+$logger = new Logger('vpn-server-api');
 
 try {
     $request = new Request($_SERVER);
 
-    $configReader = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/config.yaml')
-    );
-    $dataDir = $configReader->v('dataDir');
+    // this actually uses SERVER_NAME (hardcoded in Apache), and not HTTP_HOST
+    // that could be determined by client
+    $instanceId = $request->getUrl()->getHost();
 
-    $instanceName = $request->getUrl()->getHost();
-    if (false === Utils::nameToInstanceId($configReader->v('instanceList'), $instanceName)) {
-        throw new RuntimeException(sprintf('instance "%s" does not exist', $instanceName));
+    $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
+    $configDir = sprintf('%s/config/%s', dirname(__DIR__), $instanceId);
+
+    $instanceConfig = InstanceConfig::fromFile(
+        sprintf('%s/config.yaml', $configDir)
+    );
+
+    $apiConfig = Config::fromFile(
+        sprintf('%s/api.yaml', $configDir)
+    );
+
+    $poolList = [];
+    foreach ($instanceConfig->pools() as $poolId) {
+        $poolList[$poolId] = $instanceConfig->pool($poolId);
     }
 
-    $dataDir = sprintf('%s/%s', $dataDir, $instanceName);
-    $apiConfigFile = sprintf('%s/config/%s/api.yaml', dirname(__DIR__), $instanceName);
-    $poolsConfigFile = sprintf('%s/config/%s/pools.yaml', dirname(__DIR__), $instanceName);
-    $aclConfigFile = sprintf('%s/config/%s/acl.yaml', dirname(__DIR__), $instanceName);
-
-    $apiConfig = new Reader(new YamlFile($apiConfigFile));
-    $poolsConfig = new Reader(new YamlFile($poolsConfigFile));
-    $aclConfig = new Reader(new YamlFile($aclConfigFile));
-
-    $serverPools = new Pools($poolsConfig->v('pools'));
-
-    $client = new Client(
-        [
-            'defaults' => [
-                'headers' => [
-                    'Authorization' => sprintf(
-                        'Bearer %s',
-                        $apiConfig->v(
-                            'remoteApi',
-                            'vpn-ca-api',
-                            'token'
-                        )
-                    ),
-                ],
-            ],
-        ]
-    );
-
-    $logger = new Logger('vpn-server-api');
-    $syslog = new SyslogHandler('vpn-server-api', 'user');
-    $formatter = new LineFormatter();
-    $syslog->setFormatter($formatter);
-    $logger->pushHandler($syslog);
-
-    $managementSocket = new ManagementSocket();
-
-    // handles the connection to the various OpenVPN instances
-    $serverManager = new ServerManager($serverPools, $managementSocket, $logger);
-
-    // http request router
-    $service = new Service();
-
-    // API authentication
-    $apiAuth = new BearerAuthentication(
-        new ArrayBearerValidator(
-            $apiConfig->v('api')
-        ),
-        ['realm' => 'VPN Server API']
-    );
-
-    // ACL
-    $aclMethod = $aclConfig->v('aclMethod');
-    $aclClass = sprintf('fkooman\VPN\Server\Acl\%s', $aclMethod);
-    $acl = new $aclClass($aclConfig);
-
-    $usersDisable = new Disable($dataDir.'/users/disabled');
-    $commonNamesDisable = new Disable($dataDir.'/common_names/disabled');
-    $otpSecret = new OtpSecret($dataDir.'/users/otp_secrets');
-    $vootToken = new VootToken($dataDir.'/users/voot_tokens');
-
     $authenticationPlugin = new AuthenticationPlugin();
-    $authenticationPlugin->register($apiAuth, 'api');
+    $authenticationPlugin->register(
+        new BearerAuthentication(
+            new ArrayBearerValidator(
+                $apiConfig->v('api')
+            ),
+            ['realm' => 'VPN Server API']
+        ),
+        'api'
+    );
+    $service = new Service();
     $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
-    $service->addModule(new LogModule($dataDir));
-    $service->addModule(new OpenVpnModule($serverManager));
-    $service->addModule(new CommonNamesModule($commonNamesDisable, $logger));
-    $service->addModule(new UsersModule($usersDisable, $otpSecret, $vootToken, $acl, $logger));
-    $service->addModule(new InfoModule($serverPools));
+
+    $service->addModule(
+        new LogModule($dataDir)
+    );
+    $service->addModule(
+        new OpenVpnModule(
+            new ServerManager($instanceConfig, new ManagementSocket(), $logger)
+        )
+    );
+    $service->addModule(
+        new CommonNamesModule(
+            new CommonNames(sprintf('%s/common_names', $dataDir)),
+            $logger
+        )
+    );
+    $service->addModule(
+        new UsersModule(
+            new Users(sprintf('%s/users', $dataDir)),
+            $logger
+        )
+    );
+    $service->addModule(
+        new InfoModule($poolList)
+    );
+
     $service->run($request)->send();
 } catch (Exception $e) {
-    // internal server error
-    syslog(LOG_ERR, $e->__toString());
+    $logger->error($e->getMessage());
     $e = new InternalServerErrorException($e->getMessage());
     $e->getJsonResponse()->send();
 }

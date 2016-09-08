@@ -19,18 +19,18 @@
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Server\InstanceConfig;
-use SURFnet\VPN\Server\Config\OpenVpnConfig;
+use SURFnet\VPN\Server\Logger;
+use SURFnet\VPN\Server\OpenVpn\ServerManager;
+use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
 
 function showHelp(array $argv)
 {
     return implode(
         PHP_EOL,
         [
-            sprintf('SYNTAX: %s [--instance domain.tld] [--generate]', $argv[0]),
+            sprintf('SYNTAX: %s [--instance domain.tld]', $argv[0]),
             '',
-            '--instance domain.tld      the VPN instance to write configuration files',
-            '                           for',
-            '--generate                 generate new certificates/keys for this instance',
+            '--instance domain.tld      the VPN instance to get the status for',
             '',
         ]
     );
@@ -38,7 +38,6 @@ function showHelp(array $argv)
 
 try {
     $instanceId = null;
-    $generateCerts = false;
 
     for ($i = 0; $i < $argc; ++$i) {
         if ('--help' == $argv[$i] || '-h' === $argv[$i]) {
@@ -52,10 +51,6 @@ try {
                 ++$i;
             }
         }
-
-        if ('--generate' === $argv[$i] || '-g' === $argv[$i]) {
-            $generateCerts = true;
-        }
     }
 
     if (is_null($instanceId)) {
@@ -64,8 +59,13 @@ try {
 
     $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
     $instanceConfig = InstanceConfig::fromFile($configFile);
-    $o = new OpenVpnConfig(sprintf('%s/config/openvpn', dirname(__DIR__)));
-    $o->write($instanceId, $instanceConfig);
+
+    $serverManager = new ServerManager(
+        $instanceConfig,
+        new ManagementSocket(),
+        new Logger($argv[0])
+    );
+    var_dump($serverManager->connections());
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);

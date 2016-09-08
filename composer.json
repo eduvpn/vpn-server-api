@@ -8,30 +8,24 @@
     ],
     "autoload": {
         "psr-0": {
-            "fkooman\\VPN\\Server\\": "src/"
+            "SURFnet\\VPN\\Server\\": "src/"
         }
     },
     "description": "REST service to control OpenVPN instances",
-    "license": "Apache-2.0",
+    "license": "AGPL-3.0",
     "name": "eduvpn/vpn-server-api",
     "require": {
-        "christian-riesen/base32": "^1.0",
         "christian-riesen/otp": "^2.0",
         "ext-date": "*",
         "ext-filter": "*",
+        "ext-json": "*",
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-spl": "*",
-        "fkooman/config": "^1.0.0",
-        "fkooman/http": "^2.0",
-        "fkooman/io": "^2.0",
-        "fkooman/json": "^2.0.0",
+        "ext-yaml": "*",
         "fkooman/rest": "^2.0",
-        "fkooman/rest-plugin-authentication": "^3.0",
         "fkooman/rest-plugin-authentication-bearer": "^3.0",
-        "guzzlehttp/guzzle": "^5.3",
-        "monolog/monolog": "^1.17",
-        "php": ">=5.4",
-        "psr/log": "^1.0.0"
+        "php": ">=5.4.0",
+        "psr/log": "^1.0"
     }
 }
