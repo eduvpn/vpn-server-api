@@ -10,7 +10,7 @@ php:
 
 before_install:
   - pecl channel-update pecl.php.net
-  - pecl install yaml < /dev/null &
+  - pecl install yaml < /dev/null
 
 before_script:
   - composer install
