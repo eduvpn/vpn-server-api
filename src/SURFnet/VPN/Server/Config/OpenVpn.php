@@ -22,7 +22,7 @@ use SURFnet\VPN\Server\PoolConfig;
 use SURFnet\VPN\Server\IP;
 use RuntimeException;
 
-class OpenVpnConfig
+class OpenVpn
 {
     /** @var string */
     private $vpnConfigDir;
