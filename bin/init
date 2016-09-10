@@ -54,7 +54,7 @@ try {
         throw new RuntimeException('instance must be specified, see --help');
     }
 
-    $vpnDataDir = sprintf('%s/data/vpn/%s', dirname(__DIR__), $instanceId);
+    $vpnDataDir = sprintf('%s/openvpn-data/%s', dirname(__DIR__), $instanceId);
 
     // create VPN directory if it does not yet exist
     if (!file_exists($vpnDataDir)) {

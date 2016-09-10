@@ -48,7 +48,7 @@ try {
     }
 
     $otpLog = new OtpLog(
-        new PDO(sprintf('sqlite://%s/data/vpn/%s/otp.sqlite', dirname(__DIR__), $envData['INSTANCE_ID']))
+        new PDO(sprintf('sqlite://%s/openvpn-data/%s/otp.sqlite', dirname(__DIR__), $envData['INSTANCE_ID']))
     );
     $connection = new TwoFactor(dirname(__DIR__), $otpLog);
     $connection->twoFactor($envData);
