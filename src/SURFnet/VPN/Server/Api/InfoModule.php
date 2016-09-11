@@ -21,16 +21,16 @@ use fkooman\Http\Request;
 use fkooman\Rest\Service;
 use fkooman\Rest\ServiceModuleInterface;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
-use SURFnet\VPN\Server\Pools;
+use SURFnet\VPN\Server\InstanceConfig;
 
 class InfoModule implements ServiceModuleInterface
 {
-    /** @var array */
-    private $poolList;
+    /** @var \SURFnet\VPN\Server\InstanceConfig */
+    private $instanceConfig;
 
-    public function __construct(array $poolList)
+    public function __construct(InstanceConfig $instanceConfig)
     {
-        $this->poolList = $poolList;
+        $this->instanceConfig = $instanceConfig;
     }
 
     public function init(Service $service)
@@ -47,11 +47,11 @@ class InfoModule implements ServiceModuleInterface
 
     private function getInfo()
     {
-        $data = [];
-        foreach ($this->poolList as $poolId => $pool) {
-            $data[$poolId] = $pool->toArray();
+        $responseData = [];
+        foreach ($this->instanceConfig->pools() as $poolId) {
+            $responseData[$poolId] = $this->instanceConfig->pool($poolId)->toArray();
         }
 
-        return new ApiResponse('pools', $data);
+        return new ApiResponse('pools', $responseData);
     }
 }

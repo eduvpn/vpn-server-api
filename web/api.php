@@ -56,11 +56,6 @@ try {
         sprintf('%s/api.yaml', $configDir)
     );
 
-    $poolList = [];
-    foreach ($instanceConfig->pools() as $poolId) {
-        $poolList[$poolId] = $instanceConfig->pool($poolId);
-    }
-
     $authenticationPlugin = new AuthenticationPlugin();
     $authenticationPlugin->register(
         new BearerAuthentication(
@@ -95,7 +90,7 @@ try {
         )
     );
     $service->addModule(
-        new InfoModule($poolList)
+        new InfoModule($instanceConfig)
     );
 
     $service->run($request)->send();
