@@ -1,0 +1,175 @@
+#!/usr/bin/php
+<?php
+/**
+ * Copyright 2016 François Kooman <fkooman@tuxed.net>.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+require_once dirname(__DIR__).'/vendor/autoload.php';
+
+use fkooman\Config\Reader;
+use fkooman\Config\YamlFile;
+
+/*
+ * Parse the systemd journal.
+ *
+ * Usage:
+ *
+ * $ sudo journalctl \
+ *     -o json \
+ *     -t vpn-server-api-client-connect \
+ *     -t vpn-server-api-client-disconnect \
+ *     | vpn-server-api-parse-journal
+ */
+
+/*
+ * Due to not wanting to store all user data forever, we have a log window
+ * after which log entries disappear from the system, this can result in some
+ * issues. The log window is typically 1 month.
+ *
+ * LIMITATIONS:
+ *
+ * - if a client connected before this logging window started, it is not
+ *   visible in the logs;
+ * - if a client stays connected for the whole logging window, it is not
+ *   available in the log at all;
+ * - if a client was connected before the logging window started and
+ *   disconnected during, it is not added to the log;
+ */
+$clientConnectSyslogIdentifier = 'vpn-server-api-client-connect';
+$clientDisconnectSyslogIdentifier = 'vpn-server-api-client-disconnect';
+
+try {
+    $logData = [];
+
+    // every line is a JSON object
+    while ($jsonLine = fgets(STDIN)) {
+        $jsonData = json_decode($jsonLine, true);
+
+        if ($clientConnectSyslogIdentifier === $jsonData['SYSLOG_IDENTIFIER']) {
+
+            // handle connect data
+            $message = $jsonData['MESSAGE'];
+            $messageData = json_decode($message, true);
+            if (JSON_ERROR_NONE !== json_last_error()) {
+                // XXX if an error occurred decoding the message, it was
+                // probably a log error message, ignore them for now, but later we
+                // will need them as well!
+                continue;
+            }
+
+            $commonName = $messageData['common_name'];
+            $userId = explode('_', $commonName, 2)[0];
+            $configName = explode('_', $commonName, 2)[1];
+
+            // we have a history of changing log format, only 'instance_name'
+            // is currently used, we can get rid of instance_id and the
+            // default option soon
+            if (array_key_exists('instance_name', $messageData)) {
+                $instanceName = $messageData['instance_name'];
+            } elseif (array_key_exists('instance_id', $messageData)) {
+                $instanceName = $messageData['instance_id'];
+            } else {
+                $instanceName = 'default';
+            }
+            if (array_key_exists('pool_id', $messageData)) {
+                $poolId = $messageData['pool_id'];
+            } else {
+                $poolId = 'default';
+            }
+
+            $logKey = sprintf('%s:%s:%s', $poolId, $messageData['common_name'], $messageData['time_unix']);
+            $logData[$instanceName][$logKey] = [
+                'instance_name' => $instanceName,
+                'pool_id' => $poolId,
+                'user_id' => $userId,
+                'config_name' => $configName,
+                'v4' => $messageData['v4'],
+                'v6' => $messageData['v6'],
+                'connect_time' => intval($messageData['time_unix']),
+            ];
+        }
+
+        if ($clientDisconnectSyslogIdentifier === $jsonData['SYSLOG_IDENTIFIER']) {
+            // handle connect data
+            $message = $jsonData['MESSAGE'];
+            $messageData = json_decode($message, true);
+            if (JSON_ERROR_NONE !== json_last_error()) {
+                // XXX if an error occurred decoding the message, it was
+                // probably a log error message, ignore them for now, but later we
+                // will need them as well!
+                continue;
+            }
+
+            // we have a history of changing log format, only 'instance_name'
+            // is currently used, we can get rid of instance_id and the
+            // default option soon
+            if (array_key_exists('instance_name', $messageData)) {
+                $instanceName = $messageData['instance_name'];
+            } elseif (array_key_exists('instance_id', $messageData)) {
+                $instanceName = $messageData['instance_id'];
+            } else {
+                $instanceName = 'default';
+            }
+            if (array_key_exists('pool_id', $messageData)) {
+                $poolId = $messageData['pool_id'];
+            } else {
+                $poolId = 'default';
+            }
+
+            $logKey = sprintf('%s:%s:%s', $poolId, $messageData['common_name'], $messageData['time_unix']);
+            // XXX what if instanceName key does not exist?
+            if (!array_key_exists($logKey, $logData[$instanceName])) {
+                // XXX we did not find a matching connect entry...
+                // just ignore it
+                continue;
+            }
+            $dataTransferred = $messageData['bytes_sent'] + $messageData['bytes_received'];
+
+            $logData[$instanceName][$logKey] = array_merge(
+                $logData[$instanceName][$logKey],
+                [
+                    'disconnect_time' => $messageData['disconnect_time_unix'],
+                    'traffic' => $dataTransferred,
+                ]
+            );
+        }
+    }
+
+    $configReader = new Reader(
+        new YamlFile(sprintf('%s/config/config.yaml', dirname(__DIR__)))
+    );
+
+    foreach ($logData as $instanceName => $logEntries) {
+        $dataDir = sprintf('%s/%s', $configReader->v('dataDir'), $instanceName);
+
+        $jsonLog = json_encode(
+            [
+                'entries' => array_values($logEntries),
+            ]
+        );
+
+        if (!file_exists($dataDir)) {
+            if (false === @mkdir($dataDir, 0700, true)) {
+                throw new RuntimeException(sprintf('unable to create directory "%s"', $dataDir));
+            }
+        }
+        $logFile = sprintf('%s/log.json', $dataDir);
+        if (false === @file_put_contents($logFile, $jsonLog)) {
+            throw new RuntimeException(sprintf('unable to write log to "%s"', $logFile));
+        }
+    }
+} catch (Exception $e) {
+    echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
+    exit(1);
+}
