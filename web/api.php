@@ -35,6 +35,7 @@ use SURFnet\VPN\Server\Api\Users;
 use SURFnet\VPN\Server\Api\CommonNames;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
+use SURFnet\VPN\Server\Api\GroupsModule;
 
 $logger = new Logger('vpn-server-api');
 
@@ -86,6 +87,12 @@ try {
     $service->addModule(
         new UsersModule(
             new Users(sprintf('%s/users', $dataDir)),
+            $logger
+        )
+    );
+    $service->addModule(
+        new GroupsModule(
+            $instanceConfig,
             $logger
         )
     );

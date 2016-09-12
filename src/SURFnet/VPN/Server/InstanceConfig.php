@@ -46,7 +46,14 @@ class InstanceConfig extends Config
      */
     public function pools()
     {
+        // XXX must exist first
         return array_keys($this->v('vpnPools'));
+    }
+
+    public function groupProviders()
+    {
+        // XXX must exist first
+        return array_keys($this->v('groupProviders'));
     }
 
     public function groupProvider($groupProviderId)
@@ -65,6 +72,7 @@ class InstanceConfig extends Config
 
     public function instanceNumber()
     {
+        // XXX must exist
         return $this->v('instanceNumber');
     }
 }

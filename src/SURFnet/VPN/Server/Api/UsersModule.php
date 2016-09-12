@@ -119,17 +119,6 @@ class UsersModule implements ServiceModuleInterface
             }
         );
 
-        // GROUPS
-//        $service->get(
-//            '/users/groups/:userId',
-//            function ($userId, Request $request, TokenInfo $tokenInfo) {
-//                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
-//                InputValidation::userId($userId);
-
-//                return new ApiResponse('groups', $this->acl->getGroups($userId));
-//            }
-//        );
-
         // VOOT_TOKENS
         $service->get(
             '/users/voot_tokens/:userId',
