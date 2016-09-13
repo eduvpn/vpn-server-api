@@ -11,7 +11,7 @@
             "SURFnet\\VPN\\Server\\": "src/"
         }
     },
-    "description": "REST service to control OpenVPN instances",
+    "description": "Web service to control OpenVPN processes",
     "license": "AGPL-3.0",
     "name": "eduvpn/vpn-server-api",
     "require": {
