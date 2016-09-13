@@ -1,5 +1,9 @@
 instanceNumber: 1
 
+apiConsumers:
+    vpn-user-portal: uvwxyz
+    vpn-admin-portal: uuvvww
+
 vpnPools:
     internet:
         extIf: eth0

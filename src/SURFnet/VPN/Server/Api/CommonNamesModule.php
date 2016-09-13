@@ -38,7 +38,7 @@ class CommonNamesModule implements ServiceModuleInterface
         $service->get(
             '/common_names/disabled',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin', 'portal']);
+                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
 
                 return new ApiResponse('common_names', $this->commonNames->getDisabled());
             }
@@ -47,7 +47,7 @@ class CommonNamesModule implements ServiceModuleInterface
         $service->post(
             '/common_names/disable',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin', 'portal']);
+                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
                 $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);
                 $this->logger->info(sprintf('disabling common_name "%s"', $commonName));
@@ -59,7 +59,7 @@ class CommonNamesModule implements ServiceModuleInterface
         $service->post(
             '/common_names/enable',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin']);
+                Utils::requireUser($hookData, ['vpn-admin-portal']);
                 $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);
                 $this->logger->info(sprintf('enabling common_name "%s"', $commonName));

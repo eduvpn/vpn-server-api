@@ -34,7 +34,7 @@ class InfoModule implements ServiceModuleInterface
         $service->get(
             '/info/server',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin', 'portal']);
+                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
 
                 return $this->getInfo();
             }

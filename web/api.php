@@ -18,6 +18,7 @@
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Server\Api\Request;
+use SURFnet\VPN\Server\Api\Response;
 use SURFnet\VPN\Server\Api\Exception\HttpException;
 use SURFnet\VPN\Server\Api\CommonNames;
 use SURFnet\VPN\Server\Api\CommonNamesModule;
@@ -48,26 +49,23 @@ try {
         sprintf('%s/config.yaml', $configDir)
     );
 
-    $apiConfig = Config::fromFile(
-        sprintf('%s/api.yaml', $configDir)
-    );
-
     $service = new Service();
 
     $service->addHook(
         'before',
         'auth',
-        function (Request $request) use ($apiConfig) {
+        function (Request $request) use ($instanceConfig) {
             // check if we have valid authentication
-            $apiUsers = $apiConfig->v('api');
+            $apiConsumers = $instanceConfig->apiConsumers();
             $authUser = $request->getHeader('PHP_AUTH_USER', false);
             $authPass = $request->getHeader('PHP_AUTH_PW', false);
             if (is_null($authUser) || is_null($authPass)) {
                 throw new HttpException('missing authentication information', 401);
             }
 
-            if (array_key_exists($authUser, $apiUsers)) {
-                if (0 === Sodium\compare($apiUsers[$authUser], $authPass)) {
+            if (array_key_exists($authUser, $apiConsumers)) {
+                // time safe string compare
+                if (0 === Sodium\compare($apiConsumers[$authUser], $authPass)) {
                     return $authUser;
                 }
             }

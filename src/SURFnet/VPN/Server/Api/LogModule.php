@@ -41,7 +41,7 @@ class LogModule implements ServiceModuleInterface
         $service->get(
             '/log',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin']);
+                Utils::requireUser($hookData, ['vpn-admin-portal']);
 
                 $dateTime = $request->getQueryParameter('date_time');
                 InputValidation::dateTime($dateTime);
@@ -57,7 +57,7 @@ class LogModule implements ServiceModuleInterface
         $service->get(
             '/stats',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin']);
+                Utils::requireUser($hookData, ['vpn-admin-portal']);
 
                 return new ApiResponse('stats', Json::decodeFile(sprintf('%s/stats.json', $this->logPath)));
             }

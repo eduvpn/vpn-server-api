@@ -58,6 +58,11 @@ class InstanceConfig extends Config
         return $this->configData['groupProviders'][$groupProviderId];
     }
 
+    public function apiConsumers()
+    {
+        return $this->v('apiConsumers');
+    }
+
     public function instanceNumber()
     {
         return $this->v('instanceNumber');

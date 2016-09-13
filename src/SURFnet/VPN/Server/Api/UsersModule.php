@@ -44,7 +44,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/users/disabled',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin']);
+                Utils::requireUser($hookData, ['vpn-admin-portal']);
 
                 return new ApiResponse('users', $this->users->getDisabled());
             }
@@ -53,7 +53,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/users/is_disabled',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin']);
+                Utils::requireUser($hookData, ['vpn-admin-portal']);
                 $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
@@ -64,7 +64,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/users/disable',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin']);
+                Utils::requireUser($hookData, ['vpn-admin-portal']);
                 $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
                 $this->logger->info(sprintf('disabling user "%s"', $userId));
@@ -76,7 +76,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/users/enable',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin']);
+                Utils::requireUser($hookData, ['vpn-admin-portal']);
                 $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
                 $this->logger->info(sprintf('enabling user "%s"', $userId));
@@ -89,7 +89,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/users/has_otp_secret',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin', 'portal']);
+                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
                 $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
@@ -100,7 +100,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/users/set_otp_secret',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['portal']);
+                Utils::requireUser($hookData, ['vpn-user-portal']);
                 $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
                 $otpSecret = $request->getPostParameter('otp_secret');
@@ -113,7 +113,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/users/delete_otp_secret',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin']);
+                Utils::requireUser($hookData, ['vpn-admin-portal']);
                 $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
 
@@ -125,7 +125,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/users/has_voot_token',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['portal']);
+                Utils::requireUser($hookData, ['vpn-user-portal']);
                 $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
@@ -136,7 +136,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/users/set_vook_token',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['admin']);
+                Utils::requireUser($hookData, ['vpn-admin-portal']);
                 $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
                 $vootToken = $request->getPostParameter('voot_token');
