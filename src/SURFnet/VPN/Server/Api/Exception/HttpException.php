@@ -15,30 +15,15 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace SURFnet\VPN\Server\Api;
+namespace SURFnet\VPN\Server\Api\Exception;
 
-use InvalidArgumentException;
-use DomainException;
+use Exception;
 
-class ApiResponse extends Response
+class HttpException extends Exception
 {
-    public function __construct($wrapperKey, $responseData)
+    public function __construct($message, $code, Exception $previous = null)
     {
-        if (!is_string($wrapperKey)) {
-            throw new InvalidArgumentException('parameter must be string');
-        }
-        if (0 >= strlen($wrapperKey)) {
-            throw new DomainException('string must not be empty');
-        }
-        parent::__construct(200, 'application/json');
-        $this->setBody(
-            json_encode(
-                [
-                    'data' => [
-                        $wrapperKey => $responseData,
-                    ],
-                ]
-            )
-        );
+        // XXX make sure code is a valid http response code
+        parent::__construct($message, $code, $previous);
     }
 }

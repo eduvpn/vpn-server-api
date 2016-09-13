@@ -43,7 +43,7 @@ class UsersModule implements ServiceModuleInterface
         // DISABLED
         $service->get(
             '/users/disabled',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['admin']);
 
                 return new ApiResponse('users', $this->users->getDisabled());
@@ -52,9 +52,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->get(
             '/users/is_disabled',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['admin']);
-                $userId = Utils::requireParameter($getData, 'user_id');
+                $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
                 return new ApiResponse('disabled', $this->users->isDisabled($userId));
@@ -63,9 +63,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/users/disable',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['admin']);
-                $userId = Utils::requireParameter($postData, 'user_id');
+                $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
                 $this->logger->info(sprintf('disabling user "%s"', $userId));
 
@@ -75,9 +75,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/users/enable',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['admin']);
-                $userId = Utils::requireParameter($postData, 'user_id');
+                $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
                 $this->logger->info(sprintf('enabling user "%s"', $userId));
 
@@ -88,9 +88,9 @@ class UsersModule implements ServiceModuleInterface
         // OTP_SECRETS
         $service->get(
             '/users/has_otp_secret',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['admin', 'portal']);
-                $userId = Utils::requireParameter($getData, 'user_id');
+                $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
                 return new ApiResponse('otp_secret', $this->users->hasOtpSecret($userId));
@@ -99,11 +99,11 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/users/set_otp_secret',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['portal']);
-                $userId = Utils::requireParameter($postData, 'user_id');
+                $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
-                $otpSecret = Utils::requireParameter($postData, 'otp_secret');
+                $otpSecret = $request->getPostParameter('otp_secret');
                 InputValidation::otpSecret($otpSecret);
 
                 return new ApiResponse('ok', $this->users->setOtpSecret($userId, $otpSecret));
@@ -112,9 +112,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/users/delete_otp_secret',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['admin']);
-                $userId = Utils::requireParameter($postData, 'user_id');
+                $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
 
                 return new ApiResponse('ok', $this->users->deleteOtpSecret($userId));
@@ -124,9 +124,9 @@ class UsersModule implements ServiceModuleInterface
         // VOOT_TOKENS
         $service->get(
             '/users/has_voot_token',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['portal']);
-                $userId = Utils::requireParameter($getData, 'user_id');
+                $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
                 return new ApiResponse('voot_token', $this->users->hasVootToken($userId));
@@ -135,11 +135,11 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/users/set_vook_token',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['admin']);
-                $userId = Utils::requireParameter($postData, 'user_id');
+                $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
-                $vootToken = Utils::requireParameter($postData, 'voot_token');
+                $vootToken = $request->getPostParameter('voot_token');
                 InputValidation::vootToken($vootToken);
 
                 return new ApiResponse('ok', $this->users->setVootToken($userId, $vootToken));

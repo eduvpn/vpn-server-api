@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "393384aed2b7037d587c9f8f129fe922",
-    "content-hash": "0f2360b8bc0f2b194e11c3a9dc2635b2",
+    "hash": "0e236f6b813dfc0a288f3f61fbf016b3",
+    "content-hash": "29a425efd686337324bf20675f594e3e",
     "packages": [
         {
             "name": "christian-riesen/base32",
@@ -119,50 +119,6 @@
                 "totp"
             ],
             "time": "2016-06-10 14:47:22"
-        },
-        {
-            "name": "fkooman/http",
-            "version": "2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/fkooman/php-lib-http.git",
-                "reference": "94956a480459b7f6b880d61f21ef03e683deb995"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-lib-http/zipball/94956a480459b7f6b880d61f21ef03e683deb995",
-                "reference": "94956a480459b7f6b880d61f21ef03e683deb995",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "ext-session": "*",
-                "ext-spl": "*",
-                "php": ">=5.4"
-            },
-            "suggest": {
-                "fkooman/rest": "Simple PHP library for writing REST services."
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "fkooman\\Http\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "François Kooman",
-                    "email": "fkooman@tuxed.net",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Simple PHP library for dealing with HTTP requests and responses.",
-            "time": "2016-08-19 07:36:02"
         },
         {
             "name": "psr/log",

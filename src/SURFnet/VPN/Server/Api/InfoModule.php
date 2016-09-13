@@ -33,7 +33,7 @@ class InfoModule implements ServiceModuleInterface
     {
         $service->get(
             '/info/server',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['admin', 'portal']);
 
                 return $this->getInfo();

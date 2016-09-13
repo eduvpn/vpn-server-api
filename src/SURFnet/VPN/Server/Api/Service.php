@@ -17,9 +17,7 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
-use fkooman\Http\Exception\MethodNotAllowedException;
-use fkooman\Http\Exception\NotFoundException;
-use RuntimeException;
+use SURFnet\VPN\Server\Api\Exception\HttpException;
 
 class Service
 {
@@ -60,33 +58,39 @@ class Service
         $module->init($this);
     }
 
-    public function run(array $serverData, array $getData, array $postData)
+    public function run(Request $request)
     {
-        if (!array_key_exists('REQUEST_METHOD', $serverData)) {
-            throw new RuntimeException('invalid HTTP request, missing REQUEST_METHOD');
-        }
-
-        // before hooks
-        $hookData = [];
-        if (array_key_exists('before', $this->hooks)) {
-            foreach ($this->hooks['before'] as $hook) {
-                $hookData[$hook['name']] = $hook['cb']($serverData, $postData, $getData);
+        try {
+            // before hooks
+            $hookData = [];
+            if (array_key_exists('before', $this->hooks)) {
+                foreach ($this->hooks['before'] as $hook) {
+                    $hookData[$hook['name']] = $hook['cb']($request);
+                }
             }
-        }
 
-        $requestMethod = $serverData['REQUEST_METHOD'];
-        $pathInfo = '/';
-        if (array_key_exists('PATH_INFO', $serverData)) {
-            $pathInfo = $serverData['PATH_INFO'];
-        }
+            $requestMethod = $request->getRequestMethod();
+            $pathInfo = $request->getPathInfo();
 
-        if (!array_key_exists($requestMethod, $this->routes)) {
-            throw new MethodNotAllowedException(sprintf('method "%s" not allowed', $requestMethod));
-        }
-        if (!array_key_exists($pathInfo, $this->routes[$requestMethod])) {
-            throw new NotFoundException(sprintf('"%s" not found', $pathInfo));
-        }
+            if (!array_key_exists($requestMethod, $this->routes)) {
+                throw new HttpException(
+                    sprintf('method "%s" not allowed', $requestMethod),
+                    405
+                );
+            }
+            if (!array_key_exists($pathInfo, $this->routes[$requestMethod])) {
+                throw new HttpException(
+                    sprintf('"%s" not found', $pathInfo),
+                    404
+                );
+            }
 
-        return $this->routes[$requestMethod][$pathInfo]($serverData, $getData, $postData, $hookData);
+            return $this->routes[$requestMethod][$pathInfo]($request, $hookData);
+        } catch (HttpException $e) {
+            $response = new Response($e->getCode());
+            $response->setBody($e->getMessage());
+
+            return $response;
+        }
     }
 }

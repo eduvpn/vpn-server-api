@@ -18,7 +18,6 @@
 namespace SURFnet\VPN\Server\Api;
 
 use fkooman\Http\Exception\ForbiddenException;
-use fkooman\Http\Exception\BadRequestException;
 
 class Utils
 {
@@ -27,14 +26,5 @@ class Utils
         if (!in_array($hookData['auth'], $userList)) {
             throw new ForbiddenException(sprintf('user "%s" is not allowed to perform this operation', $hookData['auth']));
         }
-    }
-
-    public static function requireParameter(array $queryData, $parameterName)
-    {
-        if (!array_key_exists($parameterName, $queryData)) {
-            throw new BadRequestException(sprintf('missing query parameter "%s"', $parameterName));
-        }
-
-        return $queryData[$parameterName];
     }
 }

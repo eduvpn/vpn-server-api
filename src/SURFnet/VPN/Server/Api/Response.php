@@ -17,28 +17,43 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
-use InvalidArgumentException;
-use DomainException;
-
-class ApiResponse extends Response
+class Response
 {
-    public function __construct($wrapperKey, $responseData)
+    /** @var int */
+    private $statusCode;
+
+    /** @var array */
+    private $headers;
+
+    /** @var string */
+    private $body;
+
+    public function __construct($statusCode = 200, $contentType = 'text/plain')
     {
-        if (!is_string($wrapperKey)) {
-            throw new InvalidArgumentException('parameter must be string');
+        $this->statusCode = $statusCode;
+        $this->headers = [
+            'Content-Type' => $contentType,
+        ];
+        $this->body = '';
+    }
+
+    public function addHeader($key, $value)
+    {
+        $this->headers[$key] = $value;
+    }
+
+    public function setBody($body)
+    {
+        $this->body = $body;
+    }
+
+    public function send()
+    {
+        http_response_code($this->statusCode);
+        foreach ($this->headers as $key => $value) {
+            header(sprintf('%s: %s', $key, $value));
         }
-        if (0 >= strlen($wrapperKey)) {
-            throw new DomainException('string must not be empty');
-        }
-        parent::__construct(200, 'application/json');
-        $this->setBody(
-            json_encode(
-                [
-                    'data' => [
-                        $wrapperKey => $responseData,
-                    ],
-                ]
-            )
-        );
+
+        echo $this->body;
     }
 }

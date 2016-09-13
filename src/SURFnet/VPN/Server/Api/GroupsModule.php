@@ -43,9 +43,9 @@ class GroupsModule implements ServiceModuleInterface
     {
         $service->get(
             '/groups',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['portal']);
-                $userId = Utils::requireParameter($getData, 'user_id');
+                $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
                 $groupMembership = [];

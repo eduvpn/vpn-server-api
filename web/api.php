@@ -17,8 +17,8 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
-use fkooman\Http\Exception\InternalServerErrorException;
-use fkooman\Http\Exception\UnauthorizedException;
+use SURFnet\VPN\Server\Api\Request;
+use SURFnet\VPN\Server\Api\Exception\HttpException;
 use SURFnet\VPN\Server\Api\CommonNames;
 use SURFnet\VPN\Server\Api\CommonNamesModule;
 use SURFnet\VPN\Server\Api\GroupsModule;
@@ -38,7 +38,8 @@ $logger = new Logger('vpn-server-api');
 
 try {
     // this is provided by Apache, using CanonicalName
-    $instanceId = $_SERVER['SERVER_NAME'];
+    $request = new Request($_SERVER, $_GET, $_POST);
+    $instanceId = $request->getServerName();
 
     $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
     $configDir = sprintf('%s/config/%s', dirname(__DIR__), $instanceId);
@@ -56,16 +57,17 @@ try {
     $service->addHook(
         'before',
         'auth',
-        function (array $serverData) use ($apiConfig) {
+        function (Request $request) use ($apiConfig) {
             // check if we have valid authentication
             $apiUsers = $apiConfig->v('api');
             error_log(var_export($apiUsers, true));
 
-            // XXX check if variables are actually set, put this in 
-            // separate class in fkooman/http 3.0, also for other auth 
+            // XXX check if variables are actually set, put this in
+            // separate class in fkooman/http 3.0, also for other auth
             // mechanisms
-            $authUser = $serverData['PHP_AUTH_USER'];
-            $authPass = $serverData['PHP_AUTH_PW'];
+            $authUser = $request->getHeader('PHP_AUTH_USER');
+            $authPass = $request->getHeader('PHP_AUTH_PW');
+
             if (array_key_exists($authUser, $apiUsers)) {
                 // use polyfill for hash_equals PHP < 5.6?
                 if (hash_equals($apiUsers[$authUser], $authPass)) {
@@ -74,7 +76,7 @@ try {
             }
 
             // XXX fix exception
-            throw new UnauthorizedException('xyz');
+            throw new HttpException('missing or invalid authentication information', 401);
         }
     );
 
@@ -108,9 +110,10 @@ try {
         new InfoModule($instanceConfig)
     );
 
-    $service->run($_SERVER, $_GET, $_POST)->send();
+    $service->run($request)->send();
 } catch (Exception $e) {
     $logger->error($e->getMessage());
-    $e = new InternalServerErrorException($e->getMessage());
-    $e->getJsonResponse()->send();
+    $response = new Response(500);
+    $response->setBody($e->getMessage());
+    $response->send();
 }

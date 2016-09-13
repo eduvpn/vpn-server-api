@@ -40,14 +40,14 @@ class LogModule implements ServiceModuleInterface
     {
         $service->get(
             '/log',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['admin']);
 
-                $dateTime = Utils::requireParameter($getData, 'date_time');
+                $dateTime = $request->getQueryParameter('date_time');
                 InputValidation::dateTime($dateTime);
                 $dateTimeUnix = strtotime($dateTime);
 
-                $ipAddress = Utils::requireParameter($getData, 'ip_address');
+                $ipAddress = $request->getQueryParameter('ip_address');
                 InputValidation::ipAddress($ipAddress);
 
                 return new ApiResponse('log', $this->get($dateTimeUnix, $ipAddress));
@@ -56,7 +56,7 @@ class LogModule implements ServiceModuleInterface
 
         $service->get(
             '/stats',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['admin']);
 
                 return new ApiResponse('stats', Json::decodeFile(sprintf('%s/stats.json', $this->logPath)));

@@ -33,7 +33,7 @@ class OpenVpnModule implements ServiceModuleInterface
     {
         $service->get(
             '/openvpn/connections',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['admin']);
 
                 return new ApiResponse('connections', $this->serverManager->connections());
@@ -42,10 +42,10 @@ class OpenVpnModule implements ServiceModuleInterface
 
         $service->post(
             '/openvpn/kill',
-            function (array $serverData, array $getData, array $postData, array $hookData) {
+            function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['admin', 'portal']);
 
-                $commonName = Utils::requireParameter($postData, 'common_name');
+                $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);
 
                 return new ApiResponse('ok', $this->serverManager->kill($commonName));
