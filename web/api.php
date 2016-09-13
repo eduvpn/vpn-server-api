@@ -60,22 +60,19 @@ try {
         function (Request $request) use ($apiConfig) {
             // check if we have valid authentication
             $apiUsers = $apiConfig->v('api');
-
-            // XXX check if variables are actually set, put this in
-            // separate class in fkooman/http 3.0, also for other auth
-            // mechanisms
-            $authUser = $request->getHeader('PHP_AUTH_USER');
-            $authPass = $request->getHeader('PHP_AUTH_PW');
+            $authUser = $request->getHeader('PHP_AUTH_USER', false);
+            $authPass = $request->getHeader('PHP_AUTH_PW', false);
+            if (is_null($authUser) || is_null($authPass)) {
+                throw new HttpException('missing authentication information', 401);
+            }
 
             if (array_key_exists($authUser, $apiUsers)) {
-                // use polyfill for hash_equals PHP < 5.6?
-                if (hash_equals($apiUsers[$authUser], $authPass)) {
+                if (0 === Sodium\compare($apiUsers[$authUser], $authPass)) {
                     return $authUser;
                 }
             }
 
-            // XXX fix exception
-            throw new HttpException('missing or invalid authentication information', 401);
+            throw new HttpException('invalid authentication information', 401);
         }
     );
 

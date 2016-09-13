@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0e236f6b813dfc0a288f3f61fbf016b3",
-    "content-hash": "29a425efd686337324bf20675f594e3e",
+    "hash": "84a8cee6b250b1e86b680f3245cff132",
+    "content-hash": "68ecf71ca5e33995a508405e818058a2",
     "packages": [
         {
             "name": "christian-riesen/base32",
@@ -169,6 +169,7 @@
         "ext-date": "*",
         "ext-filter": "*",
         "ext-json": "*",
+        "ext-libsodium": "*",
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-spl": "*",

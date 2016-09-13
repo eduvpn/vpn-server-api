@@ -68,48 +68,30 @@ class Request
         );
     }
 
-    public function getQueryParameter($key, $defaultValue = null)
+    public function getQueryParameter($key, $isRequired = true, $defaultValue = null)
     {
-        if (array_key_exists($key, $this->getData)) {
-            return $this->getData[$key];
-        }
-
-        if (is_null($defaultValue)) {
-            throw new HttpException(
-                sprintf('missing query parameter "%s"', $key),
-                400
-            );
-        }
-
-        return $defaultValue;
+        return self::getValueFromArray('query parameter', $this->getData, $key, $isRequired, $defaultValue);
     }
 
-    public function getHeader($key, $defaultValue = null)
+    public function getPostParameter($key, $isRequired = true, $defaultValue = null)
     {
-        // do some header key normalization
-        if (array_key_exists($key, $this->serverData)) {
-            return $this->serverData[$key];
-        }
-
-        if (is_null($defaultValue)) {
-            throw new HttpException(
-                sprintf('missing header "%s"', $key),
-                400
-            );
-        }
-
-        return $defaultValue;
+        return self::getValueFromArray('post parameter', $this->postData, $key, $isRequired, $defaultValue);
     }
 
-    public function getPostParameter($key, $defaultValue = null)
+    public function getHeader($key, $isRequired = true, $defaultValue = null)
     {
-        if (array_key_exists($key, $this->postData)) {
-            return $this->postData[$key];
+        return self::getValueFromArray('header', $this->serverData, $key, $isRequired, $defaultValue);
+    }
+
+    private static function getValueFromArray($type, array $sourceData, $key, $isRequired, $defaultValue)
+    {
+        if (array_key_exists($key, $sourceData)) {
+            return $sourceData[$key];
         }
 
-        if (is_null($defaultValue)) {
+        if ($isRequired) {
             throw new HttpException(
-                sprintf('missing post parameter "%s"', $key),
+                sprintf('missing required %s "%s"', $type, $key),
                 400
             );
         }

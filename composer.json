@@ -19,6 +19,7 @@
         "ext-date": "*",
         "ext-filter": "*",
         "ext-json": "*",
+        "ext-libsodium": "*",
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-spl": "*",
