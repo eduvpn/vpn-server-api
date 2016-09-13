@@ -21,7 +21,10 @@ use SURFnet\VPN\Server\Api\Exception\HttpException;
 
 class Service
 {
+    /** @var array */
     private $routes;
+
+    /** @var array */
     private $hooks;
 
     public function __construct()

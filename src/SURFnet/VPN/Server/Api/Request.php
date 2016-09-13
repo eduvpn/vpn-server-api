@@ -21,6 +21,15 @@ use SURFnet\VPN\Server\Api\Exception\HttpException;
 
 class Request
 {
+    /** @var array */
+    private $serverData;
+
+    /** @var array */
+    private $getData;
+
+    /** @var array */
+    private $postData;
+
     public function __construct(array $serverData, array $getData, array $postData)
     {
         $this->serverData = $serverData;
