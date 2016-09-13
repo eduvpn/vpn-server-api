@@ -74,11 +74,10 @@ class OpenVpn
             $poolConfig->s(
                 'configName',
                 sprintf(
-                    'server-%s-%s-%s-%d.conf',
+                    'server-%s-%s-%d.conf',
                     $poolConfig->v('instanceId'),
                     $poolConfig->v('poolId'),
-                    $poolConfig->v('proto'),
-                    $poolConfig->v('port')
+                    $i
                 )
             );
 
