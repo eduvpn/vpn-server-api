@@ -29,13 +29,8 @@ class InstanceConfig extends Config
      */
     public function pool($poolId)
     {
-        if (!array_key_exists('vpnPools', $this->configData)) {
-            throw new InstanceException('missing "vpnPools" in configuration');
-        }
-
-        // XXX must be of type array also
-        if (!array_key_exists($poolId, $this->configData['vpnPools'])) {
-            throw new InstanceException(sprintf('pool "%s" not found in "vpnPools"', $poolId));
+        if (!in_array($poolId, $this->pools())) {
+            throw new InstanceException(sprintf('pool "%s" not found', $poolId));
         }
 
         return new PoolConfig($this->configData['vpnPools'][$poolId]);
@@ -46,25 +41,18 @@ class InstanceConfig extends Config
      */
     public function pools()
     {
-        // XXX must exist first
-        return array_keys($this->v('vpnPools'));
+        return array_keys($this->v('vpnPools', []));
     }
 
     public function groupProviders()
     {
-        // XXX must exist first
-        return array_keys($this->v('groupProviders'));
+        return array_keys($this->v('groupProviders', []));
     }
 
     public function groupProvider($groupProviderId)
     {
-        if (!array_key_exists('groupProviders', $this->configData)) {
-            throw new InstanceException('missing "groupProviders" in configuration');
-        }
-
-        // XXX must be of type array also
-        if (!array_key_exists($groupProviderId, $this->configData['groupProviders'])) {
-            return [];
+        if (!in_array($groupProviderId, $this->groupProviders())) {
+            throw new InstanceException(sprintf('group provider "%s" not found', $groupProviderId));
         }
 
         return $this->configData['groupProviders'][$groupProviderId];
@@ -72,7 +60,6 @@ class InstanceConfig extends Config
 
     public function instanceNumber()
     {
-        // XXX must exist
         return $this->v('instanceNumber');
     }
 }
