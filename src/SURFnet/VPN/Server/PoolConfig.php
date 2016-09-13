@@ -44,6 +44,16 @@ class PoolConfig extends Config
         );
     }
 
+    public function toArray()
+    {
+        return array_merge(
+            parent::toArray(),
+            [
+                'processCount' => $this->getProcessCount(),
+            ]
+        );
+    }
+
     /**
      * Depending on the size of the prefix assigned to this pool, this method
      * will return the number of OpenVPN processes backing that range, each
