@@ -17,34 +17,28 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
-use fkooman\Http\Request;
 use fkooman\Http\Exception\InternalServerErrorException;
-use fkooman\Rest\Plugin\Authentication\AuthenticationPlugin;
-use fkooman\Rest\Plugin\Authentication\Bearer\ArrayBearerValidator;
-use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
-use fkooman\Rest\Service;
-use SURFnet\VPN\Server\Config;
-use SURFnet\VPN\Server\Logger;
-use SURFnet\VPN\Server\InstanceConfig;
+use fkooman\Http\Exception\UnauthorizedException;
+use SURFnet\VPN\Server\Api\CommonNames;
 use SURFnet\VPN\Server\Api\CommonNamesModule;
+use SURFnet\VPN\Server\Api\GroupsModule;
 use SURFnet\VPN\Server\Api\InfoModule;
 use SURFnet\VPN\Server\Api\LogModule;
 use SURFnet\VPN\Server\Api\OpenVpnModule;
-use SURFnet\VPN\Server\Api\UsersModule;
+use SURFnet\VPN\Server\Api\Service;
 use SURFnet\VPN\Server\Api\Users;
-use SURFnet\VPN\Server\Api\CommonNames;
+use SURFnet\VPN\Server\Api\UsersModule;
+use SURFnet\VPN\Server\Config;
+use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Server\Logger;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
-use SURFnet\VPN\Server\Api\GroupsModule;
 
 $logger = new Logger('vpn-server-api');
 
 try {
-    $request = new Request($_SERVER);
-
-    // this actually uses SERVER_NAME (hardcoded in Apache), and not HTTP_HOST
-    // that could be determined by client
-    $instanceId = $request->getUrl()->getHost();
+    // this is provided by Apache, using CanonicalName
+    $instanceId = $_SERVER['SERVER_NAME'];
 
     $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
     $configDir = sprintf('%s/config/%s', dirname(__DIR__), $instanceId);
@@ -57,18 +51,32 @@ try {
         sprintf('%s/api.yaml', $configDir)
     );
 
-    $authenticationPlugin = new AuthenticationPlugin();
-    $authenticationPlugin->register(
-        new BearerAuthentication(
-            new ArrayBearerValidator(
-                $apiConfig->v('api')
-            ),
-            ['realm' => 'VPN Server API']
-        ),
-        'api'
-    );
     $service = new Service();
-    $service->getPluginRegistry()->registerDefaultPlugin($authenticationPlugin);
+
+    $service->addHook(
+        'before',
+        'auth',
+        function (array $serverData) use ($apiConfig) {
+            // check if we have valid authentication
+            $apiUsers = $apiConfig->v('api');
+            error_log(var_export($apiUsers, true));
+
+            // XXX check if variables are actually set, put this in 
+            // separate class in fkooman/http 3.0, also for other auth 
+            // mechanisms
+            $authUser = $serverData['PHP_AUTH_USER'];
+            $authPass = $serverData['PHP_AUTH_PW'];
+            if (array_key_exists($authUser, $apiUsers)) {
+                // use polyfill for hash_equals PHP < 5.6?
+                if (hash_equals($apiUsers[$authUser], $authPass)) {
+                    return $authUser;
+                }
+            }
+
+            // XXX fix exception
+            throw new UnauthorizedException('xyz');
+        }
+    );
 
     $service->addModule(
         new LogModule($dataDir)
@@ -100,7 +108,7 @@ try {
         new InfoModule($instanceConfig)
     );
 
-    $service->run($request)->send();
+    $service->run($_SERVER, $_GET, $_POST)->send();
 } catch (Exception $e) {
     $logger->error($e->getMessage());
     $e = new InternalServerErrorException($e->getMessage());

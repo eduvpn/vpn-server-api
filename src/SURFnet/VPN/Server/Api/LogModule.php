@@ -17,12 +17,7 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
-use fkooman\Http\Request;
-use fkooman\Rest\Service;
-use fkooman\Rest\ServiceModuleInterface;
-use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use DateTime;
-use fkooman\Json\Json;
 
 class LogModule implements ServiceModuleInterface
 {
@@ -45,14 +40,14 @@ class LogModule implements ServiceModuleInterface
     {
         $service->get(
             '/log',
-            function (Request $request, TokenInfo $tokenInfo) {
-                $tokenInfo->getScope()->requireScope(['admin']);
+            function (array $serverData, array $getData, array $postData, array $hookData) {
+                Utils::requireUser($hookData, ['admin']);
 
-                $dateTime = $request->getUrl()->getQueryParameter('date_time');
+                $dateTime = Utils::requireParameter($getData, 'date_time');
                 InputValidation::dateTime($dateTime);
                 $dateTimeUnix = strtotime($dateTime);
 
-                $ipAddress = $request->getUrl()->getQueryParameter('ip_address');
+                $ipAddress = Utils::requireParameter($getData, 'ip_address');
                 InputValidation::ipAddress($ipAddress);
 
                 return new ApiResponse('log', $this->get($dateTimeUnix, $ipAddress));
@@ -61,8 +56,8 @@ class LogModule implements ServiceModuleInterface
 
         $service->get(
             '/stats',
-            function (Request $request, TokenInfo $tokenInfo) {
-                $tokenInfo->getScope()->requireScope(['admin']);
+            function (array $serverData, array $getData, array $postData, array $hookData) {
+                Utils::requireUser($hookData, ['admin']);
 
                 return new ApiResponse('stats', Json::decodeFile(sprintf('%s/stats.json', $this->logPath)));
             }

@@ -17,10 +17,6 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
-use fkooman\Http\Request;
-use fkooman\Rest\Service;
-use fkooman\Rest\ServiceModuleInterface;
-use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use SURFnet\VPN\Server\InstanceConfig;
 
 class InfoModule implements ServiceModuleInterface
@@ -37,8 +33,8 @@ class InfoModule implements ServiceModuleInterface
     {
         $service->get(
             '/info/server',
-            function (Request $request, TokenInfo $tokenInfo) {
-                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
+            function (array $serverData, array $getData, array $postData, array $hookData) {
+                Utils::requireUser($hookData, ['admin', 'portal']);
 
                 return $this->getInfo();
             }

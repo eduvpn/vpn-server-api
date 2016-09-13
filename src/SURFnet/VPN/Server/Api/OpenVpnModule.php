@@ -17,10 +17,6 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
-use fkooman\Http\Request;
-use fkooman\Rest\Service;
-use fkooman\Rest\ServiceModuleInterface;
-use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
 
 class OpenVpnModule implements ServiceModuleInterface
@@ -37,8 +33,8 @@ class OpenVpnModule implements ServiceModuleInterface
     {
         $service->get(
             '/openvpn/connections',
-            function (Request $request, TokenInfo $tokenInfo) {
-                $tokenInfo->getScope()->requireScope(['admin']);
+            function (array $serverData, array $getData, array $postData, array $hookData) {
+                Utils::requireUser($hookData, ['admin']);
 
                 return new ApiResponse('connections', $this->serverManager->connections());
             }
@@ -46,10 +42,10 @@ class OpenVpnModule implements ServiceModuleInterface
 
         $service->post(
             '/openvpn/kill',
-            function (Request $request, TokenInfo $tokenInfo) {
-                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
+            function (array $serverData, array $getData, array $postData, array $hookData) {
+                Utils::requireUser($hookData, ['admin', 'portal']);
 
-                $commonName = $request->getPostParameter('common_name');
+                $commonName = Utils::requireParameter($postData, 'common_name');
                 InputValidation::commonName($commonName);
 
                 return new ApiResponse('ok', $this->serverManager->kill($commonName));

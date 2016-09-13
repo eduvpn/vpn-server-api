@@ -23,8 +23,7 @@
         "ext-pdo": "*",
         "ext-spl": "*",
         "ext-yaml": "*",
-        "fkooman/rest": "^2.0",
-        "fkooman/rest-plugin-authentication-bearer": "^3.0",
+        "fkooman/http": "^2.0",
         "php": ">=5.4.0",
         "psr/log": "^1.0"
     }

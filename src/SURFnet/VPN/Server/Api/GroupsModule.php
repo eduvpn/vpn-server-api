@@ -17,11 +17,7 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
-use fkooman\Http\Request;
-use fkooman\Rest\Service;
-use fkooman\Rest\ServiceModuleInterface;
 use Psr\Log\LoggerInterface;
-use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use SURFnet\VPN\Server\InstanceConfig;
 
 /**
@@ -46,9 +42,10 @@ class GroupsModule implements ServiceModuleInterface
     public function init(Service $service)
     {
         $service->get(
-            '/groups/:userId',
-            function ($userId, Request $request, TokenInfo $tokenInfo) {
-                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
+            '/groups',
+            function (array $serverData, array $getData, array $postData, array $hookData) {
+                Utils::requireUser($hookData, ['portal']);
+                $userId = Utils::requireParameter($getData, 'user_id');
                 InputValidation::userId($userId);
 
                 $groupMembership = [];

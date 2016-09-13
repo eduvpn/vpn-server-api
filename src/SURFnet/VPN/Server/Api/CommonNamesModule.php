@@ -17,11 +17,7 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
-use fkooman\Http\Request;
-use fkooman\Rest\Service;
-use fkooman\Rest\ServiceModuleInterface;
 use Psr\Log\LoggerInterface;
-use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 
 class CommonNamesModule implements ServiceModuleInterface
 {
@@ -41,17 +37,18 @@ class CommonNamesModule implements ServiceModuleInterface
     {
         $service->get(
             '/common_names/disabled',
-            function (Request $request, TokenInfo $tokenInfo) {
-                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
+            function (array $serverData, array $getData, array $postData, array $hookData) {
+                Utils::requireUser($hookData, ['admin', 'portal']);
 
                 return new ApiResponse('common_names', $this->commonNames->getDisabled());
             }
         );
 
         $service->post(
-            '/common_names/disabled/:commonName',
-            function ($commonName, Request $request, TokenInfo $tokenInfo) {
-                $tokenInfo->getScope()->requireScope(['admin', 'portal']);
+            '/common_names/disable',
+            function (array $serverData, array $getData, array $postData, array $hookData) {
+                Utils::requireUser($hookData, ['admin', 'portal']);
+                $commonName = Utils::requireParameter($postData, 'common_name');
                 InputValidation::commonName($commonName);
                 $this->logger->info(sprintf('disabling common_name "%s"', $commonName));
 
@@ -59,10 +56,11 @@ class CommonNamesModule implements ServiceModuleInterface
             }
         );
 
-        $service->delete(
-            '/common_names/disabled/:commonName',
-            function ($commonName, Request $request, TokenInfo $tokenInfo) {
-                $tokenInfo->getScope()->requireScope(['admin']);
+        $service->post(
+            '/common_names/enable',
+            function (array $serverData, array $getData, array $postData, array $hookData) {
+                Utils::requireUser($hookData, ['admin']);
+                $commonName = Utils::requireParameter($postData, 'common_name');
                 InputValidation::commonName($commonName);
                 $this->logger->info(sprintf('enabling common_name "%s"', $commonName));
 
