@@ -60,7 +60,6 @@ try {
         function (Request $request) use ($apiConfig) {
             // check if we have valid authentication
             $apiUsers = $apiConfig->v('api');
-            error_log(var_export($apiUsers, true));
 
             // XXX check if variables are actually set, put this in
             // separate class in fkooman/http 3.0, also for other auth
