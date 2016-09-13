@@ -136,7 +136,7 @@ class OpenVpn
             sprintf('reneg-sec %d', $poolConfig->v('twoFactor', false) ? 28800 : 3600),
         ];
 
-        if ($poolConfig->v('enableLog', false)) {
+        if (!$poolConfig->v('enableLog', false)) {
             $serverConfig[] = 'log /dev/null';
         }
 
