@@ -59,9 +59,11 @@ try {
             $apiConsumers = $instanceConfig->apiConsumers();
             $authUser = $request->getHeader('PHP_AUTH_USER', false);
             $authPass = $request->getHeader('PHP_AUTH_PW', false);
-            if (is_null($authUser) || is_null($authPass)) {
-                throw new HttpException('missing authentication information', 401);
-            }
+            throw new HttpException(
+                    'missing authentication information',
+                    401,
+                    ['WWW-Authenticate' => 'Basic realm="vpn-server-api"']
+                );
 
             if (array_key_exists($authUser, $apiConsumers)) {
                 // time safe string compare, using polyfill on PHP < 5.6
@@ -70,7 +72,11 @@ try {
                 }
             }
 
-            throw new HttpException('invalid authentication information', 401);
+            throw new HttpException(
+                'invalid authentication information',
+                401,
+                ['WWW-Authenticate' => 'Basic realm="vpn-server-api"']
+            );
         }
     );
 
@@ -107,7 +113,7 @@ try {
     $service->run($request)->send();
 } catch (Exception $e) {
     $logger->error($e->getMessage());
-    $response = new Response(500);
-    $response->setBody($e->getMessage());
+    $response = new Response(500, 'application/json');
+    $response->setBody(['error' => $e->getMessage()]);
     $response->send();
 }
