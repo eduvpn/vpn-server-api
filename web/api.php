@@ -55,7 +55,7 @@ try {
         $instanceConfig->v('apiConsumers'),
         'vpn-server-api'
     );
-    $service->addHook($basicAuthentication);
+    $service->addHook('before', 'auth', $basicAuthentication);
     $service->addModule(
         new LogModule($dataDir)
     );
