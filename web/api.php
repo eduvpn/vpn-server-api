@@ -19,6 +19,7 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Response;
+use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Exception\HttpException;
 use SURFnet\VPN\Server\Api\CommonNames;
 use SURFnet\VPN\Server\Api\CommonNamesModule;
@@ -50,36 +51,11 @@ try {
     );
 
     $service = new Service();
-
-    $service->addHook(
-        'before',
-        'auth',
-        function (Request $request) use ($instanceConfig) {
-            // check if we have valid authentication
-            $apiConsumers = $instanceConfig->apiConsumers();
-            $authUser = $request->getHeader('PHP_AUTH_USER', false);
-            $authPass = $request->getHeader('PHP_AUTH_PW', false);
-            throw new HttpException(
-                    'missing authentication information',
-                    401,
-                    ['WWW-Authenticate' => 'Basic realm="vpn-server-api"']
-                );
-
-            if (array_key_exists($authUser, $apiConsumers)) {
-                // time safe string compare, using polyfill on PHP < 5.6
-                if (hash_equals($apiConsumers[$authUser], $authPass)) {
-                    return $authUser;
-                }
-            }
-
-            throw new HttpException(
-                'invalid authentication information',
-                401,
-                ['WWW-Authenticate' => 'Basic realm="vpn-server-api"']
-            );
-        }
+    $basicAuthentication = new BasicAuthenticationHook(
+        $instanceConfig->v('apiConsumers'),
+        'vpn-server-api'
     );
-
+    $service->addHook($basicAuthentication);
     $service->addModule(
         new LogModule($dataDir)
     );

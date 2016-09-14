@@ -126,12 +126,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common.git",
-                "reference": "286e50b4d3701cf4010d50029247bcb8dfcdf37b"
+                "reference": "3bc1b4579666ccc8c8675014bab2712962ff4711"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/286e50b4d3701cf4010d50029247bcb8dfcdf37b",
-                "reference": "286e50b4d3701cf4010d50029247bcb8dfcdf37b",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/3bc1b4579666ccc8c8675014bab2712962ff4711",
+                "reference": "3bc1b4579666ccc8c8675014bab2712962ff4711",
                 "shasum": ""
             },
             "require": {
@@ -158,7 +158,7 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2016-09-14 13:18:10"
+            "time": "2016-09-14 13:55:25"
         },
         {
             "name": "ircmaxell/password-compat",
