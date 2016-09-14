@@ -17,14 +17,20 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
-use fkooman\Http\Exception\ForbiddenException;
+use SURFnet\VPN\Server\Api\Exception\HttpException;
 
 class Utils
 {
     public static function requireUser(array $hookData, array $userList)
     {
         if (!in_array($hookData['auth'], $userList)) {
-            throw new ForbiddenException(sprintf('user "%s" is not allowed to perform this operation', $hookData['auth']));
+            throw new HttpException(
+                sprintf(
+                    'user "%s" is not allowed to perform this operation',
+                    $hookData['auth']
+                ),
+                403
+            );
         }
     }
 }

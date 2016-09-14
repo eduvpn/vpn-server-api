@@ -1,5 +1,6 @@
 instanceNumber: 1
 
+# API consumers & credentials
 apiConsumers:
     vpn-user-portal: uvwxyz
     vpn-admin-portal: uuvvww
