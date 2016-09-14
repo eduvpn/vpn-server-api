@@ -24,8 +24,6 @@
         "ext-pdo": "*",
         "ext-spl": "*",
         "php": ">=5.4.0",
-        "psr/log": "^1.0",
-        "symfony/intl": "~2.3",
-        "symfony/polyfill": "^1.2"
+        "psr/log": "^1.0"
     }
 }

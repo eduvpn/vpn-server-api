@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9306eb21be1ac1b152ff14a599f533ae",
-    "content-hash": "44e246d63f78d4922ace8c6154a24f31",
+    "hash": "6edb237ffdaf32e2f69e6e96c68f34eb",
+    "content-hash": "55410703ef8c2c884ddc885206f7ecb4",
     "packages": [
         {
             "name": "christian-riesen/base32",
@@ -126,12 +126,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common.git",
-                "reference": "3bc1b4579666ccc8c8675014bab2712962ff4711"
+                "reference": "a5cc715fd134e3f4b57f7098f4c0e4dd19064917"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/3bc1b4579666ccc8c8675014bab2712962ff4711",
-                "reference": "3bc1b4579666ccc8c8675014bab2712962ff4711",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/a5cc715fd134e3f4b57f7098f4c0e4dd19064917",
+                "reference": "a5cc715fd134e3f4b57f7098f4c0e4dd19064917",
                 "shasum": ""
             },
             "require": {
@@ -139,6 +139,8 @@
                 "ext-spl": "*",
                 "php": ">= 5.4.0",
                 "psr/log": "^1.0",
+                "symfony/intl": "~2.3",
+                "symfony/polyfill": "^1.2",
                 "symfony/yaml": "^2.8"
             },
             "type": "library",
@@ -158,7 +160,7 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2016-09-14 13:55:25"
+            "time": "2016-09-14 13:58:26"
         },
         {
             "name": "ircmaxell/password-compat",
