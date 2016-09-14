@@ -19,12 +19,12 @@
         "ext-date": "*",
         "ext-filter": "*",
         "ext-json": "*",
-        "ext-libsodium": "*",
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-spl": "*",
-        "ext-yaml": "*",
         "php": ">=5.4.0",
-        "psr/log": "^1.0"
+        "psr/log": "^1.0",
+        "symfony/polyfill": "^1.2",
+        "symfony/yaml": "^2.8"
     }
 }

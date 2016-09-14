@@ -64,8 +64,8 @@ try {
             }
 
             if (array_key_exists($authUser, $apiConsumers)) {
-                // time safe string compare
-                if (0 === Sodium\compare($apiConsumers[$authUser], $authPass)) {
+                // time safe string compare, using polyfill on PHP < 5.6
+                if (hash_equals($apiConsumers[$authUser], $authPass)) {
                     return $authUser;
                 }
             }
