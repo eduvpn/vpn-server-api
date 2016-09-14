@@ -1,9 +1,16 @@
 instanceNumber: 1
 
-# API consumers & credentials
+# API consumers & credentials for clients using this service
 apiConsumers:
     vpn-user-portal: uvwxyz
     vpn-admin-portal: uuvvww
+
+# API providers & credentials for servers this service is connecting to
+apiProviders:
+    vpn-ca-api:
+        userName: vpn-server-api
+        userPass: aabbcc
+        apiUri: 'http://localhost:8008/api.php' 
 
 vpnPools:
     internet:

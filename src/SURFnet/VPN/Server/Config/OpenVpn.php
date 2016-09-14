@@ -27,9 +27,81 @@ class OpenVpn
     /** @var string */
     private $vpnConfigDir;
 
-    public function __construct($vpnConfigDir)
+    /** @var string */
+    private $vpnTlsDir;
+
+    public function __construct($vpnConfigDir, $vpnTlsDir)
     {
+        if (!@file_exists($vpnConfigDir)) {
+            if (false === @mkdir($vpnConfigDir, 0700, true)) {
+                throw new RuntimeException(sprintf('unable to create directory "%s"', $vpnConfigDir));
+            }
+        }
         $this->vpnConfigDir = $vpnConfigDir;
+        $this->vpnTlsDir = $vpnTlsDir;
+        if (!@file_exists($vpnTlsDir)) {
+            if (false === @mkdir($vpnTlsDir, 0700, true)) {
+                throw new RuntimeException(sprintf('unable to create directory "%s"', $vpnTlsDir));
+            }
+        }
+    }
+
+    public function generateKeys($apiUri, $userName, $userPass, $commonName, $dhLength)
+    {
+        $postData = [
+            'common_name' => $commonName,
+            'cert_type' => 'server',
+        ];
+
+        $apiUri = sprintf('%s/certificate/', $apiUri);
+
+        $ch = curl_init($apiUri);
+        $optionsSet = curl_setopt_array(
+            $ch,
+            [
+                CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+                CURLOPT_USERPWD => sprintf('%s:%s', $userName, $userPass),
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => http_build_query($postData),
+                CURLOPT_RETURNTRANSFER => true,
+            ]
+        );
+
+        if (!$optionsSet) {
+            throw new RuntimeException('unable to set all cURL options');
+        }
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+        if (false === $response) {
+            throw new RuntimeException(sprintf('cURL request error: %s', curl_error($ch)));
+        }
+
+        $configData = json_decode($response, true);
+        $certData = $configData['data']['certificate'];
+
+        $certFileMapping = [
+            'ca' => sprintf('%s/ca.crt', $this->vpnTlsDir),
+            'cert' => sprintf('%s/server.crt', $this->vpnTlsDir),
+            'key' => sprintf('%s/server.key', $this->vpnTlsDir),
+            'ta' => sprintf('%s/ta.key', $this->vpnTlsDir),
+        ];
+
+        foreach ($certFileMapping as $k => $v) {
+            if (false === @file_put_contents($v, $certData[$k])) {
+                throw new RuntimeException(sprintf('unable to write "%s"', $v));
+            }
+        }
+
+        // generate the DH params
+        $dhFile = sprintf('%s/dh.pem', $this->vpnTlsDir);
+        $cmd = sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength);
+        $output = [];
+        $returnValue = -1;
+        exec($cmd, $output, $returnValue);
+        if (0 !== $returnValue) {
+            throw new RuntimeException('unable to generate DH');
+        }
     }
 
     public function write($instanceId, InstanceConfig $instanceConfig)

@@ -26,11 +26,12 @@ function showHelp(array $argv)
     return implode(
         PHP_EOL,
         [
-            sprintf('SYNTAX: %s [--instance domain.tld] [--generate]', $argv[0]),
+            sprintf('SYNTAX: %s [--instance domain.tld] [--generate domain.tld]', $argv[0]),
             '',
             '--instance domain.tld      the VPN instance to write configuration files',
             '                           for',
-            '--generate                 generate new certificates/keys for this instance',
+            '--generate domain.tld      generate new certificates/keys for this instance,',
+            '                           a name can only be used once!',
             '',
         ]
     );
@@ -39,6 +40,8 @@ function showHelp(array $argv)
 try {
     $instanceId = null;
     $generateCerts = false;
+    $serverCn = null;
+    $dhLength = 3072;
 
     for ($i = 0; $i < $argc; ++$i) {
         if ('--help' == $argv[$i] || '-h' === $argv[$i]) {
@@ -55,6 +58,18 @@ try {
 
         if ('--generate' === $argv[$i] || '-g' === $argv[$i]) {
             $generateCerts = true;
+            if (array_key_exists($i + 1, $argv)) {
+                $serverCn = $argv[$i + 1];
+                ++$i;
+            }
+        }
+
+        // undocumented on purpose, override the dh length
+        if ('--dh' === $argv[$i]) {
+            if (array_key_exists($i + 1, $argv)) {
+                $dhLength = $argv[$i + 1];
+                ++$i;
+            }
         }
     }
 
@@ -62,10 +77,25 @@ try {
         throw new RuntimeException('instance must be specified, see --help');
     }
 
+    if ($generateCerts && is_null($serverCn)) {
+        throw new RuntimeException('cannot generate certificates without specifying server CN');
+    }
+
     $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
     $instanceConfig = InstanceConfig::fromFile($configFile);
-    $o = new OpenVpn(sprintf('%s/openvpn-config', dirname(__DIR__)));
+
+    $vpnConfigDir = sprintf('%s/openvpn-config', dirname(__DIR__));
+    $vpnTlsDir = sprintf('%s/openvpn-config/tls/%s', dirname(__DIR__), $instanceId);
+
+    $o = new OpenVpn($vpnConfigDir, $vpnTlsDir);
     $o->write($instanceId, $instanceConfig);
+    if ($generateCerts) {
+        $apiProviders = $instanceConfig->v('apiProviders');
+        $userName = $apiProviders['vpn-ca-api']['userName'];
+        $userPass = $apiProviders['vpn-ca-api']['userPass'];
+        $apiUri = $apiProviders['vpn-ca-api']['apiUri'];
+        $o->generateKeys($apiUri, $userName, $userPass, $serverCn, $dhLength);
+    }
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
