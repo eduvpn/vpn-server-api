@@ -17,6 +17,8 @@
  */
 namespace SURFnet\VPN\Server;
 
+use SURFnet\VPN\Common\Config;
+
 class PoolConfig extends Config
 {
     private static function defaultValues()

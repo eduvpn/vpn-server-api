@@ -17,21 +17,21 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
-use SURFnet\VPN\Server\Api\Request;
-use SURFnet\VPN\Server\Api\Response;
-use SURFnet\VPN\Server\Api\Exception\HttpException;
+use SURFnet\VPN\Common\Http\Request;
+use SURFnet\VPN\Common\Http\Response;
+use SURFnet\VPN\Common\Http\Exception\HttpException;
 use SURFnet\VPN\Server\Api\CommonNames;
 use SURFnet\VPN\Server\Api\CommonNamesModule;
 use SURFnet\VPN\Server\Api\GroupsModule;
 use SURFnet\VPN\Server\Api\InfoModule;
 use SURFnet\VPN\Server\Api\LogModule;
 use SURFnet\VPN\Server\Api\OpenVpnModule;
-use SURFnet\VPN\Server\Api\Service;
+use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Server\Api\Users;
 use SURFnet\VPN\Server\Api\UsersModule;
-use SURFnet\VPN\Server\Config;
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\InstanceConfig;
-use SURFnet\VPN\Server\Logger;
+use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
 

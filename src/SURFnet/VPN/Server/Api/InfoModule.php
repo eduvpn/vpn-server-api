@@ -18,6 +18,10 @@
 namespace SURFnet\VPN\Server\Api;
 
 use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Common\Http\ServiceModuleInterface;
+use SURFnet\VPN\Common\Http\Service;
+use SURFnet\VPN\Common\Http\ApiResponse;
+use SURFnet\VPN\Common\Http\Request;
 
 class InfoModule implements ServiceModuleInterface
 {

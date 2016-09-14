@@ -19,6 +19,10 @@ namespace SURFnet\VPN\Server\Api;
 
 use Psr\Log\LoggerInterface;
 use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Common\Http\ServiceModuleInterface;
+use SURFnet\VPN\Common\Http\Service;
+use SURFnet\VPN\Common\Http\ApiResponse;
+use SURFnet\VPN\Common\Http\Request;
 
 /**
  * Handle API calls for Groups.

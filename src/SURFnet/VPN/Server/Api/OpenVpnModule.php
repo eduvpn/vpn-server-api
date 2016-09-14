@@ -18,6 +18,10 @@
 namespace SURFnet\VPN\Server\Api;
 
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
+use SURFnet\VPN\Common\Http\ServiceModuleInterface;
+use SURFnet\VPN\Common\Http\Service;
+use SURFnet\VPN\Common\Http\ApiResponse;
+use SURFnet\VPN\Common\Http\Request;
 
 class OpenVpnModule implements ServiceModuleInterface
 {

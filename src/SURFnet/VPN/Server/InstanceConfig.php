@@ -17,6 +17,7 @@
  */
 namespace SURFnet\VPN\Server;
 
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\Exception\InstanceException;
 
 /**

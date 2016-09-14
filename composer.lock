@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7b0feff36be41da19d6e6524b4c595fb",
-    "content-hash": "e28cdcb9d6b64dc69be74611bae602f9",
+    "hash": "b0acd95125a8909aa4705d8f8339e033",
+    "content-hash": "945a3e0d8e02397c06f83c85d4c89e8b",
     "packages": [
         {
             "name": "christian-riesen/base32",
@@ -119,6 +119,46 @@
                 "totp"
             ],
             "time": "2016-06-10 14:47:22"
+        },
+        {
+            "name": "eduvpn/common",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eduvpn/vpn-lib-common.git",
+                "reference": "8cb8555cfe31fc3cbf6d9b1088359fc50d82b873"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/8cb8555cfe31fc3cbf6d9b1088359fc50d82b873",
+                "reference": "8cb8555cfe31fc3cbf6d9b1088359fc50d82b873",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-spl": "*",
+                "php": ">= 5.4.0",
+                "psr/log": "^1.0",
+                "symfony/yaml": "^2.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "SURFnet\\VPN\\Common\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "AGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "François Kooman",
+                    "email": "fkooman@tuxed.net"
+                }
+            ],
+            "description": "Common VPN library",
+            "time": "2016-09-14 11:29:38"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -464,7 +504,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "eduvpn/common": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
