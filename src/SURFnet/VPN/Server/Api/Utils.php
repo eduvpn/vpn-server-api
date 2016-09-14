@@ -17,7 +17,7 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
-use SURFnet\VPN\Server\Api\Exception\HttpException;
+use SURFnet\VPN\Common\Http\Exception\HttpException;
 
 class Utils
 {
