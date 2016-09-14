@@ -18,7 +18,6 @@
 namespace SURFnet\VPN\Server;
 
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Yaml\Exception\ParseException;
 use SURFnet\VPN\Server\Exception\ConfigException;
 
 /**
@@ -36,7 +35,7 @@ class Config
 
     public static function fromFile($configFile)
     {
-        if(false === $fileContent = @file_get_contents($configFile)) {
+        if (false === $fileContent = @file_get_contents($configFile)) {
             throw new ConfigException(sprintf('unable to read configuration file "%s"', $configFile));
         }
 

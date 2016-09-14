@@ -46,14 +46,14 @@ class Response
     {
         $this->body = $body;
     }
-    
+
     public function toArray()
     {
         $output = [
-            $this->statusCode
+            $this->statusCode,
         ];
 
-        foreach($this->headers as $key => $value) {
+        foreach ($this->headers as $key => $value) {
             $output[] = sprintf('%s: %s', $key, $value);
         }
         $output[] = $this->body;
