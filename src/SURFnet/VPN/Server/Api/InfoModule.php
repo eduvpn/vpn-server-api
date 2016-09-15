@@ -18,6 +18,7 @@
 namespace SURFnet\VPN\Server\Api;
 
 use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Server\PoolConfig;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ApiResponse;
@@ -49,7 +50,8 @@ class InfoModule implements ServiceModuleInterface
     {
         $responseData = [];
         foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolId) {
-            $responseData[$poolId] = $this->instanceConfig->v('vpnPools', $poolId);
+            $poolConfig = new PoolConfig($this->instanceConfig->v('vpnPools', $poolId));
+            $responseData[$poolId] = $poolConfig->v();
         }
 
         return new ApiResponse('pools', $responseData);
