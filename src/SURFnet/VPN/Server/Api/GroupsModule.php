@@ -53,11 +53,13 @@ class GroupsModule implements ServiceModuleInterface
                 InputValidation::userId($userId);
 
                 $groupMembership = [];
-                foreach (array_keys($this->instanceConfig->v('groupProviders')) as $groupProviderId) {
-                    $groupProviderConfig = $this->instanceConfig->v('groupProviders', $groupProviderId);
-                    $groupProviderClass = sprintf('SURFnet\VPN\Server\GroupProvider\%s', $groupProviderId);
-                    $groupProvider = new $groupProviderClass($groupProviderConfig);
-                    $groupMembership = array_merge($groupMembership, $groupProvider->getGroups($userId));
+                if($this->instanceConfig->e('groupProviders')) {
+                    foreach (array_keys($this->instanceConfig->v('groupProviders')) as $groupProviderId) {
+                        $groupProviderConfig = $this->instanceConfig->v('groupProviders', $groupProviderId);
+                        $groupProviderClass = sprintf('SURFnet\VPN\Server\GroupProvider\%s', $groupProviderId);
+                        $groupProvider = new $groupProviderClass($groupProviderConfig);
+                        $groupMembership = array_merge($groupMembership, $groupProvider->getGroups($userId));
+                    }
                 }
 
                 return new ApiResponse('groups', $groupMembership);
