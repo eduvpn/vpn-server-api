@@ -177,9 +177,6 @@ class Firewall
     private static function getForwardFirewall($instanceNumber, $poolNumber, PoolConfig $poolConfig, $inetFamily)
     {
         $forwardFirewall = [];
-
-        var_dump($poolConfig);
-
         if ($poolConfig->v('blockSmb')) {
             // drop SMB outgoing traffic
             // @see https://medium.com/@ValdikSS/deanonymizing-windows-users-and-capturing-microsoft-and-vpn-accounts-f7e53fe73834
