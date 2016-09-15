@@ -58,10 +58,10 @@ try {
     }
 
     $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
-    $instanceConfig = InstanceConfig::fromFile($configFile);
+    $config = InstanceConfig::fromFile($configFile);
 
     $serverManager = new ServerManager(
-        $instanceConfig,
+        $config,
         new ManagementSocket(),
         new Logger($argv[0])
     );

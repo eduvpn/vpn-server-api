@@ -48,8 +48,8 @@ class InfoModule implements ServiceModuleInterface
     private function getInfo()
     {
         $responseData = [];
-        foreach ($this->instanceConfig->pools() as $poolId) {
-            $responseData[$poolId] = $this->instanceConfig->pool($poolId)->toArray();
+        foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolId) {
+            $responseData[$poolId] = $this->instanceConfig->v('vpnPools', $poolId);
         }
 
         return new ApiResponse('pools', $responseData);

@@ -54,12 +54,14 @@ class Connection
         );
 
         // is the ACL enabled?
-        if ($instanceConfig->pool($envData['POOL_ID'])->v('enableAcl', false)) {
-            $aclGroupProvider = $instanceConfig->pool($envData['POOL_ID'])->v('aclGroupProvider');
-            $groupProviderConfig = $instanceConfig->groupProvider($aclGroupProvider);
+        $poolId = $envData['POOL_ID'];
+        $poolConfig = new PoolConfig($instanceConfig->v('vpnPools', $poolId));
+        if ($poolConfig->v('enableAcl')) {
+            $aclGroupProvider = $poolConfig->v('aclGroupProvider');
+            $groupProviderConfig = $instanceConfig->v('groupProviders', $aclGroupProvider);
             $groupProviderClass = sprintf('SURFnet\VPN\Server\GroupProvider\%s', $aclGroupProvider);
             $groupProvider = new $groupProviderClass($groupProviderConfig);
-            $aclGroupList = $instanceConfig->pool($envData['POOL_ID'])->v('aclGroupList', []);
+            $aclGroupList = $poolConfig->v('aclGroupList');
 
             if (false === self::isMember($groupProvider->getGroups($userId), $aclGroupList)) {
                 throw new ConnectionException(sprintf('client not allowed, not a member of "%s"', implode(',', $aclGroupList)));

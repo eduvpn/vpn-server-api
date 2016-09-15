@@ -82,18 +82,17 @@ try {
     }
 
     $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
-    $instanceConfig = InstanceConfig::fromFile($configFile);
+    $config = InstanceConfig::fromFile($configFile);
 
     $vpnConfigDir = sprintf('%s/openvpn-config', dirname(__DIR__));
     $vpnTlsDir = sprintf('%s/openvpn-config/tls/%s', dirname(__DIR__), $instanceId);
 
     $o = new OpenVpn($vpnConfigDir, $vpnTlsDir);
-    $o->write($instanceId, $instanceConfig);
+    $o->write($instanceId, $config);
     if ($generateCerts) {
-        $apiProviders = $instanceConfig->v('apiProviders');
-        $userName = $apiProviders['vpn-ca-api']['userName'];
-        $userPass = $apiProviders['vpn-ca-api']['userPass'];
-        $apiUri = $apiProviders['vpn-ca-api']['apiUri'];
+        $userName = $config->v('apiProviders', 'vpn-ca-api', 'userName');
+        $userPass = $config->v('apiProviders', 'vpn-ca-api', 'userPass');
+        $apiUri = $config->v('apiProviders', 'vpn-ca-api', 'apiUri');
         $o->generateKeys($apiUri, $userName, $userPass, $serverCn, $dhLength);
     }
 } catch (Exception $e) {

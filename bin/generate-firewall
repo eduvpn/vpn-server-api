@@ -48,15 +48,15 @@ try {
     }
 
     // detect all instances
-    $instanceConfigList = [];
+    $configList = [];
     $configDir = sprintf('%s/config', dirname(__DIR__));
     foreach (glob(sprintf('%s/*', $configDir), GLOB_ONLYDIR | GLOB_ERR) as $instanceDir) {
         $instanceId = basename($instanceDir);
-        $instanceConfigList[$instanceId] = InstanceConfig::fromFile(sprintf('%s/%s/config.yaml', $configDir, $instanceId));
+        $configList[$instanceId] = InstanceConfig::fromFile(sprintf('%s/%s/config.yaml', $configDir, $instanceId));
     }
 
-    $firewall = Firewall::getFirewall4($instanceConfigList);
-    $firewall6 = Firewall::getFirewall6($instanceConfigList);
+    $firewall = Firewall::getFirewall4($configList);
+    $firewall6 = Firewall::getFirewall6($configList);
 
     if ($installFw) {
         if (false === @file_put_contents('/etc/sysconfig/iptables', $firewall)) {
@@ -79,5 +79,6 @@ try {
     }
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
+    echo $e->getTraceAsString();
     exit(1);
 }

@@ -18,54 +18,7 @@
 namespace SURFnet\VPN\Server;
 
 use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Server\Exception\InstanceException;
 
-/**
- * Read the configuration of a particular instance.
- */
 class InstanceConfig extends Config
 {
-    /**
-     * Retrieve a configuration object for a pool.
-     */
-    public function pool($poolId)
-    {
-        if (!in_array($poolId, $this->pools())) {
-            throw new InstanceException(sprintf('pool "%s" not found', $poolId));
-        }
-
-        return new PoolConfig($this->configData['vpnPools'][$poolId]);
-    }
-
-    /**
-     * Retrieve a list of all pools.
-     */
-    public function pools()
-    {
-        return array_keys($this->v('vpnPools', []));
-    }
-
-    public function groupProviders()
-    {
-        return array_keys($this->v('groupProviders', []));
-    }
-
-    public function groupProvider($groupProviderId)
-    {
-        if (!in_array($groupProviderId, $this->groupProviders())) {
-            throw new InstanceException(sprintf('group provider "%s" not found', $groupProviderId));
-        }
-
-        return $this->configData['groupProviders'][$groupProviderId];
-    }
-
-    public function apiConsumers()
-    {
-        return $this->v('apiConsumers');
-    }
-
-    public function instanceNumber()
-    {
-        return $this->v('instanceNumber');
-    }
 }

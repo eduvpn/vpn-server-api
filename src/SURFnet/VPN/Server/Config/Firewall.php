@@ -95,18 +95,18 @@ class Firewall
     {
         $nat = [];
 
-        foreach ($instanceConfig->pools() as $poolNumber => $poolId) {
-            $pool = $instanceConfig->pool($poolId);
-            if ($pool->v('useNat', false)) {
+        foreach (array_keys($instanceConfig->v('vpnPools')) as $poolNumber => $poolId) {
+            $poolConfig = new PoolConfig($instanceConfig->v('vpnPools', $poolId));
+            if ($poolConfig->v('useNat')) {
                 if (4 === $inetFamily) {
                     // get the IPv4 range
-                    $srcNet = $pool->v('range');
+                    $srcNet = $poolConfig->v('range');
                 } else {
                     // get the IPv6 range
-                    $srcNet = $pool->v('range6');
+                    $srcNet = $poolConfig->v('range6');
                 }
                 // -i (--in-interface) cannot be specified for POSTROUTING
-                $nat[] = sprintf('-A POSTROUTING -s %s -o %s -j MASQUERADE', $srcNet, $pool->v('extIf'));
+                $nat[] = sprintf('-A POSTROUTING -s %s -o %s -j MASQUERADE', $srcNet, $poolConfig->v('extIf'));
             }
         }
 
@@ -131,41 +131,41 @@ class Firewall
     {
         $forwardChain = [];
 
-        foreach ($instanceConfig->pools() as $poolNumber => $poolId) {
-            $pool = $instanceConfig->pool($poolId);
-            if (6 === $inetFamily && !$pool->v('forward6')) {
+        foreach (array_keys($instanceConfig->v('vpnPools')) as $poolNumber => $poolId) {
+            $poolConfig = new PoolConfig($instanceConfig->v('vpnPools', $poolId));
+            if (6 === $inetFamily && !$poolConfig->v('forward6')) {
                 // IPv6 forwarding was disabled
                 continue;
             }
 
             if (4 === $inetFamily) {
                 // get the IPv4 range
-                $srcNet = $pool->v('range');
+                $srcNet = $poolConfig->v('range');
             } else {
                 // get the IPv6 range
-                $srcNet = $pool->v('range6');
+                $srcNet = $poolConfig->v('range6');
             }
-            $forwardChain[] = sprintf('-N vpn-%s-%s', $instanceConfig->instanceNumber(), $poolNumber);
+            $forwardChain[] = sprintf('-N vpn-%s-%s', $instanceConfig->v('instanceNumber'), $poolNumber);
 
-            $forwardChain[] = sprintf('-A FORWARD -i tun-%s-%s+ -s %s -j vpn-%s-%s', $instanceConfig->instanceNumber(), $poolNumber, $srcNet, $instanceConfig->instanceNumber(), $poolNumber);
+            $forwardChain[] = sprintf('-A FORWARD -i tun-%s-%s+ -s %s -j vpn-%s-%s', $instanceConfig->v('instanceNumber'), $poolNumber, $srcNet, $instanceConfig->v('instanceNumber'), $poolNumber);
 
             // merge outgoing forwarding firewall rules to prevent certain
             // traffic
-            $forwardChain = array_merge($forwardChain, self::getForwardFirewall($instanceConfig->instanceNumber(), $poolNumber, $pool, $inetFamily));
+            $forwardChain = array_merge($forwardChain, self::getForwardFirewall($instanceConfig->v('instanceNumber'), $poolNumber, $poolConfig, $inetFamily));
 
-            if ($pool->v('clientToClient')) {
+            if ($poolConfig->v('clientToClient')) {
                 // allow client-to-client
-                $forwardChain[] = sprintf('-A vpn-%s-%s -o tun-%s-%s+ -d %s -j ACCEPT', $instanceConfig->instanceNumber(), $poolNumber, $instanceConfig->instanceNumber(), $poolNumber, $srcNet);
+                $forwardChain[] = sprintf('-A vpn-%s-%s -o tun-%s-%s+ -d %s -j ACCEPT', $instanceConfig->v('instanceNumber'), $poolNumber, $instanceConfig->v('instanceNumber'), $poolNumber, $srcNet);
             }
-            if ($pool->v('defaultGateway')) {
+            if ($poolConfig->v('defaultGateway')) {
                 // allow traffic to all outgoing destinations
-                $forwardChain[] = sprintf('-A vpn-%s-%s -o %s -j ACCEPT', $instanceConfig->instanceNumber(), $poolNumber, $pool->v('extIf'), $srcNet);
+                $forwardChain[] = sprintf('-A vpn-%s-%s -o %s -j ACCEPT', $instanceConfig->v('instanceNumber'), $poolNumber, $poolConfig->v('extIf'), $srcNet);
             } else {
                 // only allow certain traffic to the external interface
-                foreach ($pool->v('routes') as $route) {
+                foreach ($poolConfig->v('routes') as $route) {
                     $routeIp = new IP($route);
                     if ($inetFamily === $routeIp->getFamily()) {
-                        $forwardChain[] = sprintf('-A vpn-%s-%s -o %s -d %s -j ACCEPT', $instanceConfig->instanceNumber(), $poolNumber, $pool->v('extIf'), $route);
+                        $forwardChain[] = sprintf('-A vpn-%s-%s -o %s -d %s -j ACCEPT', $instanceConfig->v('instanceNumber'), $poolNumber, $poolConfig->v('extIf'), $route);
                     }
                 }
             }
@@ -177,6 +177,8 @@ class Firewall
     private static function getForwardFirewall($instanceNumber, $poolNumber, PoolConfig $poolConfig, $inetFamily)
     {
         $forwardFirewall = [];
+
+        var_dump($poolConfig);
 
         if ($poolConfig->v('blockSmb')) {
             // drop SMB outgoing traffic

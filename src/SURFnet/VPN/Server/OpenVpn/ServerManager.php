@@ -20,6 +20,9 @@ namespace SURFnet\VPN\Server\OpenVpn;
 use Psr\Log\LoggerInterface;
 use SURFnet\VPN\Server\OpenVpn\Exception\ManagementSocketException;
 use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Server\PoolConfig;
+use SURFnet\VPN\Server\Utils;
+use SURFnet\VPN\Server\IP;
 
 /**
  * Manage all OpenVPN processes controlled by this service.
@@ -50,12 +53,15 @@ class ServerManager
         $clientConnections = [];
 
         // loop over all pools
-        foreach ($this->instanceConfig->pools() as $poolNumber => $poolId) {
-            $poolConfig = $this->instanceConfig->pool($poolId);
-            $managementIp = sprintf('127.42.%d.%d', 100 + $this->instanceConfig->instanceNumber(), 100 + $poolNumber);
+        foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolNumber => $poolId) {
+            $poolConfig = new PoolConfig($this->instanceConfig->v('vpnPools', $poolId));
+            $managementIp = sprintf('127.42.%d.%d', 100 + $this->instanceConfig->v('instanceNumber'), 100 + $poolNumber);
             $poolConnections = [];
             // loop over all processes
-            for ($i = 0; $i < $poolConfig->getProcessCount(); ++$i) {
+            $range = new IP($poolConfig->v('range'));
+            $processCount = Utils::getProcessCount($range->getPrefix());
+
+            for ($i = 0; $i < $processCount; ++$i) {
                 // add all connections from this instance to poolConnections
                 try {
                     // open the socket connection
@@ -101,12 +107,14 @@ class ServerManager
     {
         $clientsKilled = 0;
         // loop over all pools
-        foreach ($this->instanceConfig->pools() as $poolNumber => $poolId) {
-            $poolConfig = $this->instanceConfig->pool($poolId);
-            $managementIp = sprintf('127.42.%d.%d', 100 + $this->instanceConfig->instanceNumber(), 100 + $poolNumber);
+        foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolNumber => $poolId) {
+            $poolConfig = new PoolConfig($this->instanceConfig->v('vpnPools', $poolId));
+            $managementIp = sprintf('127.42.%d.%d', 100 + $this->instanceConfig->v('instanceNumber'), 100 + $poolNumber);
 
             // loop over all processes
-            for ($i = 0; $i < $poolConfig->getProcessCount(); ++$i) {
+            $range = new IP($poolConfig->v('range'));
+            $processCount = Utils::getProcessCount($range->getPrefix());
+            for ($i = 0; $i < $processCount; ++$i) {
                 // add all kills from this instance to poolKills
                 try {
                     // open the socket connection
