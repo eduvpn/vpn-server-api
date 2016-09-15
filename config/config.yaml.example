@@ -10,7 +10,7 @@ apiProviders:
     vpn-ca-api:
         userName: vpn-server-api
         userPass: aabbcc
-        apiUri: 'http://localhost:8008/api.php' 
+        apiUri: 'http://127.42.101.100:8008/api.php' 
 
 vpnPools:
     internet:
