@@ -53,7 +53,7 @@ class GroupsModule implements ServiceModuleInterface
                 InputValidation::userId($userId);
 
                 $groupMembership = [];
-                if($this->instanceConfig->e('groupProviders')) {
+                if ($this->instanceConfig->e('groupProviders')) {
                     foreach (array_keys($this->instanceConfig->v('groupProviders')) as $groupProviderId) {
                         $groupProviderConfig = $this->instanceConfig->v('groupProviders', $groupProviderId);
                         $groupProviderClass = sprintf('SURFnet\VPN\Server\GroupProvider\%s', $groupProviderId);
