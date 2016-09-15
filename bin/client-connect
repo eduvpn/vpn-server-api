@@ -20,7 +20,7 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Server\Connection;
 use SURFnet\VPN\Server\Exception\ConnectionException;
-use SURFnet\VPN\Server\Logger;
+use SURFnet\VPN\Common\Logger;
 
 $logger = new Logger(
     basename($argv[0])
