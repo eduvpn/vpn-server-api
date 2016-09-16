@@ -53,7 +53,7 @@ try {
         $config->v('apiConsumers'),
         'vpn-server-api'
     );
-    $service->addHook('before', 'auth', $basicAuthentication);
+    $service->addBeforeHook('auth', $basicAuthentication);
     $service->addModule(
         new LogModule($dataDir)
     );
