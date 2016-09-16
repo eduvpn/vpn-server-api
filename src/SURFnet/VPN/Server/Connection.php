@@ -58,9 +58,8 @@ class Connection
         $poolConfig = new PoolConfig($instanceConfig->v('vpnPools', $poolId));
         if ($poolConfig->v('enableAcl')) {
             $aclGroupProvider = $poolConfig->v('aclGroupProvider');
-            $groupProviderConfig = $instanceConfig->v('groupProviders', $aclGroupProvider);
             $groupProviderClass = sprintf('SURFnet\VPN\Server\GroupProvider\%s', $aclGroupProvider);
-            $groupProvider = new $groupProviderClass($groupProviderConfig);
+            $groupProvider = new $groupProviderClass($dataDir, $instanceConfig);
             $aclGroupList = $poolConfig->v('aclGroupList');
 
             if (false === self::isMember($groupProvider->getGroups($userId), $aclGroupList)) {

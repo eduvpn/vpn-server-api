@@ -18,45 +18,36 @@
 namespace SURFnet\VPN\Server\GroupProvider;
 
 use SURFnet\VPN\Server\GroupProviderInterface;
+use SURFnet\VPN\Server\InstanceConfig;
 
 class StaticProvider implements GroupProviderInterface
 {
-    /** @var array */
-    private $configData;
+    /** @var string */
+    private $dataDir;
 
-    public function __construct(array $configData)
+    /** @var \SURFnet\VPN\Server\InstanceConfig */
+    private $instanceConfig;
+
+    public function __construct($dataDir, InstanceConfig $instanceConfig)
     {
-        $this->configData = $configData;
+        $this->dataDir = $dataDir;
+        $this->instanceConfig = $instanceConfig;
     }
 
     public function getGroups($userId)
     {
-        if (!is_array($this->configData)) {
-            return [];
-        }
-
         $memberOf = [];
-        foreach ($this->configData as $groupId => $groupEntry) {
-            if (!is_array($groupEntry)) {
-                continue;
-            }
-            $displayName = $groupId;
 
-            if (!array_key_exists('members', $groupEntry)) {
+        $groupIdList = array_keys($this->instanceConfig->v('groupProviders', 'StaticProvider'));
+        foreach ($groupIdList as $groupId) {
+            $memberList = $this->instanceConfig->v('groupProviders', 'StaticProvider', $groupId, 'members');
+            if (!is_array($memberList) || !in_array($userId, $memberList)) {
                 continue;
-            }
-
-            if (!in_array($userId, $groupEntry['members'])) {
-                continue;
-            }
-
-            if (array_key_exists('displayName', $groupEntry)) {
-                $displayName = $groupEntry['displayName'];
             }
 
             $memberOf[] = [
                 'id' => $groupId,
-                'displayName' => $displayName,
+                'displayName' => $this->instanceConfig->v('groupProviders', 'StaticProvider', $groupId, 'displayName'),
             ];
         }
 

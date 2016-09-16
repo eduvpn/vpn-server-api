@@ -18,7 +18,6 @@
 namespace SURFnet\VPN\Server\Api;
 
 use Psr\Log\LoggerInterface;
-use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ApiResponse;
@@ -26,20 +25,18 @@ use SURFnet\VPN\Common\Http\Request;
 
 /**
  * Handle API calls for Groups.
- *
- * XXX more logging!
  */
 class GroupsModule implements ServiceModuleInterface
 {
-    /** @var \SURFnet\VPN\Server\InstanceConfig */
-    private $instanceConfig;
+    /** @var array */
+    private $groupProviders;
 
     /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
-    public function __construct(InstanceConfig $instanceConfig, LoggerInterface $logger)
+    public function __construct(array $groupProviders, LoggerInterface $logger)
     {
-        $this->instanceConfig = $instanceConfig;
+        $this->groupProviders = $groupProviders;
         $this->logger = $logger;
     }
 
@@ -53,13 +50,8 @@ class GroupsModule implements ServiceModuleInterface
                 InputValidation::userId($userId);
 
                 $groupMembership = [];
-                if ($this->instanceConfig->e('groupProviders')) {
-                    foreach (array_keys($this->instanceConfig->v('groupProviders')) as $groupProviderId) {
-                        $groupProviderConfig = $this->instanceConfig->v('groupProviders', $groupProviderId);
-                        $groupProviderClass = sprintf('SURFnet\VPN\Server\GroupProvider\%s', $groupProviderId);
-                        $groupProvider = new $groupProviderClass($groupProviderConfig);
-                        $groupMembership = array_merge($groupMembership, $groupProvider->getGroups($userId));
-                    }
+                foreach ($this->groupProviders as $groupProvider) {
+                    $groupMembership = array_merge($groupMembership, $groupProvider->getGroups($userId));
                 }
 
                 return new ApiResponse('groups', $groupMembership);
