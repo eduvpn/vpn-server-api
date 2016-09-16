@@ -30,7 +30,7 @@ class VootProvider implements GroupProviderInterface
     /** @var \SURFnet\VPN\Server\InstanceConfig */
     private $instanceConfig;
 
-    public function __construct($dataDir, InstanceConfig $config)
+    public function __construct($dataDir, InstanceConfig $instanceConfig)
     {
         $this->dataDir = $dataDir;
         $this->instanceConfig = $instanceConfig;
@@ -38,7 +38,8 @@ class VootProvider implements GroupProviderInterface
 
     public function getGroups($userId)
     {
-        if (false === $bearerToken = @file_get_contents(sprintf('%s/users/voot_tokens/%s', $dataDir, $userId))) {
+        $vootTokenPath = sprintf('%s/users/voot_tokens/%s', $this->dataDir, $userId);
+        if (false === $bearerToken = @file_get_contents($vootTokenPath)) {
             return [];
         }
 
@@ -53,7 +54,7 @@ class VootProvider implements GroupProviderInterface
         $httpClient = new Client();
         try {
             return $httpClient->get(
-                $this->instanceConfig->v('GroupProviders', 'VootProvider', 'apiUrl'),
+                $this->instanceConfig->v('groupProviders', 'VootProvider', 'apiUrl'),
                 [
                     'headers' => [
                         'Authorization' => sprintf('Bearer %s', $bearerToken),
