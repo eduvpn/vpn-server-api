@@ -21,8 +21,6 @@ use Psr\Log\LoggerInterface;
 use SURFnet\VPN\Server\OpenVpn\Exception\ManagementSocketException;
 use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Server\PoolConfig;
-use SURFnet\VPN\Server\Utils;
-use SURFnet\VPN\Server\IP;
 
 /**
  * Manage all OpenVPN processes controlled by this service.
@@ -58,10 +56,7 @@ class ServerManager
             $managementIp = sprintf('127.42.%d.%d', 100 + $this->instanceConfig->v('instanceNumber'), 100 + $poolNumber);
             $poolConnections = [];
             // loop over all processes
-            $range = new IP($poolConfig->v('range'));
-            $processCount = Utils::getProcessCount($range->getPrefix());
-
-            for ($i = 0; $i < $processCount; ++$i) {
+            for ($i = 0; $i < $poolConfig->v('processCount'); ++$i) {
                 // add all connections from this instance to poolConnections
                 try {
                     // open the socket connection
@@ -112,9 +107,7 @@ class ServerManager
             $managementIp = sprintf('127.42.%d.%d', 100 + $this->instanceConfig->v('instanceNumber'), 100 + $poolNumber);
 
             // loop over all processes
-            $range = new IP($poolConfig->v('range'));
-            $processCount = Utils::getProcessCount($range->getPrefix());
-            for ($i = 0; $i < $processCount; ++$i) {
+            for ($i = 0; $i < $poolConfig->v('processCount'); ++$i) {
                 // add all kills from this instance to poolKills
                 try {
                     // open the socket connection
