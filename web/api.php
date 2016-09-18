@@ -76,9 +76,11 @@ try {
     );
 
     $groupProviders = [];
-    foreach (array_keys($config->v('groupProviders')) as $groupProviderId) {
-        $groupProviderClass = sprintf('SURFnet\VPN\Server\GroupProvider\%s', $groupProviderId);
-        $groupProviders[] = new $groupProviderClass($dataDir, $config);
+    if ($config->e('groupProviders')) {
+        foreach (array_keys($config->v('groupProviders')) as $groupProviderId) {
+            $groupProviderClass = sprintf('SURFnet\VPN\Server\GroupProvider\%s', $groupProviderId);
+            $groupProviders[] = new $groupProviderClass($dataDir, $config);
+        }
     }
 
     $service->addModule(
