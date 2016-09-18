@@ -16,6 +16,10 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
+
+use SURFnet\VPN\Common\FileIO;
+
 function showHelp(array $argv)
 {
     return implode(
@@ -56,14 +60,7 @@ try {
 
     $statsData = [];
 
-    if (false === $logJsonData = @file_get_contents($inFile)) {
-        throw new RuntimeException(sprintf('unable to read "%s"', $inFile));
-    }
-
-    $logData = json_decode($logJsonData, true);
-    if (JSON_ERROR_NONE !== json_last_error()) {
-        throw new RuntimeException(sprintf('unable to decode JSON in "%s"', $inFile));
-    }
+    $logData = FileIO::readJsonFile($inFile);
 
     $timeConnection = [];
     $uniqueUsers = [];
@@ -146,7 +143,8 @@ try {
         $totalTraffic += $entry['traffic'];
     }
 
-    $jsonStats = json_encode(
+    FileIO::writeJsonFile(
+        $outFile,
         [
             'days' => array_values($statsData),
             'total_traffic' => $totalTraffic,
@@ -158,10 +156,6 @@ try {
             'unique_users' => count($uniqueUsers),
         ]
     );
-
-    if (false === @file_put_contents($outFile, $jsonStats)) {
-        throw new RuntimeException(sprintf('unable to write to "%s"', $outFile));
-    }
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);

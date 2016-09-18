@@ -20,6 +20,7 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Server\Config\Firewall;
 use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Common\FileIO;
 
 function showHelp(array $argv)
 {
@@ -59,13 +60,8 @@ try {
     $firewall6 = Firewall::getFirewall6($configList);
 
     if ($installFw) {
-        if (false === @file_put_contents('/etc/sysconfig/iptables', $firewall)) {
-            throw new Exception('unable to write /etc/sysconfig/iptables');
-        }
-
-        if (false === @file_put_contents('/etc/sysconfig/ip6tables', $firewall6)) {
-            throw new Exception('unable to write /etc/sysconfig/ip6tables');
-        }
+        FileIO::writeFile('/etc/sysconfig/iptables', $firewall);
+        FileIO::writeFile('/etc/sysconfig/ip6tables', $firewall6);
     } else {
         echo '##########################################'.PHP_EOL;
         echo '# IPv4'.PHP_EOL;

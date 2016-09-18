@@ -28,6 +28,9 @@
  *     -t vpn-server-api-client-disconnect \
  *     | vpn-server-api-parse-journal
  */
+require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
+
+use SURFnet\VPN\Common\FileIO;
 
 /*
  * Due to not wanting to store all user data forever, we have a log window
@@ -43,6 +46,7 @@
  * - if a client was connected before the logging window started and
  *   disconnected during, it is not added to the log;
  */
+
 $clientConnectSyslogIdentifier = 'vpn-server-api-client-connect';
 $clientDisconnectSyslogIdentifier = 'vpn-server-api-client-disconnect';
 
@@ -156,15 +160,12 @@ try {
             }
         }
 
-        $jsonLog = json_encode(
+        FileIO::writeJsonFile(
+            $logFile,
             [
                 'entries' => array_values($logEntries),
             ]
         );
-
-        if (false === @file_put_contents($logFile, $jsonLog)) {
-            throw new RuntimeException(sprintf('unable to write log to "%s"', $logFile));
-        }
     }
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;

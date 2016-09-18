@@ -22,18 +22,19 @@ use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\Request;
+use SURFnet\VPN\Common\FileIO;
 
 class LogModule implements ServiceModuleInterface
 {
     /** @var string */
-    private $logPath;
+    private $dataDir;
 
     /** @var \DateTime */
     private $dateTime;
 
-    public function __construct($logPath, DateTime $dateTime = null)
+    public function __construct($dataDir, DateTime $dateTime = null)
     {
-        $this->logPath = $logPath;
+        $this->dataDir = $dataDir;
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
@@ -62,8 +63,9 @@ class LogModule implements ServiceModuleInterface
             '/stats',
             function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['vpn-admin-portal']);
+                $statsFile = sprintf('%s/stats.json', $this->dataDir);
 
-                return new ApiResponse('stats', Json::decodeFile(sprintf('%s/stats.json', $this->logPath)));
+                return new ApiResponse('stats', FileIO::readJsonFile($statsFile));
             }
         );
     }
@@ -71,8 +73,8 @@ class LogModule implements ServiceModuleInterface
     public function get($dateTimeUnix, $ipAddress)
     {
         $returnData = [];
-
-        $logData = Json::decodeFile(sprintf('%s/log.json', $this->logPath));
+        $logFile = sprintf('%s/log.json', $this->dataDir);
+        $logData = FileIO::readJsonFile($logFile);
         foreach ($logData['entries'] as $k => $v) {
             $connectTime = $v['connect_time'];
             $disconnectTime = array_key_exists('disconnect_time', $v) ? $v['disconnect_time'] : null;
