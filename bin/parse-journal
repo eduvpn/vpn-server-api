@@ -16,10 +16,6 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
-
-use fkooman\Config\Reader;
-use fkooman\Config\YamlFile;
 
 /*
  * Parse the systemd journal.
@@ -50,6 +46,32 @@ use fkooman\Config\YamlFile;
 $clientConnectSyslogIdentifier = 'vpn-server-api-client-connect';
 $clientDisconnectSyslogIdentifier = 'vpn-server-api-client-disconnect';
 
+function verifyMessage(array $messageData, $type)
+{
+    $requiredKeys = [
+        'INSTANCE_ID',
+        'POOL_ID',
+        'common_name',
+        'time_unix',
+        'ifconfig_pool_remote_ip',
+        'ifconfig_pool_remote_ip6',
+    ];
+
+    if ('disconnect' === $type) {
+        $requiredKeys[] = 'bytes_received';
+        $requiredKeys[] = 'bytes_sent';
+        $requiredKeys[] = 'time_duration';
+    }
+
+    foreach ($requiredKeys as $k) {
+        if (!array_key_exists($k, $messageData)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 try {
     $logData = [];
 
@@ -58,7 +80,6 @@ try {
         $jsonData = json_decode($jsonLine, true);
 
         if ($clientConnectSyslogIdentifier === $jsonData['SYSLOG_IDENTIFIER']) {
-
             // handle connect data
             $message = $jsonData['MESSAGE'];
             $messageData = json_decode($message, true);
@@ -69,40 +90,29 @@ try {
                 continue;
             }
 
+            if (!verifyMessage($messageData, 'connect')) {
+                continue;
+            }
+
+            $instanceId = $messageData['INSTANCE_ID'];
+            $poolId = $messageData['POOL_ID'];
             $commonName = $messageData['common_name'];
             $userId = explode('_', $commonName, 2)[0];
             $configName = explode('_', $commonName, 2)[1];
 
-            // we have a history of changing log format, only 'instance_name'
-            // is currently used, we can get rid of instance_id and the
-            // default option soon
-            if (array_key_exists('instance_name', $messageData)) {
-                $instanceName = $messageData['instance_name'];
-            } elseif (array_key_exists('instance_id', $messageData)) {
-                $instanceName = $messageData['instance_id'];
-            } else {
-                $instanceName = 'default';
-            }
-            if (array_key_exists('pool_id', $messageData)) {
-                $poolId = $messageData['pool_id'];
-            } else {
-                $poolId = 'default';
-            }
-
             $logKey = sprintf('%s:%s:%s', $poolId, $messageData['common_name'], $messageData['time_unix']);
-            $logData[$instanceName][$logKey] = [
-                'instance_name' => $instanceName,
+            $logData[$instanceId][$logKey] = [
                 'pool_id' => $poolId,
                 'user_id' => $userId,
                 'config_name' => $configName,
-                'v4' => $messageData['v4'],
-                'v6' => $messageData['v6'],
+                'v4' => $messageData['ifconfig_pool_remote_ip'],
+                'v6' => $messageData['ifconfig_pool_remote_ip6'],
                 'connect_time' => intval($messageData['time_unix']),
             ];
         }
 
         if ($clientDisconnectSyslogIdentifier === $jsonData['SYSLOG_IDENTIFIER']) {
-            // handle connect data
+            // handle disconnect data
             $message = $jsonData['MESSAGE'];
             $messageData = json_decode($message, true);
             if (JSON_ERROR_NONE !== json_last_error()) {
@@ -112,47 +122,39 @@ try {
                 continue;
             }
 
-            // we have a history of changing log format, only 'instance_name'
-            // is currently used, we can get rid of instance_id and the
-            // default option soon
-            if (array_key_exists('instance_name', $messageData)) {
-                $instanceName = $messageData['instance_name'];
-            } elseif (array_key_exists('instance_id', $messageData)) {
-                $instanceName = $messageData['instance_id'];
-            } else {
-                $instanceName = 'default';
-            }
-            if (array_key_exists('pool_id', $messageData)) {
-                $poolId = $messageData['pool_id'];
-            } else {
-                $poolId = 'default';
+            if (!verifyMessage($messageData, 'disconnect')) {
+                continue;
             }
 
+            $instanceId = $messageData['INSTANCE_ID'];
+            $poolId = $messageData['POOL_ID'];
             $logKey = sprintf('%s:%s:%s', $poolId, $messageData['common_name'], $messageData['time_unix']);
-            // XXX what if instanceName key does not exist?
-            if (!array_key_exists($logKey, $logData[$instanceName])) {
+            // XXX what if instanceId key does not exist?
+            if (!array_key_exists($logKey, $logData[$instanceId])) {
                 // XXX we did not find a matching connect entry...
                 // just ignore it
                 continue;
             }
             $dataTransferred = $messageData['bytes_sent'] + $messageData['bytes_received'];
-
-            $logData[$instanceName][$logKey] = array_merge(
-                $logData[$instanceName][$logKey],
+            $logData[$instanceId][$logKey] = array_merge(
+                $logData[$instanceId][$logKey],
                 [
-                    'disconnect_time' => $messageData['disconnect_time_unix'],
+                    'disconnect_time' => $messageData['time_unix'] + intval($messageData['time_duration']),
                     'traffic' => $dataTransferred,
                 ]
             );
         }
     }
 
-    $configReader = new Reader(
-        new YamlFile(sprintf('%s/config/config.yaml', dirname(__DIR__)))
-    );
+    foreach ($logData as $instanceId => $logEntries) {
+        $logFile = sprintf('%s/data/%s/log.json', dirname(__DIR__), $instanceId);
+        $logDir = dirname($logFile);
 
-    foreach ($logData as $instanceName => $logEntries) {
-        $dataDir = sprintf('%s/%s', $configReader->v('dataDir'), $instanceName);
+        if (!file_exists($logDir)) {
+            if (false === @mkdir($logDir, 0700, true)) {
+                throw new RuntimeException(sprintf('unable to create directory "%s"', $logDir));
+            }
+        }
 
         $jsonLog = json_encode(
             [
@@ -160,12 +162,6 @@ try {
             ]
         );
 
-        if (!file_exists($dataDir)) {
-            if (false === @mkdir($dataDir, 0700, true)) {
-                throw new RuntimeException(sprintf('unable to create directory "%s"', $dataDir));
-            }
-        }
-        $logFile = sprintf('%s/log.json', $dataDir);
         if (false === @file_put_contents($logFile, $jsonLog)) {
             throw new RuntimeException(sprintf('unable to write log to "%s"', $logFile));
         }

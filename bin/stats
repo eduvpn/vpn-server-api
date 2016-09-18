@@ -16,126 +16,153 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
-
-use fkooman\Config\Reader;
-use fkooman\Config\YamlFile;
-use fkooman\Json\Json;
+function showHelp(array $argv)
+{
+    return implode(
+        PHP_EOL,
+        [
+            sprintf('SYNTAX: %s [--instance domain.tld]', $argv[0]),
+            '',
+            '--instance domain.tld      the instance to generate stats for',
+            '',
+        ]
+    );
+}
 
 try {
-    $configReader = new Reader(
-        new YamlFile(sprintf('%s/config/config.yaml', dirname(__DIR__)))
-    );
-    $dataDirs = [];
+    $instanceId = null;
 
-    foreach ($configReader->v('instanceList') as $instance) {
-        $instanceName = $instance['hostName'];
-        $dataDirs[] = sprintf('%s/%s', $configReader->v('dataDir'), $instanceName);
+    for ($i = 0; $i < $argc; ++$i) {
+        if ('--help' == $argv[$i] || '-h' === $argv[$i]) {
+            echo showHelp($argv);
+            exit(0);
+        }
+
+        if ('--instance' === $argv[$i] || '-i' === $argv[$i]) {
+            if (array_key_exists($i + 1, $argv)) {
+                $instanceId = $argv[$i + 1];
+                ++$i;
+            }
+        }
     }
 
-    foreach ($dataDirs as $dataDir) {
-        $inFile = sprintf('%s/log.json', $dataDir);
-        $outFile = sprintf('%s/stats.json', $dataDir);
+    if (is_null($instanceId)) {
+        throw new RuntimeException('instance must be specified, see --help');
+    }
 
-        $statsData = [];
-        $logData = Json::decodeFile($inFile);
+    $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
+    $inFile = sprintf('%s/log.json', $dataDir);
+    $outFile = sprintf('%s/stats.json', $dataDir);
 
-        $timeConnection = [];
-        $uniqueUsers = [];
+    $statsData = [];
 
-        foreach ($logData['entries'] as $entry) {
-            $dateOfConnection = date('Y-m-d', $entry['connect_time']);
-            if (!array_key_exists($dateOfConnection, $statsData)) {
-                $statsData[$dateOfConnection] = [];
-            }
-            if (!array_key_exists('number_of_connections', $statsData[$dateOfConnection])) {
-                $statsData[$dateOfConnection]['number_of_connections'] = 0;
-            }
-            if (!array_key_exists('traffic', $statsData[$dateOfConnection])) {
-                $statsData[$dateOfConnection]['traffic'] = 0;
-            }
-            if (!array_key_exists('user_list', $statsData[$dateOfConnection])) {
-                $statsData[$dateOfConnection]['user_list'] = [];
-            }
+    if (false === $logJsonData = @file_get_contents($inFile)) {
+        throw new RuntimeException(sprintf('unable to read "%s"', $inFile));
+    }
 
-            ++$statsData[$dateOfConnection]['number_of_connections'];
-            if (array_key_exists('traffic', $entry)) {
-                // when client is still connected, it won't have a 'traffic' entry
-                $statsData[$dateOfConnection]['traffic'] += $entry['traffic'];
+    $logData = json_decode($logJsonData, true);
+    if (JSON_ERROR_NONE !== json_last_error()) {
+        throw new RuntimeException(sprintf('unable to decode JSON in "%s"', $inFile));
+    }
 
-                $connectTime = $entry['connect_time'];
-                $disconnectTime = $entry['disconnect_time'];
+    $timeConnection = [];
+    $uniqueUsers = [];
 
-                // add it to table to be able to determine max concurrent connection
-                // count
-                if (!array_key_exists($connectTime, $timeConnection)) {
-                    $timeConnection[$connectTime] = [];
-                }
-                $timeConnection[$connectTime][] = 'C';
-
-                if (!array_key_exists($disconnectTime, $timeConnection)) {
-                    $timeConnection[$disconnectTime] = [];
-                }
-                $timeConnection[$disconnectTime][] = 'D';
-            }
-            if (!in_array($entry['user_id'], $statsData[$dateOfConnection]['user_list'])) {
-                $statsData[$dateOfConnection]['user_list'][] = $entry['user_id'];
-            }
-
-            // global unique user list
-            if (!in_array($entry['user_id'], $uniqueUsers)) {
-                $uniqueUsers[] = $entry['user_id'];
-            }
+    foreach ($logData['entries'] as $entry) {
+        $dateOfConnection = date('Y-m-d', $entry['connect_time']);
+        if (!array_key_exists($dateOfConnection, $statsData)) {
+            $statsData[$dateOfConnection] = [];
+        }
+        if (!array_key_exists('number_of_connections', $statsData[$dateOfConnection])) {
+            $statsData[$dateOfConnection]['number_of_connections'] = 0;
+        }
+        if (!array_key_exists('traffic', $statsData[$dateOfConnection])) {
+            $statsData[$dateOfConnection]['traffic'] = 0;
+        }
+        if (!array_key_exists('user_list', $statsData[$dateOfConnection])) {
+            $statsData[$dateOfConnection]['user_list'] = [];
         }
 
-        ksort($timeConnection);
-        $firstEntryTime = intval(key($timeConnection));
-        end($timeConnection);
-        $lastEntryTime = intval(key($timeConnection));
-        reset($timeConnection);
+        ++$statsData[$dateOfConnection]['number_of_connections'];
+        if (array_key_exists('traffic', $entry)) {
+            // when client is still connected, it won't have a 'traffic' entry
+            $statsData[$dateOfConnection]['traffic'] += $entry['traffic'];
 
-        $maxConcurrentConnections = 0;
-        $maxConcurrentConnectionsTime = 0;
-        $concurrentConnections = 0;
-        foreach ($timeConnection as $unixTime => $eventArray) {
-            foreach ($eventArray as $event) {
-                if ('C' === $event) {
-                    ++$concurrentConnections;
-                    if ($concurrentConnections > $maxConcurrentConnections) {
-                        $maxConcurrentConnections = $concurrentConnections;
-                        $maxConcurrentConnectionsTime = $unixTime;
-                    }
-                } else {
-                    --$concurrentConnections;
+            $connectTime = $entry['connect_time'];
+            $disconnectTime = $entry['disconnect_time'];
+
+            // add it to table to be able to determine max concurrent connection
+            // count
+            if (!array_key_exists($connectTime, $timeConnection)) {
+                $timeConnection[$connectTime] = [];
+            }
+            $timeConnection[$connectTime][] = 'C';
+
+            if (!array_key_exists($disconnectTime, $timeConnection)) {
+                $timeConnection[$disconnectTime] = [];
+            }
+            $timeConnection[$disconnectTime][] = 'D';
+        }
+        if (!in_array($entry['user_id'], $statsData[$dateOfConnection]['user_list'])) {
+            $statsData[$dateOfConnection]['user_list'][] = $entry['user_id'];
+        }
+
+        // global unique user list
+        if (!in_array($entry['user_id'], $uniqueUsers)) {
+            $uniqueUsers[] = $entry['user_id'];
+        }
+    }
+
+    ksort($timeConnection);
+    $firstEntryTime = intval(key($timeConnection));
+    end($timeConnection);
+    $lastEntryTime = intval(key($timeConnection));
+    reset($timeConnection);
+
+    $maxConcurrentConnections = 0;
+    $maxConcurrentConnectionsTime = 0;
+    $concurrentConnections = 0;
+    foreach ($timeConnection as $unixTime => $eventArray) {
+        foreach ($eventArray as $event) {
+            if ('C' === $event) {
+                ++$concurrentConnections;
+                if ($concurrentConnections > $maxConcurrentConnections) {
+                    $maxConcurrentConnections = $concurrentConnections;
+                    $maxConcurrentConnectionsTime = $unixTime;
                 }
+            } else {
+                --$concurrentConnections;
             }
         }
+    }
 
-        $totalTraffic = 0;
-        // convert the user list in unique user count for that day, rework array
-        // key and determine total amount of traffic
-        foreach ($statsData as $date => $entry) {
-            $statsData[$date]['date'] = $date;
-            $statsData[$date]['unique_user_count'] = count($entry['user_list']);
-            unset($statsData[$date]['user_list']);
-            $totalTraffic += $entry['traffic'];
-        }
+    $totalTraffic = 0;
+    // convert the user list in unique user count for that day, rework array
+    // key and determine total amount of traffic
+    foreach ($statsData as $date => $entry) {
+        $statsData[$date]['date'] = $date;
+        $statsData[$date]['unique_user_count'] = count($entry['user_list']);
+        unset($statsData[$date]['user_list']);
+        $totalTraffic += $entry['traffic'];
+    }
 
-        Json::encodeFile(
-            $outFile,
-            [
-                'days' => array_values($statsData),
-                'total_traffic' => $totalTraffic,
-                'generated_at' => time(),
-                'max_concurrent_connections' => $maxConcurrentConnections,
-                'max_concurrent_connections_time' => $maxConcurrentConnectionsTime,
-                'first_entry' => $firstEntryTime,
-                'last_entry' => $lastEntryTime,
-                'unique_users' => count($uniqueUsers),
-            ]
-        );
+    $jsonStats = json_encode(
+        [
+            'days' => array_values($statsData),
+            'total_traffic' => $totalTraffic,
+            'generated_at' => time(),
+            'max_concurrent_connections' => $maxConcurrentConnections,
+            'max_concurrent_connections_time' => $maxConcurrentConnectionsTime,
+            'first_entry' => $firstEntryTime,
+            'last_entry' => $lastEntryTime,
+            'unique_users' => count($uniqueUsers),
+        ]
+    );
+
+    if (false === @file_put_contents($outFile, $jsonStats)) {
+        throw new RuntimeException(sprintf('unable to write to "%s"', $outFile));
     }
 } catch (Exception $e) {
-    echo $e->getMessage().PHP_EOL;
+    echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
 }
