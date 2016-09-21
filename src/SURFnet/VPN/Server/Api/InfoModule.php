@@ -37,23 +37,18 @@ class InfoModule implements ServiceModuleInterface
     public function init(Service $service)
     {
         $service->get(
-            '/info/server',
+            '/server_pools',
             function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
 
-                return $this->getInfo();
+                $responseData = [];
+                foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolId) {
+                    $poolConfig = new PoolConfig($this->instanceConfig->v('vpnPools', $poolId));
+                    $responseData[$poolId] = $poolConfig->v();
+                }
+
+                return new ApiResponse('server_pools', $responseData);
             }
         );
-    }
-
-    private function getInfo()
-    {
-        $responseData = [];
-        foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolId) {
-            $poolConfig = new PoolConfig($this->instanceConfig->v('vpnPools', $poolId));
-            $responseData[$poolId] = $poolConfig->v();
-        }
-
-        return new ApiResponse('pools', $responseData);
     }
 }

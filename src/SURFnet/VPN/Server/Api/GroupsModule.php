@@ -43,7 +43,7 @@ class GroupsModule implements ServiceModuleInterface
     public function init(Service $service)
     {
         $service->get(
-            '/groups',
+            '/user_groups',
             function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['vpn-user-portal']);
                 $userId = $request->getQueryParameter('user_id');
@@ -54,7 +54,7 @@ class GroupsModule implements ServiceModuleInterface
                     $groupMembership = array_merge($groupMembership, $groupProvider->getGroups($userId));
                 }
 
-                return new ApiResponse('groups', $groupMembership);
+                return new ApiResponse('user_groups', $groupMembership);
             }
         );
     }
