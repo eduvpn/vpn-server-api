@@ -60,5 +60,6 @@ class InfoModule implements ServiceModuleInterface
 
                 return new ApiResponse('server_pool', $this->instanceConfig->v('vpnPools', $poolId));
             }
+        );
     }
 }
