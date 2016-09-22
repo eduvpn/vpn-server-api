@@ -57,8 +57,9 @@ class InfoModule implements ServiceModuleInterface
                 Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
                 $poolId = $request->getQueryParameter('pool_id');
                 InputValidation::poolId($poolId);
+                $poolConfig = new PoolConfig($this->instanceConfig->v('vpnPools', $poolId));
 
-                return new ApiResponse('server_pool', $this->instanceConfig->v('vpnPools', $poolId));
+                return new ApiResponse('server_pool', $poolConfig->v());
             }
         );
     }
