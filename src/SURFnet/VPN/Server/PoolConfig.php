@@ -24,10 +24,6 @@ class PoolConfig extends Config
     public function __construct(array $configData)
     {
         parent::__construct($configData);
-
-        // determine the number of processes and port/proto information
-        $range = new IP($this->v('range'));
-        $this->configData['processCount'] = self::getProcessCount($range->getPrefix());
     }
 
     public static function defaultConfig()
@@ -45,32 +41,7 @@ class PoolConfig extends Config
             'aclGroupList' => [],
             'blockSmb' => false,
             'forward6' => true,
+            'processCount' => 4,
         ];
-    }
-
-    /**
-     * Depending on the size of the prefix assigned to this pool, this method
-     * will return the number of OpenVPN processes backing that range, each
-     * pool range is split in #processCount number of OpenVPN processes.
-     */
-    private static function getProcessCount($prefix)
-    {
-        switch ($prefix) {
-            case 32:    // 1 IP
-            case 31:    // 2 IPs
-                throw new RuntimeException('not enough available IPs in range');
-            case 30:    // 4 IPs (1 usable for client, no splitting)
-            case 29:    // 8 IPs (5 usable for clients, no splitting)
-                return 1;
-            case 28:    // 16 IPs (12 usable for clients)
-            case 27:    // 32 IPs
-            case 26:    // 64 IPs
-            case 25:    // 128 IPs
-                return 2;
-            case 24:
-                return 4;
-        }
-
-        return 8;
     }
 }

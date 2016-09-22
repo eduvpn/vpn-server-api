@@ -19,7 +19,6 @@ namespace SURFnet\VPN\Server\Config;
 
 use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Server\PoolConfig;
-use SURFnet\VPN\Server\Utils;
 use SURFnet\VPN\Server\IP;
 use RuntimeException;
 
@@ -118,7 +117,7 @@ class OpenVpn
     {
         $range = new IP($poolConfig->v('range'));
         $range6 = new IP($poolConfig->v('range6'));
-        $processCount = Utils::getProcessCount($range->getPrefix());
+        $processCount = $poolConfig->v('processCount');
 
         $splitRange = $range->split($processCount);
         $splitRange6 = $range6->split($processCount);
