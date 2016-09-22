@@ -21,6 +21,7 @@ use SURFnet\VPN\Common\Http\Exception\HttpException;
 
 class InputValidation
 {
+    const POOL_ID_PATTERN = '/^[a-zA-Z-_]+$/';
     const COMMON_NAME_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
     const USER_ID_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
     const OTP_KEY_PATTERN = '/^[0-9]{6}$/';
@@ -82,6 +83,13 @@ class InputValidation
     {
         if (false === strtotime($dateTime)) {
             throw new HttpException('invalid date/time format', 400);
+        }
+    }
+
+    public static function poolId($poolId)
+    {
+        if (0 === preg_match(self::POOL_ID_PATTERN, $poolId)) {
+            throw new HttpException('invalid poolId format', 400);
         }
     }
 
