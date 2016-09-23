@@ -14,10 +14,9 @@ apiProviders:
 
 vpnPools:
     internet:
+        displayName: 'Internet Access'
         extIf: eth0
-        listen: 0.0.0.0
+        hostName: vpn.example
         range: 10.0.0.0/24
         range6: 'fd00:4242:4242::/48'
-        useNat: true
-        defaultGateway: true
-        dns: [8.8.8.8, 8.8.4.4]
+        dns: [8.8.8.8, 8.8.4.4, '2001:4860:4860::8888', '2001:4860:4860::8844']
