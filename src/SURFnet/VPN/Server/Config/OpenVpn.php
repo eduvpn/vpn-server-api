@@ -50,10 +50,9 @@ class OpenVpn
     {
         $postData = [
             'common_name' => $commonName,
-            'cert_type' => 'server',
         ];
 
-        $apiUri = sprintf('%s/certificate/', $apiUri);
+        $apiUri = sprintf('%s/add_server_certificate', $apiUri);
 
         $ch = curl_init($apiUri);
         $optionsSet = curl_setopt_array(
@@ -78,7 +77,7 @@ class OpenVpn
         }
 
         $configData = json_decode($response, true);
-        $certData = $configData['data']['certificate'];
+        $certData = $configData['data']['add_server_certificate'];
 
         $certFileMapping = [
             'ca' => sprintf('%s/ca.crt', $this->vpnTlsDir),
