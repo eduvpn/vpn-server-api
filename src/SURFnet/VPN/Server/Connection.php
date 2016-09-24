@@ -37,21 +37,19 @@ class Connection
         $dataDir = sprintf('%s/data/%s', $this->baseDir, $envData['INSTANCE_ID']);
 
         // is the user account disabled?
+        // XXX we have to be careful, if the directory is not readable by the
+        // openvpn user, it is assumed the user is not disabled! We have to
+        // find a more robust solution for this!
         $disabledUsersDir = sprintf('%s/users/disabled', $dataDir);
-        if (!@is_readable($disabledUsersDir)) {
-            // folder does not exist, or unable to read
-            throw new RuntimeException(sprintf('unable to read "%s"', $disabledUsersDir));
-        }
         if (@file_exists(sprintf('%s/%s', $disabledUsersDir, $userId))) {
             throw new ConnectionException('client not allowed, user is disabled');
         }
 
         // is the common name disabled?
+        // XXX we have to be careful, if the directory is not readable by the
+        // openvpn user, it is assumed the user is not disabled! We have to
+        // find a more robust solution for this!
         $disabledCommonNamesDir = sprintf('%s/common_names/disabled', $dataDir);
-        if (!@is_readable($disabledCommonNamesDir)) {
-            // folder does not exist, or unable to read
-            throw new RuntimeException(sprintf('unable to read "%s"', $disabledCommonNamesDir));
-        }
         if (@file_exists(sprintf('%s/%s', $disabledCommonNamesDir, $envData['common_name']))) {
             throw new ConnectionException('client not allowed, CN is disabled');
         }
