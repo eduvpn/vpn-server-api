@@ -128,7 +128,7 @@ class Users
     private static function createDir($dirName)
     {
         if (!@file_exists($dirName)) {
-            if (false === @mkdir($dirName, 0700, true)) {
+            if (false === @mkdir($dirName, 0711, true)) {
                 throw new RuntimeException(sprintf('unable to create directory "%s"', $dirName));
             }
         }
