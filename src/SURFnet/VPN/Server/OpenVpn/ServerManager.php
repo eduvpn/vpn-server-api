@@ -120,7 +120,7 @@ class ServerManager
                     );
 
                     $response = $this->managementSocket->command(sprintf('kill %s', $commonName));
-                    if (0 === strpos($response[0], 'SUCCESS: ')) {
+                    if (0 === mb_strpos($response[0], 'SUCCESS: ')) {
                         ++$clientsKilled;
                     }
                     // close the socket connection

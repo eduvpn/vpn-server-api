@@ -34,7 +34,7 @@ class IP
     public function __construct($ipAddressPrefix)
     {
         // detect if there is a prefix
-        $hasPrefix = false !== strpos($ipAddressPrefix, '/');
+        $hasPrefix = false !== mb_strpos($ipAddressPrefix, '/');
         if ($hasPrefix) {
             list($ipAddress, $ipPrefix) = explode('/', $ipAddressPrefix);
         } else {
@@ -47,7 +47,7 @@ class IP
             throw new IPException('invalid IP address');
         }
 
-        $is6 = false !== strpos($ipAddress, ':');
+        $is6 = false !== mb_strpos($ipAddress, ':');
         if ($is6) {
             if (is_null($ipPrefix)) {
                 $ipPrefix = 128;
@@ -174,12 +174,12 @@ class IP
 
         $hexAddress = bin2hex(inet_pton($this->getAddress()));
         // strip the last digits based on prefix size
-        $hexAddress = substr($hexAddress, 0, 16 - ((64 - $this->getPrefix()) / 4));
+        $hexAddress = mb_substr($hexAddress, 0, 16 - ((64 - $this->getPrefix()) / 4));
 
         $splitRanges = [];
         for ($i = 0; $i < $networkCount; ++$i) {
             // pad with zeros until there is enough space for or network number
-            $paddedHexAddress = str_pad($hexAddress, 16 - strlen(dechex($i)), '0');
+            $paddedHexAddress = str_pad($hexAddress, 16 - mb_strlen(dechex($i)), '0');
             // append the network number
             $hexAddressWithNetwork = $paddedHexAddress.dechex($i);
             // pad it to the end and convert back to IPv6 address

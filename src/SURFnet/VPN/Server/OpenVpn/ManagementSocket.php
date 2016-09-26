@@ -94,7 +94,7 @@ class ManagementSocket implements ManagementSocketInterface
     {
         $endMarkers = array('END', 'SUCCESS: ', 'ERROR: ');
         foreach ($endMarkers as $endMarker) {
-            if (0 === strpos($lastLine, $endMarker)) {
+            if (0 === mb_strpos($lastLine, $endMarker)) {
                 return true;
             }
         }

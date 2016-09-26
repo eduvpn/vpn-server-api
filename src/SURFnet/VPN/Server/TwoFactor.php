@@ -70,10 +70,10 @@ class TwoFactor
 
     private static function getUserId($commonName)
     {
-        if (false === $uPos = strpos($commonName, '_')) {
+        if (false === $uPos = mb_strpos($commonName, '_')) {
             throw new RuntimeException('unable to extract userId from commonName');
         }
 
-        return substr($commonName, 0, $uPos);
+        return mb_substr($commonName, 0, $uPos);
     }
 }

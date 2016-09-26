@@ -52,13 +52,13 @@ class StatusParser
         $globalStatsStart = 0;
 
         for ($i = 0; $i < sizeof($statusData); ++$i) {
-            if (0 === strpos($statusData[$i], 'HEADER,CLIENT_LIST')) {
+            if (0 === mb_strpos($statusData[$i], 'HEADER,CLIENT_LIST')) {
                 $clientListStart = $i;
             }
-            if (0 === strpos($statusData[$i], 'HEADER,ROUTING_TABLE')) {
+            if (0 === mb_strpos($statusData[$i], 'HEADER,ROUTING_TABLE')) {
                 $routingTableStart = $i;
             }
-            if (0 === strpos($statusData[$i], 'GLOBAL_STATS')) {
+            if (0 === mb_strpos($statusData[$i], 'GLOBAL_STATS')) {
                 $globalStatsStart = $i;
             }
         }

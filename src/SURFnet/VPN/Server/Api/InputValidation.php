@@ -71,7 +71,7 @@ class InputValidation
 
     public static function vootToken($vootToken)
     {
-        if (!is_string($vootToken) || 0 >= strlen($vootToken)) {
+        if (!is_string($vootToken) || 0 >= mb_strlen($vootToken)) {
             throw new HttpException('voot token must be non-empty string', 400);
         }
         if (0 === preg_match(self::ACCESS_TOKEN_PATTERN, $vootToken)) {
