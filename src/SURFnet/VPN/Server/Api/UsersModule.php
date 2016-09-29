@@ -129,7 +129,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/has_voot_token',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-user-portal']);
+                Utils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
                 $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
@@ -140,7 +140,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/set_voot_token',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal']);
+                Utils::requireUser($hookData, ['vpn-user-portal']);
                 $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
                 $vootToken = $request->getPostParameter('voot_token');
