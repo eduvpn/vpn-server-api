@@ -57,7 +57,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/is_disabled_user',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal']);
+                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
                 $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
