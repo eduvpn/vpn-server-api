@@ -36,10 +36,12 @@ function showHelp(array $argv)
     return implode(
         PHP_EOL,
         [
-            sprintf('SYNTAX: %s [--instance vpn.example] [--pool internet] [--ext eth0]', $argv[0]),
+            sprintf('SYNTAX: %s [--instance vpn.example] [--pool internet] [--host hostname]', $argv[0]),
+            '                   [--ext eth0]',
             '',
             '--instance instanceId      the instance to target, e.g. vpn.example',
             '--pool poolId              the pool to target, e.g. internet',
+            '--host hostname           the hostname clients connect to',
             '--ext extIf                the external interface, e.g. eth0',
             '',
         ]
@@ -50,6 +52,7 @@ try {
     $instanceId = null;
     $poolId = null;
     $extIf = null;
+    $hostName = null;
 
     for ($i = 0; $i < $argc; ++$i) {
         if ('--help' == $argv[$i] || '-h' === $argv[$i]) {
@@ -67,6 +70,13 @@ try {
         if ('--pool' === $argv[$i] || '-p' === $argv[$i]) {
             if (array_key_exists($i + 1, $argv)) {
                 $poolId = $argv[$i + 1];
+                ++$i;
+            }
+        }
+
+        if ('--host' === $argv[$i] || '-h' === $argv[$i]) {
+            if (array_key_exists($i + 1, $argv)) {
+                $hostName = $argv[$i + 1];
                 ++$i;
             }
         }
@@ -91,6 +101,10 @@ try {
         throw new RuntimeException('the external interface must be specified, see --help');
     }
 
+    if (is_null($hostName)) {
+        $hostName = $instanceId;
+    }
+
     $v4 = sprintf('10.%s.%s.0/24', hexdec(bin2hex(random_bytes(1))), hexdec(bin2hex(random_bytes(1))));
     $v6 = sprintf('fd%s:%s:%s:%s::/60', bin2hex(random_bytes(1)), bin2hex(random_bytes(2)), bin2hex(random_bytes(2)), bin2hex(random_bytes(2) & hex2bin('fff0')));
 
@@ -106,6 +120,7 @@ try {
 
     $poolConfigData['range'] = $v4;
     $poolConfigData['range6'] = $v6;
+    $poolConfigData['hostName'] = $hostName;
     $poolConfigData['extIf'] = $extIf;
 
     $instanceConfigData['vpnPools'][$poolId] = $poolConfigData;
