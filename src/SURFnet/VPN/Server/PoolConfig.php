@@ -29,10 +29,10 @@ class PoolConfig extends Config
     public static function defaultConfig()
     {
         return [
-            'defaultGateway' => true,
+            'defaultGateway' => false,
             'routes' => [],
             'dns' => [],
-            'useNat' => true,
+            'useNat' => false,
             'twoFactor' => false,
             'clientToClient' => false,
             'listen' => '0.0.0.0',
