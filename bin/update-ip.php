@@ -74,7 +74,7 @@ try {
             }
         }
 
-        if ('--host' === $argv[$i] || '-h' === $argv[$i]) {
+        if ('--host' === $argv[$i]) {
             if (array_key_exists($i + 1, $argv)) {
                 $hostName = $argv[$i + 1];
                 ++$i;
