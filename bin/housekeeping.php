@@ -18,29 +18,47 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
-use fkooman\VPN\Server\OtpLog;
-use fkooman\Config\Reader;
-use fkooman\Config\YamlFile;
+use SURFnet\VPN\Server\OtpLog;
 
-function cleanupOtp($dbPath)
+function showHelp(array $argv)
 {
-    $db = new PDO($dbPath);
-    $otpLog = new OtpLog($db);
-    // remove all OTP key entries that are older than 5 minutes
-    $otpLog->housekeeping(strtotime('now -5 minutes'));
+    return implode(
+        PHP_EOL,
+        [
+            sprintf('SYNTAX: %s [--instance domain.tld]', $argv[0]),
+            '',
+            '--instance domain.tld      the instance to housekeep',
+            '',
+        ]
+    );
 }
 
 try {
-    $configReader = new Reader(
-        new YamlFile(dirname(__DIR__).'/config/config.yaml')
-    );
-    $vpnDataDir = $configReader->v('vpnDataDir');
+    $instanceId = null;
 
-    foreach ($configReader->v('instanceList') as $instance) {
-        $instanceName = $instance['hostName'];
-        $dbPath = sprintf('sqlite://%s/%s/otp.sqlite', $vpnDataDir, $instanceName);
-        cleanupOtp($dbPath);
+    for ($i = 0; $i < $argc; ++$i) {
+        if ('--help' == $argv[$i] || '-h' === $argv[$i]) {
+            echo showHelp($argv);
+            exit(0);
+        }
+
+        if ('--instance' === $argv[$i] || '-i' === $argv[$i]) {
+            if (array_key_exists($i + 1, $argv)) {
+                $instanceId = $argv[$i + 1];
+                ++$i;
+            }
+        }
     }
+
+    if (is_null($instanceId)) {
+        throw new RuntimeException('instance must be specified, see --help');
+    }
+
+    $vpnDataDir = sprintf('%s/openvpn-data/%s', dirname(__DIR__), $instanceId);
+    $db = new PDO(sprintf('sqlite://%s/otp.sqlite', $vpnDataDir));
+    $otpLog = new OtpLog($db);
+    // remove all OTP key entries that are older than 5 minutes
+    $otpLog->housekeeping(strtotime('now -5 minutes'));
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
