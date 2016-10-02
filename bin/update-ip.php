@@ -41,7 +41,7 @@ function showHelp(array $argv)
             '',
             '--instance instanceId      the instance to target, e.g. vpn.example',
             '--pool poolId              the pool to target, e.g. internet',
-            '--host hostname           the hostname clients connect to',
+            '--host hostname            the hostname clients connect to',
             '--ext extIf                the external interface, e.g. eth0',
             '',
         ]
