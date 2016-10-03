@@ -21,7 +21,7 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 use SURFnet\VPN\Server\Config\Firewall;
 use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Common\FileIO;
-use SURFnet\VPN\Server\CliParser;
+use SURFnet\VPN\Common\CliParser;
 
 try {
     $p = new CliParser(

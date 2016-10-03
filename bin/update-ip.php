@@ -20,7 +20,7 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Server\PoolConfig;
-use SURFnet\VPN\Server\CliParser;
+use SURFnet\VPN\Common\CliParser;
 
 /*
  * Update the IP address configuration of vpn-server-api.

@@ -22,7 +22,7 @@ use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
-use SURFnet\VPN\Server\CliParser;
+use SURFnet\VPN\Common\CliParser;
 
 try {
     $p = new CliParser(
