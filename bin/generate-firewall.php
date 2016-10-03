@@ -21,31 +21,20 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 use SURFnet\VPN\Server\Config\Firewall;
 use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Common\FileIO;
-
-function showHelp(array $argv)
-{
-    return implode(
-        PHP_EOL,
-        [
-            sprintf('SYNTAX: %s [--install]', $argv[0]),
-            '',
-            '--install  install the firewall rules',
-            '',
-        ]
-    );
-}
+use SURFnet\VPN\Server\CliParser;
 
 try {
-    $installFw = false;
+    $p = new CliParser(
+        'Generate firewall rules for all instances',
+        [
+            'install' => ['install the firewall', false, false],
+        ]
+    );
 
-    for ($i = 1; $i < $argc; ++$i) {
-        if ('--help' === $argv[$i] || '-h' === $argv[$i]) {
-            echo showHelp($argv);
-            exit(0);
-        }
-        if ('--install' === $argv[$i] || '-i' === $argv[$i]) {
-            $installFw = true;
-        }
+    $opt = $p->parse($argv);
+    if ($opt->e('help')) {
+        echo $p->help();
+        exit(0);
     }
 
     // detect all instances
@@ -59,7 +48,7 @@ try {
     $firewall = Firewall::getFirewall4($configList);
     $firewall6 = Firewall::getFirewall6($configList);
 
-    if ($installFw) {
+    if ($opt->e('install')) {
         FileIO::writeFile('/etc/sysconfig/iptables', $firewall);
         FileIO::writeFile('/etc/sysconfig/ip6tables', $firewall6);
     } else {
@@ -75,6 +64,5 @@ try {
     }
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
-    echo $e->getTraceAsString();
     exit(1);
 }

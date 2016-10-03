@@ -22,42 +22,23 @@ use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
-
-function showHelp(array $argv)
-{
-    return implode(
-        PHP_EOL,
-        [
-            sprintf('SYNTAX: %s [--instance domain.tld]', $argv[0]),
-            '',
-            '--instance domain.tld      the VPN instance to get the status for',
-            '',
-        ]
-    );
-}
+use SURFnet\VPN\Server\CliParser;
 
 try {
-    $instanceId = null;
+    $p = new CliParser(
+        'Get the connection status of an instance',
+        [
+            'instance' => ['the instance', true, true],
+        ]
+    );
 
-    for ($i = 0; $i < $argc; ++$i) {
-        if ('--help' == $argv[$i] || '-h' === $argv[$i]) {
-            echo showHelp($argv);
-            exit(0);
-        }
-
-        if ('--instance' === $argv[$i] || '-i' === $argv[$i]) {
-            if (array_key_exists($i + 1, $argv)) {
-                $instanceId = $argv[$i + 1];
-                ++$i;
-            }
-        }
+    $opt = $p->parse($argv);
+    if ($opt->e('help')) {
+        echo $p->help();
+        exit(0);
     }
 
-    if (is_null($instanceId)) {
-        throw new RuntimeException('instance must be specified, see --help');
-    }
-
-    $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
+    $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $opt->v('instance'));
     $config = InstanceConfig::fromFile($configFile);
 
     $serverManager = new ServerManager(

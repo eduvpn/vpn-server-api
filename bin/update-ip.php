@@ -20,8 +20,9 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Server\PoolConfig;
+use SURFnet\VPN\Server\CliParser;
 
-/**
+/*
  * Update the IP address configuration of vpn-server-api.
  *
  * IPv4:
@@ -31,78 +32,22 @@ use SURFnet\VPN\Server\PoolConfig;
  * The IPv6 address is generated according to RFC 4193 (Global ID), it results
  * in a /60 network.
  */
-function showHelp(array $argv)
-{
-    return implode(
-        PHP_EOL,
-        [
-            sprintf('SYNTAX: %s [--instance vpn.example] [--pool internet] [--host hostname]', $argv[0]),
-            '                   [--ext eth0]',
-            '',
-            '--instance instanceId      the instance to target, e.g. vpn.example',
-            '--pool poolId              the pool to target, e.g. internet',
-            '--host hostname            the hostname clients connect to',
-            '--ext extIf                the external interface, e.g. eth0',
-            '',
-        ]
-    );
-}
 
 try {
-    $instanceId = null;
-    $poolId = null;
-    $extIf = null;
-    $hostName = null;
+    $p = new CliParser(
+        'Automatically generate an IP address and basic config for a pool',
+        [
+            'instance' => ['the instance to target, e.g. vpn.example', true, true],
+            'pool' => ['the pool to target, e.g. internet', true, true],
+            'host' => ['the hostname clients connect to', true, true],
+            'ext' => ['the external interface, e.g. eth0', true, true],
+        ]
+    );
 
-    for ($i = 0; $i < $argc; ++$i) {
-        if ('--help' == $argv[$i] || '-h' === $argv[$i]) {
-            echo showHelp($argv);
-            exit(0);
-        }
-
-        if ('--instance' === $argv[$i] || '-i' === $argv[$i]) {
-            if (array_key_exists($i + 1, $argv)) {
-                $instanceId = $argv[$i + 1];
-                ++$i;
-            }
-        }
-
-        if ('--pool' === $argv[$i] || '-p' === $argv[$i]) {
-            if (array_key_exists($i + 1, $argv)) {
-                $poolId = $argv[$i + 1];
-                ++$i;
-            }
-        }
-
-        if ('--host' === $argv[$i]) {
-            if (array_key_exists($i + 1, $argv)) {
-                $hostName = $argv[$i + 1];
-                ++$i;
-            }
-        }
-
-        if ('--ext' === $argv[$i] || '-e' === $argv[$i]) {
-            if (array_key_exists($i + 1, $argv)) {
-                $extIf = $argv[$i + 1];
-                ++$i;
-            }
-        }
-    }
-
-    if (is_null($instanceId)) {
-        throw new RuntimeException('the instanceId must be specified, see --help');
-    }
-
-    if (is_null($poolId)) {
-        throw new RuntimeException('the poolId must be specified, see --help');
-    }
-
-    if (is_null($extIf)) {
-        throw new RuntimeException('the external interface must be specified, see --help');
-    }
-
-    if (is_null($hostName)) {
-        $hostName = $instanceId;
+    $opt = $p->parse($argv);
+    if ($opt->e('help')) {
+        echo $p->help();
+        exit(0);
     }
 
     $v4 = sprintf('10.%s.%s.0/24', hexdec(bin2hex(random_bytes(1))), hexdec(bin2hex(random_bytes(1))));
@@ -111,19 +56,19 @@ try {
     echo sprintf('IPv4 CIDR  : %s', $v4).PHP_EOL;
     echo sprintf('IPv6 prefix: %s', $v6).PHP_EOL;
 
-    $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
+    $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $opt->v('instance'));
     $instanceConfig = InstanceConfig::fromFile($configFile);
-    $poolConfig = new PoolConfig($instanceConfig->v('vpnPools', $poolId));
+    $poolConfig = new PoolConfig($instanceConfig->v('vpnPools', $opt->v('pool')));
 
     $instanceConfigData = $instanceConfig->v();
     $poolConfigData = $poolConfig->v();
 
     $poolConfigData['range'] = $v4;
     $poolConfigData['range6'] = $v6;
-    $poolConfigData['hostName'] = $hostName;
-    $poolConfigData['extIf'] = $extIf;
+    $poolConfigData['hostName'] = $opt->v('host');
+    $poolConfigData['extIf'] = $opt->v('ext');
 
-    $instanceConfigData['vpnPools'][$poolId] = $poolConfigData;
+    $instanceConfigData['vpnPools'][$opt->v('pool')] = $poolConfigData;
 
     InstanceConfig::toFile($configFile, $instanceConfigData);
 } catch (Exception $e) {
