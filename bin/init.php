@@ -45,7 +45,7 @@ try {
     }
     $db = new PDO(sprintf('sqlite://%s/otp.sqlite', $vpnDataDir));
     $otpLog = new OtpLog($db);
-    $otpLog->initDatabase();
+    $otpLog->init();
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);

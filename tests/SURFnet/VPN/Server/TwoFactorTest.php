@@ -31,7 +31,7 @@ class TwoFactorTest extends PHPUnit_Framework_TestCase
     {
         $db = new PDO('sqlite::memory:');
         $this->otpLog = new OtpLog($db);
-        $this->otpLog->initDatabase();
+        $this->otpLog->init();
     }
 
     public function testTwoFactorValid()

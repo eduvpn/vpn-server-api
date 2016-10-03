@@ -28,32 +28,25 @@ class OtpLog
     /** @var PDO */
     private $db;
 
-    /** @var string */
-    private $prefix;
-
-    public function __construct(PDO $db, $prefix = '')
+    public function __construct(PDO $db)
     {
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->db = $db;
-        $this->prefix = $prefix;
     }
 
     public function record($userId, $otpKey, $timeUnix)
     {
         $stmt = $this->db->prepare(
-            sprintf(
-                'INSERT INTO %s (
-                    user_id,
-                    otp_key,
-                    time_unix
-                 ) 
-                 VALUES(
-                    :user_id, 
-                    :otp_key,
-                    :time_unix
-                 )',
-                $this->prefix.'otp_log'
-            )
+            'INSERT INTO otp_log (
+                user_id,
+                otp_key,
+                time_unix
+             ) 
+             VALUES(
+                :user_id, 
+                :otp_key,
+                :time_unix
+             )'
         );
 
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
@@ -72,9 +65,8 @@ class OtpLog
     {
         $stmt = $this->db->prepare(
             sprintf(
-                'DELETE FROM %s 
-                    WHERE time_unix < :time_unix',
-                $this->prefix.'otp_log'
+                'DELETE FROM otp_log
+                    WHERE time_unix < :time_unix'
             )
         );
 
@@ -82,28 +74,19 @@ class OtpLog
         $stmt->execute();
     }
 
-    public static function createTableQueries($prefix)
+    public function init()
     {
-        $query = array(
-            sprintf(
-                'CREATE TABLE IF NOT EXISTS %s (
-                    user_id VARCHAR(255) NOT NULL,
-                    otp_key VARCHAR(255) NOT NULL,
-                    time_unix INTEGER NOT NULL,
-                    UNIQUE(user_id, otp_key)
-                )',
-                $prefix.'otp_log'
-            ),
-        );
+        $queryList = [
+            'CREATE TABLE IF NOT EXISTS otp_log (
+                user_id VARCHAR(255) NOT NULL,
+                otp_key VARCHAR(255) NOT NULL,
+                time_unix INTEGER NOT NULL,
+                UNIQUE(user_id, otp_key)
+            )',
+        ];
 
-        return $query;
-    }
-
-    public function initDatabase()
-    {
-        $queries = self::createTableQueries($this->prefix);
-        foreach ($queries as $q) {
-            $this->db->query($q);
+        foreach ($queryList as $query) {
+            $this->db->query($query);
         }
     }
 }
