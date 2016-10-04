@@ -126,12 +126,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common.git",
-                "reference": "e9caa0bb2a8d1ac993135b6591baef69abfdba32"
+                "reference": "59b0880b8c14ce73b03bbd78d3c56a88bcfba429"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/e9caa0bb2a8d1ac993135b6591baef69abfdba32",
-                "reference": "e9caa0bb2a8d1ac993135b6591baef69abfdba32",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/59b0880b8c14ce73b03bbd78d3c56a88bcfba429",
+                "reference": "59b0880b8c14ce73b03bbd78d3c56a88bcfba429",
                 "shasum": ""
             },
             "require": {
@@ -164,7 +164,7 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2016-10-03 14:11:43"
+            "time": "2016-10-04 12:55:54"
         },
         {
             "name": "guzzlehttp/guzzle",
