@@ -154,17 +154,13 @@ try {
         $logFile = sprintf('%s/data/%s/log.json', dirname(__DIR__), $instanceId);
         $logDir = dirname($logFile);
 
-        if (!file_exists($logDir)) {
-            if (false === @mkdir($logDir, 0711, true)) {
-                throw new RuntimeException(sprintf('unable to create directory "%s"', $logDir));
-            }
-        }
-
+        FileIO::createDir($logDir, 0711);
         FileIO::writeJsonFile(
             $logFile,
             [
                 'entries' => array_values($logEntries),
-            ]
+            ],
+            0644
         );
     }
 } catch (Exception $e) {

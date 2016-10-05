@@ -39,11 +39,11 @@ class Users
     public function __construct($dataDir)
     {
         $this->disableDir = sprintf('%s/disabled', $dataDir);
-        self::createDir($this->disableDir);
+        FileIO::createDir($this->disableDir, 0711);
         $this->otpDir = sprintf('%s/otp_secrets', $dataDir);
-        self::createDir($this->otpDir);
+        FileIO::createDir($this->otpDir, 0711);
         $this->vootDir = sprintf('%s/voot_tokens', $dataDir);
-        self::createDir($this->vootDir);
+        FileIO::createDir($this->vootDir, 0711);
     }
 
     public function getDisabled()
@@ -70,15 +70,13 @@ class Users
     public function setDisabled($userId)
     {
         $disableFile = sprintf('%s/%s', $this->disableDir, $userId);
-        FileIO::writeFile($disableFile, time());
+        FileIO::writeFile($disableFile, time(), 0644);
     }
 
     public function setEnabled($userId)
     {
         $disableFile = sprintf('%s/%s', $this->disableDir, $userId);
-        if (false === @unlink($disableFile)) {
-            throw new RuntimeException(sprintf('unable to delete file "%s"', $disableFile));
-        }
+        FileIO::deleteFile($disableFile);
     }
 
     public function setOtpSecret($userId, $otpSecret)
@@ -89,15 +87,13 @@ class Users
             throw new RuntimeException('cannot overwrite OTP secret');
         }
         $otpFile = sprintf('%s/%s', $this->otpDir, $userId);
-        FileIO::writeFile($otpFile, $otpSecret);
+        FileIO::writeFile($otpFile, $otpSecret, 0644);
     }
 
     public function deleteOtpSecret($userId)
     {
         $otpFile = sprintf('%s/%s', $this->otpDir, $userId);
-        if (false === @unlink($otpFile)) {
-            throw new RuntimeException(sprintf('unable to delete file "%s"', $otpFile));
-        }
+        FileIO::deleteFile($otpFile);
     }
 
     public function hasOtpSecret($userId)
@@ -110,7 +106,7 @@ class Users
     public function setVootToken($userId, $vootToken)
     {
         $vootFile = sprintf('%s/%s', $this->vootDir, $userId);
-        FileIO::writeFile($vootFile, $vootToken);
+        FileIO::writeFile($vootFile, $vootToken, 0644);
     }
 
     public function hasVootToken($userId)
@@ -118,14 +114,5 @@ class Users
         $vootFile = sprintf('%s/%s', $this->vootDir, $userId);
 
         return @file_exists($vootFile);
-    }
-
-    private static function createDir($dirName)
-    {
-        if (!@file_exists($dirName)) {
-            if (false === @mkdir($dirName, 0711, true)) {
-                throw new RuntimeException(sprintf('unable to create directory "%s"', $dirName));
-            }
-        }
     }
 }

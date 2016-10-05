@@ -33,7 +33,7 @@ class CommonNames
     public function __construct($dataDir)
     {
         $this->disableDir = sprintf('%s/disabled', $dataDir);
-        self::createDir($this->disableDir);
+        FileIO::createDir($this->disableDir, 0711);
     }
 
     public function getDisabled()
@@ -53,23 +53,12 @@ class CommonNames
     public function setDisabled($commonName)
     {
         $disableFile = sprintf('%s/%s', $this->disableDir, $commonName);
-        FileIO::writeFile($disableFile, time());
+        FileIO::writeFile($disableFile, time(), 0644);
     }
 
     public function setEnabled($commonName)
     {
         $disableFile = sprintf('%s/%s', $this->disableDir, $commonName);
-        if (false === @unlink($disableFile)) {
-            throw new RuntimeException(sprintf('unable to delete file "%s"', $disableFile));
-        }
-    }
-
-    private static function createDir($dirName)
-    {
-        if (!@file_exists($dirName)) {
-            if (false === @mkdir($dirName, 0711, true)) {
-                throw new RuntimeException(sprintf('unable to create directory "%s"', $dirName));
-            }
-        }
+        FileIO::deleteFile($disableFile);
     }
 }

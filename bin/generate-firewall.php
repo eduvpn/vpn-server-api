@@ -49,8 +49,8 @@ try {
     $firewall6 = Firewall::getFirewall6($configList);
 
     if ($opt->e('install')) {
-        FileIO::writeFile('/etc/sysconfig/iptables', $firewall);
-        FileIO::writeFile('/etc/sysconfig/ip6tables', $firewall6);
+        FileIO::writeFile('/etc/sysconfig/iptables', $firewall, 0600);
+        FileIO::writeFile('/etc/sysconfig/ip6tables', $firewall6, 0600);
     } else {
         echo '##########################################'.PHP_EOL;
         echo '# IPv4'.PHP_EOL;

@@ -135,7 +135,8 @@ try {
             'first_entry' => $firstEntryTime,
             'last_entry' => $lastEntryTime,
             'unique_users' => count($uniqueUsers),
-        ]
+        ],
+        0644
     );
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;

@@ -33,18 +33,10 @@ class OpenVpn
 
     public function __construct($vpnConfigDir, $vpnTlsDir)
     {
-        if (!@file_exists($vpnConfigDir)) {
-            if (false === @mkdir($vpnConfigDir, 0700, true)) {
-                throw new RuntimeException(sprintf('unable to create directory "%s"', $vpnConfigDir));
-            }
-        }
+        FileIO::createDir($vpnConfigDir, 0700);
         $this->vpnConfigDir = $vpnConfigDir;
+        FileIO::createDir($vpnTlsDir, 0700);
         $this->vpnTlsDir = $vpnTlsDir;
-        if (!@file_exists($vpnTlsDir)) {
-            if (false === @mkdir($vpnTlsDir, 0700, true)) {
-                throw new RuntimeException(sprintf('unable to create directory "%s"', $vpnTlsDir));
-            }
-        }
     }
 
     public function generateKeys($apiUri, $userName, $userPass, $commonName, $dhLength)
@@ -88,7 +80,7 @@ class OpenVpn
         ];
 
         foreach ($certFileMapping as $k => $v) {
-            FileIO::writeFile($v, $certData[$k]);
+            FileIO::writeFile($v, $certData[$k], 0600);
         }
 
         // generate the DH params
@@ -228,7 +220,7 @@ class OpenVpn
 
         $configFile = sprintf('%s/%s', $this->vpnConfigDir, $processConfig['configName']);
 
-        FileIO::writeFile($configFile, implode(PHP_EOL, $serverConfig));
+        FileIO::writeFile($configFile, implode(PHP_EOL, $serverConfig), 0600);
     }
 
     private static function getRoutes(PoolConfig $poolConfig)
