@@ -17,6 +17,7 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
+use SURFnet\VPN\Common\FileIO;
 use RuntimeException;
 
 /**
@@ -69,9 +70,7 @@ class Users
     public function setDisabled($userId)
     {
         $disableFile = sprintf('%s/%s', $this->disableDir, $userId);
-        if (false === @file_put_contents($disableFile, time())) {
-            throw new RuntimeException(sprintf('unable to write file "%s"', $disableFile));
-        }
+        FileIO::writeFile($disableFile, time());
     }
 
     public function setEnabled($userId)
@@ -90,9 +89,7 @@ class Users
             throw new RuntimeException('cannot overwrite OTP secret');
         }
         $otpFile = sprintf('%s/%s', $this->otpDir, $userId);
-        if (false === @file_put_contents($otpFile, $otpSecret)) {
-            throw new RuntimeException(sprintf('unable to write file "%s"', $otpFile));
-        }
+        FileIO::writeFile($otpFile, $otpSecret);
     }
 
     public function deleteOtpSecret($userId)
@@ -113,9 +110,7 @@ class Users
     public function setVootToken($userId, $vootToken)
     {
         $vootFile = sprintf('%s/%s', $this->vootDir, $userId);
-        if (false === @file_put_contents($vootFile, $vootToken)) {
-            throw new RuntimeException(sprintf('unable to write file "%s"', $vootFile));
-        }
+        FileIO::writeFile($vootFile, $vootToken);
     }
 
     public function hasVootToken($userId)

@@ -17,6 +17,7 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
+use SURFnet\VPN\Common\FileIO;
 use RuntimeException;
 
 /**
@@ -52,9 +53,7 @@ class CommonNames
     public function setDisabled($commonName)
     {
         $disableFile = sprintf('%s/%s', $this->disableDir, $commonName);
-        if (false === @file_put_contents($disableFile, time())) {
-            throw new RuntimeException(sprintf('unable to write file "%s"', $disableFile));
-        }
+        FileIO::writeFile($disableFile, time());
     }
 
     public function setEnabled($commonName)

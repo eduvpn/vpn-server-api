@@ -20,6 +20,7 @@ namespace SURFnet\VPN\Server\Config;
 use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Server\PoolConfig;
 use SURFnet\VPN\Server\IP;
+use SURFnet\VPN\Common\FileIO;
 use RuntimeException;
 
 class OpenVpn
@@ -87,9 +88,7 @@ class OpenVpn
         ];
 
         foreach ($certFileMapping as $k => $v) {
-            if (false === @file_put_contents($v, $certData[$k])) {
-                throw new RuntimeException(sprintf('unable to write "%s"', $v));
-            }
+            FileIO::writeFile($v, $certData[$k]);
         }
 
         // generate the DH params
@@ -229,9 +228,7 @@ class OpenVpn
 
         $configFile = sprintf('%s/%s', $this->vpnConfigDir, $processConfig['configName']);
 
-        if (false === @file_put_contents($configFile, implode(PHP_EOL, $serverConfig))) {
-            throw new RuntimeException(sprintf('unable to write configuration file "%s"', $configFile));
-        }
+        FileIO::writeFile($configFile, implode(PHP_EOL, $serverConfig));
     }
 
     private static function getRoutes(PoolConfig $poolConfig)
