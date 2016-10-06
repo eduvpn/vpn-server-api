@@ -25,7 +25,7 @@ use SURFnet\VPN\Server\OpenVpn\Exception\ManagementSocketException;
  */
 class ManagementSocket implements ManagementSocketInterface
 {
-    /** @var resource */
+    /** @var resource|null */
     private $socket;
 
     public function __construct()
@@ -52,6 +52,16 @@ class ManagementSocket implements ManagementSocketInterface
         $this->command('log off');
     }
 
+    /**
+     * Send an OpenVPN command and get the response.
+     *
+     * @param string $command a OpenVPN management command and parameters
+     *
+     * @return array the response lines as array values
+     *
+     * @throws Exception\ServerSocketException in case read/write fails or
+     *                                         socket is not open
+     */
     public function command($command)
     {
         $this->requireOpenSocket();
