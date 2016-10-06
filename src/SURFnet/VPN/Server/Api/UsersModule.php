@@ -102,6 +102,19 @@ class UsersModule implements ServiceModuleInterface
         );
 
         $service->post(
+            '/verify_otp_key',
+            function (Request $request, array $hookData) {
+                Utils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal', 'vpn-server-api']);
+                $userId = $request->getPostParameter('user_id');
+                InputValidation::userId($userId);
+                $otpKey = $request->getPostParameter('otp_key');
+                InputValidation::otpKey($otpKey);
+
+                return new ApiResponse('verify_otp_key', $this->users->verifyOtpKey($userId, $otpKey));
+            }
+        );
+
+        $service->post(
             '/set_otp_secret',
             function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['vpn-user-portal']);
@@ -109,8 +122,10 @@ class UsersModule implements ServiceModuleInterface
                 InputValidation::userId($userId);
                 $otpSecret = $request->getPostParameter('otp_secret');
                 InputValidation::otpSecret($otpSecret);
+                $otpKey = $request->getPostParameter('otp_key');
+                InputValidation::otpKey($otpKey);
 
-                return new ApiResponse('set_otp_secret', $this->users->setOtpSecret($userId, $otpSecret));
+                return new ApiResponse('set_otp_secret', $this->users->setOtpSecret($userId, $otpSecret, $otpKey));
             }
         );
 

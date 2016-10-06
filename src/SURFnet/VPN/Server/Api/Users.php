@@ -19,6 +19,10 @@ namespace SURFnet\VPN\Server\Api;
 
 use SURFnet\VPN\Common\FileIO;
 use RuntimeException;
+use PDO;
+use Base32\Base32;
+use Otp\Otp;
+use SURFnet\VPN\Server\Api\Exception\OtpException;
 
 /**
  * Manages user configuration.
@@ -33,6 +37,9 @@ class Users
     /** @var string */
     private $otpDir;
 
+    /** @var OtpLog */
+    private $otpLog;
+
     /** @var string */
     private $vootDir;
 
@@ -40,8 +47,12 @@ class Users
     {
         $this->disableDir = sprintf('%s/disabled', $dataDir);
         FileIO::createDir($this->disableDir, 0711);
+
         $this->otpDir = sprintf('%s/otp_secrets', $dataDir);
         FileIO::createDir($this->otpDir, 0711);
+        // XXX maybe we should feed OtpLog to the constructor instead?
+        $this->otpLog = new OtpLog(new PDO(sprintf('sqlite://%s/otp.sqlite', $dataDir)));
+
         $this->vootDir = sprintf('%s/voot_tokens', $dataDir);
         FileIO::createDir($this->vootDir, 0711);
     }
@@ -79,15 +90,56 @@ class Users
         FileIO::deleteFile($disableFile);
     }
 
-    public function setOtpSecret($userId, $otpSecret)
+    /**
+     * Set a new OTP secret after validating it.
+     */
+    public function setOtpSecret($userId, $otpSecret, $otpKey)
     {
         // do not allow override of the OTP secret
         if (false !== $this->hasOtpSecret($userId)) {
-            // XXX should not be RuntimeException, but e.g. UsersException
-            throw new RuntimeException('cannot overwrite OTP secret');
+            throw new OtpException('cannot overwrite OTP secret');
         }
+
+        $otp = new Otp();
+        if (false === $otp->checkTotp(Base32::decode($otpSecret), $otpKey)) {
+            // wrong otp key
+            return false;
+        }
+
+        if (false === $this->otpLog->record($userId, $otpKey, time())) {
+            // otp replayed, this should not happen as there is no secret yet
+            // for this user...
+            throw new OtpException('OTP replay on registration');
+        }
+
         $otpFile = sprintf('%s/%s', $this->otpDir, $userId);
-        FileIO::writeFile($otpFile, $otpSecret, 0644);
+        FileIO::writeFile($otpFile, $otpSecret, 0600);
+
+        return true;
+    }
+
+    /**
+     * Verify an OTP key for an already registered OTP secret.
+     */
+    public function verifyOtpKey($userId, $otpKey)
+    {
+        // we do not use FileIO::readFile here as a missing file is not fatal
+        if (false === $otpSecret = @file_get_contents(sprintf('%s/%s', $this->otpDir, $userId))) {
+            throw new OtpException('no OTP secret registered');
+        }
+
+        $otp = new Otp();
+        if (false === $otp->checkTotp(Base32::decode($otpSecret), $otpKey)) {
+            // wrong otp key
+            return false;
+        }
+
+        if (false === $this->otpLog->record($userId, $otpKey, time())) {
+            // replayed
+            return false;
+        }
+
+        return true;
     }
 
     public function deleteOtpSecret($userId)

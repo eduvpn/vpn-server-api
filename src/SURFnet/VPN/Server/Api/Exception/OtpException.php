@@ -15,10 +15,10 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace SURFnet\VPN\Server\Exception;
+namespace SURFnet\VPN\Server\Api\Exception;
 
 use Exception;
 
-class TwoFactorException extends Exception
+class OtpException extends Exception
 {
 }

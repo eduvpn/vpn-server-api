@@ -49,6 +49,7 @@ try {
     $vpnConfigDir = sprintf('%s/openvpn-config', dirname(__DIR__));
     $vpnTlsDir = sprintf('%s/openvpn-config/tls/%s', dirname(__DIR__), $instanceId);
 
+    // XXX make use of CaClient
     $o = new OpenVpn($vpnConfigDir, $vpnTlsDir);
     $o->write($instanceId, $config);
     if ($generateCerts) {

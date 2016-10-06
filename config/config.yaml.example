@@ -4,6 +4,7 @@ instanceNumber: 1
 apiConsumers:
     vpn-user-portal: uvwxyz
     vpn-admin-portal: uuvvww
+    vpn-server-api: ccbbaa
 
 # API providers & credentials for servers this service is connecting to
 apiProviders:
@@ -11,6 +12,10 @@ apiProviders:
         userName: vpn-server-api
         userPass: aabbcc
         apiUri: 'http://127.42.101.100:8008/api.php' 
+    vpn-server-api:
+        userName: vpn-server-api
+        userPass: ccbbaa
+        apiUri: 'http://127.42.101.100:8009/api.php'
 
 vpnPools:
     internet:
