@@ -70,7 +70,7 @@ try {
 
     $instanceConfigData['vpnPools'][$opt->v('pool')] = $poolConfigData;
 
-    InstanceConfig::toFile($configFile, $instanceConfigData);
+    InstanceConfig::toFile($configFile, $instanceConfigData, 0440);
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
