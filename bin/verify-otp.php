@@ -56,14 +56,8 @@ try {
 
     // vpn-server-api
     $guzzleServerClient = new GuzzleHttpClient(
-        new Client([
-            'defaults' => [
-                'auth' => [
-                    $config->v('apiProviders', 'vpn-server-api', 'userName'),
-                    $config->v('apiProviders', 'vpn-server-api', 'userPass'),
-                ],
-            ],
-        ])
+        $config->v('apiProviders', 'vpn-server-api', 'userName'),
+        $config->v('apiProviders', 'vpn-server-api', 'userPass')
     );
     $serverClient = new ServerClient($guzzleServerClient, $config->v('apiProviders', 'vpn-server-api', 'apiUri'));
 
