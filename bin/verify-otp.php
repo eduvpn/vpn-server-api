@@ -22,7 +22,6 @@ use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Common\HttpClient\GuzzleHttpClient;
 use SURFnet\VPN\Common\HttpClient\ServerClient;
-use GuzzleHttp\Client;
 
 $logger = new Logger(
     basename($argv[0])
