@@ -22,6 +22,7 @@ use SURFnet\VPN\Server\PoolConfig;
 use SURFnet\VPN\Server\IP;
 use SURFnet\VPN\Common\FileIO;
 use RuntimeException;
+use SURFnet\VPN\Common\HttpClient\CaClient;
 
 class OpenVpn
 {
@@ -39,38 +40,9 @@ class OpenVpn
         $this->vpnTlsDir = $vpnTlsDir;
     }
 
-    public function generateKeys($apiUri, $userName, $userPass, $commonName, $dhLength)
+    public function generateKeys(CaClient $caClient, $commonName, $dhLength)
     {
-        $postData = [
-            'common_name' => $commonName,
-        ];
-
-        $apiUri = sprintf('%s/add_server_certificate', $apiUri);
-
-        $ch = curl_init($apiUri);
-        $optionsSet = curl_setopt_array(
-            $ch,
-            [
-                CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
-                CURLOPT_USERPWD => sprintf('%s:%s', $userName, $userPass),
-                CURLOPT_POST => true,
-                CURLOPT_POSTFIELDS => http_build_query($postData),
-                CURLOPT_RETURNTRANSFER => true,
-            ]
-        );
-
-        if (!$optionsSet) {
-            throw new RuntimeException('unable to set all cURL options');
-        }
-
-        $response = curl_exec($ch);
-        curl_close($ch);
-        if (false === $response) {
-            throw new RuntimeException(sprintf('cURL request error: %s', curl_error($ch)));
-        }
-
-        $configData = json_decode($response, true);
-        $certData = $configData['data']['add_server_certificate'];
+        $certData = $caClient->addServerCertificate($commonName);
 
         $certFileMapping = [
             'ca' => sprintf('%s/ca.crt', $this->vpnTlsDir),
@@ -84,6 +56,7 @@ class OpenVpn
         }
 
         // generate the DH params
+        // XXX use exec function we can steal from vpn-ca-api
         $dhFile = sprintf('%s/dh.pem', $this->vpnTlsDir);
         $cmd = sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength);
         $output = [];

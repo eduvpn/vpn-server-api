@@ -21,6 +21,8 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Server\Config\OpenVpn;
 use SURFnet\VPN\Common\CliParser;
+use SURFnet\VPN\Common\HttpClient\GuzzleHttpClient;
+use SURFnet\VPN\Common\HttpClient\CaClient;
 
 try {
     $p = new CliParser(
@@ -49,14 +51,15 @@ try {
     $vpnConfigDir = sprintf('%s/openvpn-config', dirname(__DIR__));
     $vpnTlsDir = sprintf('%s/openvpn-config/tls/%s', dirname(__DIR__), $instanceId);
 
-    // XXX make use of CaClient
     $o = new OpenVpn($vpnConfigDir, $vpnTlsDir);
     $o->write($instanceId, $config);
     if ($generateCerts) {
-        $userName = $config->v('apiProviders', 'vpn-ca-api', 'userName');
-        $userPass = $config->v('apiProviders', 'vpn-ca-api', 'userPass');
-        $apiUri = $config->v('apiProviders', 'vpn-ca-api', 'apiUri');
-        $o->generateKeys($apiUri, $userName, $userPass, $opt->v('cn'), $dhLength);
+        $guzzleHttpClient = new GuzzleHttpClient(
+            $config->v('apiProviders', 'vpn-ca-api', 'userName'),
+            $config->v('apiProviders', 'vpn-ca-api', 'userPass')
+        );
+        $caClient = new CaClient($guzzleHttpClient, $config->v('apiProviders', 'vpn-ca-api', 'apiUri'));
+        $o->generateKeys($caClient, $opt->v('cn'), $dhLength);
     }
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
