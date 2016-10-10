@@ -26,7 +26,7 @@ class Otp
     /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
-    /** @var \SURFnet\VPN\Common\HttpClient\HttpClientInterface */
+    /** @var \SURFnet\VPN\Common\HttpClient\ServerClient */
     private $serverClient;
 
     public function __construct(LoggerInterface $logger, ServerClient $serverClient)
