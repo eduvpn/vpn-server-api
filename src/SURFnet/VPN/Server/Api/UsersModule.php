@@ -93,7 +93,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/has_otp_secret',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
+                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-api']);
                 $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 

@@ -22,6 +22,8 @@ use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Common\HttpClient\GuzzleHttpClient;
 use SURFnet\VPN\Common\HttpClient\ServerClient;
+use SURFnet\VPN\Server\Otp;
+use SURFnet\VPN\Server\InputValidation;
 
 $logger = new Logger(
     basename($argv[0])
@@ -40,14 +42,10 @@ try {
 
     // read environment variables
     foreach ($envKeys as $envKey) {
-        $envValue = getenv($envKey);
-        if (empty($envValue)) {
-            throw new RuntimeException(sprintf('environment variable "%s" is not set', $envKey));
-        }
-        $envData[$envKey] = $envValue;
+        $envData[$envKey] = getenv($envKey);
     }
 
-    $instanceId = $envData['INSTANCE_ID'];
+    $instanceId = InputValidation::instanceId($envData['INSTANCE_ID']);
     $configDir = sprintf('%s/config/%s', dirname(__DIR__), $instanceId);
     $config = InstanceConfig::fromFile(
         sprintf('%s/config.yaml', $configDir)
@@ -60,22 +58,10 @@ try {
     );
     $serverClient = new ServerClient($guzzleServerClient, $config->v('apiProviders', 'vpn-server-api', 'apiUri'));
 
-    $userId = explode('_', $envData['common_name'], 2)[0];
-    $otpKey = $envData['password'];
-
-    if (false === $serverClient->verifyOtpKey($userId, $otpKey)) {
-        $envData['ok'] = false;
-        $envData['password'] = '_STRIPPED_';
-        $envData['error_msg'] = 'invalid OTP';
-        $logger->error(json_encode($envData));
+    $otp = new Otp($logger, $serverClient);
+    if (false === $otp->verify($envData)) {
         exit(1);
     }
-
-    $envData['ok'] = true;
-    $envData['password'] = '_STRIPPED_';
-    $logger->info(
-        json_encode($envData)
-    );
 } catch (Exception $e) {
     $logger->error($e->getMessage());
     exit(1);
