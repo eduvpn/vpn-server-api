@@ -54,7 +54,7 @@ class CommonNames
     {
         $disableFile = sprintf('%s/%s', $this->disableDir, $commonName);
 
-        return @file_exists($commonName);
+        return @file_exists($disableFile);
     }
 
     public function setDisabled($commonName)
