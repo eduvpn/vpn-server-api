@@ -50,6 +50,13 @@ class CommonNames
         return $disabledList;
     }
 
+    public function isDisabled($commonName)
+    {
+        $disableFile = sprintf('%s/%s', $this->disableDir, $commonName);
+
+        return @file_exists($commonName);
+    }
+
     public function setDisabled($commonName)
     {
         $disableFile = sprintf('%s/%s', $this->disableDir, $commonName);

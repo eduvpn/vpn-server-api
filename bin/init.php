@@ -19,6 +19,7 @@
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Server\Api\OtpLog;
+use SURFnet\VPN\Server\Api\ConnectionLog;
 use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\FileIO;
 
@@ -36,14 +37,18 @@ try {
         exit(0);
     }
 
-    $dataDir = sprintf('%s/data/%s/users', dirname(__DIR__), $opt->v('instance'));
+    $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $opt->v('instance'));
 
     // create VPN directory if it does not yet exist
     FileIO::createDir($dataDir, 0700);
 
-    $db = new PDO(sprintf('sqlite://%s/otp.sqlite', $dataDir));
+    $db = new PDO(sprintf('sqlite://%s/otp_log.sqlite', $dataDir));
     $otpLog = new OtpLog($db);
     $otpLog->init();
+
+    $db = new PDO(sprintf('sqlite://%s/connection_log.sqlite', $dataDir));
+    $connectionLog = new ConnectionLog($db);
+    $connectionLog->init();
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);

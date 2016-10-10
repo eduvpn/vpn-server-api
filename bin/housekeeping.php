@@ -36,7 +36,7 @@ try {
     }
 
     $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $opt->v('instance'));
-    $db = new PDO(sprintf('sqlite://%s/users/otp.sqlite', $dataDir));
+    $db = new PDO(sprintf('sqlite://%s/otp_log.sqlite', $dataDir));
     $otpLog = new OtpLog($db);
     // remove all OTP key entries that are older than 5 minutes
     $otpLog->housekeeping(strtotime('now -5 minutes'));

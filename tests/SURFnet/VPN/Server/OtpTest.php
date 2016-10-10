@@ -26,17 +26,24 @@ use SURFnet\VPN\Server\Test\TestHttpClient;
 
 class OtpTest extends PHPUnit_Framework_TestCase
 {
+    /** @var Otp */
+    private $otp;
+
     public function setUp()
     {
+        $this->otp = new Otp(
+            new NullLogger(),
+            new ServerClient(
+                new TestHttpClient(),
+                'serverClient'
+            )
+        );
     }
 
     public function testValidOtp()
     {
-        $serverClient = new ServerClient(new TestHttpClient(), 'serverClient');
-
-        $otp = new Otp(new NullLogger(), $serverClient);
         $this->assertTrue(
-            $otp->verify(
+            $this->otp->verify(
                 [
                     'username' => 'totp',
                     'common_name' => 'foo_bar',
@@ -48,11 +55,8 @@ class OtpTest extends PHPUnit_Framework_TestCase
 
     public function testNoOtpSecret()
     {
-        $serverClient = new ServerClient(new TestHttpClient(), 'serverClient');
-
-        $otp = new Otp(new NullLogger(), $serverClient);
         $this->assertFalse(
-            $otp->verify(
+            $this->otp->verify(
                 [
                     'username' => 'totp',
                     'common_name' => 'bar_foo',
@@ -64,11 +68,8 @@ class OtpTest extends PHPUnit_Framework_TestCase
 
     public function testNoInvalidOtpKey()
     {
-        $serverClient = new ServerClient(new TestHttpClient(), 'serverClient');
-
-        $otp = new Otp(new NullLogger(), $serverClient);
         $this->assertFalse(
-            $otp->verify(
+            $this->otp->verify(
                 [
                     'username' => 'totp',
                     'common_name' => 'foo_bar',
@@ -80,11 +81,8 @@ class OtpTest extends PHPUnit_Framework_TestCase
 
     public function testInvalidOtpPattern()
     {
-        $serverClient = new ServerClient(new TestHttpClient(), 'serverClient');
-
-        $otp = new Otp(new NullLogger(), $serverClient);
         $this->assertFalse(
-            $otp->verify(
+            $this->otp->verify(
                 [
                     'username' => 'totp',
                     'common_name' => 'foo_bar',

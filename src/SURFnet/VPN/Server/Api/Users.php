@@ -19,7 +19,6 @@ namespace SURFnet\VPN\Server\Api;
 
 use SURFnet\VPN\Common\FileIO;
 use RuntimeException;
-use PDO;
 use Base32\Base32;
 use Otp\Otp;
 use SURFnet\VPN\Server\Api\Exception\OtpException;
@@ -43,18 +42,18 @@ class Users
     /** @var string */
     private $vootDir;
 
-    public function __construct($dataDir)
+    public function __construct($dataDir, OtpLog $otpLog)
     {
         $this->disableDir = sprintf('%s/disabled', $dataDir);
         FileIO::createDir($this->disableDir, 0711);
 
         $this->otpDir = sprintf('%s/otp_secrets', $dataDir);
         FileIO::createDir($this->otpDir, 0711);
-        // XXX maybe we should feed OtpLog to the constructor instead?
-        $this->otpLog = new OtpLog(new PDO(sprintf('sqlite://%s/otp.sqlite', $dataDir)));
 
         $this->vootDir = sprintf('%s/voot_tokens', $dataDir);
         FileIO::createDir($this->vootDir, 0711);
+
+        $this->otpLog = $otpLog;
     }
 
     public function getDisabled()

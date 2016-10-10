@@ -23,11 +23,24 @@ class InputValidation
 {
     public static function instanceId($instanceId)
     {
-        if (0 === preg_match('/^[a-zA-Z0-9]{2,}$/', $instanceId)) {
+        if (0 === preg_match('/^[a-zA-Z0-9-\.]+$/', $instanceId)) {
             throw new InputValidationException('invalid instanceId pattern');
+        }
+        // MUST not be '..'
+        if ('..' === $instanceId) {
+            throw new InputValidationException('invalid instanceId pattern, cannot be ".."');
         }
 
         return $instanceId;
+    }
+
+    public static function poolId($poolId)
+    {
+        if (0 === preg_match('/^[a-zA-Z0-9]{2,}$/', $poolId)) {
+            throw new InputValidationException('invalid poolId pattern');
+        }
+
+        return $poolId;
     }
 
     public static function userName($userName)

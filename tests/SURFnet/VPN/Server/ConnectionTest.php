@@ -17,94 +17,119 @@
  */
 namespace SURFnet\VPN\Server;
 
+require_once sprintf('%s/Test/TestHttpClient.php', __DIR__);
+
 use PHPUnit_Framework_TestCase;
+use SURFnet\VPN\Common\HttpClient\ServerClient;
+use Psr\Log\NullLogger;
+use SURFnet\VPN\Server\Test\TestHttpClient;
 
 class ConnectionTest extends PHPUnit_Framework_TestCase
 {
-    public function testConnect()
+    /** @var Connection */
+    private $connection;
+
+    public function setUp()
     {
-        $c = new Connection(__DIR__);
-        $c->connect(
-            [
-                'INSTANCE_ID' => 'vpn.example',
-                'POOL_ID' => 'internet',
-                'common_name' => 'foo_xyz',
-                'time_unix' => 1234567890,
-                'ifconfig_pool_remote_ip' => '10.10.10.25',
-                'ifconfig_pool_remote_ip6' => 'fd00:1234::25',
-            ]
+        $this->connection = new Connection(
+            new NullLogger(),
+            new ServerClient(
+                new TestHttpClient(),
+                'connectionServerClient'
+            )
         );
     }
 
-    /**
-     * @expectedException \SURFnet\VPN\Server\Exception\ConnectionException
-     * @expectedExceptionMessage client not allowed, user is disabled
-     */
+    public function testValidConnection()
+    {
+        $this->assertTrue(
+            $this->connection->connect(
+                [
+                    'common_name' => 'foo_bar',
+                    'POOL_ID' => 'internet',
+                    'time_unix' => '12345678',
+                    'ifconfig_pool_remote_ip' => '10.0.42.0',
+                    'ifconfig_pool_remote_ip6' => 'fd00:4242:4242:4242::',
+                ]
+            )
+        );
+    }
+
     public function testDisabledUser()
     {
-        $c = new Connection(__DIR__);
-        $c->connect(
-            [
-                'INSTANCE_ID' => 'vpn.example',
-                'POOL_ID' => 'internet',
-                'common_name' => 'bar_xyz',
-                'time_unix' => 1234567890,
-                'ifconfig_pool_remote_ip' => '10.10.10.25',
-                'ifconfig_pool_remote_ip6' => 'fd00:1234::25',
-            ]
+        $this->assertFalse(
+            $this->connection->connect(
+                [
+                    'common_name' => 'bar_bar',
+                    'POOL_ID' => 'internet',
+                    'time_unix' => '12345678',
+                    'ifconfig_pool_remote_ip' => '10.0.42.0',
+                    'ifconfig_pool_remote_ip6' => 'fd00:4242:4242:4242::',
+                ]
+            )
         );
     }
 
-    /**
-     * @expectedException \SURFnet\VPN\Server\Exception\ConnectionException
-     * @expectedExceptionMessage client not allowed, CN is disabled
-     */
     public function testDisabledCommonName()
     {
-        $c = new Connection(__DIR__);
-        $c->connect(
-            [
-                'INSTANCE_ID' => 'vpn.example',
-                'POOL_ID' => 'internet',
-                'common_name' => 'foo_disabled',
-                'time_unix' => 1234567890,
-                'ifconfig_pool_remote_ip' => '10.10.10.25',
-                'ifconfig_pool_remote_ip6' => 'fd00:1234::25',
-            ]
+        $this->assertFalse(
+            $this->connection->connect(
+                [
+                    'common_name' => 'foo_baz',
+                    'POOL_ID' => 'internet',
+                    'time_unix' => '12345678',
+                    'ifconfig_pool_remote_ip' => '10.0.42.0',
+                    'ifconfig_pool_remote_ip6' => 'fd00:4242:4242:4242::',
+                ]
+            )
         );
     }
 
-    public function testAclIsMember()
+    public function testAclValid()
     {
-        $c = new Connection(__DIR__);
-        $c->connect(
-            [
-                'INSTANCE_ID' => 'vpn.example',
-                'POOL_ID' => 'bar',
-                'common_name' => 'foo_xyz',
-                'time_unix' => 1234567890,
-                'ifconfig_pool_remote_ip' => '10.10.10.25',
-                'ifconfig_pool_remote_ip6' => 'fd00:1234::25',
-            ]
+        $this->assertTrue(
+            $this->connection->connect(
+                [
+                    'common_name' => 'foo_bar',
+                    'POOL_ID' => 'acl',
+                    'time_unix' => '12345678',
+                    'ifconfig_pool_remote_ip' => '10.0.42.0',
+                    'ifconfig_pool_remote_ip6' => 'fd00:4242:4242:4242::',
+                ]
+            )
         );
     }
 
-    /**
-     * @expectedException \SURFnet\VPN\Server\Exception\ConnectionException
-     * @expectedExceptionMessage client not allowed, not a member of "all"
-     */
-    public function testAclIsNoMember()
+    public function testAclInvalid()
     {
-        $c = new Connection(__DIR__);
-        $c->connect(
-            [
-                'INSTANCE_ID' => 'vpn.example',
-                'POOL_ID' => 'bar',
-                'common_name' => 'xyz_abc',
-                'time_unix' => 1234567890,
-                'ifconfig_pool_remote_ip' => '10.10.10.25',
-                'ifconfig_pool_remote_ip6' => 'fd00:1234::25',
-            ]
+        $this->assertFalse(
+            $this->connection->connect(
+                [
+                    'common_name' => 'foo_bar',
+                    'POOL_ID' => 'acl2',
+                    'time_unix' => '12345678',
+                    'ifconfig_pool_remote_ip' => '10.0.42.0',
+                    'ifconfig_pool_remote_ip6' => 'fd00:4242:4242:4242::',
+                ]
+            )
+        );
+    }
+
+    public function testDisconnect()
+    {
+        $this->assertTrue(
+            $this->connection->disconnect(
+                [
+                    'common_name' => 'foo_bar',
+                    'POOL_ID' => 'acl2',
+                    'time_unix' => '12345678',
+                    'ifconfig_pool_remote_ip' => '10.0.42.0',
+                    'ifconfig_pool_remote_ip6' => 'fd00:4242:4242:4242::',
+                    'time_duration' => '3600',
+                    'bytes_sent' => '123456',
+                    'bytes_received' => '444444',
+                ]
+            )
         );
     }
 }

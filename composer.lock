@@ -126,12 +126,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common.git",
-                "reference": "5a3a487d8e3b730ff374536937d00b01f140c7e0"
+                "reference": "ad25d12b662304ca35e44266043f910c34fc8926"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/5a3a487d8e3b730ff374536937d00b01f140c7e0",
-                "reference": "5a3a487d8e3b730ff374536937d00b01f140c7e0",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/ad25d12b662304ca35e44266043f910c34fc8926",
+                "reference": "ad25d12b662304ca35e44266043f910c34fc8926",
                 "shasum": ""
             },
             "require": {
@@ -165,7 +165,7 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2016-10-10 09:23:49"
+            "time": "2016-10-10 13:30:07"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -412,16 +412,16 @@
         },
         {
             "name": "psr/log",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "5277094ed527a1c4477177d102fe4c53551953e0"
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/5277094ed527a1c4477177d102fe4c53551953e0",
-                "reference": "5277094ed527a1c4477177d102fe4c53551953e0",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
                 "shasum": ""
             },
             "require": {
@@ -455,7 +455,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-09-19 16:02:08"
+            "time": "2016-10-10 12:19:37"
         },
         {
             "name": "react/promise",

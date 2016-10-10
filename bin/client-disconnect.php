@@ -19,7 +19,11 @@
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Common\Logger;
-use SURFnet\VPN\Server\Exception\ConnectionException;
+use SURFnet\VPN\Server\Connection;
+use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Common\HttpClient\GuzzleHttpClient;
+use SURFnet\VPN\Common\HttpClient\ServerClient;
+use SURFnet\VPN\Server\InputValidation;
 
 $logger = new Logger(
     basename($argv[0])
@@ -39,23 +43,28 @@ try {
         'time_duration',
     ];
 
+    // read environment variables
     foreach ($envKeys as $envKey) {
-        $envValue = getenv($envKey);
-        if (empty($envValue)) {
-            throw new RuntimeException(sprintf('environment variable "%s" is not set', $envKey));
-        }
-        $envData[$envKey] = $envValue;
+        $envData[$envKey] = getenv($envKey);
     }
 
-    $envData['ok'] = true;
-    $logger->info(
-        json_encode($envData)
+    $instanceId = InputValidation::instanceId($envData['INSTANCE_ID']);
+    $configDir = sprintf('%s/config/%s', dirname(__DIR__), $instanceId);
+    $config = InstanceConfig::fromFile(
+        sprintf('%s/config.yaml', $configDir)
     );
-} catch (ConnectionException $e) {
-    $envData['ok'] = false;
-    $envData['error_msg'] = $e->getMessage();
-    $logger->error(json_encode($envData));
-    exit(1);
+
+    // vpn-server-api
+    $guzzleServerClient = new GuzzleHttpClient(
+        $config->v('apiProviders', 'vpn-server-api', 'userName'),
+        $config->v('apiProviders', 'vpn-server-api', 'userPass')
+    );
+    $serverClient = new ServerClient($guzzleServerClient, $config->v('apiProviders', 'vpn-server-api', 'apiUri'));
+
+    $connection = new Connection($logger, $serverClient);
+    if (false === $connection->disconnect($envData)) {
+        exit(1);
+    }
 } catch (Exception $e) {
     $logger->error($e->getMessage());
     exit(1);

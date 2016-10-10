@@ -26,6 +26,7 @@ use SURFnet\VPN\Server\Api\GroupsModule;
 use SURFnet\VPN\Server\Api\InfoModule;
 use SURFnet\VPN\Server\Api\LogModule;
 use SURFnet\VPN\Server\Api\OpenVpnModule;
+use SURFnet\VPN\Server\Api\OtpLog;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Server\Api\Users;
 use SURFnet\VPN\Server\Api\UsersModule;
@@ -70,7 +71,7 @@ try {
     );
     $service->addModule(
         new UsersModule(
-            new Users(sprintf('%s/users', $dataDir)),
+            new Users(sprintf('%s/users', $dataDir), new OtpLog(new PDO(sprintf('sqlite://%s/otp_log.sqlite', $dataDir)))),
             $logger
         )
     );

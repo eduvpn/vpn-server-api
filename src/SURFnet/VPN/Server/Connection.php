@@ -17,72 +17,74 @@
  */
 namespace SURFnet\VPN\Server;
 
-use SURFnet\VPN\Server\Exception\ConnectionException;
-use RuntimeException;
+use Psr\Log\LoggerInterface;
+use SURFnet\VPN\Common\HttpClient\ServerClient;
+use SURFnet\VPN\Server\Exception\InputValidationException;
 
 class Connection
 {
-    /** @var string */
-    private $baseDir;
+    /** @var \Psr\Log\LoggerInterface */
+    private $logger;
 
-    public function __construct($baseDir)
+    /** @var \SURFnet\VPN\Common\HttpClient\ServerClient */
+    private $serverClient;
+
+    public function __construct(LoggerInterface $logger, ServerClient $serverClient)
     {
-        $this->baseDir = $baseDir;
+        $this->logger = $logger;
+        $this->serverClient = $serverClient;
     }
 
     public function connect(array $envData)
     {
-        $userId = self::getUserId($envData['common_name']);
+        try {
+            $poolId = InputValidation::poolId($envData['POOL_ID']);
+            $commonName = InputValidation::commonName($envData['common_name']);
+            $userId = self::getUserId($commonName);
 
-        $dataDir = sprintf('%s/data/%s', $this->baseDir, $envData['INSTANCE_ID']);
+            // XXX turn the >= 3 calls below into one call
 
-        // is the user account disabled?
-        // XXX we have to be careful, if the directory is not readable by the
-        // openvpn user, it is assumed the user is not disabled! We have to
-        // find a more robust solution for this!
-        $disabledUsersDir = sprintf('%s/users/disabled', $dataDir);
-        if (@file_exists(sprintf('%s/%s', $disabledUsersDir, $userId))) {
-            throw new ConnectionException('client not allowed, user is disabled');
-        }
+            // check if user is disabled
+            if (true === $this->serverClient->isDisabledUser($userId)) {
+                $this->logger->error('user is disabled', $envData);
 
-        // is the common name disabled?
-        // XXX we have to be careful, if the directory is not readable by the
-        // openvpn user, it is assumed the user is not disabled! We have to
-        // find a more robust solution for this!
-        $disabledCommonNamesDir = sprintf('%s/common_names/disabled', $dataDir);
-        if (@file_exists(sprintf('%s/%s', $disabledCommonNamesDir, $envData['common_name']))) {
-            throw new ConnectionException('client not allowed, CN is disabled');
-        }
-
-        $configDir = sprintf('%s/config/%s', $this->baseDir, $envData['INSTANCE_ID']);
-
-        // read the instance/pool configuration
-        $instanceConfig = InstanceConfig::fromFile(
-            sprintf('%s/config.yaml', $configDir)
-        );
-
-        // is the ACL enabled?
-        $poolId = $envData['POOL_ID'];
-        $poolConfig = new PoolConfig($instanceConfig->v('vpnPools', $poolId));
-        if ($poolConfig->v('enableAcl')) {
-            $aclGroupProvider = $poolConfig->v('aclGroupProvider');
-            $groupProviderClass = sprintf('SURFnet\VPN\Server\GroupProvider\%s', $aclGroupProvider);
-            $groupProvider = new $groupProviderClass($dataDir, $instanceConfig);
-            $aclGroupList = $poolConfig->v('aclGroupList');
-
-            if (false === self::isMember($groupProvider->getGroups($userId), $aclGroupList)) {
-                throw new ConnectionException(sprintf('client not allowed, not a member of "%s"', implode(',', $aclGroupList)));
+                return false;
             }
+
+            // check if the common_name is disabled
+            if (true === $this->serverClient->isDisabledCommonName($commonName)) {
+                $this->logger->error('common_name is disabled', $envData);
+
+                return false;
+            }
+
+            // if the ACL is enabled, verify that the user is allowed to
+            // connect
+            $serverPool = $this->serverClient->serverPool($poolId);
+            if ($serverPool['enableAcl']) {
+                $userGroups = $this->serverClient->userGroups($userId);
+                if (false === self::isMember($userGroups, $serverPool['aclGroupList'])) {
+                    $this->logger->error('user is not a member of required group', $envData);
+
+                    return false;
+                }
+            }
+
+            $this->logger->info(json_encode(array_merge($envData, ['ok' => true])));
+
+            return true;
+        } catch (InputValidationException $e) {
+            $this->logger->error($e->getMessage(), $envData);
+
+            return false;
         }
     }
 
-    private static function getUserId($commonName)
+    public function disconnect(array $envData)
     {
-        if (false === $uPos = mb_strpos($commonName, '_')) {
-            throw new RuntimeException('unable to extract userId from commonName');
-        }
+        $this->logger->info(json_encode(array_merge($envData, ['ok' => true])));
 
-        return mb_substr($commonName, 0, $uPos);
+        return true;
     }
 
     private static function isMember(array $memberOf, array $aclGroupList)
@@ -95,5 +97,14 @@ class Connection
         }
 
         return false;
+    }
+
+    private static function getUserId($commonName)
+    {
+        // XXX share this with "Otp" class and possibly others
+
+        // return the part before the first underscore, it is already validated
+        // so we can be sure this is fine
+        return substr($commonName, 0, strpos($commonName, '_'));
     }
 }
