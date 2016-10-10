@@ -45,7 +45,7 @@ class GroupsModule implements ServiceModuleInterface
         $service->get(
             '/user_groups',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-user-portal']);
+                Utils::requireUser($hookData, ['vpn-user-portal', 'vpn-server-api']);
                 $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
