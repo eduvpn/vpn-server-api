@@ -29,9 +29,8 @@ $logger = new Logger(
     basename($argv[0])
 );
 
-$envData = [];
-
 try {
+    $envData = [];
     $envKeys = [
         'INSTANCE_ID',
         'POOL_ID',
