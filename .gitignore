@@ -1,6 +1,4 @@
 /vendor
 /data
-/openvpn-data
 /openvpn-config
-/config/*.yaml
 /config/*/*.yaml
