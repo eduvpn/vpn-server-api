@@ -95,7 +95,7 @@ class Firewall
     {
         $nat = [];
 
-        foreach (array_keys($instanceConfig->v('vpnPools')) as $poolNumber => $poolId) {
+        foreach (array_keys($instanceConfig->v('vpnPools')) as $poolId) {
             $poolConfig = new PoolConfig($instanceConfig->v('vpnPools', $poolId));
             if ($poolConfig->v('useNat')) {
                 if (4 === $inetFamily) {
@@ -131,8 +131,9 @@ class Firewall
     {
         $forwardChain = [];
 
-        foreach (array_keys($instanceConfig->v('vpnPools')) as $poolNumber => $poolId) {
+        foreach (array_keys($instanceConfig->v('vpnPools')) as $poolId) {
             $poolConfig = new PoolConfig($instanceConfig->v('vpnPools', $poolId));
+            $poolNumber = $poolConfig->v('poolNumber');
             if (6 === $inetFamily && !$poolConfig->v('forward6')) {
                 // IPv6 forwarding was disabled
                 continue;
