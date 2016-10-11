@@ -51,8 +51,9 @@ class ServerManager
         $clientConnections = [];
 
         // loop over all pools
-        foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolNumber => $poolId) {
+        foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolId) {
             $poolConfig = new PoolConfig($this->instanceConfig->v('vpnPools', $poolId));
+            $poolNumber = $poolConfig->v('poolNumber');
             $managementIp = sprintf('127.42.%d.%d', 100 + $this->instanceConfig->v('instanceNumber'), 100 + $poolNumber);
             $poolConnections = [];
             // loop over all processes
@@ -102,8 +103,9 @@ class ServerManager
     {
         $clientsKilled = 0;
         // loop over all pools
-        foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolNumber => $poolId) {
+        foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolId) {
             $poolConfig = new PoolConfig($this->instanceConfig->v('vpnPools', $poolId));
+            $poolNumber = $poolConfig->v('poolNumber');
             $managementIp = sprintf('127.42.%d.%d', 100 + $this->instanceConfig->v('instanceNumber'), 100 + $poolNumber);
 
             // loop over all processes

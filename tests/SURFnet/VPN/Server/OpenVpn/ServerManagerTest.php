@@ -38,6 +38,7 @@ class ServerManagerTest extends PHPUnit_Framework_TestCase
                     'instanceNumber' => 1,
                     'vpnPools' => [
                         'default' => [
+                            'poolNumber' => 1,
                             'name' => 'Default Instance',
                             'hostName' => 'vpn.example',
                             'extIf' => 'eth0',
