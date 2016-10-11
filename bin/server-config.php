@@ -73,7 +73,7 @@ try {
             ),
             $config->v('apiProviders', 'vpn-ca-api', 'apiUri')
         );
-        $dhSourceFile = sprintf('%s/config/dh4096.pem', dirname(__DIR__));
+        $dhSourceFile = sprintf('%s/config/dh.pem', dirname(__DIR__));
         $o->generateKeys($caClient, $opt->v('cn'), $dhSourceFile);
     }
 } catch (Exception $e) {
