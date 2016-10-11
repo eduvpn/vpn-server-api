@@ -18,17 +18,20 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
-use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\Config\OpenVpn;
+use SURFnet\VPN\Server\PoolConfig;
 use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\HttpClient\GuzzleHttpClient;
 use SURFnet\VPN\Common\HttpClient\CaClient;
+use SURFnet\VPN\Common\HttpClient\ServerClient;
 
 try {
     $p = new CliParser(
         'Generate VPN server configuration for an instance',
         [
             'instance' => ['the instance', true, true],
+            'pool' => ['the pool', true, true],
             'generate' => ['generate a new certificate for the server', false, false],
             'cn' => ['the CN of the certificate to generate', true, false],
             'dh' => ['the length of DH keys, defaults to 3072', true, false],
@@ -42,23 +45,36 @@ try {
     }
 
     $instanceId = $opt->v('instance');
+    $poolId = $opt->v('pool');
     $generateCerts = $opt->e('generate');
     $dhLength = $opt->e('dh') ? $opt->v('dh') : 3072;
 
     $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
-    $config = InstanceConfig::fromFile($configFile);
+    $config = Config::fromFile($configFile);
 
     $vpnConfigDir = sprintf('%s/openvpn-config', dirname(__DIR__));
-    $vpnTlsDir = sprintf('%s/openvpn-config/tls/%s', dirname(__DIR__), $instanceId);
+    $vpnTlsDir = sprintf('%s/openvpn-config/tls/%s/%s', dirname(__DIR__), $instanceId, $poolId);
+
+    $serverClient = new ServerClient(
+        new GuzzleHttpClient(
+            $config->v('apiProviders', 'vpn-server-api', 'userName'),
+            $config->v('apiProviders', 'vpn-server-api', 'userPass')
+        ),
+        $config->v('apiProviders', 'vpn-server-api', 'apiUri')
+    );
+    $instanceNumber = $serverClient->instanceNumber();
+    $poolConfig = new PoolConfig($serverClient->serverPool($poolId));
 
     $o = new OpenVpn($vpnConfigDir, $vpnTlsDir);
-    $o->write($instanceId, $config);
+    $o->writePool($instanceNumber, $instanceId, $poolId, $poolConfig);
     if ($generateCerts) {
-        $guzzleHttpClient = new GuzzleHttpClient(
-            $config->v('apiProviders', 'vpn-ca-api', 'userName'),
-            $config->v('apiProviders', 'vpn-ca-api', 'userPass')
+        $caClient = new CaClient(
+            new GuzzleHttpClient(
+                $config->v('apiProviders', 'vpn-ca-api', 'userName'),
+                $config->v('apiProviders', 'vpn-ca-api', 'userPass')
+            ),
+            $config->v('apiProviders', 'vpn-ca-api', 'apiUri')
         );
-        $caClient = new CaClient($guzzleHttpClient, $config->v('apiProviders', 'vpn-ca-api', 'apiUri'));
         $o->generateKeys($caClient, $opt->v('cn'), $dhLength);
     }
 } catch (Exception $e) {

@@ -67,16 +67,7 @@ class OpenVpn
         }
     }
 
-    public function write($instanceId, InstanceConfig $instanceConfig)
-    {
-        $instanceNumber = $instanceConfig->v('instanceNumber');
-        foreach (array_keys($instanceConfig->v('vpnPools')) as $poolNumber => $poolId) {
-            $poolConfig = new PoolConfig($instanceConfig->v('vpnPools', $poolId));
-            $this->writePool($instanceNumber, $instanceId, $poolNumber, $poolId, $poolConfig);
-        }
-    }
-
-    private function writePool($instanceNumber, $instanceId, $poolNumber, $poolId, PoolConfig $poolConfig)
+    public function writePool($instanceNumber, $instanceId, $poolId, PoolConfig $poolConfig)
     {
         $range = new IP($poolConfig->v('range'));
         $range6 = new IP($poolConfig->v('range6'));
@@ -86,7 +77,7 @@ class OpenVpn
         $splitRange6 = $range6->split($processCount);
 
         $processConfig = [
-            'managementIp' => sprintf('127.42.%d.%d', 100 + $instanceNumber, 100 + $poolNumber),
+            'managementIp' => sprintf('127.42.%d.%d', 100 + $instanceNumber, 100 + $poolConfig->v('poolNumber')),
         ];
 
         for ($i = 0; $i < $processCount; ++$i) {
@@ -102,7 +93,7 @@ class OpenVpn
 
             $processConfig['range'] = $splitRange[$i];
             $processConfig['range6'] = $splitRange6[$i];
-            $processConfig['dev'] = sprintf('tun-%d-%d-%d', $instanceNumber, $poolNumber, $i);
+            $processConfig['dev'] = sprintf('tun-%d-%d-%d', $instanceNumber, $poolConfig->v('poolNumber'), $i);
             $processConfig['proto'] = $proto;
             $processConfig['port'] = $port;
             $processConfig['managementPort'] = 11940 + $i;
@@ -119,7 +110,7 @@ class OpenVpn
 
     private function writeProcess($instanceId, $poolId, PoolConfig $poolConfig, array $processConfig)
     {
-        $tlsDir = sprintf('/etc/openvpn/tls/%s', $instanceId);
+        $tlsDir = sprintf('/etc/openvpn/tls/%s/%s', $instanceId, $poolId);
 
         $rangeIp = new IP($processConfig['range']);
         $range6Ip = new IP($processConfig['range6']);
