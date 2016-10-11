@@ -17,7 +17,6 @@
  */
 namespace SURFnet\VPN\Server\Config;
 
-use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Server\PoolConfig;
 use SURFnet\VPN\Server\IP;
 use SURFnet\VPN\Common\FileIO;
@@ -40,7 +39,7 @@ class OpenVpn
         $this->vpnTlsDir = $vpnTlsDir;
     }
 
-    public function generateKeys(CaClient $caClient, $commonName, $dhLength)
+    public function generateKeys(CaClient $caClient, $commonName, $dhSourceFile)
     {
         $certData = $caClient->addServerCertificate($commonName);
 
@@ -55,15 +54,10 @@ class OpenVpn
             FileIO::writeFile($v, $certData[$k], 0600);
         }
 
-        // generate the DH params
-        // XXX use exec function we can steal from vpn-ca-api
-        $dhFile = sprintf('%s/dh.pem', $this->vpnTlsDir);
-        $cmd = sprintf('/usr/bin/openssl dhparam -out %s %d >/dev/null 2>/dev/null', $dhFile, $dhLength);
-        $output = [];
-        $returnValue = -1;
-        exec($cmd, $output, $returnValue);
-        if (0 !== $returnValue) {
-            throw new RuntimeException('unable to generate DH');
+        // copy the DH parameter file
+        $dhTargetFile = sprintf('%s/dh.pem', $this->vpnTlsDir);
+        if (false === copy($dhSourceFile, $dhTargetFile)) {
+            throw new RuntimeException('unable to copy DH file');
         }
     }
 

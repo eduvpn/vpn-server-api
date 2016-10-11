@@ -34,7 +34,6 @@ try {
             'pool' => ['the pool', true, true],
             'generate' => ['generate a new certificate for the server', false, false],
             'cn' => ['the CN of the certificate to generate', true, false],
-            'dh' => ['the length of DH keys, defaults to 3072', true, false],
         ]
     );
 
@@ -47,7 +46,6 @@ try {
     $instanceId = $opt->v('instance');
     $poolId = $opt->v('pool');
     $generateCerts = $opt->e('generate');
-    $dhLength = $opt->e('dh') ? $opt->v('dh') : 3072;
 
     $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
     $config = Config::fromFile($configFile);
@@ -75,7 +73,8 @@ try {
             ),
             $config->v('apiProviders', 'vpn-ca-api', 'apiUri')
         );
-        $o->generateKeys($caClient, $opt->v('cn'), $dhLength);
+        $dhSourceFile = sprintf('%s/config/dh4096.pem', dirname(__DIR__));
+        $o->generateKeys($caClient, $opt->v('cn'), $dhSourceFile);
     }
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
