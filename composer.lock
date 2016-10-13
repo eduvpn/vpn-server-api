@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9b7c5f90bd6db11ba32abb9dd2dc6c2c",
-    "content-hash": "cac5ab01a7282d7088f403603d32dd25",
+    "hash": "211c12f60c39a8f7f75177e59fa1d27c",
+    "content-hash": "b0df73a154c815d734bbbc1808c83290",
     "packages": [
         {
             "name": "christian-riesen/base32",
@@ -126,22 +126,24 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common.git",
-                "reference": "27f918cf8eb56b685c115bf48e5a7fffbec68b67"
+                "reference": "c0ee23c961edea45f78e6bdaf0dfaeb9f35a9446"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/27f918cf8eb56b685c115bf48e5a7fffbec68b67",
-                "reference": "27f918cf8eb56b685c115bf48e5a7fffbec68b67",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/c0ee23c961edea45f78e6bdaf0dfaeb9f35a9446",
+                "reference": "c0ee23c961edea45f78e6bdaf0dfaeb9f35a9446",
                 "shasum": ""
             },
             "require": {
+                "ext-curl": "*",
+                "ext-date": "*",
                 "ext-filter": "*",
                 "ext-hash": "*",
                 "ext-json": "*",
                 "ext-mbstring": "*",
+                "ext-pcre": "*",
                 "ext-session": "*",
                 "ext-spl": "*",
-                "guzzlehttp/guzzle": "^5.3",
                 "php": ">= 5.4.0",
                 "psr/log": "^1.0",
                 "symfony/intl": "~2.3",
@@ -165,7 +167,7 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2016-10-11 14:33:11"
+            "time": "2016-10-13 12:31:31"
         },
         {
             "name": "guzzlehttp/guzzle",

@@ -22,7 +22,7 @@ use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\Config\OpenVpn;
 use SURFnet\VPN\Server\PoolConfig;
 use SURFnet\VPN\Common\CliParser;
-use SURFnet\VPN\Common\HttpClient\GuzzleHttpClient;
+use SURFnet\VPN\Common\HttpClient\CurlHttpClient;
 use SURFnet\VPN\Common\HttpClient\CaClient;
 use SURFnet\VPN\Common\HttpClient\ServerClient;
 
@@ -54,7 +54,7 @@ try {
     $vpnTlsDir = sprintf('%s/openvpn-config/tls/%s/%s', dirname(__DIR__), $instanceId, $poolId);
 
     $serverClient = new ServerClient(
-        new GuzzleHttpClient(
+        new CurlHttpClient(
             $config->v('apiProviders', 'vpn-server-api', 'userName'),
             $config->v('apiProviders', 'vpn-server-api', 'userPass')
         ),
@@ -67,7 +67,7 @@ try {
     $o->writePool($instanceNumber, $instanceId, $poolId, $poolConfig);
     if ($generateCerts) {
         $caClient = new CaClient(
-            new GuzzleHttpClient(
+            new CurlHttpClient(
                 $config->v('apiProviders', 'vpn-ca-api', 'userName'),
                 $config->v('apiProviders', 'vpn-ca-api', 'userPass')
             ),
