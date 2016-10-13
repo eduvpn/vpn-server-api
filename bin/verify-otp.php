@@ -20,7 +20,7 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Server\InstanceConfig;
-use SURFnet\VPN\Common\HttpClient\CurlHttpClient;
+use SURFnet\VPN\Common\HttpClient\GuzzleHttpClient;
 use SURFnet\VPN\Common\HttpClient\ServerClient;
 use SURFnet\VPN\Server\Otp;
 use SURFnet\VPN\Server\InputValidation;
@@ -52,9 +52,15 @@ try {
 
     // vpn-server-api
     $serverClient = new ServerClient(
-        new CurlHttpClient(
-            $config->v('apiProviders', 'vpn-server-api', 'userName'),
-            $config->v('apiProviders', 'vpn-server-api', 'userPass')
+        new GuzzleHttpClient(
+            [
+                'defaults' => [
+                    'auth' => [
+                        $config->v('apiProviders', 'vpn-server-api', 'userName'),
+                        $config->v('apiProviders', 'vpn-server-api', 'userPass'),
+                    ],
+                ],
+            ]
         ),
         $config->v('apiProviders', 'vpn-server-api', 'apiUri')
     );
