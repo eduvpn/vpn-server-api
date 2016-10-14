@@ -19,7 +19,7 @@ namespace SURFnet\VPN\Server\OpenVpn;
 
 use Psr\Log\LoggerInterface;
 use SURFnet\VPN\Server\OpenVpn\Exception\ManagementSocketException;
-use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\PoolConfig;
 
 /**
@@ -27,8 +27,8 @@ use SURFnet\VPN\Server\PoolConfig;
  */
 class ServerManager
 {
-    /** @var \SURFnet\VPN\Server\InstanceConfig */
-    private $instanceConfig;
+    /** @var \SURFnet\VPN\Common\Config */
+    private $config;
 
     /** @var ManagementSocketInterface */
     private $managementSocket;
@@ -36,9 +36,9 @@ class ServerManager
     /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
-    public function __construct(InstanceConfig $instanceConfig, ManagementSocketInterface $managementSocket, LoggerInterface $logger)
+    public function __construct(Config $config, ManagementSocketInterface $managementSocket, LoggerInterface $logger)
     {
-        $this->instanceConfig = $instanceConfig;
+        $this->config = $config;
         $this->managementSocket = $managementSocket;
         $this->logger = $logger;
     }
@@ -51,10 +51,10 @@ class ServerManager
         $clientConnections = [];
 
         // loop over all pools
-        foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolId) {
-            $poolConfig = new PoolConfig($this->instanceConfig->v('vpnPools', $poolId));
+        foreach (array_keys($this->config->v('vpnPools')) as $poolId) {
+            $poolConfig = new PoolConfig($this->config->v('vpnPools', $poolId));
             $poolNumber = $poolConfig->v('poolNumber');
-            $managementIp = sprintf('127.42.%d.%d', 100 + $this->instanceConfig->v('instanceNumber'), 100 + $poolNumber);
+            $managementIp = sprintf('127.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $poolNumber);
             $poolConnections = [];
             // loop over all processes
             for ($i = 0; $i < $poolConfig->v('processCount'); ++$i) {
@@ -103,10 +103,10 @@ class ServerManager
     {
         $clientsKilled = 0;
         // loop over all pools
-        foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolId) {
-            $poolConfig = new PoolConfig($this->instanceConfig->v('vpnPools', $poolId));
+        foreach (array_keys($this->config->v('vpnPools')) as $poolId) {
+            $poolConfig = new PoolConfig($this->config->v('vpnPools', $poolId));
             $poolNumber = $poolConfig->v('poolNumber');
-            $managementIp = sprintf('127.42.%d.%d', 100 + $this->instanceConfig->v('instanceNumber'), 100 + $poolNumber);
+            $managementIp = sprintf('127.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $poolNumber);
 
             // loop over all processes
             for ($i = 0; $i < $poolConfig->v('processCount'); ++$i) {

@@ -18,7 +18,7 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
-use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
@@ -39,7 +39,7 @@ try {
     }
 
     $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $opt->v('instance'));
-    $config = InstanceConfig::fromFile($configFile);
+    $config = Config::fromFile($configFile);
 
     $serverManager = new ServerManager(
         $config,

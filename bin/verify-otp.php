@@ -19,7 +19,7 @@
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Common\Logger;
-use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\HttpClient\GuzzleHttpClient;
 use SURFnet\VPN\Common\HttpClient\ServerClient;
 use SURFnet\VPN\Server\Otp;
@@ -46,7 +46,7 @@ try {
 
     $instanceId = InputValidation::instanceId($envData['INSTANCE_ID']);
     $configDir = sprintf('%s/config/%s', dirname(__DIR__), $instanceId);
-    $config = InstanceConfig::fromFile(
+    $config = Config::fromFile(
         sprintf('%s/config.yaml', $configDir)
     );
 

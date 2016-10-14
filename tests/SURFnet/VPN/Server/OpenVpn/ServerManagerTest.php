@@ -22,7 +22,7 @@ require_once sprintf('%s/Test/TestSocket.php', __DIR__);
 use PHPUnit_Framework_TestCase;
 use SURFnet\VPN\Server\OpenVpn\Test\TestSocket;
 use Psr\Log\NullLogger;
-use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Common\Config;
 
 class ServerManagerTest extends PHPUnit_Framework_TestCase
 {
@@ -33,7 +33,7 @@ class ServerManagerTest extends PHPUnit_Framework_TestCase
     public function testGetStatus()
     {
         $serverManager = new ServerManager(
-            new InstanceConfig(
+            new Config(
                 [
                     'instanceNumber' => 1,
                     'vpnPools' => [

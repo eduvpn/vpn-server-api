@@ -31,7 +31,6 @@ use SURFnet\VPN\Server\Api\OtpLog;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Server\Api\Users;
 use SURFnet\VPN\Server\Api\UsersModule;
-use SURFnet\VPN\Server\InstanceConfig;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
@@ -46,7 +45,7 @@ try {
     $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
     $configDir = sprintf('%s/config/%s', dirname(__DIR__), $instanceId);
 
-    $config = InstanceConfig::fromFile(
+    $config = Config::fromFile(
         sprintf('%s/config.yaml', $configDir)
     );
 

@@ -17,7 +17,7 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
-use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\PoolConfig;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\Http\Service;
@@ -26,12 +26,12 @@ use SURFnet\VPN\Common\Http\Request;
 
 class InfoModule implements ServiceModuleInterface
 {
-    /** @var \SURFnet\VPN\Server\InstanceConfig */
-    private $instanceConfig;
+    /** @var \SURFnet\VPN\Common\Config */
+    private $config;
 
-    public function __construct(InstanceConfig $instanceConfig)
+    public function __construct(Config $config)
     {
-        $this->instanceConfig = $instanceConfig;
+        $this->config = $config;
     }
 
     public function init(Service $service)
@@ -41,7 +41,7 @@ class InfoModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['vpn-server-api']);
 
-                return new ApiResponse('instance_number', $this->instanceConfig->v('instanceNumber'));
+                return new ApiResponse('instance_number', $this->config->v('instanceNumber'));
             }
         );
 
@@ -51,8 +51,8 @@ class InfoModule implements ServiceModuleInterface
                 Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
 
                 $responseData = [];
-                foreach (array_keys($this->instanceConfig->v('vpnPools')) as $poolId) {
-                    $poolConfig = new PoolConfig($this->instanceConfig->v('vpnPools', $poolId));
+                foreach (array_keys($this->config->v('vpnPools')) as $poolId) {
+                    $poolConfig = new PoolConfig($this->config->v('vpnPools', $poolId));
                     $responseData[$poolId] = $poolConfig->v();
                 }
 
@@ -66,7 +66,7 @@ class InfoModule implements ServiceModuleInterface
                 Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-api']);
                 $poolId = $request->getQueryParameter('pool_id');
                 InputValidation::poolId($poolId);
-                $poolConfig = new PoolConfig($this->instanceConfig->v('vpnPools', $poolId));
+                $poolConfig = new PoolConfig($this->config->v('vpnPools', $poolId));
 
                 return new ApiResponse('server_pool', $poolConfig->v());
             }

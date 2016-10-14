@@ -18,7 +18,7 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
-use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\PoolConfig;
 use SURFnet\VPN\Common\CliParser;
 
@@ -57,10 +57,10 @@ try {
     echo sprintf('IPv6 prefix: %s', $v6).PHP_EOL;
 
     $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $opt->v('instance'));
-    $instanceConfig = InstanceConfig::fromFile($configFile);
-    $poolConfig = new PoolConfig($instanceConfig->v('vpnPools', $opt->v('pool')));
+    $config = Config::fromFile($configFile);
+    $poolConfig = new PoolConfig($config->v('vpnPools', $opt->v('pool')));
 
-    $instanceConfigData = $instanceConfig->v();
+    $configData = $config->v();
     $poolConfigData = $poolConfig->v();
 
     $poolConfigData['range'] = $v4;
@@ -68,9 +68,9 @@ try {
     $poolConfigData['hostName'] = $opt->v('host');
     $poolConfigData['extIf'] = $opt->v('ext');
 
-    $instanceConfigData['vpnPools'][$opt->v('pool')] = $poolConfigData;
+    $configData['vpnPools'][$opt->v('pool')] = $poolConfigData;
 
-    InstanceConfig::toFile($configFile, $instanceConfigData, 0440);
+    Config::toFile($configFile, $configData, 0440);
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
