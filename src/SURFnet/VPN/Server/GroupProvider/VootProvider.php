@@ -59,19 +59,15 @@ class VootProvider implements GroupProviderInterface
 
     private function fetchGroups($bearerToken)
     {
-        $httpClient = new Client();
-        try {
-            return $httpClient->get(
-                $this->instanceConfig->v('groupProviders', 'VootProvider', 'apiUrl'),
-                [
-                    'headers' => [
-                        'Authorization' => sprintf('Bearer %s', $bearerToken),
-                    ],
-                ]
-            )->json();
-        } catch (TransferException $e) {
-            return [];
-        }
+        $httpClient = new GuzzleHttpClient(
+            [
+                'headers' => [
+                    'Authorization' => sprintf('Bearer %s', $bearerToken),
+                ],
+            ]
+        );
+
+        return $httpClient->get($this->instanceConfig->v('groupProviders', 'VootProvider', 'apiUrl'));
     }
 
     private static function extractMembership(array $responseData)
