@@ -20,20 +20,20 @@ namespace SURFnet\VPN\Server\GroupProvider;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use SURFnet\VPN\Server\GroupProviderInterface;
-use SURFnet\VPN\Server\InstanceConfig;
+use SURFnet\VPN\Common\Config;
 
 class VootProvider implements GroupProviderInterface
 {
+    /** @var \SURFnet\VPN\Common\Config */
+    private $config;
+
     /** @var string */
     private $dataDir;
 
-    /** @var \SURFnet\VPN\Server\InstanceConfig */
-    private $instanceConfig;
-
-    public function __construct($dataDir, InstanceConfig $instanceConfig)
+    public function __construct(Config $config, $dataDir)
     {
+        $this->config = $config;
         $this->dataDir = $dataDir;
-        $this->instanceConfig = $instanceConfig;
     }
 
     /**
@@ -46,8 +46,7 @@ class VootProvider implements GroupProviderInterface
      */
     public function getGroups($userId)
     {
-        $vootTokenPath = sprintf('%s/users/voot_tokens/%s', $this->dataDir, $userId);
-        if (false === $bearerToken = @file_get_contents($vootTokenPath)) {
+        if (false === $bearerToken = @file_get_contents(sprintf('%s/users/voot_tokens/%s', $this->dataDir, $userId))) {
             return [];
         }
 
@@ -59,15 +58,19 @@ class VootProvider implements GroupProviderInterface
 
     private function fetchGroups($bearerToken)
     {
-        $httpClient = new GuzzleHttpClient(
-            [
-                'headers' => [
-                    'Authorization' => sprintf('Bearer %s', $bearerToken),
-                ],
-            ]
-        );
-
-        return $httpClient->get($this->instanceConfig->v('groupProviders', 'VootProvider', 'apiUrl'));
+        $httpClient = new Client();
+        try {
+            return $httpClient->get(
+                $this->config->v('apiUrl'),
+                [
+                    'headers' => [
+                        'Authorization' => sprintf('Bearer %s', $bearerToken),
+                    ],
+                ]
+            )->json();
+        } catch (TransferException $e) {
+            return [];
+        }
     }
 
     private static function extractMembership(array $responseData)

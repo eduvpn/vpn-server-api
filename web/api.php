@@ -20,6 +20,7 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Response;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\Api\CommonNames;
 use SURFnet\VPN\Server\Api\CommonNamesModule;
 use SURFnet\VPN\Server\Api\GroupsModule;
@@ -80,7 +81,12 @@ try {
     if ($config->e('groupProviders')) {
         foreach (array_keys($config->v('groupProviders')) as $groupProviderId) {
             $groupProviderClass = sprintf('SURFnet\VPN\Server\GroupProvider\%s', $groupProviderId);
-            $groupProviders[] = new $groupProviderClass($dataDir, $config);
+            $groupProviders[] = new $groupProviderClass(
+                new Config(
+                    $config->v('groupProviders', $groupProviderId)
+                ),
+                $dataDir
+            );
         }
     }
 

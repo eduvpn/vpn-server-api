@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9b7c5f90bd6db11ba32abb9dd2dc6c2c",
-    "content-hash": "cac5ab01a7282d7088f403603d32dd25",
+    "hash": "211c12f60c39a8f7f75177e59fa1d27c",
+    "content-hash": "b0df73a154c815d734bbbc1808c83290",
     "packages": [
         {
             "name": "christian-riesen/base32",
@@ -126,12 +126,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common.git",
-                "reference": "3a3fd3cd0cb6653771899d9af985a6dcc224f08d"
+                "reference": "b27ab7cef60ec6f3ff3fb60e1c6557caa32b1ce8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/3a3fd3cd0cb6653771899d9af985a6dcc224f08d",
-                "reference": "3a3fd3cd0cb6653771899d9af985a6dcc224f08d",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/b27ab7cef60ec6f3ff3fb60e1c6557caa32b1ce8",
+                "reference": "b27ab7cef60ec6f3ff3fb60e1c6557caa32b1ce8",
                 "shasum": ""
             },
             "require": {
@@ -167,7 +167,7 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2016-10-14 14:11:29"
+            "time": "2016-10-14 14:27:32"
         },
         {
             "name": "guzzlehttp/guzzle",
