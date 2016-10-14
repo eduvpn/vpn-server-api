@@ -70,8 +70,14 @@ class OpenVpn
         $splitRange = $range->split($processCount);
         $splitRange6 = $range6->split($processCount);
 
+        if ($poolConfig->e('managementIp')) {
+            $managementIp = $poolConfig->v('managementIp');
+        } else {
+            $managementIp = sprintf('127.42.%d.%d', 100 + $instanceNumber, 100 + $poolConfig->v('poolNumber'));
+        }
+
         $processConfig = [
-            'managementIp' => sprintf('127.42.%d.%d', 100 + $instanceNumber, 100 + $poolConfig->v('poolNumber')),
+            'managementIp' => $managementIp,
         ];
 
         for ($i = 0; $i < $processCount; ++$i) {

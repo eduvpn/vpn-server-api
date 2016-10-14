@@ -106,7 +106,12 @@ class ServerManager
         foreach (array_keys($this->config->v('vpnPools')) as $poolId) {
             $poolConfig = new PoolConfig($this->config->v('vpnPools', $poolId));
             $poolNumber = $poolConfig->v('poolNumber');
-            $managementIp = sprintf('127.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $poolNumber);
+
+            if ($poolConfig->e('managementIp')) {
+                $managementIp = $poolConfig->v('managementIp');
+            } else {
+                $managementIp = sprintf('127.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $poolNumber);
+            }
 
             // loop over all processes
             for ($i = 0; $i < $poolConfig->v('processCount'); ++$i) {
