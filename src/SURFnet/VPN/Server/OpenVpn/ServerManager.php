@@ -53,8 +53,8 @@ class ServerManager
         // loop over all pools
         foreach (array_keys($this->config->v('vpnPools')) as $poolId) {
             $poolConfig = new PoolConfig($this->config->v('vpnPools', $poolId));
-            $poolNumber = $poolConfig->v('poolNumber');
-            $managementIp = sprintf('127.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $poolNumber);
+            $managementIp = $this->getManagementIp($poolConfig);
+
             $poolConnections = [];
             // loop over all processes
             for ($i = 0; $i < $poolConfig->v('processCount'); ++$i) {
@@ -105,13 +105,7 @@ class ServerManager
         // loop over all pools
         foreach (array_keys($this->config->v('vpnPools')) as $poolId) {
             $poolConfig = new PoolConfig($this->config->v('vpnPools', $poolId));
-            $poolNumber = $poolConfig->v('poolNumber');
-
-            if ($poolConfig->e('managementIp')) {
-                $managementIp = $poolConfig->v('managementIp');
-            } else {
-                $managementIp = sprintf('127.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $poolNumber);
-            }
+            $managementIp = $this->getManagementIp($poolConfig);
 
             // loop over all processes
             for ($i = 0; $i < $poolConfig->v('processCount'); ++$i) {
@@ -147,5 +141,14 @@ class ServerManager
         }
 
         return 0 !== $clientsKilled;
+    }
+
+    private function getManagementIp(PoolConfig $poolConfig)
+    {
+        if ($poolConfig->e('managementIp')) {
+            return $poolConfig->v('managementIp');
+        }
+
+        return sprintf('127.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $poolConfig->v('poolNumber'));
     }
 }
