@@ -86,9 +86,16 @@ class OpenVpn
             if (1 === $processCount || $i !== $processCount - 1) {
                 $proto = 'udp';
                 $port = 1194 + $i;
+                $local = $poolConfig->v('listen');
             } else {
                 $proto = 'tcp';
-                $port = 1194;
+                if ($poolConfig->v('hasProxy')) {
+                    $port = 1194;
+                    $local = $managementIp;
+                } else {
+                    $port = 443;
+                    $local = $poolConfig->v('listen');
+                }
             }
 
             $processConfig['range'] = $splitRange[$i];
@@ -96,6 +103,7 @@ class OpenVpn
             $processConfig['dev'] = sprintf('tun-%d-%d-%d', $instanceNumber, $poolConfig->v('poolNumber'), $i);
             $processConfig['proto'] = $proto;
             $processConfig['port'] = $port;
+            $processConfig['local'] = $local;
             $processConfig['managementPort'] = 11940 + $i;
             $processConfig['configName'] = sprintf(
                 'server-%s-%s-%d.conf',
@@ -151,7 +159,7 @@ class OpenVpn
             sprintf('setenv INSTANCE_ID %s', $instanceId),
             sprintf('setenv POOL_ID %s', $poolId),
             sprintf('proto %s', 'tcp' === $processConfig['proto'] ? 'tcp-server' : 'udp'),
-            sprintf('local %s', 'tcp' === $processConfig['proto'] ? $processConfig['managementIp'] : $poolConfig->v('listen')),
+            sprintf('local %s', $processConfig['local']),
 
             // increase the renegotiation time to 8h from the default of 1h when
             // using 2FA, otherwise the user would be asked for the 2FA key every
