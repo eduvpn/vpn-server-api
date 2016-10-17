@@ -19,6 +19,7 @@
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Server\Config\Firewall;
+use SURFnet\VPN\Server\FirewallConfig;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\FileIO;
 use SURFnet\VPN\Common\CliParser;
@@ -37,16 +38,24 @@ try {
         exit(0);
     }
 
+    $configDir = sprintf('%s/config', dirname(__DIR__));
+
+    // load generic firewall configuration
+    try {
+        $firewallConfig = FirewallConfig::fromFile(sprintf('%s/firewall.yaml', $configDir));
+    } catch (RuntimeException $e) {
+        $firewallConfig = new FirewallConfig([]);
+    }
+
     // detect all instances
     $configList = [];
-    $configDir = sprintf('%s/config', dirname(__DIR__));
     foreach (glob(sprintf('%s/*', $configDir), GLOB_ONLYDIR | GLOB_ERR) as $instanceDir) {
         $instanceId = basename($instanceDir);
         $configList[$instanceId] = Config::fromFile(sprintf('%s/%s/config.yaml', $configDir, $instanceId));
     }
 
-    $firewall = Firewall::getFirewall4($configList);
-    $firewall6 = Firewall::getFirewall6($configList);
+    $firewall = Firewall::getFirewall4($configList, $firewallConfig);
+    $firewall6 = Firewall::getFirewall6($configList, $firewallConfig);
 
     if ($opt->e('install')) {
         FileIO::writeFile('/etc/sysconfig/iptables', $firewall, 0600);

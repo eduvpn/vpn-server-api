@@ -19,21 +19,22 @@ namespace SURFnet\VPN\Server\Config;
 
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\PoolConfig;
+use SURFnet\VPN\Server\FirewallConfig;
 use SURFnet\VPN\Server\IP;
 
 class Firewall
 {
-    public static function getFirewall4(array $configList, $asArray = false)
+    public static function getFirewall4(array $configList, FirewallConfig $firewallConfig, $asArray = false)
     {
-        return self::getFirewall($configList, 4, $asArray);
+        return self::getFirewall($configList, $firewallConfig, 4, $asArray);
     }
 
-    public static function getFirewall6(array $configList, $asArray = false)
+    public static function getFirewall6(array $configList, FirewallConfig $firewallConfig, $asArray = false)
     {
-        return self::getFirewall($configList, 6, $asArray);
+        return self::getFirewall($configList, $firewallConfig, 6, $asArray);
     }
 
-    private static function getFirewall(array $configList, $inetFamily, $asArray)
+    private static function getFirewall(array $configList, FirewallConfig $firewallConfig, $inetFamily, $asArray)
     {
         $firewall = [];
 
@@ -66,7 +67,7 @@ class Firewall
         );
 
         // INPUT
-        $firewall = array_merge($firewall, self::getInputChain($inetFamily));
+        $firewall = array_merge($firewall, self::getInputChain($inetFamily, $firewallConfig));
 
         // FORWARD
         $firewall = array_merge(
@@ -113,16 +114,36 @@ class Firewall
         return $nat;
     }
 
-    private static function getInputChain($inetFamily)
+    private static function getInputChain($inetFamily, FirewallConfig $firewallConfig)
     {
         $inputChain = [
             '-A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT',
             sprintf('-A INPUT -p %s -j ACCEPT', 4 === $inetFamily ? 'icmp' : 'ipv6-icmp'),
             '-A INPUT -i lo -j ACCEPT',
-            '-A INPUT -m state --state NEW -m multiport -p tcp --dports 22,80,443 -j ACCEPT',
-            '-A INPUT -m state --state NEW -m udp -p udp --dport 1194:1201 -j ACCEPT',
-            sprintf('-A INPUT -j REJECT --reject-with %s', 4 === $inetFamily ? 'icmp-host-prohibited' : 'icmp6-adm-prohibited'),
         ];
+
+        $inputChain[] = sprintf(
+            '-A INPUT -m state --state NEW -m multiport -p udp --dports %s -j ACCEPT',
+            implode(',', $firewallConfig->v('inputChain', 'udp'))
+        );
+
+        $inputChain[] = sprintf(
+            '-A INPUT -m state --state NEW -m multiport -p tcp --dports %s -j ACCEPT',
+            implode(',', $firewallConfig->v('inputChain', 'tcp'))
+        );
+
+//        foreach($firewallConfig->v('inputChain', 'udp') as $entry) {
+//            $inputChain[] = sprintf('-A INPUT -m state --state NEW -m udp -p udp --dport %s -j ACCEPT', $entry);
+//        }
+
+//        foreach($firewallConfig->v('inputChain', 'tcp') as $entry) {
+//            $inputChain[] = sprintf('-A INPUT -m state --state NEW -m tcp -p tcp --dport %s -j ACCEPT', $entry);
+//        }
+
+//            '-A INPUT -m state --state NEW -m multiport -p tcp --dports 22,80,443 -j ACCEPT',
+//            '-A INPUT -m state --state NEW -m udp -p udp --dport 1194:1201 -j ACCEPT',
+
+        $inputChain[] = sprintf('-A INPUT -j REJECT --reject-with %s', 4 === $inetFamily ? 'icmp-host-prohibited' : 'icmp6-adm-prohibited');
 
         return $inputChain;
     }
