@@ -23,6 +23,8 @@ use SURFnet\VPN\Server\FirewallConfig;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\FileIO;
 use SURFnet\VPN\Common\CliParser;
+use SURFnet\VPN\Common\HttpClient\GuzzleHttpClient;
+use SURFnet\VPN\Common\HttpClient\ServerClient;
 
 try {
     $p = new CliParser(
@@ -51,7 +53,24 @@ try {
     $configList = [];
     foreach (glob(sprintf('%s/*', $configDir), GLOB_ONLYDIR | GLOB_ERR) as $instanceDir) {
         $instanceId = basename($instanceDir);
-        $configList[$instanceId] = Config::fromFile(sprintf('%s/%s/config.yaml', $configDir, $instanceId));
+        $config = Config::fromFile(sprintf('%s/%s/config.yaml', $configDir, $instanceId));
+
+        $serverClient = new ServerClient(
+            new GuzzleHttpClient(
+                [
+                    'defaults' => [
+                        'auth' => [
+                            $config->v('apiProviders', 'vpn-server-api', 'userName'),
+                            $config->v('apiProviders', 'vpn-server-api', 'userPass'),
+                        ],
+                    ],
+                ]
+            ),
+            $config->v('apiProviders', 'vpn-server-api', 'apiUri')
+        );
+
+        $instanceConfig = $serverClient->instanceConfig();
+        $configList[$instanceId] = new Config($instanceConfig);
     }
 
     $firewall = Firewall::getFirewall4($configList, $firewallConfig);

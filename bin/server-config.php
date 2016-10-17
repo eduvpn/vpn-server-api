@@ -66,7 +66,9 @@ try {
         ),
         $config->v('apiProviders', 'vpn-server-api', 'apiUri')
     );
-    $instanceNumber = $serverClient->instanceNumber();
+
+    $instanceConfig = $serverClient->instanceConfig();
+    $instanceNumber = $instanceConfig['instanceNumber'];
     $poolConfig = new PoolConfig($serverClient->serverPool($poolId));
 
     $o = new OpenVpn($vpnConfigDir, $vpnTlsDir);
