@@ -122,6 +122,7 @@ class Firewall
             '-A INPUT -i lo -j ACCEPT',
         ];
 
+        // NOTE: multiport is limited to 15 ports (a range counts as two)
         $inputChain[] = sprintf(
             '-A INPUT -m state --state NEW -m multiport -p udp --dports %s -j ACCEPT',
             implode(',', $firewallConfig->v('inputChain', 'udp'))
@@ -131,17 +132,6 @@ class Firewall
             '-A INPUT -m state --state NEW -m multiport -p tcp --dports %s -j ACCEPT',
             implode(',', $firewallConfig->v('inputChain', 'tcp'))
         );
-
-//        foreach($firewallConfig->v('inputChain', 'udp') as $entry) {
-//            $inputChain[] = sprintf('-A INPUT -m state --state NEW -m udp -p udp --dport %s -j ACCEPT', $entry);
-//        }
-
-//        foreach($firewallConfig->v('inputChain', 'tcp') as $entry) {
-//            $inputChain[] = sprintf('-A INPUT -m state --state NEW -m tcp -p tcp --dport %s -j ACCEPT', $entry);
-//        }
-
-//            '-A INPUT -m state --state NEW -m multiport -p tcp --dports 22,80,443 -j ACCEPT',
-//            '-A INPUT -m state --state NEW -m udp -p udp --dport 1194:1201 -j ACCEPT',
 
         $inputChain[] = sprintf('-A INPUT -j REJECT --reject-with %s', 4 === $inetFamily ? 'icmp-host-prohibited' : 'icmp6-adm-prohibited');
 
