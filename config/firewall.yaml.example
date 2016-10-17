@@ -13,3 +13,7 @@ inputChain:
         - 1194:1201
         # PeerVPN
         #- 7000
+
+    # PeerVPN
+    #trustedInterfaces:
+    #    - tap+

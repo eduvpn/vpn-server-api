@@ -122,6 +122,11 @@ class Firewall
             '-A INPUT -i lo -j ACCEPT',
         ];
 
+        // add trusted interfaces
+        foreach ($firewallConfig->v('inputChain', 'trustedInterfaces') as $trustedIf) {
+            $inputChain[] = sprintf('-A INPUT -i %s -j ACCEPT', $trustedIf);
+        }
+
         // NOTE: multiport is limited to 15 ports (a range counts as two)
         $inputChain[] = sprintf(
             '-A INPUT -m state --state NEW -m multiport -p udp --dports %s -j ACCEPT',
