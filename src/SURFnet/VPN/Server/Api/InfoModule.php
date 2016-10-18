@@ -18,7 +18,7 @@
 namespace SURFnet\VPN\Server\Api;
 
 use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Server\PoolConfig;
+use SURFnet\VPN\Common\ProfileConfig;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ApiResponse;
@@ -56,9 +56,9 @@ class InfoModule implements ServiceModuleInterface
                 Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-api']);
                 $poolId = $request->getQueryParameter('pool_id');
                 InputValidation::poolId($poolId);
-                $poolConfig = new PoolConfig($this->config->v('vpnPools', $poolId));
+                $profileConfig = new ProfileConfig($this->config->v('vpnPools', $poolId));
 
-                return new ApiResponse('server_pool', $poolConfig->v());
+                return new ApiResponse('server_pool', $profileConfig->v());
             }
         );
     }

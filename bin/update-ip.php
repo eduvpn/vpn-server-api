@@ -19,7 +19,7 @@
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Server\PoolConfig;
+use SURFnet\VPN\Common\ProfileConfig;
 use SURFnet\VPN\Common\CliParser;
 
 /*
@@ -58,17 +58,17 @@ try {
 
     $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $opt->v('instance'));
     $config = Config::fromFile($configFile);
-    $poolConfig = new PoolConfig($config->v('vpnPools', $opt->v('pool')));
+    $profileConfig = new ProfileConfig($config->v('vpnPools', $opt->v('pool')));
 
     $configData = $config->v();
-    $poolConfigData = $poolConfig->v();
+    $profileConfigData = $profileConfig->v();
 
-    $poolConfigData['range'] = $v4;
-    $poolConfigData['range6'] = $v6;
-    $poolConfigData['hostName'] = $opt->v('host');
-    $poolConfigData['extIf'] = $opt->v('ext');
+    $profileConfigData['range'] = $v4;
+    $profileConfigData['range6'] = $v6;
+    $profileConfigData['hostName'] = $opt->v('host');
+    $profileConfigData['extIf'] = $opt->v('ext');
 
-    $configData['vpnPools'][$opt->v('pool')] = $poolConfigData;
+    $configData['vpnPools'][$opt->v('pool')] = $profileConfigData;
 
     Config::toFile($configFile, $configData, 0440);
 } catch (Exception $e) {

@@ -20,7 +20,7 @@ namespace SURFnet\VPN\Server\OpenVpn;
 use Psr\Log\LoggerInterface;
 use SURFnet\VPN\Server\OpenVpn\Exception\ManagementSocketException;
 use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Server\PoolConfig;
+use SURFnet\VPN\Common\ProfileConfig;
 
 /**
  * Manage all OpenVPN processes controlled by this service.
@@ -52,12 +52,12 @@ class ServerManager
 
         // loop over all pools
         foreach (array_keys($this->config->v('vpnPools')) as $poolId) {
-            $poolConfig = new PoolConfig($this->config->v('vpnPools', $poolId));
-            $managementIp = $this->getManagementIp($poolConfig);
+            $profileConfig = new ProfileConfig($this->config->v('vpnPools', $poolId));
+            $managementIp = $this->getManagementIp($profileConfig);
 
             $poolConnections = [];
             // loop over all processes
-            for ($i = 0; $i < $poolConfig->v('processCount'); ++$i) {
+            for ($i = 0; $i < $profileConfig->v('processCount'); ++$i) {
                 // add all connections from this instance to poolConnections
                 try {
                     // open the socket connection
@@ -104,11 +104,11 @@ class ServerManager
         $clientsKilled = 0;
         // loop over all pools
         foreach (array_keys($this->config->v('vpnPools')) as $poolId) {
-            $poolConfig = new PoolConfig($this->config->v('vpnPools', $poolId));
-            $managementIp = $this->getManagementIp($poolConfig);
+            $profileConfig = new ProfileConfig($this->config->v('vpnPools', $poolId));
+            $managementIp = $this->getManagementIp($profileConfig);
 
             // loop over all processes
-            for ($i = 0; $i < $poolConfig->v('processCount'); ++$i) {
+            for ($i = 0; $i < $profileConfig->v('processCount'); ++$i) {
                 // add all kills from this instance to poolKills
                 try {
                     // open the socket connection
@@ -143,12 +143,12 @@ class ServerManager
         return 0 !== $clientsKilled;
     }
 
-    private function getManagementIp(PoolConfig $poolConfig)
+    private function getManagementIp(ProfileConfig $profileConfig)
     {
-        if ($poolConfig->e('managementIp')) {
-            return $poolConfig->v('managementIp');
+        if ($profileConfig->e('managementIp')) {
+            return $profileConfig->v('managementIp');
         }
 
-        return sprintf('127.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $poolConfig->v('poolNumber'));
+        return sprintf('127.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $profileConfig->v('poolNumber'));
     }
 }

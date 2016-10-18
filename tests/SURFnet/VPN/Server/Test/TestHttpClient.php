@@ -19,7 +19,7 @@ namespace SURFnet\VPN\Server\Test;
 
 use SURFnet\VPN\Common\HttpClient\HttpClientInterface;
 use RuntimeException;
-use SURFnet\VPN\Server\PoolConfig;
+use SURFnet\VPN\Common\ProfileConfig;
 
 class TestHttpClient implements HttpClientInterface
 {
@@ -40,27 +40,27 @@ class TestHttpClient implements HttpClientInterface
             case 'connectionServerClient/is_disabled_common_name?common_name=foo_baz':
                 return self::wrap('is_disabled_common_name', true);
             case 'connectionServerClient/server_pool?pool_id=internet':
-                $poolConfig = new PoolConfig([]);
+                $profileConfig = new ProfileConfig([]);
 
-                return self::wrap('server_pool', $poolConfig->v());
+                return self::wrap('server_pool', $profileConfig->v());
             case 'connectionServerClient/server_pool?pool_id=acl':
-                $poolConfig = new PoolConfig(
+                $profileConfig = new ProfileConfig(
                     [
                         'enableAcl' => true,
                         'aclGroupList' => ['all'],
                     ]
                 );
 
-                return self::wrap('server_pool', $poolConfig->v());
+                return self::wrap('server_pool', $profileConfig->v());
             case 'connectionServerClient/server_pool?pool_id=acl2':
-                $poolConfig = new PoolConfig(
+                $profileConfig = new ProfileConfig(
                     [
                         'enableAcl' => true,
                         'aclGroupList' => ['students'],
                     ]
                 );
 
-                return self::wrap('server_pool', $poolConfig->v());
+                return self::wrap('server_pool', $profileConfig->v());
             case 'connectionServerClient/user_groups?user_id=foo':
                 return self::wrap(
                     'user_groups',

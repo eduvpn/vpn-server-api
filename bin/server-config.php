@@ -20,7 +20,7 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\Config\OpenVpn;
-use SURFnet\VPN\Server\PoolConfig;
+use SURFnet\VPN\Common\ProfileConfig;
 use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\HttpClient\GuzzleHttpClient;
 use SURFnet\VPN\Common\HttpClient\CaClient;
@@ -69,10 +69,10 @@ try {
 
     $instanceConfig = $serverClient->instanceConfig();
     $instanceNumber = $instanceConfig['instanceNumber'];
-    $poolConfig = new PoolConfig($serverClient->serverPool($poolId));
+    $profileConfig = new ProfileConfig($serverClient->serverPool($poolId));
 
     $o = new OpenVpn($vpnConfigDir, $vpnTlsDir);
-    $o->writePool($instanceNumber, $instanceId, $poolId, $poolConfig);
+    $o->writePool($instanceNumber, $instanceId, $poolId, $profileConfig);
     if ($generateCerts) {
         $caClient = new CaClient(
             new GuzzleHttpClient(
