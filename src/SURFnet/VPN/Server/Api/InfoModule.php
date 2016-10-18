@@ -41,12 +41,17 @@ class InfoModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
 
-                $instanceConfig = $this->config->v();
-                // remove credentials, XXX move credentials in other file
-                unset($instanceConfig['apiConsumers']);
-                unset($instanceConfig['apiProviders']);
+                $responseData = [
+                    'instanceNumber' => $this->config->v('instanceNumber'),
+                    'vpnPools' => [],
+                ];
 
-                return new ApiResponse('instance_config', $instanceConfig);
+                foreach ($this->config->v('vpnPools') as $poolId => $poolConfig) {
+                    $profileConfig = new ProfileConfig($poolConfig);
+                    $responseData['vpnPools'][$poolId] = $profileConfig->v();
+                }
+
+                return new ApiResponse('instance_config', $responseData);
             }
         );
 
