@@ -47,8 +47,8 @@ use SURFnet\VPN\Common\FileIO;
  *   disconnected during, it is not added to the log;
  */
 
-$clientConnectSyslogIdentifier = 'vpn-server-api-client-connect';
-$clientDisconnectSyslogIdentifier = 'vpn-server-api-client-disconnect';
+$clientConnectSyslogIdentifier = 'vpn-server-node-client-connect';
+$clientDisconnectSyslogIdentifier = 'vpn-server-node-client-disconnect';
 
 function verifyMessage(array $messageData, $type)
 {
