@@ -33,7 +33,7 @@ class CommonNames
     public function __construct($dataDir)
     {
         $this->disableDir = sprintf('%s/disabled', $dataDir);
-        FileIO::createDir($this->disableDir, 0711);
+        FileIO::createDir($this->disableDir, 0700);
     }
 
     public function getDisabled()
@@ -60,7 +60,7 @@ class CommonNames
     public function setDisabled($commonName)
     {
         $disableFile = sprintf('%s/%s', $this->disableDir, $commonName);
-        FileIO::writeFile($disableFile, time(), 0644);
+        FileIO::writeFile($disableFile, time(), 0600);
     }
 
     public function setEnabled($commonName)

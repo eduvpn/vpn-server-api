@@ -45,13 +45,13 @@ class Users
     public function __construct($dataDir, OtpLog $otpLog)
     {
         $this->disableDir = sprintf('%s/disabled', $dataDir);
-        FileIO::createDir($this->disableDir, 0711);
+        FileIO::createDir($this->disableDir, 0700);
 
         $this->otpDir = sprintf('%s/otp_secrets', $dataDir);
-        FileIO::createDir($this->otpDir, 0711);
+        FileIO::createDir($this->otpDir, 0700);
 
         $this->vootDir = sprintf('%s/voot_tokens', $dataDir);
-        FileIO::createDir($this->vootDir, 0711);
+        FileIO::createDir($this->vootDir, 0700);
 
         $this->otpLog = $otpLog;
     }
@@ -80,7 +80,7 @@ class Users
     public function setDisabled($userId)
     {
         $disableFile = sprintf('%s/%s', $this->disableDir, $userId);
-        FileIO::writeFile($disableFile, time(), 0644);
+        FileIO::writeFile($disableFile, time(), 0600);
     }
 
     public function setEnabled($userId)
@@ -157,7 +157,7 @@ class Users
     public function setVootToken($userId, $vootToken)
     {
         $vootFile = sprintf('%s/%s', $this->vootDir, $userId);
-        FileIO::writeFile($vootFile, $vootToken, 0644);
+        FileIO::writeFile($vootFile, $vootToken, 0600);
     }
 
     public function hasVootToken($userId)
