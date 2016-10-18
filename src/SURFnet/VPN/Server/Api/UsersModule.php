@@ -57,7 +57,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/is_disabled_user',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-api']);
+                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
                 $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
@@ -93,7 +93,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/has_otp_secret',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-api']);
+                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
                 $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
@@ -104,7 +104,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/verify_otp_key',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal', 'vpn-server-api']);
+                Utils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal', 'vpn-server-node']);
                 $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
                 $otpKey = $request->getPostParameter('otp_key');

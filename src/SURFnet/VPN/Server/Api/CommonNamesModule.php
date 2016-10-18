@@ -51,7 +51,7 @@ class CommonNamesModule implements ServiceModuleInterface
         $service->get(
             '/is_disabled_common_name',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-api']);
+                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
                 $commonName = $request->getQueryParameter('common_name');
                 InputValidation::commonName($commonName);
 

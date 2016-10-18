@@ -39,7 +39,7 @@ class InfoModule implements ServiceModuleInterface
         $service->get(
             '/instance_config',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-api']);
+                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
 
                 $instanceConfig = $this->config->v();
                 // remove credentials, XXX move credentials in other file
@@ -53,7 +53,7 @@ class InfoModule implements ServiceModuleInterface
         $service->get(
             '/server_pool',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-api']);
+                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
                 $poolId = $request->getQueryParameter('pool_id');
                 InputValidation::poolId($poolId);
                 $profileConfig = new ProfileConfig($this->config->v('vpnPools', $poolId));
