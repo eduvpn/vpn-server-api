@@ -54,7 +54,7 @@ function verifyMessage(array $messageData, $type)
 {
     $requiredKeys = [
         'INSTANCE_ID',
-        'POOL_ID',
+        'PROFILE_ID',
         'common_name',
         'time_unix',
         'ifconfig_pool_remote_ip',
@@ -99,14 +99,14 @@ try {
             }
 
             $instanceId = $messageData['INSTANCE_ID'];
-            $poolId = $messageData['POOL_ID'];
+            $profileId = $messageData['PROFILE_ID'];
             $commonName = $messageData['common_name'];
             $userId = explode('_', $commonName, 2)[0];
             $configName = explode('_', $commonName, 2)[1];
 
-            $logKey = sprintf('%s:%s:%s', $poolId, $messageData['common_name'], $messageData['time_unix']);
+            $logKey = sprintf('%s:%s:%s', $profileId, $messageData['common_name'], $messageData['time_unix']);
             $logData[$instanceId][$logKey] = [
-                'pool_id' => $poolId,
+                'profile_id' => $profileId,
                 'user_id' => $userId,
                 'config_name' => $configName,
                 'v4' => $messageData['ifconfig_pool_remote_ip'],
@@ -131,8 +131,8 @@ try {
             }
 
             $instanceId = $messageData['INSTANCE_ID'];
-            $poolId = $messageData['POOL_ID'];
-            $logKey = sprintf('%s:%s:%s', $poolId, $messageData['common_name'], $messageData['time_unix']);
+            $profileId = $messageData['PROFILE_ID'];
+            $logKey = sprintf('%s:%s:%s', $profileId, $messageData['common_name'], $messageData['time_unix']);
             // XXX what if instanceId key does not exist?
             if (!array_key_exists($logKey, $logData[$instanceId])) {
                 // XXX we did not find a matching connect entry...

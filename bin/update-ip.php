@@ -35,10 +35,10 @@ use SURFnet\VPN\Common\CliParser;
 
 try {
     $p = new CliParser(
-        'Automatically generate an IP address and basic config for a pool',
+        'Automatically generate an IP address and basic config for a profile',
         [
             'instance' => ['the instance to target, e.g. vpn.example', true, true],
-            'pool' => ['the pool to target, e.g. internet', true, true],
+            'profile' => ['the profile to target, e.g. internet', true, true],
             'host' => ['the hostname clients connect to', true, true],
             'ext' => ['the external interface, e.g. eth0', true, true],
         ]
@@ -58,7 +58,7 @@ try {
 
     $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $opt->v('instance'));
     $config = Config::fromFile($configFile);
-    $profileConfig = new ProfileConfig($config->v('vpnPools', $opt->v('pool')));
+    $profileConfig = new ProfileConfig($config->v('vpnProfiles', $opt->v('profile')));
 
     $configData = $config->v();
     $profileConfigData = $profileConfig->v();
@@ -68,7 +68,7 @@ try {
     $profileConfigData['hostName'] = $opt->v('host');
     $profileConfigData['extIf'] = $opt->v('ext');
 
-    $configData['vpnPools'][$opt->v('pool')] = $profileConfigData;
+    $configData['vpnProfiles'][$opt->v('profile')] = $profileConfigData;
 
     Config::toFile($configFile, $configData, 0644);
 } catch (Exception $e) {

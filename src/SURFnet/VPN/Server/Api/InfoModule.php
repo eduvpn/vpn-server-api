@@ -43,12 +43,12 @@ class InfoModule implements ServiceModuleInterface
 
                 $responseData = [
                     'instanceNumber' => $this->config->v('instanceNumber'),
-                    'vpnPools' => [],
+                    'vpnProfiles' => [],
                 ];
 
-                foreach ($this->config->v('vpnPools') as $poolId => $poolConfig) {
-                    $profileConfig = new ProfileConfig($poolConfig);
-                    $responseData['vpnPools'][$poolId] = $profileConfig->v();
+                foreach ($this->config->v('vpnProfiles') as $profileId => $profileConfigData) {
+                    $profileConfig = new ProfileConfig($profileConfigData);
+                    $responseData['vpnProfiles'][$profileId] = $profileConfig->v();
                 }
 
                 return new ApiResponse('instance_config', $responseData);
@@ -56,14 +56,14 @@ class InfoModule implements ServiceModuleInterface
         );
 
         $service->get(
-            '/server_pool',
+            '/server_profile',
             function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
-                $poolId = $request->getQueryParameter('pool_id');
-                InputValidation::poolId($poolId);
-                $profileConfig = new ProfileConfig($this->config->v('vpnPools', $poolId));
+                $profileId = $request->getQueryParameter('profile_id');
+                InputValidation::profileId($profileId);
+                $profileConfig = new ProfileConfig($this->config->v('vpnProfiles', $profileId));
 
-                return new ApiResponse('server_pool', $profileConfig->v());
+                return new ApiResponse('server_profile', $profileConfig->v());
             }
         );
     }

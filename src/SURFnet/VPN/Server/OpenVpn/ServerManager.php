@@ -50,15 +50,15 @@ class ServerManager
     {
         $clientConnections = [];
 
-        // loop over all pools
-        foreach (array_keys($this->config->v('vpnPools')) as $poolId) {
-            $profileConfig = new ProfileConfig($this->config->v('vpnPools', $poolId));
+        // loop over all profiles
+        foreach (array_keys($this->config->v('vpnProfiles')) as $profileId) {
+            $profileConfig = new ProfileConfig($this->config->v('vpnProfiles', $profileId));
             $managementIp = $this->getManagementIp($profileConfig);
 
-            $poolConnections = [];
+            $profileConnections = [];
             // loop over all processes
             for ($i = 0; $i < $profileConfig->v('processCount'); ++$i) {
-                // add all connections from this instance to poolConnections
+                // add all connections from this instance to profileConnections
                 try {
                     // open the socket connection
                     $this->managementSocket->open(
@@ -68,8 +68,8 @@ class ServerManager
                             11940 + $i
                         )
                     );
-                    $poolConnections = array_merge(
-                        $poolConnections,
+                    $profileConnections = array_merge(
+                        $profileConnections,
                         StatusParser::parse($this->managementSocket->command('status 2'))
                     );
                     // close the socket connection
@@ -86,15 +86,15 @@ class ServerManager
                     );
                 }
             }
-            // we add the poolConnections to the clientConnections array
-            $clientConnections[] = ['id' => $poolId, 'connections' => $poolConnections];
+            // we add the profileConnections to the clientConnections array
+            $clientConnections[] = ['id' => $profileId, 'connections' => $profileConnections];
         }
 
         return $clientConnections;
     }
 
     /**
-     * Disconnect all clients with this CN from all pools and instances
+     * Disconnect all clients with this CN from all profiles and instances
      * managed by this service.
      *
      * @param string $commonName the CN to kill
@@ -102,14 +102,14 @@ class ServerManager
     public function kill($commonName)
     {
         $clientsKilled = 0;
-        // loop over all pools
-        foreach (array_keys($this->config->v('vpnPools')) as $poolId) {
-            $profileConfig = new ProfileConfig($this->config->v('vpnPools', $poolId));
+        // loop over all profiles
+        foreach (array_keys($this->config->v('vpnProfiles')) as $profileId) {
+            $profileConfig = new ProfileConfig($this->config->v('vpnProfiles', $profileId));
             $managementIp = $this->getManagementIp($profileConfig);
 
             // loop over all processes
             for ($i = 0; $i < $profileConfig->v('processCount'); ++$i) {
-                // add all kills from this instance to poolKills
+                // add all kills from this instance to profileKills
                 try {
                     // open the socket connection
                     $this->managementSocket->open(
@@ -149,6 +149,6 @@ class ServerManager
             return $profileConfig->v('managementIp');
         }
 
-        return sprintf('127.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $profileConfig->v('poolNumber'));
+        return sprintf('127.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $profileConfig->v('profileNumber'));
     }
 }

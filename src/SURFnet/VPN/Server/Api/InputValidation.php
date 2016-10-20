@@ -21,7 +21,7 @@ use SURFnet\VPN\Common\Http\Exception\HttpException;
 
 class InputValidation
 {
-    const POOL_ID_PATTERN = '/^[a-zA-Z-_]+$/';
+    const PROFILE_ID_PATTERN = '/^[a-zA-Z-_]+$/';
     const COMMON_NAME_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
     const USER_ID_PATTERN = '/^[a-zA-Z0-9-_.@]+$/';
     const OTP_KEY_PATTERN = '/^[0-9]{6}$/';
@@ -86,10 +86,10 @@ class InputValidation
         }
     }
 
-    public static function poolId($poolId)
+    public static function profileId($profileId)
     {
-        if (0 === preg_match(self::POOL_ID_PATTERN, $poolId)) {
-            throw new HttpException('invalid poolId format', 400);
+        if (0 === preg_match(self::PROFILE_ID_PATTERN, $profileId)) {
+            throw new HttpException('invalid profileId format', 400);
         }
     }
 
