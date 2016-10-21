@@ -149,6 +149,6 @@ class ServerManager
             return $profileConfig->v('managementIp');
         }
 
-        return sprintf('127.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $profileConfig->v('profileNumber'));
+        return sprintf('10.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $profileConfig->v('profileNumber'));
     }
 }
