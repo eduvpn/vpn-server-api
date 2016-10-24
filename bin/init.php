@@ -19,6 +19,7 @@
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Server\Api\OtpLog;
+use SURFnet\VPN\Server\Api\ConnectionLog;
 use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\FileIO;
 
@@ -44,6 +45,10 @@ try {
     $db = new PDO(sprintf('sqlite://%s/otp_log.sqlite', $dataDir));
     $otpLog = new OtpLog($db);
     $otpLog->init();
+
+    $db = new PDO(sprintf('sqlite://%s/connection_log.sqlite', $dataDir));
+    $connectionLog = new ConnectionLog($db);
+    $connectionLog->init();
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
