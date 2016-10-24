@@ -34,20 +34,20 @@ class ConnectionLog
         $this->db = $db;
     }
 
-    public function connect($profileId, $commonName, $ip, $ip6, $connectedAt)
+    public function connect($profileId, $commonName, $ip4, $ip6, $connectedAt)
     {
         $stmt = $this->db->prepare(
             'INSERT INTO connection_log (
                 profile_id,
                 common_name,
-                ip,
+                ip4,
                 ip6,
                 connected_at
              ) 
              VALUES(
                 :profile_id, 
                 :common_name,
-                :ip,
+                :ip4,
                 :ip6,
                 :connected_at
              )'
@@ -55,7 +55,7 @@ class ConnectionLog
 
         $stmt->bindValue(':profile_id', $profileId, PDO::PARAM_STR);
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
-        $stmt->bindValue(':ip', $ip, PDO::PARAM_STR);
+        $stmt->bindValue(':ip4', $ip4, PDO::PARAM_STR);
         $stmt->bindValue(':ip6', $ip6, PDO::PARAM_STR);
         $stmt->bindValue(':connected_at', $connectedAt, PDO::PARAM_INT);
 
@@ -68,7 +68,7 @@ class ConnectionLog
         return true;
     }
 
-    public function disconnect($profileId, $commonName, $ip, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)
+    public function disconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)
     {
         $stmt = $this->db->prepare(
             'UPDATE connection_log
@@ -78,7 +78,7 @@ class ConnectionLog
                 WHERE 
                     profile_id = :profile_id AND
                     common_name = :common_name AND
-                    ip = :ip AND
+                    ip4 = :ip4 AND
                     ip6 = :ip6 AND
                     connected_at = :connected_at
             '
@@ -86,7 +86,7 @@ class ConnectionLog
 
         $stmt->bindValue(':profile_id', $profileId, PDO::PARAM_STR);
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
-        $stmt->bindValue(':ip', $ip, PDO::PARAM_STR);
+        $stmt->bindValue(':ip4', $ip4, PDO::PARAM_STR);
         $stmt->bindValue(':ip6', $ip6, PDO::PARAM_STR);
         $stmt->bindValue(':connected_at', $connectedAt, PDO::PARAM_INT);
         $stmt->bindValue(':disconnected_at', $disconnectedAt, PDO::PARAM_INT);
@@ -108,7 +108,7 @@ class ConnectionLog
             'CREATE TABLE IF NOT EXISTS connection_log (
                 profile_id VARCHAR(255) NOT NULL,
                 common_name VARCHAR(255) NOT NULL,
-                ip VARCHAR(255) NOT NULL,
+                ip4 VARCHAR(255) NOT NULL,
                 ip6 VARCHAR(255) NOT NULL,
                 connected_at INTEGER NOT NULL,
                 disconnected_at INTEGER DEFAULT NULL,
