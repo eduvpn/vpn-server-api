@@ -38,7 +38,9 @@ try {
         exit(0);
     }
 
-    $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $opt->v('instance'));
+    $instanceId = $opt->v('instance');
+
+    $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
     $config = Config::fromFile($configFile);
 
     $serverManager = new ServerManager(
@@ -46,7 +48,20 @@ try {
         new ManagementSocket(),
         new Logger($argv[0])
     );
-    var_dump($serverManager->connections());
+
+    $output = [
+        sprintf('*** %s ***', $instanceId),
+    ];
+
+    foreach ($serverManager->connections() as $profile) {
+        $output[] = $profile['id'];
+
+        foreach ($profile['connections'] as $connection) {
+            $output[] = sprintf("\t%s\t%s", $connection['common_name'], implode(', ', $connection['virtual_address']));
+        }
+    }
+
+    echo implode(PHP_EOL, $output).PHP_EOL;
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
