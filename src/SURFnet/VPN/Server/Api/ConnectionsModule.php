@@ -96,7 +96,7 @@ class ConnectionsModule implements ServiceModuleInterface
 
                 $responseData = $this->connectionLog->connect($profileId, $commonName, $ip4, $ip6, $connectedAt);
 
-                return new ApiResponse('connect', $responseData);
+                return new ApiResponse('connect', ['ok' => $responseData]);
             }
         );
 
@@ -122,7 +122,7 @@ class ConnectionsModule implements ServiceModuleInterface
 
                 $responseData = $this->connectionLog->disconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred);
 
-                return new ApiResponse('disconnect', $responseData);
+                return new ApiResponse('disconnect', ['ok' => $responseData]);
             }
         );
     }
