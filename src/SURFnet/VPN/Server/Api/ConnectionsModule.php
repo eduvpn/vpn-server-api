@@ -72,12 +72,12 @@ class ConnectionsModule implements ServiceModuleInterface
 
                 // check if user is disabled
                 if (true === $this->users->isDisabled($userId)) {
-                    return false;
+                    return new ApiResponse('connect', ['ok' => false, 'error' => sprintf('user "%s" disabled', $userId)]);
                 }
 
                 // check if the common_name is disabled
                 if (true === $this->commonNames->isDisabled($commonName)) {
-                    return false;
+                    return new ApiResponse('connect', ['ok' => false, 'error' => sprintf('common_name "%s" disabled', $commonName)]);
                 }
 
                 // if the ACL is enabled, verify that the user is allowed to
@@ -90,7 +90,7 @@ class ConnectionsModule implements ServiceModuleInterface
                     }
 
                     if (false === self::isMember($userGroups, $profileConfig->v('aclGroupList'))) {
-                        return false;
+                        return new ApiResponse('connect', ['ok' => false, 'error' => sprintf('user "%s" not in ACL', $userId)]);
                     }
                 }
 
