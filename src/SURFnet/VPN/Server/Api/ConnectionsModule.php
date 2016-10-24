@@ -61,8 +61,8 @@ class ConnectionsModule implements ServiceModuleInterface
                 InputValidation::profileId($profileId);
                 $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);
-                $ip = $request->getPostParameter('ip');
-                InputValidation::ip4($ip);
+                $ip4 = $request->getPostParameter('ip4');
+                InputValidation::ip4($ip4);
                 $ip6 = $request->getPostParameter('ip6');
                 InputValidation::ip6($ip6);
                 $connectedAt = $request->getPostParameter('connected_at');
@@ -94,7 +94,7 @@ class ConnectionsModule implements ServiceModuleInterface
                     }
                 }
 
-                $responseData = $this->connectionLog->connect($profileId, $commonName, $ip, $ip6, $connectedAt);
+                $responseData = $this->connectionLog->connect($profileId, $commonName, $ip4, $ip6, $connectedAt);
 
                 return new ApiResponse('connect', $responseData);
             }
@@ -109,8 +109,8 @@ class ConnectionsModule implements ServiceModuleInterface
                 InputValidation::profileId($profileId);
                 $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);
-                $ip = $request->getPostParameter('ip');
-                InputValidation::ip4($ip);
+                $ip4 = $request->getPostParameter('ip4');
+                InputValidation::ip4($ip4);
                 $ip6 = $request->getPostParameter('ip6');
                 InputValidation::ip6($ip6);
                 $connectedAt = $request->getPostParameter('connected_at');
@@ -120,7 +120,7 @@ class ConnectionsModule implements ServiceModuleInterface
                 $bytesTransferred = $request->getPostParameter('bytes_transferred');
                 InputValidation::bytesTransferred($bytesTransferred);
 
-                $responseData = $this->connectionLog->disconnect($profileId, $commonName, $ip, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred);
+                $responseData = $this->connectionLog->disconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred);
 
                 return new ApiResponse('disconnect', $responseData);
             }
