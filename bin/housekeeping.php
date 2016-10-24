@@ -19,6 +19,7 @@
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Server\Api\OtpLog;
+use SURFnet\VPN\Server\Api\ConnectionLog;
 use SURFnet\VPN\Common\CliParser;
 
 try {
@@ -36,10 +37,14 @@ try {
     }
 
     $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $opt->v('instance'));
+
     $db = new PDO(sprintf('sqlite://%s/otp_log.sqlite', $dataDir));
     $otpLog = new OtpLog($db);
-    // remove all OTP key entries that are older than 5 minutes
     $otpLog->housekeeping(strtotime('now -5 minutes'));
+
+    $db = new PDO(sprintf('sqlite://%s/connection_log.sqlite', $dataDir));
+    $connectionLog = new ConnectionLog($db);
+    $connectionLog->housekeeping(strtotime('now -1 month'));
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);

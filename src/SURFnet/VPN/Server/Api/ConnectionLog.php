@@ -102,6 +102,19 @@ class ConnectionLog
         return true;
     }
 
+    public function housekeeping($timeUnix)
+    {
+        $stmt = $this->db->prepare(
+            sprintf(
+                'DELETE FROM connection_log
+                    WHERE connected_at < :time_unix'
+            )
+        );
+
+        $stmt->bindValue(':time_unix', $timeUnix, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
     public function init()
     {
         $queryList = [
