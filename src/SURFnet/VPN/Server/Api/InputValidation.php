@@ -99,4 +99,39 @@ class InputValidation
             throw new HttpException('invalid IP address', 400);
         }
     }
+
+    public static function ip4($ipAddress)
+    {
+        if (false === filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            throw new HttpException('invalid IPv4 address', 400);
+        }
+    }
+
+    public static function ip6($ipAddress)
+    {
+        if (false === filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            throw new HttpException('invalid IPv6 address', 400);
+        }
+    }
+
+    public static function connectedAt($connectedAt)
+    {
+        if (!is_numeric($connectedAt) || 0 >= $connectedAt) {
+            throw new HttpException('connectedAt must be positive integer', 400);
+        }
+    }
+
+    public static function disconnectedAt($disconnectedAt)
+    {
+        if (!is_numeric($disconnectedAt) || 0 >= $disconnectedAt) {
+            throw new HttpException('disconnectedAt must be positive integer', 400);
+        }
+    }
+
+    public static function bytesTransferred($bytesTransferred)
+    {
+        if (!is_numeric($bytesTransferred) || 0 >= $bytesTransferred) {
+            throw new HttpException('bytesTransferred must be positive integer', 400);
+        }
+    }
 }

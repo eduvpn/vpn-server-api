@@ -26,6 +26,8 @@ use SURFnet\VPN\Server\Api\CommonNamesModule;
 use SURFnet\VPN\Server\Api\GroupsModule;
 use SURFnet\VPN\Server\Api\InfoModule;
 use SURFnet\VPN\Server\Api\LogModule;
+use SURFnet\VPN\Server\Api\ConnectionLog;
+use SURFnet\VPN\Server\Api\ConnectionsModule;
 use SURFnet\VPN\Server\Api\OpenVpnModule;
 use SURFnet\VPN\Server\Api\OtpLog;
 use SURFnet\VPN\Common\Http\Service;
@@ -63,15 +65,19 @@ try {
             new ServerManager($config, new ManagementSocket(), $logger)
         )
     );
+
+    $commonNames = new CommonNames(sprintf('%s/common_names', $dataDir));
     $service->addModule(
         new CommonNamesModule(
-            new CommonNames(sprintf('%s/common_names', $dataDir)),
+            $commonNames,
             $logger
         )
     );
+
+    $users = new Users(sprintf('%s/users', $dataDir), new OtpLog(new PDO(sprintf('sqlite://%s/otp_log.sqlite', $dataDir))));
     $service->addModule(
         new UsersModule(
-            new Users(sprintf('%s/users', $dataDir), new OtpLog(new PDO(sprintf('sqlite://%s/otp_log.sqlite', $dataDir)))),
+            $users,
             $logger
         )
     );
@@ -88,6 +94,18 @@ try {
             );
         }
     }
+
+    $connectionLog = new ConnectionLog(new PDO(sprintf('sqlite://%s/connection_log.sqlite', $dataDir)));
+
+    $service->addModule(
+        new ConnectionsModule(
+            $config,
+            $users,
+            $commonNames,
+            $connectionLog,
+            $groupProviders
+        )
+    );
 
     $service->addModule(
         new GroupsModule(

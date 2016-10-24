@@ -34,18 +34,18 @@ class ConnectionLog
         $this->db = $db;
     }
 
-    public function connect($poolId, $commonName, $ip, $ip6, $connectedAt)
+    public function connect($profileId, $commonName, $ip, $ip6, $connectedAt)
     {
         $stmt = $this->db->prepare(
             'INSERT INTO connection_log (
-                pool_id,
+                profile_id,
                 common_name,
                 ip,
                 ip6,
                 connected_at
              ) 
              VALUES(
-                :pool_id, 
+                :profile_id, 
                 :common_name,
                 :ip,
                 :ip6,
@@ -53,7 +53,7 @@ class ConnectionLog
              )'
         );
 
-        $stmt->bindValue(':pool_id', $poolId, PDO::PARAM_STR);
+        $stmt->bindValue(':profile_id', $profileId, PDO::PARAM_STR);
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
         $stmt->bindValue(':ip', $ip, PDO::PARAM_STR);
         $stmt->bindValue(':ip6', $ip6, PDO::PARAM_STR);
@@ -68,7 +68,7 @@ class ConnectionLog
         return true;
     }
 
-    public function disconnect($poolId, $commonName, $ip, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)
+    public function disconnect($profileId, $commonName, $ip, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)
     {
         $stmt = $this->db->prepare(
             'UPDATE connection_log
@@ -76,7 +76,7 @@ class ConnectionLog
                     disconnected_at = :disconnected_at, 
                     bytes_transferred = :bytes_transferred
                 WHERE 
-                    pool_id = :pool_id AND
+                    profile_id = :profile_id AND
                     common_name = :common_name AND
                     ip = :ip AND
                     ip6 = :ip6 AND
@@ -84,7 +84,7 @@ class ConnectionLog
             '
         );
 
-        $stmt->bindValue(':pool_id', $poolId, PDO::PARAM_STR);
+        $stmt->bindValue(':profile_id', $profileId, PDO::PARAM_STR);
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
         $stmt->bindValue(':ip', $ip, PDO::PARAM_STR);
         $stmt->bindValue(':ip6', $ip6, PDO::PARAM_STR);
@@ -106,7 +106,7 @@ class ConnectionLog
     {
         $queryList = [
             'CREATE TABLE IF NOT EXISTS connection_log (
-                pool_id VARCHAR(255) NOT NULL,
+                profile_id VARCHAR(255) NOT NULL,
                 common_name VARCHAR(255) NOT NULL,
                 ip VARCHAR(255) NOT NULL,
                 ip6 VARCHAR(255) NOT NULL,
