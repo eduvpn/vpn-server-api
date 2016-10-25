@@ -44,7 +44,7 @@ try {
 
     $db = new PDO(sprintf('sqlite://%s/connection_log.sqlite', $dataDir));
     $connectionLog = new ConnectionLog($db);
-    $connectionLog->housekeeping(strtotime('now -1 month'));
+    $connectionLog->housekeeping(strtotime('now -32 days'));
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);

@@ -57,9 +57,7 @@ try {
         'vpn-server-api'
     );
     $service->addBeforeHook('auth', $basicAuthentication);
-    $service->addModule(
-        new LogModule($dataDir)
-    );
+
     $service->addModule(
         new OpenVpnModule(
             new ServerManager($config, new ManagementSocket(), $logger)
@@ -105,6 +103,10 @@ try {
             $connectionLog,
             $groupProviders
         )
+    );
+
+    $service->addModule(
+        new LogModule($connectionLog)
     );
 
     $service->addModule(

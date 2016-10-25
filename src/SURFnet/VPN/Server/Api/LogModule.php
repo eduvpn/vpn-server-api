@@ -17,7 +17,6 @@
  */
 namespace SURFnet\VPN\Server\Api;
 
-use DateTime;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ApiResponse;
@@ -26,19 +25,12 @@ use SURFnet\VPN\Common\FileIO;
 
 class LogModule implements ServiceModuleInterface
 {
-    /** @var string */
-    private $dataDir;
+    /** @var ConnectionLog */
+    private $connectionLog;
 
-    /** @var \DateTime */
-    private $dateTime;
-
-    public function __construct($dataDir, DateTime $dateTime = null)
+    public function __construct(ConnectionLog $connectionLog)
     {
-        $this->dataDir = $dataDir;
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-        $this->dateTime = $dateTime;
+        $this->connectionLog = $connectionLog;
     }
 
     public function init(Service $service)
@@ -50,54 +42,33 @@ class LogModule implements ServiceModuleInterface
 
                 $dateTime = $request->getQueryParameter('date_time');
                 InputValidation::dateTime($dateTime);
-                $dateTimeUnix = strtotime($dateTime);
+
+                // do not convert if we have a number, it is probably already unix time
+                $dateTimeUnix = is_numeric($dateTime) ? intval($dateTime) : strtotime($dateTime);
 
                 $ipAddress = $request->getQueryParameter('ip_address');
                 InputValidation::ipAddress($ipAddress);
 
-                return new ApiResponse('log', $this->get($dateTimeUnix, $ipAddress));
-            }
-        );
-
-        $service->get(
-            '/stats',
-            function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal']);
-                $statsFile = sprintf('%s/stats.json', $this->dataDir);
-
-                return new ApiResponse('stats', FileIO::readJsonFile($statsFile));
-            }
-        );
-    }
-
-    public function get($dateTimeUnix, $ipAddress)
-    {
-        $returnData = [];
-        $logFile = sprintf('%s/log.json', $this->dataDir);
-        $logData = FileIO::readJsonFile($logFile);
-        foreach ($logData['entries'] as $k => $v) {
-            $connectTime = $v['connect_time'];
-            $disconnectTime = array_key_exists('disconnect_time', $v) ? $v['disconnect_time'] : null;
-
-            if ($connectTime <= $dateTimeUnix && (is_null($disconnectTime) || $disconnectTime >= $dateTimeUnix)) {
-                // XXX edge cases? still connected? just disconnected?
-                $v4 = $v['v4'];
-                $v6 = $v['v6'];
-                if ($v4 === $ipAddress || $v6 === $ipAddress) {
-                    $returnData[] = [
-                        // XXX deal with still connected
-                        'user_id' => $v['user_id'],
-                        'v4' => $v4,
-                        'v6' => $v6,
-                        'config_name' => $v['config_name'],
-                        'connect_time' => $connectTime,
-                        'disconnect_time' => $disconnectTime,
-                    ];
+                $logData = $this->connectionLog->get($dateTimeUnix, $ipAddress);
+                if (false !== $logData) {
+                    foreach ($logData as $k => $value) {
+                        $logData[$k]['user_id'] = substr($value['common_name'], 0, strpos($value['common_name'], '_'));
+                        $logData[$k]['config_name'] = substr($value['common_name'], strpos($value['common_name'], '_') + 1);
+                    }
                 }
-            }
-        }
-        // XXX could there actually be multiple results?
 
-        return $returnData;
+                return new ApiResponse('log', $logData);
+            }
+        );
+
+//        $service->get(
+//            '/stats',
+//            function (Request $request, array $hookData) {
+//                Utils::requireUser($hookData, ['vpn-admin-portal']);
+//                $statsFile = sprintf('%s/stats.json', $this->dataDir);
+
+//                return new ApiResponse('stats', FileIO::readJsonFile($statsFile));
+//            }
+//        );
     }
 }

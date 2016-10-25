@@ -81,7 +81,7 @@ class InputValidation
 
     public static function dateTime($dateTime)
     {
-        if (false === strtotime($dateTime)) {
+        if (!is_numeric($dateTime) && false === strtotime($dateTime)) {
             throw new HttpException('invalid date/time format', 400);
         }
     }

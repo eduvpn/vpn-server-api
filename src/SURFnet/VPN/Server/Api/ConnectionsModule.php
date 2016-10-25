@@ -115,8 +115,10 @@ class ConnectionsModule implements ServiceModuleInterface
                 InputValidation::ip6($ip6);
                 $connectedAt = $request->getPostParameter('connected_at');
                 InputValidation::connectedAt($connectedAt);
+
                 $disconnectedAt = $request->getPostParameter('disconnected_at');
                 InputValidation::disconnectedAt($disconnectedAt);
+
                 $bytesTransferred = $request->getPostParameter('bytes_transferred');
                 InputValidation::bytesTransferred($bytesTransferred);
 
