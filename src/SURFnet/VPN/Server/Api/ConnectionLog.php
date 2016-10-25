@@ -123,7 +123,7 @@ class ConnectionLog
              WHERE
                 (ip4 = :ip_address OR ip6 = :ip_address)
                 AND connected_at < :date_time_unix
-                AND disconnected_at > :date_time_unix'
+                AND (disconnected_at > :date_time_unix OR disconnected_at IS NULL)'
         );
         $stmt->bindValue(':ip_address', $ipAddress, PDO::PARAM_STR);
         $stmt->bindValue(':date_time_unix', $dateTimeUnix, PDO::PARAM_STR);
