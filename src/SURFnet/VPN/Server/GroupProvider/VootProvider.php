@@ -86,22 +86,7 @@ class VootProvider implements GroupProviderInterface
             if (!is_string($groupEntry['id'])) {
                 continue;
             }
-            $displayName = $groupEntry['id'];
-
-            // override displayName if one is set
-            if (array_key_exists('displayName', $groupEntry)) {
-                // check if it is multilanguage
-                if (is_string($groupEntry['displayName'])) {
-                    $displayName = $groupEntry['displayName'];
-                } else {
-                    // take english if available, otherwise first
-                    if (array_key_exists('en', $groupEntry['displayName'])) {
-                        $displayName = $groupEntry['displayName']['en'];
-                    } else {
-                        $displayName = array_values($groupEntry['displayName'])[0];
-                    }
-                }
-            }
+            $displayName = self::getDisplayName($groupEntry);
 
             $memberOf[] = [
                 'id' => $groupEntry['id'],
@@ -110,5 +95,26 @@ class VootProvider implements GroupProviderInterface
         }
 
         return $memberOf;
+    }
+
+    private static function getDisplayName(array $groupEntry)
+    {
+        if (!array_key_exists('displayName', $groupEntry)) {
+            return $groupEntry['id'];
+        }
+
+        if (is_string($groupEntry['displayName'])) {
+            return $groupEntry['displayName'];
+        }
+
+        if (is_array($groupEntry['displayName'])) {
+            if (array_key_exists('en', $groupEntry['displayName'])) {
+                return $groupEntry['displayName']['en'];
+            }
+
+            return array_values($groupEntry['displayName'])[0];
+        }
+
+        return $groupEntry['id'];
     }
 }

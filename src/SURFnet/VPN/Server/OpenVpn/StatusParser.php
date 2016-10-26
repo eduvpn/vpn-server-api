@@ -67,7 +67,7 @@ class StatusParser
         $parsedRoutingTable = self::parseRoutingTable(array_slice($statusData, $routingTableStart, $globalStatsStart - $routingTableStart));
 
         // merge routing table in client list
-        foreach ($parsedClientList as $key => $value) {
+        foreach (array_keys($parsedClientList) as $key) {
             if (!array_key_exists($key, $parsedRoutingTable)) {
                 $parsedClientList[$key]['virtual_address'] = array();
             } else {
