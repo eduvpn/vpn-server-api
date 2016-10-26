@@ -94,9 +94,11 @@ class ConnectionsModule implements ServiceModuleInterface
                     }
                 }
 
-                $responseData = $this->connectionLog->connect($profileId, $commonName, $ip4, $ip6, $connectedAt);
+                if (false == $this->connectionLog->connect($profileId, $commonName, $ip4, $ip6, $connectedAt)) {
+                    return new ApiResponse('connect', ['ok' => false, 'error' => 'unable to write connect event to log, dropping client']);
+                }
 
-                return new ApiResponse('connect', ['ok' => $responseData]);
+                return new ApiResponse('connect', ['ok' => true]);
             }
         );
 
@@ -122,9 +124,11 @@ class ConnectionsModule implements ServiceModuleInterface
                 $bytesTransferred = $request->getPostParameter('bytes_transferred');
                 InputValidation::bytesTransferred($bytesTransferred);
 
-                $responseData = $this->connectionLog->disconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred);
+                if (false === $this->connectionLog->disconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)) {
+                    return new ApiResponse('disconnect', ['ok' => false, 'error' => 'unable to write disconnect event to log, nothing we can do']);
+                }
 
-                return new ApiResponse('disconnect', ['ok' => $responseData]);
+                return new ApiResponse('disconnect', ['ok' => true]);
             }
         );
     }
