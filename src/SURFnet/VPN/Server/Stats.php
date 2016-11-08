@@ -119,7 +119,5 @@ class Stats
             'unique_user_count' => count($uniqueUsers),
             'active_user_count' => $activeUserCount,
         ];
-
-        return $statsData;
     }
 }
