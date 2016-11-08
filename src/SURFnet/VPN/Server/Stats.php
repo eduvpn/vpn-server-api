@@ -88,7 +88,6 @@ class Stats
         }
 
         $maxConcurrentConnections = 0;
-        $maxConcurrentConnectionsTime = 0;
         $concurrentConnections = 0;
         foreach ($timeConnection as $unixTime => $eventArray) {
             foreach ($eventArray as $event) {
@@ -96,7 +95,6 @@ class Stats
                     ++$concurrentConnections;
                     if ($concurrentConnections > $maxConcurrentConnections) {
                         $maxConcurrentConnections = $concurrentConnections;
-                        $maxConcurrentConnectionsTime = $unixTime;
                     }
                 } else {
                     --$concurrentConnections;
