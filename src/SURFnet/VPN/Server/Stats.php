@@ -18,8 +18,18 @@
 
 namespace SURFnet\VPN\Server;
 
+use DateTime;
+
 class Stats
 {
+    /** @var \DateTime */
+    private $now;
+
+    public function __construct(DateTime $now)
+    {
+        $this->now = $now;
+    }
+
     public function get(array $logEntries)
     {
         $statsData = [];
@@ -111,11 +121,11 @@ class Stats
         return [
             'days' => array_values($statsData),
             'total_traffic' => $totalTraffic,
-            'generated_at' => time(),
+            'generated_at' => $this->now->getTimestamp(),
             'max_concurrent_connections' => $maxConcurrentConnections,
-            'max_concurrent_connections_time' => $maxConcurrentConnectionsTime,
-            'first_entry' => $firstEntryTime,
-            'last_entry' => $lastEntryTime,
+//            'max_concurrent_connections_time' => $maxConcurrentConnectionsTime,
+//            'first_entry' => $firstEntryTime,
+//            'last_entry' => $lastEntryTime,
             'unique_user_count' => count($uniqueUsers),
             'active_user_count' => $activeUserCount,
         ];

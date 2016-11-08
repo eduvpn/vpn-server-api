@@ -43,7 +43,7 @@ try {
     $db = new PDO(sprintf('sqlite://%s/connection_log.sqlite', $dataDir));
     $connectionLog = new ConnectionLog($db);
 
-    $stats = new Stats();
+    $stats = new Stats(new DateTime());
     $statsData = $stats->get($connectionLog->getAll());
 
     FileIO::writeJsonFile(

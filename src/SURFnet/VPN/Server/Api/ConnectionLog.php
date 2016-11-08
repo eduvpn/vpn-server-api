@@ -93,7 +93,8 @@ class ConnectionLog
         $stmt->bindValue(':disconnected_at', $disconnectedAt, PDO::PARAM_INT);
         $stmt->bindValue(':bytes_transferred', $bytesTransferred, PDO::PARAM_INT);
 
-        // XXX number of affected rows should be one!
+        // XXX number of affected rows should be one, otherwise corresponding
+        // connect entry was not found? or there was more than one?
         try {
             $stmt->execute();
         } catch (PDOException $e) {
