@@ -20,6 +20,7 @@ namespace SURFnet\VPN\Server;
 
 use PHPUnit_Framework_TestCase;
 use DateTime;
+use DateTimeZone;
 
 class StatsTest extends PHPUnit_Framework_TestCase
 {
@@ -142,7 +143,7 @@ class StatsTest extends PHPUnit_Framework_TestCase
 
     public function testStillConnectedClient()
     {
-        $s = new Stats(new DateTime('2011-05-05'));
+        $s = new Stats(new DateTime('2011-05-05', new DateTimeZone('UTC')));
         $result = $s->get(
             [
                 [
@@ -164,7 +165,7 @@ class StatsTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
                 'total_traffic' => 0,
-                'generated_at' => 1304546400,
+                'generated_at' => 1304553600,
                 'max_concurrent_connections' => 1,
                 'unique_user_count' => 1,
                 'active_user_count' => 1,
