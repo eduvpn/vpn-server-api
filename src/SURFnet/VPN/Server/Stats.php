@@ -85,12 +85,6 @@ class Stats
             }
         }
 
-        ksort($timeConnection);
-        $firstEntryTime = intval(key($timeConnection));
-        end($timeConnection);
-        $lastEntryTime = intval(key($timeConnection));
-        reset($timeConnection);
-
         $maxConcurrentConnections = 0;
         $maxConcurrentConnectionsTime = 0;
         $concurrentConnections = 0;
@@ -123,9 +117,6 @@ class Stats
             'total_traffic' => $totalTraffic,
             'generated_at' => $this->now->getTimestamp(),
             'max_concurrent_connections' => $maxConcurrentConnections,
-//            'max_concurrent_connections_time' => $maxConcurrentConnectionsTime,
-//            'first_entry' => $firstEntryTime,
-//            'last_entry' => $lastEntryTime,
             'unique_user_count' => count($uniqueUsers),
             'active_user_count' => $activeUserCount,
         ];
