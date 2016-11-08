@@ -20,6 +20,8 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Common\FileIO;
 use SURFnet\VPN\Common\CliParser;
+use SURFnet\VPN\Server\Api\ConnectionLog;
+use SURFnet\VPN\Server\Stats;
 
 try {
     $p = new CliParser(
@@ -36,107 +38,17 @@ try {
     }
 
     $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $opt->v('instance'));
-    $inFile = sprintf('%s/log.json', $dataDir);
     $outFile = sprintf('%s/stats.json', $dataDir);
 
-    $statsData = [];
+    $db = new PDO(sprintf('sqlite://%s/connection_log.sqlite', $dataDir));
+    $connectionLog = new ConnectionLog($db);
 
-    $logData = FileIO::readJsonFile($inFile);
-
-    $timeConnection = [];
-    $uniqueUsers = [];
-
-    foreach ($logData['entries'] as $entry) {
-        $dateOfConnection = date('Y-m-d', $entry['connect_time']);
-        if (!array_key_exists($dateOfConnection, $statsData)) {
-            $statsData[$dateOfConnection] = [];
-        }
-        if (!array_key_exists('number_of_connections', $statsData[$dateOfConnection])) {
-            $statsData[$dateOfConnection]['number_of_connections'] = 0;
-        }
-        if (!array_key_exists('traffic', $statsData[$dateOfConnection])) {
-            $statsData[$dateOfConnection]['traffic'] = 0;
-        }
-        if (!array_key_exists('user_list', $statsData[$dateOfConnection])) {
-            $statsData[$dateOfConnection]['user_list'] = [];
-        }
-
-        ++$statsData[$dateOfConnection]['number_of_connections'];
-        if (array_key_exists('traffic', $entry)) {
-            // when client is still connected, it won't have a 'traffic' entry
-            $statsData[$dateOfConnection]['traffic'] += $entry['traffic'];
-
-            $connectTime = $entry['connect_time'];
-            $disconnectTime = $entry['disconnect_time'];
-
-            // add it to table to be able to determine max concurrent connection
-            // count
-            if (!array_key_exists($connectTime, $timeConnection)) {
-                $timeConnection[$connectTime] = [];
-            }
-            $timeConnection[$connectTime][] = 'C';
-
-            if (!array_key_exists($disconnectTime, $timeConnection)) {
-                $timeConnection[$disconnectTime] = [];
-            }
-            $timeConnection[$disconnectTime][] = 'D';
-        }
-        if (!in_array($entry['user_id'], $statsData[$dateOfConnection]['user_list'])) {
-            $statsData[$dateOfConnection]['user_list'][] = $entry['user_id'];
-        }
-
-        // global unique user list
-        if (!in_array($entry['user_id'], $uniqueUsers)) {
-            $uniqueUsers[] = $entry['user_id'];
-        }
-    }
-
-    ksort($timeConnection);
-    $firstEntryTime = intval(key($timeConnection));
-    end($timeConnection);
-    $lastEntryTime = intval(key($timeConnection));
-    reset($timeConnection);
-
-    $maxConcurrentConnections = 0;
-    $maxConcurrentConnectionsTime = 0;
-    $concurrentConnections = 0;
-    foreach ($timeConnection as $unixTime => $eventArray) {
-        foreach ($eventArray as $event) {
-            if ('C' === $event) {
-                ++$concurrentConnections;
-                if ($concurrentConnections > $maxConcurrentConnections) {
-                    $maxConcurrentConnections = $concurrentConnections;
-                    $maxConcurrentConnectionsTime = $unixTime;
-                }
-            } else {
-                --$concurrentConnections;
-            }
-        }
-    }
-
-    $totalTraffic = 0;
-    // convert the user list in unique user count for that day, rework array
-    // key and determine total amount of traffic
-    foreach ($statsData as $date => $entry) {
-        $statsData[$date]['date'] = $date;
-        $statsData[$date]['unique_user_count'] = count($entry['user_list']);
-        unset($statsData[$date]['user_list']);
-        $totalTraffic += $entry['traffic'];
-    }
+    $stats = new Stats();
+    $statsData = $stats->get($connectionLog->getAll());
 
     FileIO::writeJsonFile(
         $outFile,
-        [
-            'days' => array_values($statsData),
-            'total_traffic' => $totalTraffic,
-            'generated_at' => time(),
-            'max_concurrent_connections' => $maxConcurrentConnections,
-            'max_concurrent_connections_time' => $maxConcurrentConnectionsTime,
-            'first_entry' => $firstEntryTime,
-            'last_entry' => $lastEntryTime,
-            'unique_users' => count($uniqueUsers),
-        ],
-        0644
+        $statsData
     );
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;

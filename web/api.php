@@ -106,7 +106,7 @@ try {
     );
 
     $service->addModule(
-        new LogModule($connectionLog)
+        new LogModule($connectionLog, $dataDir)
     );
 
     $service->addModule(

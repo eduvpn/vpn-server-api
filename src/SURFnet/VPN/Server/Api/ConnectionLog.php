@@ -15,6 +15,7 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace SURFnet\VPN\Server\Api;
 
 use PDO;
@@ -113,6 +114,17 @@ class ConnectionLog
 
         $stmt->bindValue(':time_unix', $timeUnix, PDO::PARAM_INT);
         $stmt->execute();
+    }
+
+    public function getAll()
+    {
+        $stmt = $this->db->prepare(
+            'SELECT common_name, connected_at, disconnected_at, bytes_transferred
+             FROM connection_log'
+        );
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function get($dateTimeUnix, $ipAddress)

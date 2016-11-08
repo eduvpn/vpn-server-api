@@ -15,6 +15,7 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace SURFnet\VPN\Server\Api;
 
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
@@ -28,9 +29,13 @@ class LogModule implements ServiceModuleInterface
     /** @var ConnectionLog */
     private $connectionLog;
 
-    public function __construct(ConnectionLog $connectionLog)
+    /** @var string */
+    private $dataDir;
+
+    public function __construct(ConnectionLog $connectionLog, $dataDir)
     {
         $this->connectionLog = $connectionLog;
+        $this->dataDir = $dataDir;
     }
 
     public function init(Service $service)
@@ -64,14 +69,14 @@ class LogModule implements ServiceModuleInterface
             }
         );
 
-//        $service->get(
-//            '/stats',
-//            function (Request $request, array $hookData) {
-//                Utils::requireUser($hookData, ['vpn-admin-portal']);
-//                $statsFile = sprintf('%s/stats.json', $this->dataDir);
+        $service->get(
+            '/stats',
+            function (Request $request, array $hookData) {
+                Utils::requireUser($hookData, ['vpn-admin-portal']);
+                $statsFile = sprintf('%s/stats.json', $this->dataDir);
 
-//                return new ApiResponse('stats', FileIO::readJsonFile($statsFile));
-//            }
-//        );
+                return new ApiResponse('stats', FileIO::readJsonFile($statsFile));
+            }
+        );
     }
 }
