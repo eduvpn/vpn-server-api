@@ -20,13 +20,12 @@ namespace SURFnet\VPN\Server;
 
 use PHPUnit_Framework_TestCase;
 use DateTime;
-use DateTimeZone;
 
 class StatsTest extends PHPUnit_Framework_TestCase
 {
     public function testOneClient()
     {
-        $s = new Stats(new DateTime('2011-05-05'));
+        $s = new Stats(DateTime::createFromFormat('U', 1234567890));
         $result = $s->get(
             [
                 [
@@ -48,7 +47,7 @@ class StatsTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
                 'total_traffic' => 1000000,
-                'generated_at' => 1304546400,
+                'generated_at' => 1234567890,
                 'max_concurrent_connections' => 1,
                 'unique_user_count' => 1,
                 'active_user_count' => 0,
@@ -59,7 +58,7 @@ class StatsTest extends PHPUnit_Framework_TestCase
 
     public function testTwoConcurrentClients()
     {
-        $s = new Stats(new DateTime('2011-05-05'));
+        $s = new Stats(DateTime::createFromFormat('U', 1234567890));
         $result = $s->get(
             [
                 [
@@ -87,7 +86,7 @@ class StatsTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
                 'total_traffic' => 2000000,
-                'generated_at' => 1304546400,
+                'generated_at' => 1234567890,
                 'max_concurrent_connections' => 2,
                 'unique_user_count' => 2,
                 'active_user_count' => 0,
@@ -98,7 +97,7 @@ class StatsTest extends PHPUnit_Framework_TestCase
 
     public function testTwoNonConcurrentClients()
     {
-        $s = new Stats(new DateTime('2011-05-05'));
+        $s = new Stats(DateTime::createFromFormat('U', 1234567890));
         $result = $s->get(
             [
                 [
@@ -132,7 +131,7 @@ class StatsTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
                 'total_traffic' => 2000000,
-                'generated_at' => 1304546400,
+                'generated_at' => 1234567890,
                 'max_concurrent_connections' => 1,
                 'unique_user_count' => 1,
                 'active_user_count' => 0,
@@ -143,7 +142,7 @@ class StatsTest extends PHPUnit_Framework_TestCase
 
     public function testStillConnectedClient()
     {
-        $s = new Stats(new DateTime('2011-05-05', new DateTimeZone('UTC')));
+        $s = new Stats(DateTime::createFromFormat('U', 1234567890));
         $result = $s->get(
             [
                 [
@@ -165,7 +164,7 @@ class StatsTest extends PHPUnit_Framework_TestCase
                     ],
                 ],
                 'total_traffic' => 0,
-                'generated_at' => 1304553600,
+                'generated_at' => 1234567890,
                 'max_concurrent_connections' => 1,
                 'unique_user_count' => 1,
                 'active_user_count' => 1,
