@@ -65,6 +65,10 @@ class ConnectionsModule implements ServiceModuleInterface
                 InputValidation::ip4($ip4);
                 $ip6 = $request->getPostParameter('ip6');
                 InputValidation::ip6($ip6);
+
+                // normalize the IPv6 address
+                $ip6 = inet_ntop(inet_pton($ip6));
+                
                 $connectedAt = $request->getPostParameter('connected_at');
                 InputValidation::connectedAt($connectedAt);
 
@@ -115,6 +119,10 @@ class ConnectionsModule implements ServiceModuleInterface
                 InputValidation::ip4($ip4);
                 $ip6 = $request->getPostParameter('ip6');
                 InputValidation::ip6($ip6);
+
+                // normalize the IPv6 address
+                $ip6 = inet_ntop(inet_pton($ip6));
+
                 $connectedAt = $request->getPostParameter('connected_at');
                 InputValidation::connectedAt($connectedAt);
 

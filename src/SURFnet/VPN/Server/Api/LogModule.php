@@ -49,6 +49,9 @@ class LogModule implements ServiceModuleInterface
                 $ipAddress = $request->getQueryParameter('ip_address');
                 InputValidation::ipAddress($ipAddress);
 
+                // normalize the IP(v6) address
+                $ipAddress = inet_ntop(inet_pton($ipAddress));
+
                 $logData = $this->connectionLog->get($dateTimeUnix, $ipAddress);
                 if (false !== $logData) {
                     foreach ($logData as $k => $value) {
