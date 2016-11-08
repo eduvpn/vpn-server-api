@@ -16,7 +16,7 @@
     "name": "eduvpn/vpn-server-api",
     "require": {
         "christian-riesen/otp": "^2.0",
-        "eduvpn/common": "dev-master",
+        "eduvpn/common": "^1.0",
         "ext-curl": "*",
         "ext-date": "*",
         "ext-filter": "*",
