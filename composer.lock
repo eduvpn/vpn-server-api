@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "73d6685cf22b3ff7e10de5c95c8d23c1",
+    "hash": "e8381872dd351bf5c20373968193e371",
     "content-hash": "57e633b5c733720354213e39b407baf9",
     "packages": [
         {
@@ -122,16 +122,16 @@
         },
         {
             "name": "eduvpn/common",
-            "version": "1.0.0",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common.git",
-                "reference": "73649ee100aa589164ba0330ccbb64ef76dffc65"
+                "reference": "d17a5a9af8a63eff7ce628a204e1c952d5f6fde6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/73649ee100aa589164ba0330ccbb64ef76dffc65",
-                "reference": "73649ee100aa589164ba0330ccbb64ef76dffc65",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/d17a5a9af8a63eff7ce628a204e1c952d5f6fde6",
+                "reference": "d17a5a9af8a63eff7ce628a204e1c952d5f6fde6",
                 "shasum": ""
             },
             "require": {
@@ -152,7 +152,7 @@
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
+                "psr-4": {
                     "SURFnet\\VPN\\Common\\": "src/"
                 }
             },
@@ -167,7 +167,7 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2016-11-08 13:37:44"
+            "time": "2016-11-09 10:52:56"
         },
         {
             "name": "guzzlehttp/guzzle",
