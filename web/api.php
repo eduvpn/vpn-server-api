@@ -75,25 +75,13 @@ try {
         )
     );
 
-    $initDb = false;
     $otpLogFile = sprintf('%s/otp_log.sqlite', $dataDir);
-    if (!@file_exists($otpLogFile)) {
-        $initDb = true;
-    }
     $otpLog = new OtpLog(new PDO(sprintf('sqlite://%s', $otpLogFile)));
-    if ($initDb) {
-        $otpLog->init();
-    }
+    $otpLog->init();
 
-    $initDb = false;
     $connectionLogFile = sprintf('%s/connection_log.sqlite', $dataDir);
-    if (!@file_exists($connectionLogFile)) {
-        $initDb = true;
-    }
     $connectionLog = new ConnectionLog(new PDO(sprintf('sqlite://%s', $connectionLogFile)));
-    if ($initDb) {
-        $connectionLog->init();
-    }
+    $connectionLog->init();
 
     $users = new Users(sprintf('%s/users', $dataDir), $otpLog);
     $service->addModule(
