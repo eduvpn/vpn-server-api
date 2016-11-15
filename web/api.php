@@ -42,7 +42,10 @@ $logger = new Logger('vpn-server-api');
 try {
     // this is provided by Apache, using CanonicalName
     $request = new Request($_SERVER, $_GET, $_POST);
-    $instanceId = $request->getServerName();
+
+    if (false === $instanceId = getenv('VPN_INSTANCE_ID')) {
+        $instanceId = $request->getServerName();
+    }
 
     $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
     $configDir = sprintf('%s/config/%s', dirname(__DIR__), $instanceId);
@@ -72,7 +75,19 @@ try {
         )
     );
 
-    $users = new Users(sprintf('%s/users', $dataDir), new OtpLog(new PDO(sprintf('sqlite://%s/otp_log.sqlite', $dataDir))));
+    $otpLogFile = sprintf('%s/otp_log.sqlite', $dataDir);
+    $otpLog = new OtpLog(new PDO(sprintf('sqlite://%s', $otpLogFile)));
+    if (!@file_exists($otpLogFile)) {
+        $otpLog->init();
+    }
+
+    $connectionLogFile = sprintf('%s/connection_log.sqlite', $dataDir);
+    $connectionLog = new ConnectionLog(new PDO(sprintf('sqlite://%s', $connectionLogFile)));
+    if (!@file_exists($connectionLogFile)) {
+        $connectionLog->init();
+    }
+
+    $users = new Users(sprintf('%s/users', $dataDir), $otpLog);
     $service->addModule(
         new UsersModule(
             $users,
@@ -92,8 +107,6 @@ try {
             );
         }
     }
-
-    $connectionLog = new ConnectionLog(new PDO(sprintf('sqlite://%s/connection_log.sqlite', $dataDir)));
 
     $service->addModule(
         new ConnectionsModule(
