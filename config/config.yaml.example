@@ -1,19 +1,129 @@
-instanceNumber: 1
-
 # API consumers & credentials for clients using this service
 apiConsumers:
     vpn-user-portal: uvwxyz
     vpn-admin-portal: uuvvww
     vpn-server-node: ccbbaa
-   
+
+# The number of this instance, every instance has a unique number
+instanceNumber: 1
+
+# List of VPN profiles 
 vpnProfiles:
     internet:
+        # The number of this profile, every profile per instance has a unique 
+        # number
+        # REQUIRED
         profileNumber: 1
+
+        # The name of the profile as shown in the user and admin portals
+        # REQUIRED
         displayName: 'Internet Access'
+
+        # The external interface which connects to the Internet or to the 
+        # network you want to reach through the VPN
+        # REQUIRED
         extIf: eth0
-        useNat: true
-        defaultGateway: true
-        hostName: vpn.example
+
+        # The IPv4 range of the network that will be assigned to clients
+        # REQUIRED
         range: 10.0.0.0/24
+
+        # The IPv6 range of the network that will be assigned to clients
+        # REQUIRED
         range6: 'fd00:4242:4242::/48'
+
+        # The hostname the VPN client(s) will connect to
+        # REQUIRED
+        hostName: vpn.example
+
+        # The address the OpenVPN processes will listen on
+        # DEFAULT = '::'
+        listen: '::'
+
+        # Override the assigned managementIp based on instanceNumber and 
+        # profileNumber with a chosen IP
+        # DEFAULT = 10.42.<INSTANCE_ID>+100.<PROFILE_NUMBER>+100
+        managementIp: 127.0.0.1
+
+        # Indicate that the OpenVPN processes cannot take tcp/443 but share it 
+        # with a web server
+        # DEFAULT = true
+        portShare: true
+
+        # Whether or not to NAT the range and range6 network to the extIf
+        # DEFAULT = false
+        useNat: true
+
+        # Whether or not to forward IPv6 traffic, useful when your VPN server 
+        # does not have IPv6 connectivity to avoid timeouts
+        # DEFAULT = true
+        forward6: true
+
+        # Whether or not to route all traffic from the client over the VPN
+        # DEFAULT = false
+        defaultGateway: true
+
+        # IPv4 and IPv6 routes to push to the client, only used when 
+        # defaultGateway is false
+        # DEFAULT = []
+        routes: []
+
+        # IPv4 and IPv6 address of DNS server(s) to push to the client, only 
+        # used when defaultGateway is true
+        # DEFAULT  = []
         dns: [8.8.8.8, 8.8.4.4, '2001:4860:4860::8888', '2001:4860:4860::8844']
+
+        # Whether or not to enable two-factor authentication
+        # DEFAULT = false
+        twoFactor: false
+
+        # Whether or not to allow client-to-client traffic
+        # DEFAULT = false
+        clientToClient: false
+
+        # Whether or not to enable OpenVPN logging
+        # DEFAULT = false
+        enableLog: false
+
+        # Whether or not to enable ACLs for controlling who can connect
+        # DEFAULT = false
+        enableAcl: false
+
+        # The list of groups to allow access, requires enableAcl to be true
+        # DEFAULT  = []        
+        aclGroupList: []
+
+        # The provider to use for retrieving group membership
+        # DEFAULT = StaticProvider
+        aclGroupProvider: StaticProvider
+
+        # Whether or not to block Samba/CIFS traffic to the Internet
+        # DEFAULT = false
+        blockSmb: false
+
+        # The number of OpenVPN processes to use for this range, MUST be 1, 2, 
+        # 4 or 8
+        # DEFAULT = 4
+        processCount: 4
+
+        # Hide the profile from the user portal, i.e. do not allow the user to 
+        # choose it
+        # DEFAULT = false
+        hideProfile: false
+
+groupProviders:
+    # Static Configuration
+    StaticProvider:
+        all:
+            displayName: All
+            members: [foo, bar]
+        students:
+            displayName: Students
+            members: [foo]
+        employees:
+            displayName: Employees
+            members: [bar]
+    # An extensible protocol for dynamic exchange of group and authorization 
+    # data (http://openvoot.org)
+    VootProvider:
+        apiUrl: 'https://voot.surfconext.nl/me/groups'
