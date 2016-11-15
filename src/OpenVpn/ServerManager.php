@@ -145,10 +145,10 @@ class ServerManager
 
     private function getManagementIp(ProfileConfig $profileConfig)
     {
-        if ($profileConfig->e('managementIp')) {
-            return $profileConfig->v('managementIp');
+        if('auto' === $profileConfig->v('managementIp')) {
+            return sprintf('10.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $profileConfig->v('profileNumber'));
         }
 
-        return sprintf('10.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $profileConfig->v('profileNumber'));
+        return $profileConfig->v('managementIp');
     }
 }

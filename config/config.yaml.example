@@ -42,7 +42,7 @@ vpnProfiles:
 
         # Override the assigned managementIp based on instanceNumber and 
         # profileNumber with a chosen IP
-        # DEFAULT = 10.42.<INSTANCE_ID>+100.<PROFILE_NUMBER>+100
+        # DEFAULT = auto (10.42.<INSTANCE_ID>+100.<PROFILE_NUMBER>+100)
         managementIp: 127.0.0.1
 
         # Indicate that the OpenVPN processes cannot take tcp/443 but share it 
