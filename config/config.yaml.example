@@ -104,7 +104,7 @@ vpnProfiles:
         # The number of OpenVPN processes to use for this range, MUST be 1, 2, 
         # 4 or 8
         # DEFAULT = 4
-        processCount: 4
+        processCount: 1
 
         # Hide the profile from the user portal, i.e. do not allow the user to 
         # choose it
