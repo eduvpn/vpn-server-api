@@ -25,6 +25,7 @@ use SURFnet\VPN\Server\Api\CommonNames;
 use SURFnet\VPN\Server\Api\CommonNamesModule;
 use SURFnet\VPN\Server\Api\GroupsModule;
 use SURFnet\VPN\Server\Api\InfoModule;
+use SURFnet\VPN\Server\Api\MotdModule;
 use SURFnet\VPN\Server\Api\LogModule;
 use SURFnet\VPN\Server\Api\ConnectionLog;
 use SURFnet\VPN\Server\Api\ConnectionsModule;
@@ -112,6 +113,10 @@ try {
             $connectionLog,
             $groupProviders
         )
+    );
+
+    $service->addModule(
+        new MotdModule($dataDir)
     );
 
     $service->addModule(
