@@ -38,15 +38,15 @@ class MotdModule implements ServiceModuleInterface
     public function init(Service $service)
     {
         $service->get(
-            '/get_motd',
+            '/motd',
             function (Request $request, array $hookData) {
                 Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
 
                 try {
-                    return new ApiResponse('get_motd', FileIO::readFile($this->motdFile));
+                    return new ApiResponse('motd', FileIO::readFile($this->motdFile));
                 } catch (RuntimeException $e) {
                     // no motd
-                    return new ApiResponse('get_motd', false);
+                    return new ApiResponse('motd', false);
                 }
             }
         );
