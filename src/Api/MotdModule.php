@@ -57,10 +57,10 @@ class MotdModule implements ServiceModuleInterface
                 Utils::requireUser($hookData, ['vpn-admin-portal']);
 
                 $motdMessage = $request->getPostParameter('motd_message');
-
-                // sanitize the motdMessage
-                $motdMessage = htmlspecialchars($motdMessage);
-
+                // we do NOT sanitize or verify motd_message as *everything*
+                // is allowed! It will never be used as-is for showing in the
+                // browser, as the user portal will escape it before showing
+                // and the apps MUST interprete it as "text/plain".
                 try {
                     FileIO::writeFile($this->motdFile, $motdMessage);
 
