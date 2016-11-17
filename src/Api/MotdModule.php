@@ -59,7 +59,7 @@ class MotdModule implements ServiceModuleInterface
                 $motdMessage = $request->getPostParameter('motd_message');
 
                 // sanitize the motdMessage
-                $motdMessage = htmlspecialchars($motdMessage, ENT_QUOTES);
+                $motdMessage = htmlspecialchars($motdMessage);
 
                 try {
                     FileIO::writeFile($this->motdFile, $motdMessage);
