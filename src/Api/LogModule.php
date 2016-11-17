@@ -23,6 +23,7 @@ use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\FileIO;
+use RuntimeException;
 
 class LogModule implements ServiceModuleInterface
 {
@@ -75,7 +76,12 @@ class LogModule implements ServiceModuleInterface
                 Utils::requireUser($hookData, ['vpn-admin-portal']);
                 $statsFile = sprintf('%s/stats.json', $this->dataDir);
 
-                return new ApiResponse('stats', FileIO::readJsonFile($statsFile));
+                try {
+                    return new ApiResponse('stats', FileIO::readJsonFile($statsFile));
+                } catch (RuntimeException $e) {
+                    // no stats file available yet
+                    return new ApiResponse('stats', false);
+                }
             }
         );
     }
