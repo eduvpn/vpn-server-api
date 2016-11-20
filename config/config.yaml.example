@@ -54,10 +54,14 @@ vpnProfiles:
         # DEFAULT = false
         useNat: true
 
-        # Whether or not to forward IPv6 traffic, useful when your VPN server 
-        # does not have IPv6 connectivity to avoid timeouts
-        # DEFAULT = true
-        forward6: true
+        # Do not forward IPv4 traffic, useful for creating an IPv6 only VPN
+        # DEFAULT = false
+        reject4: false
+
+        # Do not forward IPv6 traffic, useful when the VPN server does not have 
+        # IPv6 connectivity
+        # DEFAULT = false
+        reject6: false
 
         # Whether or not to route all traffic from the client over the VPN
         # DEFAULT = false
