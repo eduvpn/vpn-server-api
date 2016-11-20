@@ -15,6 +15,7 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace SURFnet\VPN\Server\OpenVpn\Test;
 
 use SURFnet\VPN\Server\OpenVpn\ManagementSocketInterface;
@@ -55,7 +56,7 @@ class TestSocket implements ManagementSocketInterface
         if ('connections' === $this->callType) {
             if ('tcp://10.42.101.101:11940' === $this->socketAddress) {
                 // send back the returnData as an array
-                return explode("\n", file_get_contents(dirname(__DIR__).'/data/socket/openvpn_23_status_one_client.txt'));
+                return explode("\n", file_get_contents(dirname(__DIR__).'/data/socket/openvpn_23_status.txt'));
             } else {
                 return explode("\n", file_get_contents(dirname(__DIR__).'/data/socket/openvpn_23_status_no_clients.txt'));
             }

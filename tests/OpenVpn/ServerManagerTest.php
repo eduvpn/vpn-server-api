@@ -15,6 +15,7 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace SURFnet\VPN\Server\OpenVpn;
 
 require_once sprintf('%s/Test/TestSocket.php', __DIR__);
@@ -60,16 +61,23 @@ class ServerManagerTest extends PHPUnit_Framework_TestCase
                     'id' => 'default',
                     'connections' => [
                         [
-                            'common_name' => 'fkooman_samsung_i9300',
+                            'common_name' => 'fkooman_testdroid',
                             'user_id' => 'fkooman',
-                            'name' => 'samsung_i9300',
-                            'real_address' => '91.64.87.183:43103',
-                            'bytes_in' => 18301,
-                            'bytes_out' => 30009,
-                            'connected_since' => 1451323167,
+                            'name' => 'testdroid',
+                            'proto' => 6,
                             'virtual_address' => [
-                                'fd00:4242:4242::1003',
-                                '10.42.42.5',
+                                'fd77:6bac:e591:8203::1001',
+                                '10.120.188.195',
+                            ],
+                        ],
+                        [
+                            'common_name' => 'fkooman_lenovo_f24',
+                            'user_id' => 'fkooman',
+                            'name' => 'lenovo_f24',
+                            'proto' => 4,
+                            'virtual_address' => [
+                                '10.120.188.194',
+                                'fd77:6bac:e591:8203::1000',
                             ],
                         ],
                     ],

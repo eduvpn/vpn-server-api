@@ -15,6 +15,7 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace SURFnet\VPN\Server\OpenVpn;
 
 /**
@@ -94,11 +95,12 @@ class StatusParser
                 'common_name' => $commonName,
                 'user_id' => explode('_', $commonName, 2)[0],
                 'name' => explode('_', $commonName, 2)[1],
-                'real_address' => $parsedClient[2],
+                //'real_address' => $parsedClient[2],
+                'proto' => 3 === substr_count($parsedClient[2], '.') ? 4 : 6,
                 //'virtual_address' => $parsedClient[3],
-                'bytes_in' => intval($parsedClient[4]),
-                'bytes_out' => intval($parsedClient[5]),
-                'connected_since' => intval($parsedClient[7]),
+                //'bytes_in' => intval($parsedClient[4]),
+                //'bytes_out' => intval($parsedClient[5]),
+                //'connected_since' => intval($parsedClient[7]),
             );
         }
 
