@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e8381872dd351bf5c20373968193e371",
-    "content-hash": "57e633b5c733720354213e39b407baf9",
+    "hash": "c9ea218ed52ef921ad18da7ec400ad20",
+    "content-hash": "66e9092584125e0d54133c9f9a8bf215",
     "packages": [
         {
             "name": "christian-riesen/base32",
@@ -505,16 +505,16 @@
         },
         {
             "name": "symfony/intl",
-            "version": "v2.8.13",
+            "version": "v2.8.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/intl.git",
-                "reference": "2ec401b37460b22077643d48773e5f6a9f0b21e8"
+                "reference": "36a13a8fc1a56cbfdc709135a1723323b53f3460"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/intl/zipball/2ec401b37460b22077643d48773e5f6a9f0b21e8",
-                "reference": "2ec401b37460b22077643d48773e5f6a9f0b21e8",
+                "url": "https://api.github.com/repos/symfony/intl/zipball/36a13a8fc1a56cbfdc709135a1723323b53f3460",
+                "reference": "36a13a8fc1a56cbfdc709135a1723323b53f3460",
                 "shasum": ""
             },
             "require": {
@@ -577,7 +577,7 @@
                 "l10n",
                 "localization"
             ],
-            "time": "2016-09-06 10:55:00"
+            "time": "2016-11-18 21:10:01"
         },
         {
             "name": "symfony/polyfill",
@@ -670,16 +670,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.8.13",
+            "version": "v2.8.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "396784cd06b91f3db576f248f2402d547a077787"
+                "reference": "befb26a3713c97af90d25dd12e75621ef14d91ff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/396784cd06b91f3db576f248f2402d547a077787",
-                "reference": "396784cd06b91f3db576f248f2402d547a077787",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/befb26a3713c97af90d25dd12e75621ef14d91ff",
+                "reference": "befb26a3713c97af90d25dd12e75621ef14d91ff",
                 "shasum": ""
             },
             "require": {
@@ -715,7 +715,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2016-10-21 20:59:10"
+            "time": "2016-11-14 16:15:57"
         }
     ],
     "packages-dev": [],
