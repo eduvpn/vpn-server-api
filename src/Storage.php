@@ -90,7 +90,6 @@ class Storage
         }
 
         // user does not exist yet, add it
-
         $stmt = $this->db->prepare(
             'INSERT INTO users (external_user_id, user_id) VALUES(:external_user_id, :user_id)'
         );
@@ -261,6 +260,23 @@ class Storage
         // XXX it seems on update the rowCount is always 1, even if nothing was
         // modified?
         return 1 === $stmt->rowCount();
+    }
+
+    public function isDisabledUser($externalUserId)
+    {
+        $stmt = $this->db->prepare(
+            'SELECT is_disabled
+             FROM users
+             WHERE external_user_id = :external_user_id'
+        );
+        $stmt->bindValue(':external_user_id', $externalUserId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        if (false === $result = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            return false;
+        }
+
+        return $result['is_disabled'];
     }
 
     public function clientConnect($profileId, $commonName, $ip4, $ip6, $connectedAt)

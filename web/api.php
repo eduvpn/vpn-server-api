@@ -30,6 +30,7 @@ use SURFnet\VPN\Server\Api\StatsModule;
 use SURFnet\VPN\Server\Api\UsersModule;
 use SURFnet\VPN\Server\Api\InfoModule;
 use SURFnet\VPN\Server\Api\OpenVpnModule;
+use SURFnet\VPN\Server\Api\MotdModule;
 use SURFnet\VPN\Server\Api\LogModule;
 use SURFnet\VPN\Server\Api\CertificatesModule;
 use SURFnet\VPN\Server\Storage;
@@ -117,6 +118,12 @@ try {
 
     $service->addModule(
         new LogModule(
+            $storage
+        )
+    );
+
+    $service->addModule(
+        new MotdModule(
             $storage
         )
     );

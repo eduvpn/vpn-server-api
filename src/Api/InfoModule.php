@@ -40,16 +40,17 @@ class InfoModule implements ServiceModuleInterface
     {
         /* INFO */
         $service->get(
-            '/profile_info',
+            '/profile_list',
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
 
-                $profileId = $request->getQueryParameter('profile_id');
-                InputValidation::profileId($profileId);
+                $profileList = [];
+                foreach($this->config->v('vpnProfiles') as $profileId => $profileData) {
+                    $profileConfig = new ProfileConfig($profileData);
+                    $profileList[$profileId] = $profileConfig->v();
+                }
 
-                $profileConfig = new ProfileConfig($this->config->v('vpnProfiles', $profileId));
-
-                return new ApiResponse('profile_info', $profileConfig->v());
+                return new ApiResponse('profile_list', $profileList);
             }
         );
     }

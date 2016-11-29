@@ -98,6 +98,18 @@ class UsersModule implements ServiceModuleInterface
             }
         );
 
+        $service->get(
+            '/is_disabled_user',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
+
+                $userId = $request->getQueryParameter('user_id');
+                InputValidation::userId($userId);
+
+                return new ApiResponse('is_disabled_user', $this->storage->isDisabledUser($userId));
+            }
+        );
+
         $service->post(
             '/disable_user',
             function (Request $request, array $hookData) {

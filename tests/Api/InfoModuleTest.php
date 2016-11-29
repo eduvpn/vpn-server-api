@@ -32,7 +32,7 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $config = Config::fromFile(sprintf('%s/data/config.yaml', __DIR__));
+        $config = Config::fromFile(sprintf('%s/data/info_module_config.yaml', __DIR__));
 
         $this->service = new Service();
         $this->service->addModule(
@@ -50,44 +50,46 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
         $this->service->addBeforeHook('auth', $bearerAuthentication);
     }
 
-    public function testProfileInfo()
+    public function testProfileList()
     {
         $this->assertSame(
             [
                 'data' => [
-                    'profile_info' => [
-                        'defaultGateway' => false,
-                        'routes' => [],
-                        'dns' => [],
-                        'useNat' => false,
-                        'twoFactor' => false,
-                        'clientToClient' => false,
-                        'listen' => '::',
-                        'enableLog' => false,
-                        'enableAcl' => false,
-                        'aclGroupList' => [],
-                        'managementIp' => 'auto',
-                        'blockSmb' => false,
-                        'reject4' => false,
-                        'reject6' => false,
-                        'processCount' => 4,
-                        'aclGroupProvider' => 'StaticProvider',
-                        'portShare' => true,
-                        'hideProfile' => false,
-                        'profileNumber' => 1,
-                        'displayName' => 'Internet Access',
-                        'extIf' => 'eth0',
-                        'range' => '10.0.0.0/24',
-                        'range6' => 'fd00:4242:4242::/48',
-                        'hostName' => 'vpn.example',
+                    'profile_list' => [
+                        'internet' => [
+                            'defaultGateway' => false,
+                            'routes' => [],
+                            'dns' => [],
+                            'useNat' => false,
+                            'twoFactor' => false,
+                            'clientToClient' => false,
+                            'listen' => '::',
+                            'enableLog' => false,
+                            'enableAcl' => false,
+                            'aclGroupList' => [],
+                            'managementIp' => 'auto',
+                            'blockSmb' => false,
+                            'reject4' => false,
+                            'reject6' => false,
+                            'processCount' => 4,
+                            'aclGroupProvider' => 'StaticProvider',
+                            'portShare' => true,
+                            'hideProfile' => false,
+                            'profileNumber' => 1,
+                            'displayName' => 'Internet Access',
+                            'extIf' => 'eth0',
+                            'range' => '10.0.0.0/24',
+                            'range6' => 'fd00:4242:4242::/48',
+                            'hostName' => 'vpn.example',
+                        ],
                     ],
                 ],
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
                 'GET',
-                '/profile_info',
-                ['profile_id' => 'internet'],
+                '/profile_list',
+                [],
                 []
             )
         );
