@@ -15,6 +15,7 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace SURFnet\VPN\Server\OpenVpn;
 
 use Psr\Log\LoggerInterface;
@@ -145,7 +146,7 @@ class ServerManager
 
     private function getManagementIp(ProfileConfig $profileConfig)
     {
-        if('auto' === $profileConfig->v('managementIp')) {
+        if ('auto' === $profileConfig->v('managementIp')) {
             return sprintf('10.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $profileConfig->v('profileNumber'));
         }
 

@@ -2,14 +2,12 @@
 
 return [
     'directory_list' => [
+        'bin',
         'src',
         'web',
-        'bin',
-        'vendor/christian-riesen/otp',
-        'vendor/christian-riesen/base32',
         'vendor/eduvpn/common',
-        'vendor/guzzlehttp',
         'vendor/psr/log',
+        'vendor/guzzlehttp/guzzle',
     ],
     'exclude_analysis_directory_list' => [
         'vendor/',

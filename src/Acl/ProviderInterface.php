@@ -16,10 +16,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace SURFnet\VPN\Server\OpenVpn\Exception;
+namespace SURFnet\VPN\Server\Acl;
 
-use RuntimeException;
-
-class ManagementSocketException extends RuntimeException
+interface ProviderInterface
 {
+    /**
+     * Get the groups a user is a member of.
+     *
+     * @param string userId the userID of the user to request the groups of
+     *
+     * @return array the groups as an array containing the keys "id" and
+     *               "displayName", empty array if no groups are available for this user
+     */
+    public function getGroups($userId);
 }

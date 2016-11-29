@@ -15,6 +15,7 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace SURFnet\VPN\Server\Api;
 
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
@@ -22,10 +23,11 @@ use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\Request;
+use SURFnet\VPN\Common\Http\AuthUtils;
 
 class OpenVpnModule implements ServiceModuleInterface
 {
-    /** @var ServerManager */
+    /** @var \SURFnet\VPN\Server\OpenVpn\ServerManager */
     private $serverManager;
 
     public function __construct(ServerManager $serverManager)
@@ -38,7 +40,7 @@ class OpenVpnModule implements ServiceModuleInterface
         $service->get(
             '/client_connections',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
                 return new ApiResponse('client_connections', $this->serverManager->connections());
             }
@@ -47,7 +49,7 @@ class OpenVpnModule implements ServiceModuleInterface
         $service->post(
             '/kill_client',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
 
                 $commonName = $request->getPostParameter('common_name');
                 InputValidation::commonName($commonName);

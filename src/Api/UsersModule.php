@@ -15,153 +15,122 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace SURFnet\VPN\Server\Api;
 
-use Psr\Log\LoggerInterface;
+use SURFnet\VPN\Common\Http\AuthUtils;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\Request;
+use SURFnet\VPN\Common\Http\ApiResponse;
+use SURFnet\VPN\Server\Storage;
 
-/**
- * Handle API calls for Users.
- *
- * XXX more logging!
- */
 class UsersModule implements ServiceModuleInterface
 {
-    /** @var Users */
-    private $users;
+    /** @var \SURFnet\VPN\Server\Storage */
+    private $storage;
 
-    /** @var \Psr\Log\LoggerInterface */
-    private $logger;
-
-    public function __construct(Users $users, LoggerInterface $logger)
+    public function __construct(Storage $storage)
     {
-        $this->users = $users;
-        $this->logger = $logger;
+        $this->storage = $storage;
     }
 
     public function init(Service $service)
     {
-        // DISABLED
         $service->get(
-            '/disabled_users',
+            '/user_list',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
-                return new ApiResponse('disabled_users', $this->users->getDisabled());
-            }
-        );
-
-        $service->get(
-            '/is_disabled_user',
-            function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
-                $userId = $request->getQueryParameter('user_id');
-                InputValidation::userId($userId);
-
-                return new ApiResponse('is_disabled_user', $this->users->isDisabled($userId));
+                return new ApiResponse('user_list', $this->storage->getUsers());
             }
         );
 
         $service->post(
-            '/disable_user',
+            '/set_totp_secret',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+
                 $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
-                $this->logger->info(sprintf('disabling user "%s"', $userId));
+                $totpSecret = $request->getPostParameter('totp_secret');
+                InputValidation::totpSecret($totpSecret);
 
-                return new ApiResponse('disable_user', $this->users->setDisabled($userId));
+                return new ApiResponse('set_totp_secret', ['ok' => $this->storage->setTotpSecret($userId, $totpSecret)]);
             }
         );
 
         $service->post(
-            '/enable_user',
+            '/delete_totp_secret',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal']);
-                $userId = $request->getPostParameter('user_id');
-                InputValidation::userId($userId);
-                $this->logger->info(sprintf('enabling user "%s"', $userId));
+                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
-                return new ApiResponse('enable_user', $this->users->setEnabled($userId));
-            }
-        );
-
-        // OTP_SECRETS
-        $service->get(
-            '/has_otp_secret',
-            function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
-                $userId = $request->getQueryParameter('user_id');
-                InputValidation::userId($userId);
-
-                return new ApiResponse('has_otp_secret', $this->users->hasOtpSecret($userId));
-            }
-        );
-
-        $service->post(
-            '/verify_otp_key',
-            function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal', 'vpn-server-node']);
-                $userId = $request->getPostParameter('user_id');
-                InputValidation::userId($userId);
-                $otpKey = $request->getPostParameter('otp_key');
-                InputValidation::otpKey($otpKey);
-
-                return new ApiResponse('verify_otp_key', $this->users->verifyOtpKey($userId, $otpKey));
-            }
-        );
-
-        $service->post(
-            '/set_otp_secret',
-            function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-user-portal']);
-                $userId = $request->getPostParameter('user_id');
-                InputValidation::userId($userId);
-                $otpSecret = $request->getPostParameter('otp_secret');
-                InputValidation::otpSecret($otpSecret);
-                $otpKey = $request->getPostParameter('otp_key');
-                InputValidation::otpKey($otpKey);
-
-                return new ApiResponse('set_otp_secret', $this->users->setOtpSecret($userId, $otpSecret, $otpKey));
-            }
-        );
-
-        $service->post(
-            '/delete_otp_secret',
-            function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal']);
                 $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
 
-                return new ApiResponse('delete_otp_secret', $this->users->deleteOtpSecret($userId));
-            }
-        );
-
-        // VOOT_TOKENS
-        $service->get(
-            '/has_voot_token',
-            function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
-                $userId = $request->getQueryParameter('user_id');
-                InputValidation::userId($userId);
-
-                return new ApiResponse('has_voot_token', $this->users->hasVootToken($userId));
+                return new ApiResponse('delete_totp_secret', ['ok' => $this->storage->deleteTotpSecret($userId)]);
             }
         );
 
         $service->post(
             '/set_voot_token',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-user-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+
                 $userId = $request->getPostParameter('user_id');
                 InputValidation::userId($userId);
                 $vootToken = $request->getPostParameter('voot_token');
                 InputValidation::vootToken($vootToken);
 
-                return new ApiResponse('set_voot_token', $this->users->setVootToken($userId, $vootToken));
+                return new ApiResponse('set_voot_token', ['ok' => $this->storage->setVootToken($userId, $vootToken)]);
+            }
+        );
+
+        $service->post(
+            '/delete_voot_token',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
+
+                $userId = $request->getPostParameter('user_id');
+                InputValidation::userId($userId);
+
+                return new ApiResponse('delete_voot_token', ['ok' => $this->storage->deleteVootToken($userId)]);
+            }
+        );
+
+        $service->post(
+            '/disable_user',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
+
+                $userId = $request->getPostParameter('user_id');
+                InputValidation::userId($userId);
+
+                return new ApiResponse('disable_user', ['ok' => $this->storage->disableUser($userId)]);
+            }
+        );
+
+        $service->post(
+            '/enable_user',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
+
+                $userId = $request->getPostParameter('user_id');
+                InputValidation::userId($userId);
+
+                return new ApiResponse('enable_user', ['ok' => $this->storage->enableUser($userId)]);
+            }
+        );
+
+        $service->post(
+            '/delete_user',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
+
+                $userId = $request->getPostParameter('user_id');
+                InputValidation::userId($userId);
+
+                return new ApiResponse('delete_user', ['ok' => $this->storage->deleteUser($userId)]);
             }
         );
     }

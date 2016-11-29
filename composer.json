@@ -11,7 +11,7 @@
             "SURFnet\\VPN\\Server\\": "src/"
         }
     },
-    "description": "Web service to manage VPN nodes",
+    "description": "VPN Service Backend",
     "license": "AGPL-3.0",
     "name": "eduvpn/vpn-server-api",
     "repositories": [
@@ -22,18 +22,8 @@
         }
     ],
     "require": {
-        "christian-riesen/otp": "^2.0",
-        "eduvpn/common": "^1.0",
-        "ext-curl": "*",
-        "ext-date": "*",
-        "ext-filter": "*",
-        "ext-json": "*",
-        "ext-mbstring": "*",
-        "ext-pcre": "*",
-        "ext-pdo": "*",
-        "ext-spl": "*",
+        "eduvpn/common": "dev-master",
         "guzzlehttp/guzzle": "^5.3",
-        "php": ">=5.4.0",
-        "psr/log": "^1.0"
+        "php": ">=5.4.0"
     }
 }

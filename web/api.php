@@ -21,22 +21,21 @@ use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Response;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Server\Api\CommonNames;
-use SURFnet\VPN\Server\Api\CommonNamesModule;
-use SURFnet\VPN\Server\Api\GroupsModule;
-use SURFnet\VPN\Server\Api\InfoModule;
-use SURFnet\VPN\Server\Api\MotdModule;
-use SURFnet\VPN\Server\Api\LogModule;
-use SURFnet\VPN\Server\Api\ConnectionLog;
-use SURFnet\VPN\Server\Api\ConnectionsModule;
-use SURFnet\VPN\Server\Api\OpenVpnModule;
-use SURFnet\VPN\Server\Api\OtpLog;
 use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Server\Api\Users;
-use SURFnet\VPN\Server\Api\UsersModule;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
+use SURFnet\VPN\Server\Api\ConnectionsModule;
+use SURFnet\VPN\Server\Api\StatsModule;
+use SURFnet\VPN\Server\Api\UsersModule;
+use SURFnet\VPN\Server\Api\InfoModule;
+use SURFnet\VPN\Server\Api\OpenVpnModule;
+use SURFnet\VPN\Server\Api\LogModule;
+use SURFnet\VPN\Server\Api\CertificatesModule;
+use SURFnet\VPN\Server\Storage;
+use SURFnet\VPN\Common\Random;
+use SURFnet\VPN\Server\CA\EasyRsaCa;
+use SURFnet\VPN\Server\TlsAuth;
 
 $logger = new Logger('vpn-server-api');
 
@@ -58,44 +57,23 @@ try {
     $service = new Service();
     $basicAuthentication = new BasicAuthenticationHook(
         $config->v('apiConsumers'),
-        'vpn-server-api'
+        'vpn-server-backend'
     );
     $service->addBeforeHook('auth', $basicAuthentication);
 
-    $service->addModule(
-        new OpenVpnModule(
-            new ServerManager($config, new ManagementSocket(), $logger)
-        )
-    );
+    $random = new Random();
 
-    $commonNames = new CommonNames(sprintf('%s/common_names', $dataDir));
-    $service->addModule(
-        new CommonNamesModule(
-            $commonNames,
-            $logger
-        )
-    );
-
-    $otpLogFile = sprintf('%s/otp_log.sqlite', $dataDir);
-    $otpLog = new OtpLog(new PDO(sprintf('sqlite://%s', $otpLogFile)));
-    $otpLog->init();
-
-    $connectionLogFile = sprintf('%s/connection_log.sqlite', $dataDir);
-    $connectionLog = new ConnectionLog(new PDO(sprintf('sqlite://%s', $connectionLogFile)));
-    $connectionLog->init();
-
-    $users = new Users(sprintf('%s/users', $dataDir), $otpLog);
-    $service->addModule(
-        new UsersModule(
-            $users,
-            $logger
-        )
+    $storage = new Storage(
+        new PDO(
+            sprintf('sqlite://%s/db.sqlite', $dataDir)
+        ),
+        $random
     );
 
     $groupProviders = [];
     if ($config->e('groupProviders')) {
         foreach (array_keys($config->v('groupProviders')) as $groupProviderId) {
-            $groupProviderClass = sprintf('SURFnet\VPN\Server\GroupProvider\%s', $groupProviderId);
+            $groupProviderClass = sprintf('SURFnet\VPN\Server\Acl\Provider\%s', $groupProviderId);
             $groupProviders[] = new $groupProviderClass(
                 new Config(
                     $config->v('groupProviders', $groupProviderId)
@@ -108,29 +86,57 @@ try {
     $service->addModule(
         new ConnectionsModule(
             $config,
-            $users,
-            $commonNames,
-            $connectionLog,
+            $storage,
             $groupProviders
         )
     );
 
     $service->addModule(
-        new MotdModule($dataDir)
-    );
-
-    $service->addModule(
-        new LogModule($connectionLog, $dataDir)
-    );
-
-    $service->addModule(
-        new GroupsModule(
-            $groupProviders,
-            $logger
+        new StatsModule(
+            $dataDir
         )
     );
+
     $service->addModule(
-        new InfoModule($config)
+        new UsersModule(
+            $storage
+        )
+    );
+
+    $service->addModule(
+        new InfoModule(
+            $config
+        )
+    );
+
+    $service->addModule(
+        new OpenVpnModule(
+            new ServerManager($config, new ManagementSocket(), $logger)
+        )
+    );
+
+    $service->addModule(
+        new LogModule(
+            $storage
+        )
+    );
+
+    $easyRsaDir = sprintf('%s/easy-rsa', dirname(__DIR__));
+    $easyRsaDataDir = sprintf('%s/easy-rsa', $dataDir);
+
+    $easyRsaCa = new EasyRsaCa(
+        $easyRsaDir,
+        $easyRsaDataDir
+    );
+    $tlsAuth = new TlsAuth($dataDir);
+
+    $service->addModule(
+        new CertificatesModule(
+            $easyRsaCa,
+            $storage,
+            $tlsAuth,
+            $random
+        )
     );
 
     $service->run($request)->send();

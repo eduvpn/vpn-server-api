@@ -23,33 +23,33 @@ use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\ApiResponse;
-use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Common\ProfileConfig;
+use SURFnet\VPN\Common\FileIO;
+use RuntimeException;
 
-class InfoModule implements ServiceModuleInterface
+class StatsModule implements ServiceModuleInterface
 {
-    /** @var \SURFnet\VPN\Common\Config */
-    private $config;
+    /** @var string */
+    private $dataDir;
 
-    public function __construct(Config $config)
+    public function __construct($dataDir)
     {
-        $this->config = $config;
+        $this->dataDir = $dataDir;
     }
 
     public function init(Service $service)
     {
-        /* INFO */
         $service->get(
-            '/profile_info',
+            '/stats',
             function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
+                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
+                $statsFile = sprintf('%s/stats.json', $this->dataDir);
 
-                $profileId = $request->getQueryParameter('profile_id');
-                InputValidation::profileId($profileId);
-
-                $profileConfig = new ProfileConfig($this->config->v('vpnProfiles', $profileId));
-
-                return new ApiResponse('profile_info', $profileConfig->v());
+                try {
+                    return new ApiResponse('stats', FileIO::readJsonFile($statsFile));
+                } catch (RuntimeException $e) {
+                    // no stats file available yet
+                    return new ApiResponse('stats', false);
+                }
             }
         );
     }

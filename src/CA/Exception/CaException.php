@@ -16,10 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace SURFnet\VPN\Server\OpenVpn\Exception;
+namespace SURFnet\VPN\Server\CA\Exception;
 
-use RuntimeException;
+use Exception;
 
-class ManagementSocketException extends RuntimeException
+class CaException extends Exception
 {
 }

@@ -18,25 +18,21 @@
 
 namespace SURFnet\VPN\Server\Api;
 
+use SURFnet\VPN\Common\Http\AuthUtils;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\Request;
-use SURFnet\VPN\Common\FileIO;
-use RuntimeException;
+use SURFnet\VPN\Common\Http\ApiResponse;
+use SURFnet\VPN\Server\Storage;
 
 class LogModule implements ServiceModuleInterface
 {
-    /** @var ConnectionLog */
-    private $connectionLog;
+    /** @var \SURFnet\VPN\Server\Storage */
+    private $storage;
 
-    /** @var string */
-    private $dataDir;
-
-    public function __construct(ConnectionLog $connectionLog, $dataDir)
+    public function __construct(Storage $storage)
     {
-        $this->connectionLog = $connectionLog;
-        $this->dataDir = $dataDir;
+        $this->storage = $storage;
     }
 
     public function init(Service $service)
@@ -44,7 +40,7 @@ class LogModule implements ServiceModuleInterface
         $service->get(
             '/log',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
                 $dateTime = $request->getQueryParameter('date_time');
                 InputValidation::dateTime($dateTime);
@@ -58,7 +54,10 @@ class LogModule implements ServiceModuleInterface
                 // normalize the IP(v6) address
                 $ipAddress = inet_ntop(inet_pton($ipAddress));
 
-                $logData = $this->connectionLog->get($dateTimeUnix, $ipAddress);
+                $logData = $this->storage->getLogEntry($dateTimeUnix, $ipAddress);
+
+                // XXX probably should be empty instead of false?!
+                // we need to get the external_user_id instead and expose that... not the internal, also expose CN so it can be blocked by admin
                 if (false !== $logData) {
                     foreach ($logData as $k => $value) {
                         $logData[$k]['user_id'] = substr($value['common_name'], 0, strpos($value['common_name'], '_'));
@@ -67,21 +66,6 @@ class LogModule implements ServiceModuleInterface
                 }
 
                 return new ApiResponse('log', $logData);
-            }
-        );
-
-        $service->get(
-            '/stats',
-            function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-admin-portal']);
-                $statsFile = sprintf('%s/stats.json', $this->dataDir);
-
-                try {
-                    return new ApiResponse('stats', FileIO::readJsonFile($statsFile));
-                } catch (RuntimeException $e) {
-                    // no stats file available yet
-                    return new ApiResponse('stats', false);
-                }
             }
         );
     }

@@ -1,8 +1,15 @@
-# API consumers & credentials for clients using this service
+# API consumers & credentials
 apiConsumers:
-    vpn-user-portal: uvwxyz
-    vpn-admin-portal: uuvvww
-    vpn-server-node: ccbbaa
+    vpn-user-portal: abcdef
+    vpn-admin-portal: fedcba
+    vpn-server-node: aabbcc
+
+# Ca Configuration
+CA:
+    key_size: 4096
+    ca_expire: 1826
+    cert_expire: 365
+    ca_cn: VPN CA
 
 # The number of this instance, every instance has a unique number
 instanceNumber: 1

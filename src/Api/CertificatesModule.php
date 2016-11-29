@@ -1,0 +1,132 @@
+<?php
+/**
+ *  Copyright (C) 2016 SURFnet.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Affero General Public License as
+ *  published by the Free Software Foundation, either version 3 of the
+ *  License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Affero General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Affero General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+namespace SURFnet\VPN\Server\Api;
+
+use SURFnet\VPN\Common\Http\AuthUtils;
+use SURFnet\VPN\Common\Http\ServiceModuleInterface;
+use SURFnet\VPN\Common\Http\Service;
+use SURFnet\VPN\Common\Http\Request;
+use SURFnet\VPN\Common\Http\ApiResponse;
+use SURFnet\VPN\Server\Storage;
+use SURFnet\VPN\Server\CA\CaInterface;
+use SURFnet\VPN\Server\TlsAuth;
+use SURFnet\VPN\Common\RandomInterface;
+
+class CertificatesModule implements ServiceModuleInterface
+{
+    /** @var \SURFnet\VPN\Server\CA\CaInterface */
+    private $ca;
+
+    /** @var \SURFnet\VPN\Server\Storage */
+    private $storage;
+
+    /** @var \SURFnet\VPN\Server\TlsAuth */
+    private $tlsAuth;
+
+    /** @var \SURFnet\VPN\Common\RandomInterface */
+    private $random;
+
+    public function __construct(CaInterface $ca, Storage $storage, TlsAuth $tlsAuth, RandomInterface $random)
+    {
+        $this->ca = $ca;
+        $this->storage = $storage;
+        $this->tlsAuth = $tlsAuth;
+        $this->random = $random;
+    }
+
+    public function init(Service $service)
+    {
+        /* CERTIFICATES */
+        $service->post(
+            '/add_client_certificate',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+
+                $userId = $request->getPostParameter('user_id');
+                InputValidation::userId($userId);
+                $displayName = $request->getPostParameter('display_name');
+                InputValidation::displayName($displayName);
+
+                // generate a random string as the certificate's CN
+                $commonName = $this->random->get(16);
+                $certInfo = $this->ca->clientCert($commonName);
+                // add TLS Auth
+                $certInfo['ta'] = $this->tlsAuth->get();
+                $certInfo['ca'] = $this->ca->caCert();
+
+                $this->storage->addCertificate($userId, $commonName, $displayName, $certInfo['valid_from'], $certInfo['valid_to']);
+
+                return new ApiResponse('add_client_certificate', $certInfo, 201);
+            }
+        );
+
+        $service->post(
+            '/add_server_certificate',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-server-node']);
+
+                $commonName = $request->getPostParameter('common_name');
+                InputValidation::commonName($commonName);
+
+                $certInfo = $this->ca->serverCert($commonName);
+                // add TLS Auth
+                $certInfo['ta'] = $this->tlsAuth->get();
+                $certInfo['ca'] = $this->ca->caCert();
+
+                return new ApiResponse('add_server_certificate', $certInfo, 201);
+            }
+        );
+
+        $service->post(
+            '/disable_client_certificate',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
+
+                $commonName = $request->getPostParameter('common_name');
+                InputValidation::commonName($commonName);
+
+                return new ApiResponse('disable_client_certificate', $this->storage->disableCertificate($commonName));
+            }
+        );
+
+        $service->post(
+            '/enable_client_certificate',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
+
+                $commonName = $request->getPostParameter('common_name');
+                InputValidation::commonName($commonName);
+
+                return new ApiResponse('enable_client_certificate', $this->storage->enableCertificate($commonName));
+            }
+        );
+
+        $service->get(
+            '/list_client_certificates',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
+
+                $userId = $request->getPostParameter('user_id');
+                InputValidation::userId($userId);
+
+                return new ApiResponse('list_client_certificates', $this->storage->getCertificates($userId));
+            }
+        );
+    }
+}

@@ -15,38 +15,33 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace SURFnet\VPN\Server\Api;
 
-use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Common\ProfileConfig;
+use SURFnet\VPN\Server\Storage;
+use SURFnet\VPN\Common\Http\AuthUtils;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\Request;
+use SURFnet\VPN\Common\Config;
+use SURFnet\VPN\Common\Http\ApiResponse;
+use SURFnet\VPN\Common\ProfileConfig;
 
 class ConnectionsModule implements ServiceModuleInterface
 {
     /** @var \SURFnet\VPN\Common\Config */
     private $config;
 
-    /** @var Users */
-    private $users;
-
-    /** @var CommonNames */
-    private $commonNames;
-
-    /** @var ConnectionLog */
-    private $connectionLog;
+    /** @var \SURFnet\VPN\Server\Storage */
+    private $storage;
 
     /** @var array */
     private $groupProviders;
 
-    public function __construct(Config $config, Users $users, CommonNames $commonNames, ConnectionLog $connectionLog, array $groupProviders)
+    public function __construct(Config $config, Storage $storage, array $groupProviders)
     {
         $this->config = $config;
-        $this->users = $users;
-        $this->commonNames = $commonNames;
-        $this->connectionLog = $connectionLog;
+        $this->storage = $storage;
         $this->groupProviders = $groupProviders;
     }
 
@@ -55,99 +50,94 @@ class ConnectionsModule implements ServiceModuleInterface
         $service->post(
             '/connect',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-server-node']);
+                AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
-                $profileId = $request->getPostParameter('profile_id');
-                InputValidation::profileId($profileId);
-                $commonName = $request->getPostParameter('common_name');
-                InputValidation::commonName($commonName);
-                $ip4 = $request->getPostParameter('ip4');
-                InputValidation::ip4($ip4);
-                $ip6 = $request->getPostParameter('ip6');
-                InputValidation::ip6($ip6);
-
-                // normalize the IPv6 address
-                $ip6 = inet_ntop(inet_pton($ip6));
-                
-                $connectedAt = $request->getPostParameter('connected_at');
-                InputValidation::connectedAt($connectedAt);
-
-                $userId = self::getUserId($commonName);
-
-                // check if user is disabled
-                if (true === $this->users->isDisabled($userId)) {
-                    return new ApiResponse('connect', ['ok' => false, 'error' => sprintf('user "%s" disabled', $userId)]);
-                }
-
-                // check if the common_name is disabled
-                if (true === $this->commonNames->isDisabled($commonName)) {
-                    return new ApiResponse('connect', ['ok' => false, 'error' => sprintf('common_name "%s" disabled', $commonName)]);
-                }
-
-                // if the ACL is enabled, verify that the user is allowed to
-                // connect
-                $profileConfig = new ProfileConfig($this->config->v('vpnProfiles', $profileId));
-                if ($profileConfig->v('enableAcl')) {
-                    $userGroups = [];
-                    foreach ($this->groupProviders as $groupProvider) {
-                        $userGroups = array_merge($userGroups, $groupProvider->getGroups($userId));
-                    }
-
-                    if (false === self::isMember($userGroups, $profileConfig->v('aclGroupList'))) {
-                        return new ApiResponse('connect', ['ok' => false, 'error' => sprintf('user "%s" not in ACL', $userId)]);
-                    }
-                }
-
-                if (false == $this->connectionLog->connect($profileId, $commonName, $ip4, $ip6, $connectedAt)) {
-                    return new ApiResponse('connect', ['ok' => false, 'error' => 'unable to write connect event to log, dropping client']);
-                }
-
-                return new ApiResponse('connect', ['ok' => true]);
+                return $this->connect($request);
             }
         );
 
         $service->post(
             '/disconnect',
             function (Request $request, array $hookData) {
-                Utils::requireUser($hookData, ['vpn-server-node']);
+                AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
-                $profileId = $request->getPostParameter('profile_id');
-                InputValidation::profileId($profileId);
-                $commonName = $request->getPostParameter('common_name');
-                InputValidation::commonName($commonName);
-                $ip4 = $request->getPostParameter('ip4');
-                InputValidation::ip4($ip4);
-                $ip6 = $request->getPostParameter('ip6');
-                InputValidation::ip6($ip6);
+                return $this->disconnect($request);
+            }
+        );
 
-                // normalize the IPv6 address
-                $ip6 = inet_ntop(inet_pton($ip6));
+        $service->post(
+            '/verify_otp',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
-                $connectedAt = $request->getPostParameter('connected_at');
-                InputValidation::connectedAt($connectedAt);
-
-                $disconnectedAt = $request->getPostParameter('disconnected_at');
-                InputValidation::disconnectedAt($disconnectedAt);
-
-                $bytesTransferred = $request->getPostParameter('bytes_transferred');
-                InputValidation::bytesTransferred($bytesTransferred);
-
-                if (false === $this->connectionLog->disconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)) {
-                    return new ApiResponse('disconnect', ['ok' => false, 'error' => 'unable to write disconnect event to log, nothing we can do']);
-                }
-
-                return new ApiResponse('disconnect', ['ok' => true]);
+                return $this->verifyOtp($request);
             }
         );
     }
 
-    private static function getUserId($commonName)
+    public function connect(Request $request)
     {
-        // XXX do not repeat this everywhere
+        $profileId = $request->getPostParameter('profile_id');
+        InputValidation::profileId($profileId);
+        $commonName = $request->getPostParameter('common_name');
+        InputValidation::commonName($commonName);
+        $ip4 = $request->getPostParameter('ip4');
+        InputValidation::ip4($ip4);
+        $ip6 = $request->getPostParameter('ip6');
+        InputValidation::ip6($ip6);
 
-        // return the part before the first underscore, it is already validated
-        // so we can be sure this is fine
-        return substr($commonName, 0, strpos($commonName, '_'));
+        // normalize the IPv6 address
+        $ip6 = inet_ntop(inet_pton($ip6));
+
+        $connectedAt = $request->getPostParameter('connected_at');
+        InputValidation::connectedAt($connectedAt);
+
+        if (true !== $response = $this->verifyConnection($profileId, $commonName)) {
+            return $response;
+        }
+
+        if (false == $this->storage->clientConnect($profileId, $commonName, $ip4, $ip6, $connectedAt)) {
+            return new ApiResponse('connect', ['ok' => false, 'error' => 'unable to write connect event to log']);
+        }
+
+        return new ApiResponse('connect', ['ok' => true]);
+    }
+
+    private function verifyConnection($profileId, $commonName)
+    {
+        // verify status of certificate/user
+        if (false === $result = $this->storage->getUserCertificateStatus($commonName)) {
+            return new ApiResponse('connect', ['ok' => false, 'error' => 'user or certificate does not exist']);
+        }
+
+        if ($result['user_is_disabled']) {
+            return new ApiResponse('connect', ['ok' => false, 'error' => 'user is disabled']);
+        }
+
+        if ($result['certificate_is_disabled']) {
+            return new ApiResponse('connect', ['ok' => false, 'error' => 'certificate is disabled']);
+        }
+
+        return $this->verifyAcl($profileId, $result['external_user_id']);
+    }
+
+    private function verifyAcl($profileId, $externalUserId)
+    {
+        // verify ACL
+        $profileConfig = new ProfileConfig($this->config->v('vpnProfiles', $profileId));
+        if ($profileConfig->v('enableAcl')) {
+            // ACL enabled
+            $userGroups = [];
+            foreach ($this->groupProviders as $groupProvider) {
+                $userGroups = array_merge($userGroups, $groupProvider->getGroups($externalUserId));
+            }
+
+            if (false === self::isMember($userGroups, $profileConfig->v('aclGroupList'))) {
+                return new ApiResponse('connect', ['ok' => false, 'error' => 'user not in ACL']);
+            }
+        }
+
+        return true;
     }
 
     private static function isMember(array $memberOf, array $aclGroupList)
@@ -160,5 +150,39 @@ class ConnectionsModule implements ServiceModuleInterface
         }
 
         return false;
+    }
+
+    public function disconnect(Request $request)
+    {
+        $profileId = $request->getPostParameter('profile_id');
+        InputValidation::profileId($profileId);
+        $commonName = $request->getPostParameter('common_name');
+        InputValidation::commonName($commonName);
+        $ip4 = $request->getPostParameter('ip4');
+        InputValidation::ip4($ip4);
+        $ip6 = $request->getPostParameter('ip6');
+        InputValidation::ip6($ip6);
+
+        // normalize the IPv6 address
+        $ip6 = inet_ntop(inet_pton($ip6));
+
+        $connectedAt = $request->getPostParameter('connected_at');
+        InputValidation::connectedAt($connectedAt);
+
+        $disconnectedAt = $request->getPostParameter('disconnected_at');
+        InputValidation::disconnectedAt($disconnectedAt);
+
+        $bytesTransferred = $request->getPostParameter('bytes_transferred');
+        InputValidation::bytesTransferred($bytesTransferred);
+
+        if (false === $this->storage->clientDisconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)) {
+            return new ApiResponse('disconnect', ['ok' => false, 'error' => 'unable to write disconnect event to log']);
+        }
+
+        return new ApiResponse('disconnect', ['ok' => true]);
+    }
+
+    public function verifyOtp(Request $request)
+    {
     }
 }
