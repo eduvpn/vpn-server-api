@@ -414,7 +414,7 @@ class Storage
 
         $stmt->execute();
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $stmt->fetch(PDO::FETCH_ASSOC)['motd_message'];
     }
 
     public function setMotd($motdMessage)
