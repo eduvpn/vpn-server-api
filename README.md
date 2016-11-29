@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/eduvpn/vpn-server-backend.svg)](https://travis-ci.org/eduvpn/vpn-server-backend)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/eduvpn/vpn-server-backend/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/eduvpn/vpn-server-backend/?branch=master)
+[![Build Status](https://travis-ci.org/eduvpn/vpn-server-api.svg)](https://travis-ci.org/eduvpn/vpn-server-api)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/eduvpn/vpn-server-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/eduvpn/vpn-server-api/?branch=master)
 
-VPN Backend.
+VPN Server API.
 
 # Third Party Software
 

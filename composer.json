@@ -11,7 +11,7 @@
             "SURFnet\\VPN\\Server\\": "src/"
         }
     },
-    "description": "VPN Service Backend",
+    "description": "VPN Server API",
     "license": "AGPL-3.0",
     "name": "eduvpn/vpn-server-api",
     "repositories": [
