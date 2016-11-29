@@ -23,10 +23,10 @@ use SURFnet\VPN\Common\RandomInterface;
 
 class Storage
 {
-    /** @var PDO */
+    /** @var \PDO */
     private $db;
 
-    /** @var \fkooman\VPN\Common\RandomInterface */
+    /** @var \SURFnet\VPN\Common\RandomInterface */
     private $random;
 
     public function __construct(PDO $db, RandomInterface $random)
