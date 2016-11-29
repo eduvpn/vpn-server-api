@@ -386,6 +386,44 @@ class Storage
 
         $stmt->bindValue(':time_unix', $timeUnix, PDO::PARAM_INT);
         $stmt->execute();
+
+        return 1 === $stmt->rowCount();
+    }
+
+    public function motd()
+    {
+        $stmt = $this->db->prepare(
+            'SELECT motd_message FROM motd'
+        );
+
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function setMotd($motdMessage)
+    {
+        $this->deleteMotd();
+
+        $stmt = $this->db->prepare(
+            'INSERT INTO motd (motd_message) VALUES(:motd_message)'
+        );
+
+        $stmt->bindValue(':motd_message', $motdMessage, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 === $stmt->rowCount();
+    }
+
+    public function deleteMotd()
+    {
+        $stmt = $this->db->prepare(
+            'DELETE FROM motd'
+        );
+
+        $stmt->execute();
+
+        return 1 === $stmt->rowCount();
     }
 
     public function init()
@@ -426,6 +464,9 @@ class Storage
                 totp_key VARCHAR(255) NOT NULL,
                 time_unix INTEGER NOT NULL,
                 UNIQUE(user_id, totp_key)
+            )',
+            'CREATE TABLE IF NOT EXISTS motd (
+                motd_message TEXT
             )',
         ];
 
