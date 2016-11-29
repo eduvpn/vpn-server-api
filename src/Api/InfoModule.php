@@ -45,7 +45,7 @@ class InfoModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
 
                 $profileList = [];
-                foreach($this->config->v('vpnProfiles') as $profileId => $profileData) {
+                foreach ($this->config->v('vpnProfiles') as $profileId => $profileData) {
                     $profileConfig = new ProfileConfig($profileData);
                     $profileList[$profileId] = $profileConfig->v();
                 }

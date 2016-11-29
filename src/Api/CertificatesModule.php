@@ -122,7 +122,7 @@ class CertificatesModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
-                $userId = $request->getPostParameter('user_id');
+                $userId = $request->getQueryParameter('user_id');
                 InputValidation::userId($userId);
 
                 return new ApiResponse('list_client_certificates', $this->storage->getCertificates($userId));
