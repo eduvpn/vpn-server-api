@@ -501,7 +501,7 @@ class Storage
                 bytes_transferred INTEGER DEFAULT NULL                
             )',
             'CREATE TABLE IF NOT EXISTS totp_log (
-                user_id VARCHAR(255) UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+                user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
                 totp_key VARCHAR(255) NOT NULL,
                 time_unix INTEGER NOT NULL
             )',
