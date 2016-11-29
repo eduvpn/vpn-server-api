@@ -24,6 +24,8 @@ use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Server\Storage;
 use PDO;
+use Otp\Otp;
+use Base32\Base32;
 
 class UsersModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -43,7 +45,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
         $storage->addCertificate('foo', 'abcd1234', 'ABCD1234', 12345678, 23456789);
         $storage->disableUser('bar');
-        $storage->setTotpSecret('bar', 'bar123');
+        $storage->setTotpSecret('bar', 'CN2XAL23SIFTDFXZ');
         $storage->setVootToken('bar', '123456');
 
         $this->service = new Service();
@@ -92,6 +94,10 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
     public function testSetTotpSecret()
     {
+        $otp = new Otp();
+        $totpSecret = 'MM7TTLHPA7WZOJFB';
+        $totpKey = $otp->totp(Base32::decode($totpSecret));
+
         $this->assertSame(
             [
                 'data' => [
@@ -107,8 +113,56 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                 [],
                 [
                     'user_id' => 'foo',
-                    'totp_secret' => 'bar',
+                    'totp_secret' => $totpSecret,
+                    'totp_key' => $totpKey,
                 ]
+            )
+        );
+    }
+
+    public function testVerifyOtpKey()
+    {
+        $otp = new Otp();
+        $totpSecret = 'CN2XAL23SIFTDFXZ';
+        $totpKey = $otp->totp(Base32::decode($totpSecret));
+
+        $this->assertSame(
+            [
+                'data' => [
+                    'verify_totp_key' => [
+                        'ok' => true,
+                    ],
+                ],
+            ],
+            $this->makeRequest(
+                ['vpn-user-portal', 'aabbcc'],
+                'POST',
+                '/verify_totp_key',
+                [],
+                [
+                    'user_id' => 'bar',
+                    'totp_key' => $totpKey,
+                ]
+            )
+        );
+    }
+
+    public function testHasTotpSecret()
+    {
+        $this->assertSame(
+            [
+                'data' => [
+                    'has_totp_secret' => true,
+                ],
+            ],
+            $this->makeRequest(
+                ['vpn-user-portal', 'aabbcc'],
+                'GET',
+                '/has_totp_secret',
+                [
+                    'user_id' => 'bar',
+                ],
+                []
             )
         );
     }

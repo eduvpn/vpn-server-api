@@ -5,6 +5,8 @@ return [
         'bin',
         'src',
         'web',
+    'vendor/christian-riesen/otp',
+        'vendor/christian-riesen/base32',
         'vendor/eduvpn/common',
         'vendor/psr/log',
         'vendor/guzzlehttp/guzzle',

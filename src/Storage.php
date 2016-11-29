@@ -129,6 +129,34 @@ class Storage
         return 1 === $stmt->rowCount();
     }
 
+    public function hasTotpSecret($externalUserId)
+    {
+        $userId = $this->getUserId($externalUserId);
+        $stmt = $this->db->prepare(
+            'SELECT COUNT(*)
+             FROM totp_secrets
+             WHERE user_id = :user_id'
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 === intval($stmt->fetchColumn());
+    }
+
+    public function getTotpSecret($externalUserId)
+    {
+        $userId = $this->getUserId($externalUserId);
+        $stmt = $this->db->prepare(
+            'SELECT totp_secret
+             FROM totp_secrets
+             WHERE user_id = :user_id'
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetchColumn();
+    }
+
     public function setTotpSecret($externalUserId, $totpSecret)
     {
         $userId = $this->getUserId($externalUserId);
@@ -265,18 +293,14 @@ class Storage
     public function isDisabledUser($externalUserId)
     {
         $stmt = $this->db->prepare(
-            'SELECT is_disabled
+            'SELECT COUNT(*)
              FROM users
-             WHERE external_user_id = :external_user_id'
+             WHERE external_user_id = :external_user_id AND is_disabled = 1'
         );
         $stmt->bindValue(':external_user_id', $externalUserId, PDO::PARAM_STR);
         $stmt->execute();
 
-        if (false === $result = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            return false;
-        }
-
-        return $result['is_disabled'];
+        return 1 === intval($stmt->fetchColumn());
     }
 
     public function clientConnect($profileId, $commonName, $ip4, $ip6, $connectedAt)
@@ -355,8 +379,9 @@ class Storage
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function recordTotpKey($userId, $totpKey, $timeUnix)
+    public function recordTotpKey($externalUserId, $totpKey, $timeUnix)
     {
+        $userId = $this->getUserId($externalUserId);
         $stmt = $this->db->prepare(
             'INSERT INTO totp_log (
                 user_id,
@@ -414,7 +439,7 @@ class Storage
 
         $stmt->execute();
 
-        return $stmt->fetch(PDO::FETCH_ASSOC)['motd_message'];
+        return $stmt->fetchColumn();
     }
 
     public function setMotd($motdMessage)
@@ -478,8 +503,7 @@ class Storage
             'CREATE TABLE IF NOT EXISTS totp_log (
                 user_id VARCHAR(255) UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
                 totp_key VARCHAR(255) NOT NULL,
-                time_unix INTEGER NOT NULL,
-                UNIQUE(user_id, totp_key)
+                time_unix INTEGER NOT NULL
             )',
             'CREATE TABLE IF NOT EXISTS motd (
                 motd_message TEXT

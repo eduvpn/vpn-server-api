@@ -84,4 +84,9 @@ class InputValidation
     {
         // TBD
     }
+
+    public static function totpKey($totpKey)
+    {
+        // TBD
+    }
 }
