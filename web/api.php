@@ -100,7 +100,8 @@ try {
 
     $service->addModule(
         new UsersModule(
-            $storage
+            $storage,
+            $groupProviders
         )
     );
 

@@ -23,9 +23,11 @@ use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Server\Storage;
+use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
 use PDO;
 use Otp\Otp;
 use Base32\Base32;
+use SURFnet\VPN\Common\Config;
 
 class UsersModuleTest extends PHPUnit_Framework_TestCase
 {
@@ -48,10 +50,18 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $storage->setTotpSecret('bar', 'CN2XAL23SIFTDFXZ');
         $storage->setVootToken('bar', '123456');
 
+        $config = Config::fromFile(sprintf('%s/data/user_groups_config.yaml', __DIR__));
+        $groupProviders = [
+            new StaticProvider(
+                new Config($config->v('groupProviders', 'StaticProvider'))
+            ),
+        ];
+
         $this->service = new Service();
         $this->service->addModule(
             new UsersModule(
-                $storage
+                $storage,
+                $groupProviders
             )
         );
 
@@ -296,6 +306,35 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                 [
                     'user_id' => 'foo',
                 ]
+            )
+        );
+    }
+
+    public function testUserGroups()
+    {
+        $this->assertSame(
+            [
+                'data' => [
+                    'user_groups' => [
+                        [
+                            'id' => 'all',
+                            'displayName' => 'All',
+                        ],
+                        [
+                            'id' => 'employees',
+                            'displayName' => 'Employees',
+                        ],
+                    ],
+                ],
+            ],
+            $this->makeRequest(
+                ['vpn-user-portal', 'aabbcc'],
+                'GET',
+                '/user_groups',
+                [
+                    'user_id' => 'bar',
+                ],
+                []
             )
         );
     }
