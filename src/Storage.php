@@ -404,9 +404,8 @@ class Storage
         return 1 === $stmt->rowCount();
     }
 
-    public function housekeeping($timeUnix)
+    public function cleanConnectionLog($timeUnix)
     {
-        // connection_log
         $stmt = $this->db->prepare(
             sprintf(
                 'DELETE FROM connection_log
@@ -415,9 +414,12 @@ class Storage
         );
 
         $stmt->bindValue(':time_unix', $timeUnix, PDO::PARAM_INT);
-        $stmt->execute();
 
-        // otp_log
+        return $stmt->execute();
+    }
+
+    public function cleanTotpLog($timeUnix)
+    {
         $stmt = $this->db->prepare(
             sprintf(
                 'DELETE FROM totp_log
@@ -426,9 +428,8 @@ class Storage
         );
 
         $stmt->bindValue(':time_unix', $timeUnix, PDO::PARAM_INT);
-        $stmt->execute();
 
-        return 1 === $stmt->rowCount();
+        return $stmt->execute();
     }
 
     public function motd()

@@ -52,7 +52,7 @@ class StatusParser
         // merge routing table in client list
         foreach (array_keys($parsedClientList) as $key) {
             if (!array_key_exists($key, $parsedRoutingTable)) {
-                $parsedClientList[$key]['virtual_address'] = array();
+                $parsedClientList[$key]['virtual_address'] = [];
             } else {
                 $parsedClientList[$key]['virtual_address'] = $parsedRoutingTable[$key];
             }
@@ -63,17 +63,17 @@ class StatusParser
 
     private static function parseClientList(array $clientList)
     {
-        $parsedClientList = array();
+        $parsedClientList = [];
         for ($i = 1; $i < sizeof($clientList); ++$i) {
             $parsedClient = str_getcsv($clientList[$i]);
             $commonName = $parsedClient[1];
             if (array_key_exists($commonName, $parsedClientList)) {
                 //syslog(LOG_ERR('duplicate common name, possibly --duplicate-cn enabled in server configuration'));
             }
-            $parsedClientList[$commonName] = array(
+            $parsedClientList[$commonName] = [
                 'common_name' => $commonName,
                 'proto' => 3 === substr_count($parsedClient[2], '.') ? 4 : 6,
-            );
+            ];
         }
 
         return $parsedClientList;
@@ -81,12 +81,12 @@ class StatusParser
 
     private static function parseRoutingTable(array $routingTable)
     {
-        $parsedRoutingTable = array();
+        $parsedRoutingTable = [];
         for ($i = 1; $i < sizeof($routingTable); ++$i) {
             $parsedRoute = str_getcsv($routingTable[$i]);
             $commonName = $parsedRoute[2];
             if (!array_key_exists($commonName, $parsedRoutingTable)) {
-                $parsedRoutingTable[$commonName] = array();
+                $parsedRoutingTable[$commonName] = [];
             }
             $parsedRoutingTable[$commonName][] = $parsedRoute[1];
         }

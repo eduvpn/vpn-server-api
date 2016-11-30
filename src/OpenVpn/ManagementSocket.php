@@ -90,7 +90,7 @@ class ManagementSocket implements ManagementSocketInterface
 
     private function read()
     {
-        $dataBuffer = array();
+        $dataBuffer = [];
         while (!feof($this->socket) && !$this->isEndOfResponse(end($dataBuffer))) {
             if (false === $readData = @fgets($this->socket, 4096)) {
                 throw new ManagementSocketException('unable to read from socket');
@@ -103,7 +103,7 @@ class ManagementSocket implements ManagementSocketInterface
 
     private function isEndOfResponse($lastLine)
     {
-        $endMarkers = array('END', 'SUCCESS: ', 'ERROR: ');
+        $endMarkers = ['END', 'SUCCESS: ', 'ERROR: '];
         foreach ($endMarkers as $endMarker) {
             if (0 === mb_strpos($lastLine, $endMarker)) {
                 return true;
