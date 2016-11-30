@@ -18,16 +18,16 @@
 
 namespace SURFnet\VPN\Server\Api;
 
+use Base32\Base32;
+use Otp\Otp;
+use PDO;
 use PHPUnit_Framework_TestCase;
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Server\Storage;
 use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
-use PDO;
-use Otp\Otp;
-use Base32\Base32;
-use SURFnet\VPN\Common\Config;
+use SURFnet\VPN\Server\Storage;
 
 class UsersModuleTest extends PHPUnit_Framework_TestCase
 {

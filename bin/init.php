@@ -18,11 +18,11 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
-use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\CliParser;
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Random;
-use SURFnet\VPN\Server\Storage;
 use SURFnet\VPN\Server\CA\EasyRsaCa;
+use SURFnet\VPN\Server\Storage;
 use SURFnet\VPN\Server\TlsAuth;
 
 try {

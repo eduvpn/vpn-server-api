@@ -18,10 +18,10 @@
 
 namespace SURFnet\VPN\Server\CA;
 
+use RuntimeException;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\FileIO;
 use SURFnet\VPN\Server\CA\Exception\CaException;
-use RuntimeException;
 
 class EasyRsaCa implements CaInterface
 {

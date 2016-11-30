@@ -18,8 +18,8 @@
 
 namespace SURFnet\VPN\Server\Test;
 
-use SURFnet\VPN\Server\OpenVpn\ManagementSocketInterface;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocketException;
+use SURFnet\VPN\Server\OpenVpn\ManagementSocketInterface;
 
 /**
  * Abstraction to use the OpenVPN management interface using a socket

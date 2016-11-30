@@ -18,8 +18,8 @@
 
 namespace SURFnet\VPN\Server\Acl\Provider;
 
-use SURFnet\VPN\Server\Acl\ProviderInterface;
 use SURFnet\VPN\Common\Config;
+use SURFnet\VPN\Server\Acl\ProviderInterface;
 
 class StaticProvider implements ProviderInterface
 {

@@ -18,8 +18,8 @@
 
 namespace SURFnet\VPN\Server;
 
-use SURFnet\VPN\Common\FileIO;
 use RuntimeException;
+use SURFnet\VPN\Common\FileIO;
 
 class TlsAuth
 {

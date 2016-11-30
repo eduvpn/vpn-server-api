@@ -20,8 +20,8 @@ namespace SURFnet\VPN\Server\Acl\Provider;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
-use SURFnet\VPN\Server\Acl\ProviderInterface;
 use SURFnet\VPN\Common\Config;
+use SURFnet\VPN\Server\Acl\ProviderInterface;
 
 class VootProvider implements ProviderInterface
 {

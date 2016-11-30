@@ -21,13 +21,13 @@ namespace SURFnet\VPN\Server\Api;
 require_once sprintf('%s/Test/TestSocket.php', dirname(__DIR__));
 
 use PHPUnit_Framework_TestCase;
-use SURFnet\VPN\Server\Test\TestSocket;
+use Psr\Log\NullLogger;
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
-use Psr\Log\NullLogger;
+use SURFnet\VPN\Server\Test\TestSocket;
 
 class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
 {

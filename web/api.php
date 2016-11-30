@@ -17,25 +17,25 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
+use SURFnet\VPN\Common\Config;
+use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Response;
-use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
-use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Logger;
-use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
-use SURFnet\VPN\Server\OpenVpn\ServerManager;
+use SURFnet\VPN\Common\Random;
+use SURFnet\VPN\Server\Api\CertificatesModule;
 use SURFnet\VPN\Server\Api\ConnectionsModule;
+use SURFnet\VPN\Server\Api\InfoModule;
+use SURFnet\VPN\Server\Api\LogModule;
+use SURFnet\VPN\Server\Api\MotdModule;
+use SURFnet\VPN\Server\Api\OpenVpnModule;
 use SURFnet\VPN\Server\Api\StatsModule;
 use SURFnet\VPN\Server\Api\UsersModule;
-use SURFnet\VPN\Server\Api\InfoModule;
-use SURFnet\VPN\Server\Api\OpenVpnModule;
-use SURFnet\VPN\Server\Api\MotdModule;
-use SURFnet\VPN\Server\Api\LogModule;
-use SURFnet\VPN\Server\Api\CertificatesModule;
-use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Common\Random;
 use SURFnet\VPN\Server\CA\EasyRsaCa;
+use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
+use SURFnet\VPN\Server\OpenVpn\ServerManager;
+use SURFnet\VPN\Server\Storage;
 use SURFnet\VPN\Server\TlsAuth;
 
 $logger = new Logger('vpn-server-api');

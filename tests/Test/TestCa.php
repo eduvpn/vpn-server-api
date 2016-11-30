@@ -18,8 +18,8 @@
 
 namespace SURFnet\VPN\Server\Test;
 
-use SURFnet\VPN\Server\CA\CaInterface;
 use SURFnet\VPN\Common\Config;
+use SURFnet\VPN\Server\CA\CaInterface;
 
 class TestCa implements CaInterface
 {

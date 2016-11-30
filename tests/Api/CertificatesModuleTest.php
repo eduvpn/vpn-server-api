@@ -22,12 +22,12 @@ require_once sprintf('%s/Test/TestCa.php', dirname(__DIR__));
 
 use PDO;
 use PHPUnit_Framework_TestCase;
-use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\Test\TestCa;
-use SURFnet\VPN\Server\TlsAuth;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
+use SURFnet\VPN\Server\Storage;
+use SURFnet\VPN\Server\Test\TestCa;
+use SURFnet\VPN\Server\TlsAuth;
 
 class CertificatesModuleTest extends PHPUnit_Framework_TestCase
 {

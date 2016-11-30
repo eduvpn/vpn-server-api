@@ -18,14 +18,14 @@
 
 namespace SURFnet\VPN\Server\Api;
 
-use SURFnet\VPN\Common\Http\AuthUtils;
-use SURFnet\VPN\Common\Http\ServiceModuleInterface;
-use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Common\Http\Request;
-use SURFnet\VPN\Common\Http\ApiResponse;
-use SURFnet\VPN\Server\Storage;
-use Otp\Otp;
 use Base32\Base32;
+use Otp\Otp;
+use SURFnet\VPN\Common\Http\ApiResponse;
+use SURFnet\VPN\Common\Http\AuthUtils;
+use SURFnet\VPN\Common\Http\Request;
+use SURFnet\VPN\Common\Http\Service;
+use SURFnet\VPN\Common\Http\ServiceModuleInterface;
+use SURFnet\VPN\Server\Storage;
 
 class UsersModule implements ServiceModuleInterface
 {

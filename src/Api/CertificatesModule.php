@@ -18,15 +18,15 @@
 
 namespace SURFnet\VPN\Server\Api;
 
-use SURFnet\VPN\Common\Http\AuthUtils;
-use SURFnet\VPN\Common\Http\ServiceModuleInterface;
-use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\ApiResponse;
-use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\CA\CaInterface;
-use SURFnet\VPN\Server\TlsAuth;
+use SURFnet\VPN\Common\Http\AuthUtils;
+use SURFnet\VPN\Common\Http\Request;
+use SURFnet\VPN\Common\Http\Service;
+use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\RandomInterface;
+use SURFnet\VPN\Server\CA\CaInterface;
+use SURFnet\VPN\Server\Storage;
+use SURFnet\VPN\Server\TlsAuth;
 
 class CertificatesModule implements ServiceModuleInterface
 {

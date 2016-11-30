@@ -19,9 +19,9 @@
 namespace SURFnet\VPN\Server\OpenVpn;
 
 use Psr\Log\LoggerInterface;
-use SURFnet\VPN\Server\OpenVpn\Exception\ManagementSocketException;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\ProfileConfig;
+use SURFnet\VPN\Server\OpenVpn\Exception\ManagementSocketException;
 
 /**
  * Manage all OpenVPN processes controlled by this service.
