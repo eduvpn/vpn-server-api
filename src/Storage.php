@@ -116,6 +116,20 @@ class Storage
         return 1 === $stmt->rowCount();
     }
 
+    public function hasVootToken($externalUserId)
+    {
+        $userId = $this->getUserId($externalUserId);
+        $stmt = $this->db->prepare(
+            'SELECT COUNT(*)
+             FROM voot_tokens
+             WHERE user_id = :user_id'
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 === intval($stmt->fetchColumn());
+    }
+
     public function deleteVootToken($externalUserId)
     {
         $userId = $this->getUserId($externalUserId);

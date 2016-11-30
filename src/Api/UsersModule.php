@@ -155,6 +155,18 @@ class UsersModule implements ServiceModuleInterface
         );
 
         $service->get(
+            '/has_voot_token',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
+
+                $userId = $request->getQueryParameter('user_id');
+                InputValidation::userId($userId);
+
+                return new ApiResponse('has_voot_token', $this->storage->hasVootToken($userId));
+            }
+        );
+
+        $service->get(
             '/is_disabled_user',
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
