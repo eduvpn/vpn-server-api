@@ -164,5 +164,7 @@ class ConnectionsModule implements ServiceModuleInterface
 
     public function verifyOtp(Request $request)
     {
+        // XXX implement me!
+        return new ApiResponse('verify_otp', ['ok' => false]);
     }
 }
