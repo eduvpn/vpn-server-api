@@ -518,7 +518,8 @@ class Storage
             'CREATE TABLE IF NOT EXISTS totp_log (
                 user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
                 totp_key VARCHAR(255) NOT NULL,
-                time_unix INTEGER NOT NULL
+                time_unix INTEGER NOT NULL,
+                UNIQUE(user_id, totp_key)
             )',
             'CREATE TABLE IF NOT EXISTS motd (
                 motd_message TEXT
