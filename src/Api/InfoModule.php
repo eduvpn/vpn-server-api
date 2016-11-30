@@ -40,6 +40,15 @@ class InfoModule implements ServiceModuleInterface
     {
         /* INFO */
         $service->get(
+            '/instance_number',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-server-node']);
+
+                return new ApiResponse('instance_number', $this->config->v('instanceNumber'));
+            }
+        );
+
+        $service->get(
             '/profile_list',
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
