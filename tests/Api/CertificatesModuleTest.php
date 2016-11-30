@@ -70,12 +70,16 @@ class CertificatesModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'certificate' => 'ClientCert for random_1',
-                'private_key' => 'ClientKey for random_1',
-                'valid_from' => 1234567890,
-                'valid_to' => 2345678901,
-                'ta' => 'Test_Ta_Key',
-                'ca' => 'Ca',
+                'data' => [
+                    'add_client_certificate' => [
+                        'certificate' => 'ClientCert for random_1',
+                        'private_key' => 'ClientKey for random_1',
+                        'valid_from' => 1234567890,
+                        'valid_to' => 2345678901,
+                        'ta' => 'Test_Ta_Key',
+                        'ca' => 'Ca',
+                    ],
+                ],
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'abcdef'],
@@ -91,12 +95,16 @@ class CertificatesModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'certificate' => 'ServerCert for vpn.example',
-                'private_key' => 'ServerCert for vpn.example',
-                'valid_from' => 1234567890,
-                'valid_to' => 2345678901,
-                'ta' => 'Test_Ta_Key',
-                'ca' => 'Ca',
+                'data' => [
+                    'add_server_certificate' => [
+                        'certificate' => 'ServerCert for vpn.example',
+                        'private_key' => 'ServerCert for vpn.example',
+                        'valid_from' => 1234567890,
+                        'valid_to' => 2345678901,
+                        'ta' => 'Test_Ta_Key',
+                        'ca' => 'Ca',
+                    ],
+                ],
             ],
             $this->makeRequest(
                 ['vpn-server-node', 'aabbcc'],
@@ -126,6 +134,6 @@ class CertificatesModuleTest extends PHPUnit_Framework_TestCase
             )
         );
 
-        return json_decode($response->getBody(), true)['data'][substr($pathInfo, 1)];
+        return json_decode($response->getBody(), true);
     }
 }

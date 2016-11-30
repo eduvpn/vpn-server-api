@@ -20,6 +20,7 @@ namespace SURFnet\VPN\Server\Api;
 
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\AuthUtils;
+use SURFnet\VPN\Common\Http\InputValidation;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
@@ -58,10 +59,8 @@ class CertificatesModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = $request->getPostParameter('user_id');
-                InputValidation::userId($userId);
-                $displayName = $request->getPostParameter('display_name');
-                InputValidation::displayName($displayName);
+                $userId = InputValidation::userId($request->getPostParameter('user_id'));
+                $displayName = InputValidation::displayName($request->getPostParameter('display_name'));
 
                 // generate a random string as the certificate's CN
                 $commonName = $this->random->get(16);
@@ -81,8 +80,7 @@ class CertificatesModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
-                $commonName = $request->getPostParameter('common_name');
-                InputValidation::commonName($commonName);
+                $commonName = InputValidation::serverCommonName($request->getPostParameter('common_name'));
 
                 $certInfo = $this->ca->serverCert($commonName);
                 // add TLS Auth
@@ -98,8 +96,7 @@ class CertificatesModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
-                $commonName = $request->getPostParameter('common_name');
-                InputValidation::commonName($commonName);
+                $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
 
                 return new ApiResponse('disable_client_certificate', $this->storage->disableCertificate($commonName));
             }
@@ -110,8 +107,7 @@ class CertificatesModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
-                $commonName = $request->getPostParameter('common_name');
-                InputValidation::commonName($commonName);
+                $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
 
                 return new ApiResponse('enable_client_certificate', $this->storage->enableCertificate($commonName));
             }
@@ -122,8 +118,7 @@ class CertificatesModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
-                $userId = $request->getQueryParameter('user_id');
-                InputValidation::userId($userId);
+                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
 
                 return new ApiResponse('list_client_certificates', $this->storage->getCertificates($userId));
             }

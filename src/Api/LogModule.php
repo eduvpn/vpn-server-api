@@ -20,6 +20,7 @@ namespace SURFnet\VPN\Server\Api;
 
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\AuthUtils;
+use SURFnet\VPN\Common\Http\InputValidation;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
@@ -42,19 +43,10 @@ class LogModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
-                $dateTime = $request->getQueryParameter('date_time');
-                InputValidation::dateTime($dateTime);
+                $dateTime = InputValidation::dateTime($request->getQueryParameter('date_time'));
+                $ipAddress = InputValidation::ipAddress($request->getQueryParameter('ip_address'));
 
-                // do not convert if we have a number, it is probably already unix time
-                $dateTimeUnix = is_numeric($dateTime) ? intval($dateTime) : strtotime($dateTime);
-
-                $ipAddress = $request->getQueryParameter('ip_address');
-                InputValidation::ipAddress($ipAddress);
-
-                // normalize the IP(v6) address
-                $ipAddress = inet_ntop(inet_pton($ipAddress));
-
-                $logData = $this->storage->getLogEntry($dateTimeUnix, $ipAddress);
+                $logData = $this->storage->getLogEntry($dateTime, $ipAddress);
 
                 // XXX probably should be empty instead of false?!
                 // we need to get the external_user_id instead and expose that... not the internal, also expose CN so it can be blocked by admin

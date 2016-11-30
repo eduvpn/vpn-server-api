@@ -42,8 +42,8 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
             $random
         );
         $storage->init();
-        $storage->addCertificate('foo', 'abcd1234', 'ABCD1234', 12345678, 23456789);
-        $storage->clientConnect('internet', 'abcd1234', '10.10.10.10', 'fd00:4242:4242:4242::', 12345678);
+        $storage->addCertificate('foo', '12345678901234567890123456789012', '12345678901234567890123456789012', 12345678, 23456789);
+        $storage->clientConnect('internet', '12345678901234567890123456789012', '10.10.10.10', 'fd00:4242:4242:4242::', 12345678);
 
         $config = Config::fromFile(sprintf('%s/data/config.yaml', __DIR__));
 
@@ -90,7 +90,7 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
                 [],
                 [
                     'profile_id' => 'internet',
-                    'common_name' => 'abcd1234',
+                    'common_name' => '12345678901234567890123456789012',
                     'ip4' => '10.10.10.10',
                     'ip6' => 'fd00:4242:4242:4242::',
                     'connected_at' => 12345678,
@@ -116,7 +116,7 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
                 [],
                 [
                     'profile_id' => 'acl',
-                    'common_name' => 'abcd1234',
+                    'common_name' => '12345678901234567890123456789012',
                     'ip4' => '10.10.10.10',
                     'ip6' => 'fd00:4242:4242:4242::',
                     'connected_at' => 12345678,
@@ -143,7 +143,7 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
                 [],
                 [
                     'profile_id' => 'acl2',
-                    'common_name' => 'abcd1234',
+                    'common_name' => '12345678901234567890123456789012',
                     'ip4' => '10.10.10.10',
                     'ip6' => 'fd00:4242:4242:4242::',
                     'connected_at' => 12345678,
@@ -169,7 +169,7 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
                 [],
                 [
                     'profile_id' => 'internet',
-                    'common_name' => 'abcd1234',
+                    'common_name' => '12345678901234567890123456789012',
                     'ip4' => '10.10.10.10',
                     'ip6' => 'fd00:4242:4242:4242::',
                     'connected_at' => 12345678,

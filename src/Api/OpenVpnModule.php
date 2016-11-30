@@ -20,6 +20,7 @@ namespace SURFnet\VPN\Server\Api;
 
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\AuthUtils;
+use SURFnet\VPN\Common\Http\InputValidation;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
@@ -51,8 +52,7 @@ class OpenVpnModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
 
-                $commonName = $request->getPostParameter('common_name');
-                InputValidation::commonName($commonName);
+                $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
 
                 return new ApiResponse('kill_client', $this->serverManager->kill($commonName));
             }

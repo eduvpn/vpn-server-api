@@ -22,6 +22,7 @@ use Base32\Base32;
 use Otp\Otp;
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\AuthUtils;
+use SURFnet\VPN\Common\Http\InputValidation;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
@@ -57,12 +58,9 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = $request->getPostParameter('user_id');
-                InputValidation::userId($userId);
-                $totpSecret = $request->getPostParameter('totp_secret');
-                InputValidation::totpSecret($totpSecret);
-                $totpKey = $request->getPostParameter('totp_key');
-                InputValidation::totpKey($totpKey);
+                $userId = InputValidation::userId($request->getPostParameter('user_id'));
+                $totpSecret = InputValidation::totpSecret($request->getPostParameter('totp_secret'));
+                $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
 
                 $otp = new Otp();
                 if (false === $otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
@@ -82,10 +80,8 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
-                $userId = $request->getPostParameter('user_id');
-                InputValidation::userId($userId);
-                $totpKey = $request->getPostParameter('totp_key');
-                InputValidation::totpKey($totpKey);
+                $userId = InputValidation::userId($request->getPostParameter('user_id'));
+                $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
 
                 // XXX what to do if user does not have one?
                 $totpSecret = $this->storage->getTotpSecret($userId);
@@ -109,8 +105,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
-                $userId = $request->getQueryParameter('user_id');
-                InputValidation::userId($userId);
+                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
 
                 return new ApiResponse('has_totp_secret', $this->storage->hasTotpSecret($userId));
             }
@@ -121,8 +116,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
-                $userId = $request->getPostParameter('user_id');
-                InputValidation::userId($userId);
+                $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
                 return new ApiResponse('delete_totp_secret', ['ok' => $this->storage->deleteTotpSecret($userId)]);
             }
@@ -133,10 +127,8 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = $request->getPostParameter('user_id');
-                InputValidation::userId($userId);
-                $vootToken = $request->getPostParameter('voot_token');
-                InputValidation::vootToken($vootToken);
+                $userId = InputValidation::userId($request->getPostParameter('user_id'));
+                $vootToken = InputValidation::vootToken($request->getPostParameter('voot_token'));
 
                 return new ApiResponse('set_voot_token', ['ok' => $this->storage->setVootToken($userId, $vootToken)]);
             }
@@ -147,8 +139,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
-                $userId = $request->getPostParameter('user_id');
-                InputValidation::userId($userId);
+                $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
                 return new ApiResponse('delete_voot_token', ['ok' => $this->storage->deleteVootToken($userId)]);
             }
@@ -159,8 +150,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
-                $userId = $request->getQueryParameter('user_id');
-                InputValidation::userId($userId);
+                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
 
                 return new ApiResponse('has_voot_token', $this->storage->hasVootToken($userId));
             }
@@ -171,8 +161,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
 
-                $userId = $request->getQueryParameter('user_id');
-                InputValidation::userId($userId);
+                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
 
                 return new ApiResponse('is_disabled_user', $this->storage->isDisabledUser($userId));
             }
@@ -183,8 +172,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
-                $userId = $request->getPostParameter('user_id');
-                InputValidation::userId($userId);
+                $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
                 return new ApiResponse('disable_user', ['ok' => $this->storage->disableUser($userId)]);
             }
@@ -195,8 +183,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
-                $userId = $request->getPostParameter('user_id');
-                InputValidation::userId($userId);
+                $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
                 return new ApiResponse('enable_user', ['ok' => $this->storage->enableUser($userId)]);
             }
@@ -207,8 +194,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
-                $userId = $request->getPostParameter('user_id');
-                InputValidation::userId($userId);
+                $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
                 return new ApiResponse('delete_user', ['ok' => $this->storage->deleteUser($userId)]);
             }
