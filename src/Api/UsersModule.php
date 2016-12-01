@@ -89,11 +89,14 @@ class UsersModule implements ServiceModuleInterface
 
                 // XXX what to do if user does not have one?
                 $totpSecret = $this->storage->getTotpSecret($userId);
-                $this->storage->recordTotpKey($userId, $totpKey, time());
 
                 $otp = new Otp();
                 if (!$otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
                     return new ApiErrorResponse('verify_totp_key', 'invalid OTP key');
+                }
+
+                if (false === $this->storage->recordTotpKey($userId, $totpKey, time())) {
+                    return new ApiErrorResponse('verify_totp_key', 'OTP key replay');
                 }
 
                 return new ApiResponse('verify_totp_key');

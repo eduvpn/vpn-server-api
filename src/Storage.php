@@ -19,6 +19,7 @@
 namespace SURFnet\VPN\Server;
 
 use PDO;
+use PDOException;
 use SURFnet\VPN\Common\RandomInterface;
 
 class Storage
@@ -427,9 +428,14 @@ class Storage
         $stmt->bindValue(':totp_key', $totpKey, PDO::PARAM_STR);
         $stmt->bindValue(':time_unix', $timeUnix, PDO::PARAM_INT);
 
-        $stmt->execute();
+        try {
+            $stmt->execute();
+        } catch (PDOException $e) {
+            // unable to record the TOTP, probably uniqueness contrains
+            return false;
+        }
 
-        return 1 === $stmt->rowCount();
+        return true;
     }
 
     public function cleanConnectionLog($timeUnix)
@@ -514,11 +520,11 @@ class Storage
             )',
             'CREATE TABLE IF NOT EXISTS certificates (
                 common_name VARCHAR(255) NOT NULL PRIMARY KEY,
-                user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
                 display_name VARCHAR(255) NOT NULL,
                 valid_from INTEGER NOT NULL,
                 valid_to INTEGER NOT NULL,
-                is_disabled BOOLEAN DEFAULT 0
+                is_disabled BOOLEAN DEFAULT 0,
+                user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
             )',
             'CREATE TABLE IF NOT EXISTS connection_log (
                 common_name VARCHAR(255) NOT NULL REFERENCES certificates(common_name),
@@ -530,9 +536,9 @@ class Storage
                 bytes_transferred INTEGER DEFAULT NULL                
             )',
             'CREATE TABLE IF NOT EXISTS totp_log (
-                user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
                 totp_key VARCHAR(255) NOT NULL,
                 time_unix INTEGER NOT NULL,
+                user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
                 UNIQUE(user_id, totp_key)
             )',
             'CREATE TABLE IF NOT EXISTS motd (
