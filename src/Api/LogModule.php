@@ -48,13 +48,9 @@ class LogModule implements ServiceModuleInterface
 
                 $logData = $this->storage->getLogEntry($dateTime, $ipAddress);
 
-                // XXX probably should be empty instead of false?!
-                // we need to get the external_user_id instead and expose that... not the internal, also expose CN so it can be blocked by admin
-                if (false !== $logData) {
-                    foreach ($logData as $k => $value) {
-                        $logData[$k]['user_id'] = substr($value['common_name'], 0, strpos($value['common_name'], '_'));
-                        $logData[$k]['config_name'] = substr($value['common_name'], strpos($value['common_name'], '_') + 1);
-                    }
+                foreach ($logData as $k => $v) {
+                    $certInfo = $this->storage->getUserCertificateInfo($v['common_name']);
+                    $logData[$k] = array_merge($logData[$k], $certInfo);
                 }
 
                 return new ApiResponse('log', $logData);
