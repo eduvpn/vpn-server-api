@@ -536,7 +536,7 @@ class Storage
                 UNIQUE(user_id, totp_key)
             )',
             'CREATE TABLE IF NOT EXISTS motd (
-                motd_message TEXT
+                motd_message TEXT NOT NULL
             )',
         ];
 
