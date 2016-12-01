@@ -20,8 +20,9 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\FileIO;
-use SURFnet\VPN\Server\Api\ConnectionLog;
+use SURFnet\VPN\Common\Random;
 use SURFnet\VPN\Server\Stats;
+use SURFnet\VPN\Server\Storage;
 
 try {
     $p = new CliParser(
@@ -38,13 +39,13 @@ try {
     }
 
     $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $opt->v('instance'));
+    $db = new PDO(sprintf('sqlite://%s/db.sqlite', $dataDir));
+    $storage = new Storage($db, new Random());
+
     $outFile = sprintf('%s/stats.json', $dataDir);
 
-    $db = new PDO(sprintf('sqlite://%s/connection_log.sqlite', $dataDir));
-    $connectionLog = new ConnectionLog($db);
-
     $stats = new Stats(new DateTime());
-    $statsData = $stats->get($connectionLog->getAll());
+    $statsData = $stats->get($storage->getAllLogEntries());
 
     FileIO::writeJsonFile(
         $outFile,

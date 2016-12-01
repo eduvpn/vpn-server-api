@@ -38,12 +38,9 @@ class Stats
         $activeUserCount = 0;
 
         foreach ($logEntries as $entry) {
-            // determine user_id
-
-            $userId = substr($entry['common_name'], 0, strpos($entry['common_name'], '_'));
+            $userId = $entry['user_id'];
             $connectedAt = $entry['connected_at'];
             $disconnectedAt = $entry['disconnected_at'];
-
             $connectedAtDateTime = DateTime::createFromFormat('U', $entry['connected_at']);
             $dateOfConnection = $connectedAtDateTime->format('Y-m-d');
 

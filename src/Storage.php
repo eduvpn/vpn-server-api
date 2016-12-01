@@ -318,6 +318,19 @@ class Storage
         return 1 === intval($stmt->fetchColumn());
     }
 
+    public function getAllLogEntries()
+    {
+        $stmt = $this->db->prepare(
+            'SELECT c.user_id, l.common_name, l.connected_at, l.disconnected_at, l.bytes_transferred
+             FROM connection_log l, certificates c
+             WHERE c.common_name = l.common_name'
+        );
+
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function clientConnect($profileId, $commonName, $ip4, $ip6, $connectedAt)
     {
         $stmt = $this->db->prepare(
