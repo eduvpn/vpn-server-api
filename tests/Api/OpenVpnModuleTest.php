@@ -20,6 +20,7 @@ namespace SURFnet\VPN\Server\Api;
 
 require_once sprintf('%s/Test/TestSocket.php', dirname(__DIR__));
 
+use PDO;
 use PHPUnit_Framework_TestCase;
 use Psr\Log\NullLogger;
 use SURFnet\VPN\Common\Config;
@@ -27,6 +28,7 @@ use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
+use SURFnet\VPN\Server\Storage;
 use SURFnet\VPN\Server\Test\TestSocket;
 
 class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
@@ -38,6 +40,16 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
     {
         $config = Config::fromFile(sprintf('%s/data/openvpn_module_config.yaml', __DIR__));
 
+        $random = $this->getMockBuilder('SURFnet\VPN\Common\RandomInterface')->getMock();
+        $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
+        $storage = new Storage(
+            new PDO('sqlite::memory:'),
+            $random
+        );
+        $storage->init();
+        $storage->addCertificate('foo', '12345678901234567890123456789012', 'Display Name', 12345678, 23456789);
+        $storage->addCertificate('foo', '99123456789012345678901234567890', 'Display Name 2', 12345678, 23456789);
+
         $serverManager = new ServerManager(
             $config,
             new TestSocket(),
@@ -47,7 +59,8 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
         $this->service = new Service();
         $this->service->addModule(
             new OpenVpnModule(
-                $serverManager
+                $serverManager,
+                $storage
             )
         );
 
@@ -68,20 +81,28 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                     'id' => 'internet',
                     'connections' => [
                         [
-                            'common_name' => 'fkooman_testdroid',
+                            'common_name' => '12345678901234567890123456789012',
                             'proto' => 6,
                             'virtual_address' => [
                                 'fd77:6bac:e591:8203::1001',
                                 '10.120.188.195',
                             ],
+                            'user_id' => 'foo',
+                            'user_is_disabled' => '0',
+                            'display_name' => 'Display Name',
+                            'certificate_is_disabled' => '0',
                         ],
                         [
-                            'common_name' => 'fkooman_lenovo_f24',
+                            'common_name' => '99123456789012345678901234567890',
                             'proto' => 4,
                             'virtual_address' => [
                                 '10.120.188.194',
                                 'fd77:6bac:e591:8203::1000',
                             ],
+                            'user_id' => 'foo',
+                            'user_is_disabled' => '0',
+                            'display_name' => 'Display Name 2',
+                            'certificate_is_disabled' => '0',
                         ],
                     ],
                 ],

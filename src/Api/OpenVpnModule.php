@@ -25,15 +25,20 @@ use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
+use SURFnet\VPN\Server\Storage;
 
 class OpenVpnModule implements ServiceModuleInterface
 {
     /** @var \SURFnet\VPN\Server\OpenVpn\ServerManager */
     private $serverManager;
 
-    public function __construct(ServerManager $serverManager)
+    /** @var \SURFnet\VPN\Server\Storage */
+    private $storage;
+
+    public function __construct(ServerManager $serverManager, Storage $storage)
     {
         $this->serverManager = $serverManager;
+        $this->storage = $storage;
     }
 
     public function init(Service $service)
@@ -43,7 +48,15 @@ class OpenVpnModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
-                return new ApiResponse('client_connections', $this->serverManager->connections());
+                $clientConnections = $this->serverManager->connections();
+                // augment the connection info with the actual user info
+                foreach ($clientConnections as $k => $v) {
+                    foreach ($v['connections'] as $k1 => $v2) {
+                        $clientConnections[$k]['connections'][$k1] = array_merge($v2, $this->storage->getUserCertificateInfo($v2['common_name']));
+                    }
+                }
+
+                return new ApiResponse('client_connections', $clientConnections);
             }
         );
 

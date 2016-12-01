@@ -58,12 +58,13 @@ class Storage
         return $userList;
     }
 
-    public function getUserCertificateStatus($commonName)
+    public function getUserCertificateInfo($commonName)
     {
         $stmt = $this->db->prepare(
             'SELECT 
-                u.external_user_id AS external_user_id, 
-                u.is_disabled AS user_is_disabled, 
+                u.external_user_id AS user_id, 
+                u.is_disabled AS user_is_disabled,
+                c.display_name AS display_name,
                 c.is_disabled AS certificate_is_disabled 
              FROM users u, certificates c 
              WHERE c.common_name = :common_name'

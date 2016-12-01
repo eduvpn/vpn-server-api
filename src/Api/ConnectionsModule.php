@@ -99,7 +99,7 @@ class ConnectionsModule implements ServiceModuleInterface
     private function verifyConnection($profileId, $commonName)
     {
         // verify status of certificate/user
-        if (false === $result = $this->storage->getUserCertificateStatus($commonName)) {
+        if (false === $result = $this->storage->getUserCertificateInfo($commonName)) {
             return new ApiErrorResponse('connect', 'user or certificate does not exist');
         }
 
@@ -111,7 +111,7 @@ class ConnectionsModule implements ServiceModuleInterface
             return new ApiErrorResponse('connect', 'certificate is disabled');
         }
 
-        return $this->verifyAcl($profileId, $result['external_user_id']);
+        return $this->verifyAcl($profileId, $result['user_id']);
     }
 
     private function verifyAcl($profileId, $externalUserId)
