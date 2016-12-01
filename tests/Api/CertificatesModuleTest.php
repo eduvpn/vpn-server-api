@@ -70,21 +70,17 @@ class CertificatesModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'data' => [
-                    'add_client_certificate' => [
-                        'certificate' => 'ClientCert for random_1',
-                        'private_key' => 'ClientKey for random_1',
-                        'valid_from' => 1234567890,
-                        'valid_to' => 2345678901,
-                        'ta' => 'Test_Ta_Key',
-                        'ca' => 'Ca',
-                    ],
-                ],
+                'certificate' => 'ClientCert for random_1',
+                'private_key' => 'ClientKey for random_1',
+                'valid_from' => 1234567890,
+                'valid_to' => 2345678901,
+                'ta' => 'Test_Ta_Key',
+                'ca' => 'Ca',
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'abcdef'],
                 'POST',
-                '/add_client_certificate',
+                'add_client_certificate',
                 [],
                 ['user_id' => 'foo', 'display_name' => 'bar']
             )
@@ -95,21 +91,17 @@ class CertificatesModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'data' => [
-                    'add_server_certificate' => [
-                        'certificate' => 'ServerCert for vpn.example',
-                        'private_key' => 'ServerCert for vpn.example',
-                        'valid_from' => 1234567890,
-                        'valid_to' => 2345678901,
-                        'ta' => 'Test_Ta_Key',
-                        'ca' => 'Ca',
-                    ],
-                ],
+                'certificate' => 'ServerCert for vpn.example',
+                'private_key' => 'ServerCert for vpn.example',
+                'valid_from' => 1234567890,
+                'valid_to' => 2345678901,
+                'ta' => 'Test_Ta_Key',
+                'ca' => 'Ca',
             ],
             $this->makeRequest(
                 ['vpn-server-node', 'aabbcc'],
                 'POST',
-                '/add_server_certificate',
+                'add_server_certificate',
                 [],
                 ['common_name' => 'vpn.example']
             )
@@ -124,8 +116,8 @@ class CertificatesModuleTest extends PHPUnit_Framework_TestCase
                     'SERVER_PORT' => 80,
                     'SERVER_NAME' => 'vpn.example',
                     'REQUEST_METHOD' => $requestMethod,
-                    'PATH_INFO' => $pathInfo,
-                    'REQUEST_URI' => $pathInfo,
+                    'PATH_INFO' => sprintf('/%s', $pathInfo),
+                    'REQUEST_URI' => sprintf('/%s', $pathInfo),
                     'PHP_AUTH_USER' => $basicAuth[0],
                     'PHP_AUTH_PW' => $basicAuth[1],
                 ],
@@ -134,6 +126,16 @@ class CertificatesModuleTest extends PHPUnit_Framework_TestCase
             )
         );
 
-        return json_decode($response->getBody(), true);
+        $responseArray = json_decode($response->getBody(), true)[$pathInfo];
+        if ($responseArray['ok']) {
+            if (array_key_exists('data', $responseArray)) {
+                return $responseArray['data'];
+            }
+
+            return true;
+        }
+
+        // in case of errors...
+        return $responseArray;
     }
 }

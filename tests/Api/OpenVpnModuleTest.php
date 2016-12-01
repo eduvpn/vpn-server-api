@@ -64,27 +64,23 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'data' => [
-                    'client_connections' => [
+                [
+                    'id' => 'internet',
+                    'connections' => [
                         [
-                            'id' => 'internet',
-                            'connections' => [
-                                [
-                                    'common_name' => 'fkooman_testdroid',
-                                    'proto' => 6,
-                                    'virtual_address' => [
-                                        'fd77:6bac:e591:8203::1001',
-                                        '10.120.188.195',
-                                    ],
-                                ],
-                                [
-                                    'common_name' => 'fkooman_lenovo_f24',
-                                    'proto' => 4,
-                                    'virtual_address' => [
-                                        '10.120.188.194',
-                                        'fd77:6bac:e591:8203::1000',
-                                    ],
-                                ],
+                            'common_name' => 'fkooman_testdroid',
+                            'proto' => 6,
+                            'virtual_address' => [
+                                'fd77:6bac:e591:8203::1001',
+                                '10.120.188.195',
+                            ],
+                        ],
+                        [
+                            'common_name' => 'fkooman_lenovo_f24',
+                            'proto' => 4,
+                            'virtual_address' => [
+                                '10.120.188.194',
+                                'fd77:6bac:e591:8203::1000',
                             ],
                         ],
                     ],
@@ -93,7 +89,7 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
             $this->makeRequest(
                 ['vpn-admin-portal', 'bbccdd'],
                 'GET',
-                '/client_connections',
+                'client_connections',
                 [],
                 []
             )
@@ -108,8 +104,8 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                     'SERVER_PORT' => 80,
                     'SERVER_NAME' => 'vpn.example',
                     'REQUEST_METHOD' => $requestMethod,
-                    'PATH_INFO' => $pathInfo,
-                    'REQUEST_URI' => $pathInfo,
+                    'PATH_INFO' => sprintf('/%s', $pathInfo),
+                    'REQUEST_URI' => sprintf('/%s', $pathInfo),
                     'PHP_AUTH_USER' => $basicAuth[0],
                     'PHP_AUTH_PW' => $basicAuth[1],
                 ],
@@ -118,6 +114,16 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
             )
         );
 
-        return json_decode($response->getBody(), true);
+        $responseArray = json_decode($response->getBody(), true)[$pathInfo];
+        if ($responseArray['ok']) {
+            if (array_key_exists('data', $responseArray)) {
+                return $responseArray['data'];
+            }
+
+            return true;
+        }
+
+        // in case of errors...
+        return $responseArray;
     }
 }

@@ -79,23 +79,19 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'data' => [
-                    'user_list' => [
-                        [
-                            'user_id' => 'foo',
-                            'is_disabled' => false,
-                        ],
-                        [
-                            'user_id' => 'bar',
-                            'is_disabled' => false,
-                        ],
-                    ],
+                [
+                    'user_id' => 'foo',
+                    'is_disabled' => false,
+                ],
+                [
+                    'user_id' => 'bar',
+                    'is_disabled' => false,
                 ],
             ],
             $this->makeRequest(
                 ['vpn-admin-portal', 'bbccdd'],
                 'GET',
-                '/user_list',
+                'user_list',
                 ['profile_id' => 'internet'],
                 []
             )
@@ -108,18 +104,11 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $totpSecret = 'MM7TTLHPA7WZOJFB';
         $totpKey = $otp->totp(Base32::decode($totpSecret));
 
-        $this->assertSame(
-            [
-                'data' => [
-                    'set_totp_secret' => [
-                        'ok' => true,
-                    ],
-                ],
-            ],
+        $this->assertTrue(
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
                 'POST',
-                '/set_totp_secret',
+                'set_totp_secret',
                 [],
                 [
                     'user_id' => 'foo',
@@ -136,18 +125,11 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $totpSecret = 'CN2XAL23SIFTDFXZ';
         $totpKey = $otp->totp(Base32::decode($totpSecret));
 
-        $this->assertSame(
-            [
-                'data' => [
-                    'verify_totp_key' => [
-                        'ok' => true,
-                    ],
-                ],
-            ],
+        $this->assertTrue(
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
                 'POST',
-                '/verify_totp_key',
+                'verify_totp_key',
                 [],
                 [
                     'user_id' => 'bar',
@@ -159,16 +141,11 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
     public function testHasTotpSecret()
     {
-        $this->assertSame(
-            [
-                'data' => [
-                    'has_totp_secret' => true,
-                ],
-            ],
+        $this->assertTrue(
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
                 'GET',
-                '/has_totp_secret',
+                'has_totp_secret',
                 [
                     'user_id' => 'bar',
                 ],
@@ -179,18 +156,11 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteTotpSecret()
     {
-        $this->assertSame(
-            [
-                'data' => [
-                    'delete_totp_secret' => [
-                        'ok' => true,
-                    ],
-                ],
-            ],
+        $this->assertTrue(
             $this->makeRequest(
                 ['vpn-admin-portal', 'bbccdd'],
                 'POST',
-                '/delete_totp_secret',
+                'delete_totp_secret',
                 [],
                 [
                     'user_id' => 'bar',
@@ -201,18 +171,11 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
     public function testSetVootToken()
     {
-        $this->assertSame(
-            [
-                'data' => [
-                    'set_voot_token' => [
-                        'ok' => true,
-                    ],
-                ],
-            ],
+        $this->assertTrue(
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
                 'POST',
-                '/set_voot_token',
+                'set_voot_token',
                 [],
                 [
                     'user_id' => 'foo',
@@ -224,18 +187,11 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteVootToken()
     {
-        $this->assertSame(
-            [
-                'data' => [
-                    'delete_voot_token' => [
-                        'ok' => true,
-                    ],
-                ],
-            ],
+        $this->assertTrue(
             $this->makeRequest(
                 ['vpn-admin-portal', 'bbccdd'],
                 'POST',
-                '/delete_voot_token',
+                'delete_voot_token',
                 [],
                 [
                     'user_id' => 'bar',
@@ -246,18 +202,11 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
     public function testDisableUser()
     {
-        $this->assertSame(
-            [
-                'data' => [
-                    'disable_user' => [
-                        'ok' => true,
-                    ],
-                ],
-            ],
+        $this->assertTrue(
             $this->makeRequest(
                 ['vpn-admin-portal', 'bbccdd'],
                 'POST',
-                '/disable_user',
+                'disable_user',
                 [],
                 [
                     'user_id' => 'foo',
@@ -268,18 +217,11 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
     public function testEnableUser()
     {
-        $this->assertSame(
-            [
-                'data' => [
-                    'enable_user' => [
-                        'ok' => true,
-                    ],
-                ],
-            ],
+        $this->assertTrue(
             $this->makeRequest(
                 ['vpn-admin-portal', 'bbccdd'],
                 'POST',
-                '/enable_user',
+                'enable_user',
                 [],
                 [
                     'user_id' => 'bar',
@@ -290,18 +232,11 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
     public function testDeleteUser()
     {
-        $this->assertSame(
-            [
-                'data' => [
-                    'delete_user' => [
-                        'ok' => true,
-                    ],
-                ],
-            ],
+        $this->assertTrue(
             $this->makeRequest(
                 ['vpn-admin-portal', 'bbccdd'],
                 'POST',
-                '/delete_user',
+                'delete_user',
                 [],
                 [
                     'user_id' => 'foo',
@@ -314,23 +249,19 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'data' => [
-                    'user_groups' => [
-                        [
-                            'id' => 'all',
-                            'displayName' => 'All',
-                        ],
-                        [
-                            'id' => 'employees',
-                            'displayName' => 'Employees',
-                        ],
-                    ],
+                [
+                    'id' => 'all',
+                    'displayName' => 'All',
+                ],
+                [
+                    'id' => 'employees',
+                    'displayName' => 'Employees',
                 ],
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
                 'GET',
-                '/user_groups',
+                'user_groups',
                 [
                     'user_id' => 'bar',
                 ],
@@ -347,8 +278,8 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                     'SERVER_PORT' => 80,
                     'SERVER_NAME' => 'vpn.example',
                     'REQUEST_METHOD' => $requestMethod,
-                    'PATH_INFO' => $pathInfo,
-                    'REQUEST_URI' => $pathInfo,
+                    'PATH_INFO' => sprintf('/%s', $pathInfo),
+                    'REQUEST_URI' => sprintf('/%s', $pathInfo),
                     'PHP_AUTH_USER' => $basicAuth[0],
                     'PHP_AUTH_PW' => $basicAuth[1],
                 ],
@@ -357,6 +288,16 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
             )
         );
 
-        return json_decode($response->getBody(), true);
+        $responseArray = json_decode($response->getBody(), true)[$pathInfo];
+        if ($responseArray['ok']) {
+            if (array_key_exists('data', $responseArray)) {
+                return $responseArray['data'];
+            }
+
+            return true;
+        }
+
+        // in case of errors...
+        return $responseArray;
     }
 }

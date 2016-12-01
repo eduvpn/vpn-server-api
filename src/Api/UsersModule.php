@@ -20,6 +20,7 @@ namespace SURFnet\VPN\Server\Api;
 
 use Base32\Base32;
 use Otp\Otp;
+use SURFnet\VPN\Common\Http\ApiErrorResponse;
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\AuthUtils;
 use SURFnet\VPN\Common\Http\InputValidation;
@@ -65,13 +66,16 @@ class UsersModule implements ServiceModuleInterface
                 $otp = new Otp();
                 if (false === $otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
                     // wrong otp key
-                    return new ApiResponse('set_totp_secret', ['ok' => false]);
+                    return new ApiErrorResponse('set_totp_secret', 'invalid OTP key');
                 }
 
                 // XXX use DateTime here, easier for testing
-                $this->storage->recordTotpKey($userId, $totpKey, time());
 
-                return new ApiResponse('set_totp_secret', ['ok' => $this->storage->setTotpSecret($userId, $totpSecret)]);
+                // XXX check if all these things worked!
+                $this->storage->recordTotpKey($userId, $totpKey, time());
+                $this->storage->setTotpSecret($userId, $totpSecret);
+
+                return new ApiResponse('set_totp_secret');
             }
         );
 
@@ -86,17 +90,13 @@ class UsersModule implements ServiceModuleInterface
                 // XXX what to do if user does not have one?
                 $totpSecret = $this->storage->getTotpSecret($userId);
                 $this->storage->recordTotpKey($userId, $totpKey, time());
-                $otp = new Otp();
 
-                return new ApiResponse(
-                    'verify_totp_key',
-                    [
-                        'ok' => $otp->checkTotp(
-                            Base32::decode($totpSecret),
-                            $totpKey
-                        ),
-                    ]
-                );
+                $otp = new Otp();
+                if (!$otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
+                    return new ApiErrorResponse('verify_totp_key', 'invalid OTP key');
+                }
+
+                return new ApiResponse('verify_totp_key');
             }
         );
 
@@ -118,7 +118,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
-                return new ApiResponse('delete_totp_secret', ['ok' => $this->storage->deleteTotpSecret($userId)]);
+                return new ApiResponse('delete_totp_secret', $this->storage->deleteTotpSecret($userId));
             }
         );
 
@@ -130,7 +130,7 @@ class UsersModule implements ServiceModuleInterface
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
                 $vootToken = InputValidation::vootToken($request->getPostParameter('voot_token'));
 
-                return new ApiResponse('set_voot_token', ['ok' => $this->storage->setVootToken($userId, $vootToken)]);
+                return new ApiResponse('set_voot_token', $this->storage->setVootToken($userId, $vootToken));
             }
         );
 
@@ -141,7 +141,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
-                return new ApiResponse('delete_voot_token', ['ok' => $this->storage->deleteVootToken($userId)]);
+                return new ApiResponse('delete_voot_token', $this->storage->deleteVootToken($userId));
             }
         );
 
@@ -174,7 +174,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
-                return new ApiResponse('disable_user', ['ok' => $this->storage->disableUser($userId)]);
+                return new ApiResponse('disable_user', $this->storage->disableUser($userId));
             }
         );
 
@@ -185,7 +185,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
-                return new ApiResponse('enable_user', ['ok' => $this->storage->enableUser($userId)]);
+                return new ApiResponse('enable_user', $this->storage->enableUser($userId));
             }
         );
 
@@ -196,7 +196,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
-                return new ApiResponse('delete_user', ['ok' => $this->storage->deleteUser($userId)]);
+                return new ApiResponse('delete_user', $this->storage->deleteUser($userId));
             }
         );
 

@@ -75,18 +75,11 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
 
     public function testConnect()
     {
-        $this->assertSame(
-            [
-                'data' => [
-                    'connect' => [
-                        'ok' => true,
-                    ],
-                ],
-            ],
+        $this->assertTrue(
             $this->makeRequest(
                 ['vpn-server-node', 'aabbcc'],
                 'POST',
-                '/connect',
+                'connect',
                 [],
                 [
                     'profile_id' => 'internet',
@@ -101,18 +94,11 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
 
     public function testConnectInAcl()
     {
-        $this->assertSame(
-            [
-                'data' => [
-                    'connect' => [
-                        'ok' => true,
-                    ],
-                ],
-            ],
+        $this->assertTrue(
             $this->makeRequest(
                 ['vpn-server-node', 'aabbcc'],
                 'POST',
-                '/connect',
+                'connect',
                 [],
                 [
                     'profile_id' => 'acl',
@@ -129,17 +115,13 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'data' => [
-                    'connect' => [
-                        'ok' => false,
-                        'error' => 'user not in ACL',
-                    ],
-                ],
+                'ok' => false,
+                'error' => 'user not in ACL',
             ],
             $this->makeRequest(
                 ['vpn-server-node', 'aabbcc'],
                 'POST',
-                '/connect',
+                'connect',
                 [],
                 [
                     'profile_id' => 'acl2',
@@ -154,18 +136,11 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
 
     public function testDisconnect()
     {
-        $this->assertSame(
-            [
-                'data' => [
-                    'disconnect' => [
-                        'ok' => true,
-                    ],
-                ],
-            ],
+        $this->assertTrue(
             $this->makeRequest(
                 ['vpn-server-node', 'aabbcc'],
                 'POST',
-                '/disconnect',
+                'disconnect',
                 [],
                 [
                     'profile_id' => 'internet',
@@ -188,8 +163,8 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
                     'SERVER_PORT' => 80,
                     'SERVER_NAME' => 'vpn.example',
                     'REQUEST_METHOD' => $requestMethod,
-                    'PATH_INFO' => $pathInfo,
-                    'REQUEST_URI' => $pathInfo,
+                    'PATH_INFO' => sprintf('/%s', $pathInfo),
+                    'REQUEST_URI' => sprintf('/%s', $pathInfo),
                     'PHP_AUTH_USER' => $basicAuth[0],
                     'PHP_AUTH_PW' => $basicAuth[1],
                 ],
@@ -198,6 +173,16 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
             )
         );
 
-        return json_decode($response->getBody(), true);
+        $responseArray = json_decode($response->getBody(), true)[$pathInfo];
+        if ($responseArray['ok']) {
+            if (array_key_exists('data', $responseArray)) {
+                return $responseArray['data'];
+            }
+
+            return true;
+        }
+
+        // in case of errors...
+        return $responseArray;
     }
 }

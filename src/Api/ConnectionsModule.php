@@ -19,6 +19,7 @@
 namespace SURFnet\VPN\Server\Api;
 
 use SURFnet\VPN\Common\Config;
+use SURFnet\VPN\Common\Http\ApiErrorResponse;
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\AuthUtils;
 use SURFnet\VPN\Common\Http\InputValidation;
@@ -89,25 +90,25 @@ class ConnectionsModule implements ServiceModuleInterface
         }
 
         if (false == $this->storage->clientConnect($profileId, $commonName, $ip4, $ip6, $connectedAt)) {
-            return new ApiResponse('connect', ['ok' => false, 'error' => 'unable to write connect event to log']);
+            return new ApiErrorResponse('connect', 'unable to write connect event to log');
         }
 
-        return new ApiResponse('connect', ['ok' => true]);
+        return new ApiResponse('connect');
     }
 
     private function verifyConnection($profileId, $commonName)
     {
         // verify status of certificate/user
         if (false === $result = $this->storage->getUserCertificateStatus($commonName)) {
-            return new ApiResponse('connect', ['ok' => false, 'error' => 'user or certificate does not exist']);
+            return new ApiErrorResponse('connect', 'user or certificate does not exist');
         }
 
         if ($result['user_is_disabled']) {
-            return new ApiResponse('connect', ['ok' => false, 'error' => 'user is disabled']);
+            return new ApiErrorResponse('connect', 'user is disabled');
         }
 
         if ($result['certificate_is_disabled']) {
-            return new ApiResponse('connect', ['ok' => false, 'error' => 'certificate is disabled']);
+            return new ApiErrorResponse('connect', 'certificate is disabled');
         }
 
         return $this->verifyAcl($profileId, $result['external_user_id']);
@@ -125,7 +126,7 @@ class ConnectionsModule implements ServiceModuleInterface
             }
 
             if (false === self::isMember($userGroups, $profileConfig->v('aclGroupList'))) {
-                return new ApiResponse('connect', ['ok' => false, 'error' => 'user not in ACL']);
+                return new ApiErrorResponse('connect', 'user not in ACL');
             }
         }
 
@@ -156,15 +157,15 @@ class ConnectionsModule implements ServiceModuleInterface
         $bytesTransferred = InputValidation::bytesTransferred($request->getPostParameter('bytes_transferred'));
 
         if (false === $this->storage->clientDisconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)) {
-            return new ApiResponse('disconnect', ['ok' => false, 'error' => 'unable to write disconnect event to log']);
+            return new ApiErrorResponse('disconnect', 'unable to write disconnect event to log');
         }
 
-        return new ApiResponse('disconnect', ['ok' => true]);
+        return new ApiResponse('disconnect');
     }
 
     public function verifyOtp(Request $request)
     {
         // XXX implement me!
-        return new ApiResponse('verify_otp', ['ok' => false]);
+        return new ApiErrorResponse('verify_otp', 'not verified');
     }
 }

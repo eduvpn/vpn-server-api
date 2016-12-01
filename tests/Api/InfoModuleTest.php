@@ -54,41 +54,37 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             [
-                'data' => [
-                    'profile_list' => [
-                        'internet' => [
-                            'defaultGateway' => false,
-                            'routes' => [],
-                            'dns' => [],
-                            'useNat' => false,
-                            'twoFactor' => false,
-                            'clientToClient' => false,
-                            'listen' => '::',
-                            'enableLog' => false,
-                            'enableAcl' => false,
-                            'aclGroupList' => [],
-                            'managementIp' => 'auto',
-                            'blockSmb' => false,
-                            'reject4' => false,
-                            'reject6' => false,
-                            'processCount' => 4,
-                            'aclGroupProvider' => 'StaticProvider',
-                            'portShare' => true,
-                            'hideProfile' => false,
-                            'profileNumber' => 1,
-                            'displayName' => 'Internet Access',
-                            'extIf' => 'eth0',
-                            'range' => '10.0.0.0/24',
-                            'range6' => 'fd00:4242:4242::/48',
-                            'hostName' => 'vpn.example',
-                        ],
-                    ],
+                'internet' => [
+                    'defaultGateway' => false,
+                    'routes' => [],
+                    'dns' => [],
+                    'useNat' => false,
+                    'twoFactor' => false,
+                    'clientToClient' => false,
+                    'listen' => '::',
+                    'enableLog' => false,
+                    'enableAcl' => false,
+                    'aclGroupList' => [],
+                    'managementIp' => 'auto',
+                    'blockSmb' => false,
+                    'reject4' => false,
+                    'reject6' => false,
+                    'processCount' => 4,
+                    'aclGroupProvider' => 'StaticProvider',
+                    'portShare' => true,
+                    'hideProfile' => false,
+                    'profileNumber' => 1,
+                    'displayName' => 'Internet Access',
+                    'extIf' => 'eth0',
+                    'range' => '10.0.0.0/24',
+                    'range6' => 'fd00:4242:4242::/48',
+                    'hostName' => 'vpn.example',
                 ],
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
                 'GET',
-                '/profile_list',
+                'profile_list',
                 [],
                 []
             )
@@ -103,8 +99,8 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                     'SERVER_PORT' => 80,
                     'SERVER_NAME' => 'vpn.example',
                     'REQUEST_METHOD' => $requestMethod,
-                    'PATH_INFO' => $pathInfo,
-                    'REQUEST_URI' => $pathInfo,
+                    'PATH_INFO' => sprintf('/%s', $pathInfo),
+                    'REQUEST_URI' => sprintf('/%s', $pathInfo),
                     'PHP_AUTH_USER' => $basicAuth[0],
                     'PHP_AUTH_PW' => $basicAuth[1],
                 ],
@@ -113,6 +109,16 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
             )
         );
 
-        return json_decode($response->getBody(), true);
+        $responseArray = json_decode($response->getBody(), true)[$pathInfo];
+        if ($responseArray['ok']) {
+            if (array_key_exists('data', $responseArray)) {
+                return $responseArray['data'];
+            }
+
+            return true;
+        }
+
+        // in case of errors...
+        return $responseArray;
     }
 }
