@@ -113,7 +113,8 @@ try {
 
     $service->addModule(
         new OpenVpnModule(
-            new ServerManager($config, new ManagementSocket(), $logger)
+            new ServerManager($config, new ManagementSocket(), $logger),
+            $storage
         )
     );
 
