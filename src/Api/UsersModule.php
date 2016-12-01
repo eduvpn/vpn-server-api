@@ -60,8 +60,8 @@ class UsersModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $totpSecret = InputValidation::totpSecret($request->getPostParameter('totp_secret'));
-                $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
+                $totpSecret = InputValidation::otpSecret($request->getPostParameter('totp_secret'));
+                $totpKey = InputValidation::otpKey($request->getPostParameter('totp_key'));
 
                 $otp = new Otp();
                 if (false === $otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
@@ -85,7 +85,7 @@ class UsersModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
+                $totpKey = InputValidation::otpKey($request->getPostParameter('totp_key'));
 
                 // XXX what to do if user does not have one?
                 $totpSecret = $this->storage->getTotpSecret($userId);
