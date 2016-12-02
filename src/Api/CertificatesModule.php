@@ -123,5 +123,16 @@ class CertificatesModule implements ServiceModuleInterface
                 return new ApiResponse('list_client_certificates', $this->storage->getCertificates($userId));
             }
         );
+
+        $service->get(
+            '/client_certificate_info',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
+
+                $commonName = InputValidation::commonName($request->getQueryParameter('common_name'));
+
+                return new ApiResponse('client_certificate_info', $this->storage->getUserCertificateInfo($commonName));
+            }
+        );
     }
 }
