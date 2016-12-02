@@ -18,6 +18,8 @@
 
 namespace SURFnet\VPN\Server\Api;
 
+use Base32\Base32;
+use Otp\Otp;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\ApiErrorResponse;
 use SURFnet\VPN\Common\Http\ApiResponse;
@@ -165,7 +167,29 @@ class ConnectionsModule implements ServiceModuleInterface
 
     public function verifyOtp(Request $request)
     {
-        // XXX implement me!
-        return new ApiErrorResponse('verify_otp', 'not verified');
+        $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
+        // we do not need 'otp_type', as only 'totp' is supported at the moment
+        InputValidation::otpType($request->getPostParameter('otp_type'));
+        $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
+
+        $certInfo = $this->storage->getUserCertificateInfo($commonName);
+        $userId = $certInfo['user_id'];
+
+        if (!$this->storage->hasTotpSecret($userId)) {
+            return new ApiErrorResponse('verify_otp', 'user has no OTP secret');
+        }
+
+        $totpSecret = $this->storage->getTotpSecret($userId);
+
+        $otp = new Otp();
+        if (!$otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
+            return new ApiErrorResponse('verify_otp', 'invalid OTP key');
+        }
+
+        if (false === $this->storage->recordTotpKey($userId, $totpKey, time())) {
+            return new ApiErrorResponse('verify_otp', 'OTP key replay');
+        }
+
+        return new ApiResponse('verify_otp');
     }
 }

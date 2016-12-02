@@ -182,9 +182,14 @@ class Storage
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->bindValue(':totp_secret', $totpSecret, PDO::PARAM_STR);
 
-        $stmt->execute();
+        try {
+            $stmt->execute();
+        } catch (PDOException $e) {
+            // unable to add the TOTP secret, probably uniqueness contrains
+            return false;
+        }
 
-        return 1 === $stmt->rowCount();
+        return true;
     }
 
     public function deleteTotpSecret($externalUserId)

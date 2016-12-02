@@ -60,8 +60,8 @@ class UsersModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $totpSecret = InputValidation::otpSecret($request->getPostParameter('totp_secret'));
-                $totpKey = InputValidation::otpKey($request->getPostParameter('totp_key'));
+                $totpSecret = InputValidation::totpSecret($request->getPostParameter('totp_secret'));
+                $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
 
                 $otp = new Otp();
                 if (false === $otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
@@ -72,7 +72,10 @@ class UsersModule implements ServiceModuleInterface
                 // XXX use DateTime here, easier for testing
 
                 // XXX check if all these things worked!
-                $this->storage->recordTotpKey($userId, $totpKey, time());
+
+                if (false === $this->storage->recordTotpKey($userId, $totpKey, time())) {
+                    return new ApiErrorResponse('set_totp_secret', 'OTP key replay');
+                }
                 $this->storage->setTotpSecret($userId, $totpSecret);
 
                 return new ApiResponse('set_totp_secret');
@@ -85,9 +88,11 @@ class UsersModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $totpKey = InputValidation::otpKey($request->getPostParameter('totp_key'));
+                $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
 
-                // XXX what to do if user does not have one?
+                if (!$this->storage->hasTotpSecret($userId)) {
+                    return new ApiErrorResponse('verify_totp_key', 'user has no OTP secret');
+                }
                 $totpSecret = $this->storage->getTotpSecret($userId);
 
                 $otp = new Otp();

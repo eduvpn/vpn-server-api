@@ -18,6 +18,8 @@
 
 namespace SURFnet\VPN\Server\Api;
 
+use Base32\Base32;
+use Otp\Otp;
 use PDO;
 use PHPUnit_Framework_TestCase;
 use SURFnet\VPN\Common\Config;
@@ -43,6 +45,7 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
         );
         $storage->init();
         $storage->addCertificate('foo', '12345678901234567890123456789012', '12345678901234567890123456789012', 12345678, 23456789);
+        $storage->setTotpSecret('foo', 'CN2XAL23SIFTDFXZ');
         $storage->clientConnect('internet', '12345678901234567890123456789012', '10.10.10.10', 'fd00:4242:4242:4242::', 12345678);
 
         $config = Config::fromFile(sprintf('%s/data/config.yaml', __DIR__));
@@ -150,6 +153,27 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
                     'connected_at' => 12345678,
                     'disconnected_at' => 23456789,
                     'bytes_transferred' => 2222222,
+                ]
+            )
+        );
+    }
+
+    public function testVerifyOtp()
+    {
+        $otp = new Otp();
+        $totpSecret = 'CN2XAL23SIFTDFXZ';
+        $totpKey = $otp->totp(Base32::decode($totpSecret));
+
+        $this->assertTrue(
+            $this->makeRequest(
+                ['vpn-server-node', 'aabbcc'],
+                'POST',
+                'verify_otp',
+                [],
+                [
+                    'common_name' => '12345678901234567890123456789012',
+                    'otp_type' => 'totp',
+                    'totp_key' => $totpKey,
                 ]
             )
         );
