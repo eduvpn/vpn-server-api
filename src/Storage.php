@@ -67,8 +67,11 @@ class Storage
                 u.is_disabled AS user_is_disabled,
                 c.display_name AS display_name,
                 c.is_disabled AS certificate_is_disabled 
-             FROM users u, certificates c 
-             WHERE c.common_name = :common_name'
+             FROM 
+                users u, certificates c 
+             WHERE 
+                u.user_id = c.user_id AND 
+                c.common_name = :common_name'
         );
 
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
@@ -341,9 +344,12 @@ class Storage
     public function getAllLogEntries()
     {
         $stmt = $this->db->prepare(
-            'SELECT c.user_id, l.common_name, l.connected_at, l.disconnected_at, l.bytes_transferred
-             FROM connection_log l, certificates c
-             WHERE c.common_name = l.common_name'
+            'SELECT 
+                 c.user_id, l.common_name, l.connected_at, l.disconnected_at, l.bytes_transferred
+             FROM 
+                 connection_log l, certificates c
+             WHERE 
+                 c.common_name = l.common_name'
         );
 
         $stmt->execute();

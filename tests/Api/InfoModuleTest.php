@@ -23,7 +23,6 @@ use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
 
 class InfoModuleTest extends PHPUnit_Framework_TestCase
 {
