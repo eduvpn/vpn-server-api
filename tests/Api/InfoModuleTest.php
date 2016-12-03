@@ -70,7 +70,6 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                     'reject4' => false,
                     'reject6' => false,
                     'processCount' => 4,
-                    'aclGroupProvider' => 'StaticProvider',
                     'portShare' => true,
                     'hideProfile' => false,
                     'profileNumber' => 1,
