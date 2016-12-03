@@ -1,0 +1,19 @@
+HTTP/1.1 401 Unauthorized
+Date: Sat, 03 Dec 2016 16:14:40 GMT
+Server: Apache-Coyote/1.1
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1; mode=block
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Cache-Control: no-store
+Pragma: no-cache
+WWW-Authenticate: Bearer realm="groups", error="invalid_token", error_description="12f80570-55e4-4384-a7dd-f185e6bc50b8"
+Content-Type: application/json;charset=UTF-8
+Connection: close
+Transfer-Encoding: chunked
+Strict-Transport-Security: max-age=15768000
+Set-Cookie: HTTPSERVERID=JAPP1; path=/; HttpOnly; Secure
+
+{"error":"invalid_token","error_description":"12f80570-55e4-4384-a7dd-f185e6bc50b8"}

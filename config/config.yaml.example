@@ -104,10 +104,6 @@ vpnProfiles:
         # DEFAULT  = []        
         aclGroupList: []
 
-        # The provider to use for retrieving group membership
-        # DEFAULT = StaticProvider
-        aclGroupProvider: StaticProvider
-
         # Whether or not to block Samba/CIFS traffic to the Internet
         # DEFAULT = false
         blockSmb: false
@@ -122,19 +118,19 @@ vpnProfiles:
         # DEFAULT = false
         hideProfile: false
 
-groupProviders:
-    # Static Configuration
-    StaticProvider:
-        all:
-            displayName: All
-            members: [foo, bar]
-        students:
-            displayName: Students
-            members: [foo]
-        employees:
-            displayName: Employees
-            members: [bar]
-    # An extensible protocol for dynamic exchange of group and authorization 
-    # data (http://openvoot.org)
-    VootProvider:
-        apiUrl: 'https://voot.surfconext.nl/me/groups'
+#groupProviders:
+#    StaticProvider:
+#        all:
+#            displayName: All
+#            members: [foo, bar]
+#        students:
+#            displayName: Students
+#            members: [foo]
+#        employees:
+#            displayName: Employees
+#            members: [bar]
+#
+#    # An extensible protocol for dynamic exchange of group and authorization 
+#    # data (http://openvoot.org)
+#    VootProvider:
+#        apiUrl: 'https://voot.surfconext.nl/me/groups'

@@ -17,6 +17,7 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
+use GuzzleHttp\Client;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
@@ -24,6 +25,8 @@ use SURFnet\VPN\Common\Http\Response;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Common\Random;
+use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
+use SURFnet\VPN\Server\Acl\Provider\VootProvider;
 use SURFnet\VPN\Server\Api\CertificatesModule;
 use SURFnet\VPN\Server\Api\ConnectionsModule;
 use SURFnet\VPN\Server\Api\InfoModule;
@@ -73,13 +76,23 @@ try {
 
     $groupProviders = [];
     if ($config->e('groupProviders')) {
-        foreach (array_keys($config->v('groupProviders')) as $groupProviderId) {
-            $groupProviderClass = sprintf('SURFnet\VPN\Server\Acl\Provider\%s', $groupProviderId);
-            $groupProviders[] = new $groupProviderClass(
+        $enabledProviders = array_keys($config->v('groupProviders'));
+        // StaticProvider
+        if (in_array('StaticProvider', $enabledProviders)) {
+            $groupProviders[] = new StaticProvider(
                 new Config(
-                    $config->v('groupProviders', $groupProviderId)
+                    $config->v('groupProviders', 'StaticProvider')
+                )
+            );
+        }
+        // VootProvider
+        if (in_array('VootProvider', $enabledProviders)) {
+            $groupProviders[] = new VootProvider(
+                new Config(
+                    $config->v('groupProviders', 'VootProvider')
                 ),
-                $dataDir
+                $storage,
+                new Client()
             );
         }
     }

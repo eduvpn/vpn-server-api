@@ -22,19 +22,24 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\Acl\ProviderInterface;
+use SURFnet\VPN\Server\Storage;
 
 class VootProvider implements ProviderInterface
 {
     /** @var \SURFnet\VPN\Common\Config */
     private $config;
 
-    /** @var string */
-    private $dataDir;
+    /** @var \SURFnet\VPN\Server\Storage */
+    private $storage;
 
-    public function __construct(Config $config, $dataDir)
+    /** @var \GuzzleHttp\Client */
+    private $client;
+
+    public function __construct(Config $config, Storage $storage, Client $client)
     {
         $this->config = $config;
-        $this->dataDir = $dataDir;
+        $this->storage = $storage;
+        $this->client = $client;
     }
 
     /**
@@ -47,21 +52,21 @@ class VootProvider implements ProviderInterface
      */
     public function getGroups($userId)
     {
-        if (false === $bearerToken = @file_get_contents(sprintf('%s/users/voot_tokens/%s', $this->dataDir, $userId))) {
+        // XXX combine this request with get to not require 2 queries
+        if (!$this->storage->hasVootToken($userId)) {
             return [];
         }
 
         // fetch the groups and extract the membership data
         return self::extractMembership(
-            $this->fetchGroups($bearerToken)
+            $this->fetchGroups($this->storage->getVootToken($userId))
         );
     }
 
     private function fetchGroups($bearerToken)
     {
-        $httpClient = new Client();
         try {
-            return $httpClient->get(
+            return $this->client->get(
                 $this->config->v('apiUrl'),
                 [
                     'headers' => [

@@ -104,6 +104,20 @@ class Storage
         return $userId;
     }
 
+    public function getVootToken($externalUserId)
+    {
+        $userId = $this->getUserId($externalUserId);
+        $stmt = $this->db->prepare(
+            'SELECT voot_token
+             FROM voot_tokens
+             WHERE user_id = :user_id'
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetchColumn();
+    }
+
     public function setVootToken($externalUserId, $vootToken)
     {
         $userId = $this->getUserId($externalUserId);
