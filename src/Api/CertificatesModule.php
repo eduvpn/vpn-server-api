@@ -114,13 +114,13 @@ class CertificatesModule implements ServiceModuleInterface
         );
 
         $service->get(
-            '/list_client_certificates',
+            '/client_certificate_list',
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
                 $userId = InputValidation::userId($request->getQueryParameter('user_id'));
 
-                return new ApiResponse('list_client_certificates', $this->storage->getCertificates($userId));
+                return new ApiResponse('client_certificate_list', $this->storage->getCertificates($userId));
             }
         );
 
