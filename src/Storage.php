@@ -349,7 +349,11 @@ class Storage
              FROM 
                  connection_log l, certificates c
              WHERE 
-                 c.common_name = l.common_name'
+                 c.common_name = l.common_name
+             AND
+                 l.disconnected_at IS NOT NULL
+             ORDER BY
+                 l.connected_at'
         );
 
         $stmt->execute();

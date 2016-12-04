@@ -84,7 +84,9 @@ class Stats
             }
         }
 
+        ksort($timeConnection);
         $maxConcurrentConnections = 0;
+        $maxConcurrentConnectionsTime = 0;
         $concurrentConnections = 0;
         foreach ($timeConnection as $unixTime => $eventArray) {
             foreach ($eventArray as $event) {
@@ -92,6 +94,7 @@ class Stats
                     ++$concurrentConnections;
                     if ($concurrentConnections > $maxConcurrentConnections) {
                         $maxConcurrentConnections = $concurrentConnections;
+                        $maxConcurrentConnectionsTime = $unixTime;
                     }
                 } else {
                     --$concurrentConnections;
@@ -114,6 +117,7 @@ class Stats
             'total_traffic' => $totalTraffic,
             'generated_at' => $this->now->getTimestamp(),
             'max_concurrent_connections' => $maxConcurrentConnections,
+            'max_concurrent_connections_time' => $maxConcurrentConnectionsTime,
             'unique_user_count' => count($uniqueUsers),
             'active_user_count' => $activeUserCount,
         ];
