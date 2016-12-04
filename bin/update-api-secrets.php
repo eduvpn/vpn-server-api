@@ -56,7 +56,7 @@ try {
     $configData['apiConsumers']['vpn-user-portal'] = $credentials['vpn-user-portal'];
     $configData['apiConsumers']['vpn-admin-portal'] = $credentials['vpn-admin-portal'];
     $configData['apiConsumers']['vpn-server-node'] = $credentials['vpn-server-node'];
-    Config::toFile($configFile, $configData);
+    Config::toFile($configFile, $configData, 0644);
 
     // consumers
     $consumerConfigFiles = [
@@ -70,7 +70,7 @@ try {
             $config = Config::fromFile($configFile);
             $configData = $config->v();
             $configData['apiProviders']['vpn-server-api']['userPass'] = $credentials[$configId];
-            Config::toFile($configFile, $configData);
+            Config::toFile($configFile, $configData, 0644);
         }
     }
 } catch (Exception $e) {
