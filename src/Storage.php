@@ -80,7 +80,7 @@ class Storage
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    private function getUserId($externalUserId)
+    private function getInternalUserId($externalUserId)
     {
         $stmt = $this->db->prepare(
             'SELECT user_id
@@ -109,7 +109,7 @@ class Storage
 
     public function getVootToken($externalUserId)
     {
-        $userId = $this->getUserId($externalUserId);
+        $userId = $this->getInternalUserId($externalUserId);
         $stmt = $this->db->prepare(
             'SELECT voot_token
              FROM voot_tokens
@@ -123,7 +123,7 @@ class Storage
 
     public function setVootToken($externalUserId, $vootToken)
     {
-        $userId = $this->getUserId($externalUserId);
+        $userId = $this->getInternalUserId($externalUserId);
         $stmt = $this->db->prepare(
             'INSERT INTO voot_tokens (user_id, voot_token) VALUES(:user_id, :voot_token)'
         );
@@ -137,7 +137,7 @@ class Storage
 
     public function hasVootToken($externalUserId)
     {
-        $userId = $this->getUserId($externalUserId);
+        $userId = $this->getInternalUserId($externalUserId);
         $stmt = $this->db->prepare(
             'SELECT COUNT(*)
              FROM voot_tokens
@@ -151,7 +151,7 @@ class Storage
 
     public function deleteVootToken($externalUserId)
     {
-        $userId = $this->getUserId($externalUserId);
+        $userId = $this->getInternalUserId($externalUserId);
         $stmt = $this->db->prepare(
             'DELETE FROM voot_tokens WHERE user_id = :user_id'
         );
@@ -164,7 +164,7 @@ class Storage
 
     public function hasTotpSecret($externalUserId)
     {
-        $userId = $this->getUserId($externalUserId);
+        $userId = $this->getInternalUserId($externalUserId);
         $stmt = $this->db->prepare(
             'SELECT COUNT(*)
              FROM totp_secrets
@@ -178,7 +178,7 @@ class Storage
 
     public function getTotpSecret($externalUserId)
     {
-        $userId = $this->getUserId($externalUserId);
+        $userId = $this->getInternalUserId($externalUserId);
         $stmt = $this->db->prepare(
             'SELECT totp_secret
              FROM totp_secrets
@@ -192,7 +192,7 @@ class Storage
 
     public function setTotpSecret($externalUserId, $totpSecret)
     {
-        $userId = $this->getUserId($externalUserId);
+        $userId = $this->getInternalUserId($externalUserId);
         $stmt = $this->db->prepare(
             'INSERT INTO totp_secrets (user_id, totp_secret) VALUES(:user_id, :totp_secret)'
         );
@@ -211,7 +211,7 @@ class Storage
 
     public function deleteTotpSecret($externalUserId)
     {
-        $userId = $this->getUserId($externalUserId);
+        $userId = $this->getInternalUserId($externalUserId);
         $stmt = $this->db->prepare(
             'DELETE FROM totp_secrets WHERE user_id = :user_id'
         );
@@ -236,7 +236,7 @@ class Storage
 
     public function addCertificate($externalUserId, $commonName, $displayName, $validFrom, $validTo)
     {
-        $userId = $this->getUserId($externalUserId);
+        $userId = $this->getInternalUserId($externalUserId);
         $stmt = $this->db->prepare(
             'INSERT INTO certificates (common_name, user_id, display_name, valid_from, valid_to) VALUES(:common_name, :user_id, :display_name, :valid_from, :valid_to)'
         );
@@ -253,7 +253,7 @@ class Storage
 
     public function getCertificates($externalUserId)
     {
-        $userId = $this->getUserId($externalUserId);
+        $userId = $this->getInternalUserId($externalUserId);
         $stmt = $this->db->prepare(
             'SELECT common_name, display_name, valid_from, valid_to, is_disabled
              FROM certificates
@@ -357,15 +357,17 @@ class Storage
     {
         $stmt = $this->db->prepare(
             'SELECT 
-                 c.user_id, l.common_name, l.connected_at, l.disconnected_at, l.bytes_transferred
+                 external_user_id AS user_id, 
+                 common_name, 
+                 connected_at, 
+                 disconnected_at, 
+                 bytes_transferred
              FROM 
-                 connection_log l, certificates c
-             WHERE 
-                 c.common_name = l.common_name
-             AND
-                 l.disconnected_at IS NOT NULL
+                 connection_log
+             WHERE
+                 disconnected_at IS NOT NULL
              ORDER BY
-                 l.connected_at'
+                 connected_at'
         );
 
         $stmt->execute();
@@ -377,6 +379,7 @@ class Storage
     {
         $stmt = $this->db->prepare(
             'INSERT INTO connection_log (
+                external_user_id,
                 profile_id,
                 common_name,
                 ip4,
@@ -384,6 +387,16 @@ class Storage
                 connected_at
              ) 
              VALUES(
+                (
+                    SELECT
+                        u.external_user_id
+                    FROM 
+                        users u, certificates c
+                    WHERE
+                        u.user_id = c.user_id
+                    AND
+                        c.common_name = :common_name
+                ),                
                 :profile_id, 
                 :common_name,
                 :ip4,
@@ -435,7 +448,7 @@ class Storage
     public function getLogEntry($dateTimeUnix, $ipAddress)
     {
         $stmt = $this->db->prepare(
-            'SELECT profile_id, common_name, ip4, ip6, connected_at, disconnected_at
+            'SELECT external_user_id, profile_id, common_name, ip4, ip6, connected_at, disconnected_at
              FROM connection_log
              WHERE
                 (ip4 = :ip_address OR ip6 = :ip_address)
@@ -451,7 +464,7 @@ class Storage
 
     public function recordTotpKey($externalUserId, $totpKey, $timeUnix)
     {
-        $userId = $this->getUserId($externalUserId);
+        $userId = $this->getInternalUserId($externalUserId);
         $stmt = $this->db->prepare(
             'INSERT INTO totp_log (
                 user_id,
@@ -484,7 +497,10 @@ class Storage
         $stmt = $this->db->prepare(
             sprintf(
                 'DELETE FROM connection_log
-                    WHERE connected_at < :time_unix'
+                 WHERE
+                     connected_at < :time_unix
+                 AND
+                     disconnected_at IS NOT NULL'
             )
         );
 
@@ -568,7 +584,8 @@ class Storage
                 user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
             )',
             'CREATE TABLE IF NOT EXISTS connection_log (
-                common_name VARCHAR(255) NOT NULL REFERENCES certificates(common_name),
+                external_user_id VARCHAR(255) NOT NULL,
+                common_name VARCHAR(255) NOT NULL,
                 profile_id VARCHAR(255) NOT NULL,
                 ip4 VARCHAR(255) NOT NULL,
                 ip6 VARCHAR(255) NOT NULL,

@@ -48,11 +48,6 @@ class LogModule implements ServiceModuleInterface
 
                 $logData = $this->storage->getLogEntry($dateTime, $ipAddress);
 
-                foreach ($logData as $k => $v) {
-                    $certInfo = $this->storage->getUserCertificateInfo($v['common_name']);
-                    $logData[$k] = array_merge($logData[$k], $certInfo);
-                }
-
                 return new ApiResponse('log', $logData);
             }
         );
