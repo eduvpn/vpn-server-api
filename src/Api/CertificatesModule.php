@@ -92,6 +92,17 @@ class CertificatesModule implements ServiceModuleInterface
         );
 
         $service->post(
+            '/delete_client_certificate',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+
+                $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
+
+                return new ApiResponse('delete_client_certificate', $this->storage->deleteCertificate($commonName));
+            }
+        );
+
+        $service->post(
             '/disable_client_certificate',
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);

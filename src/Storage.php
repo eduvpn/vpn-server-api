@@ -288,6 +288,18 @@ class Storage
         return 1 === $stmt->rowCount();
     }
 
+    public function deleteCertificate($commonName)
+    {
+        $stmt = $this->db->prepare(
+            'DELETE FROM certificates WHERE common_name = :common_name'
+        );
+        $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
+
+        $stmt->execute();
+
+        return 1 === $stmt->rowCount();
+    }
+
     public function enableCertificate($commonName)
     {
         $stmt = $this->db->prepare(
