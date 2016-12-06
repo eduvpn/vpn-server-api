@@ -42,7 +42,7 @@ try {
     $storage = new Storage($db);
 
     $storage->cleanConnectionLog(strtotime('now -32 days'));
-    $storage->cleanTotpLog(new DateTime('now -1 minute'));
+    $storage->cleanTotpLog(new DateTime('now -5 minutes'));
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
