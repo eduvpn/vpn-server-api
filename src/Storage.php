@@ -18,6 +18,7 @@
 
 namespace SURFnet\VPN\Server;
 
+use DateTime;
 use PDO;
 use PDOException;
 
@@ -605,21 +606,21 @@ SQL
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function recordTotpKey($userId, $totpKey, $timeUnix)
+    public function recordTotpKey($userId, $totpKey, DateTime $dateTime)
     {
         $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     INSERT INTO totp_log 
-        (user_id, totp_key, time_unix)
+        (user_id, totp_key, date_time)
     VALUES
-        (:user_id, :totp_key, :time_unix)
+        (:user_id, :totp_key, :date_time)
 SQL
         );
 
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->bindValue(':totp_key', $totpKey, PDO::PARAM_STR);
-        $stmt->bindValue(':time_unix', $timeUnix, PDO::PARAM_INT);
+        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
 
         try {
             $stmt->execute();
@@ -640,7 +641,7 @@ SQL
     WHERE
         connected_at < :time_unix
     AND
-        disconnected_at IS NOT NULL'
+        disconnected_at IS NOT NULL
 SQL
         );
 
@@ -649,18 +650,18 @@ SQL
         return $stmt->execute();
     }
 
-    public function cleanTotpLog($timeUnix)
+    public function cleanTotpLog(DateTime $dateTime)
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
     DELETE FROM 
         totp_log
     WHERE 
-        time_unix < :time_unix'
+        date_time < :date_time
 SQL
         );
 
-        $stmt->bindValue(':time_unix', $timeUnix, PDO::PARAM_INT);
+        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
 
         return $stmt->execute();
     }
@@ -757,7 +758,7 @@ SQL;
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS totp_log (
         totp_key VARCHAR(255) NOT NULL,
-        time_unix INTEGER NOT NULL,
+        date_time DATETIME NOT NULL,
         user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         UNIQUE (user_id, totp_key)
     )

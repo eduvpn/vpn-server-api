@@ -19,6 +19,7 @@
 namespace SURFnet\VPN\Server\Api;
 
 use Base32\Base32;
+use DateTime;
 use Otp\Otp;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\ApiErrorResponse;
@@ -137,7 +138,7 @@ class ConnectionsModule implements ServiceModuleInterface
             return new ApiErrorResponse('verify_otp', 'invalid OTP key');
         }
 
-        if (false === $this->storage->recordTotpKey($userId, $totpKey, time())) {
+        if (false === $this->storage->recordTotpKey($userId, $totpKey, new DateTime('now'))) {
             return new ApiErrorResponse('verify_otp', 'OTP key replay');
         }
 

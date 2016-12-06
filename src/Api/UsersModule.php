@@ -19,6 +19,7 @@
 namespace SURFnet\VPN\Server\Api;
 
 use Base32\Base32;
+use DateTime;
 use Otp\Otp;
 use SURFnet\VPN\Common\Http\ApiErrorResponse;
 use SURFnet\VPN\Common\Http\ApiResponse;
@@ -73,7 +74,7 @@ class UsersModule implements ServiceModuleInterface
 
                 // XXX check if all these things worked!
 
-                if (false === $this->storage->recordTotpKey($userId, $totpKey, time())) {
+                if (false === $this->storage->recordTotpKey($userId, $totpKey, new DateTime('now'))) {
                     return new ApiErrorResponse('set_totp_secret', 'OTP key replay');
                 }
                 $this->storage->setTotpSecret($userId, $totpSecret);
@@ -100,7 +101,7 @@ class UsersModule implements ServiceModuleInterface
                     return new ApiErrorResponse('verify_totp_key', 'invalid OTP key');
                 }
 
-                if (false === $this->storage->recordTotpKey($userId, $totpKey, time())) {
+                if (false === $this->storage->recordTotpKey($userId, $totpKey, new DateTime('now'))) {
                     return new ApiErrorResponse('verify_totp_key', 'OTP key replay');
                 }
 
