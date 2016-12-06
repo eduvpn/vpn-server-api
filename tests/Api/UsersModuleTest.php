@@ -19,6 +19,7 @@
 namespace SURFnet\VPN\Server\Api;
 
 use Base32\Base32;
+use DateTime;
 use Otp\Otp;
 use PDO;
 use PHPUnit_Framework_TestCase;
@@ -36,19 +37,21 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $random = $this->getMockBuilder('SURFnet\VPN\Common\RandomInterface')->getMock();
-        $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
-
         $storage = new Storage(
-            new PDO('sqlite::memory:'),
-            $random
+            new PDO('sqlite::memory:')
         );
         $storage->init();
 
         $storage->addCertificate('foo', 'abcd1234', 'ABCD1234', 12345678, 23456789);
+
         $storage->disableUser('bar');
         $storage->setTotpSecret('bar', 'CN2XAL23SIFTDFXZ');
         $storage->setVootToken('bar', '123456');
+
+        // user "baz" has a secret, and already used a key for replay testing
+        $storage->setTotpSecret('baz', 'SWIXJ4V7VYALWH6E');
+        $otp = new Otp();
+        $storage->recordTotpKey('baz', $otp->totp(Base32::decode('SWIXJ4V7VYALWH6E')), new DateTime('now'));
 
         $config = Config::fromFile(sprintf('%s/data/user_groups_config.yaml', __DIR__));
         $groupProviders = [
@@ -86,6 +89,10 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                 [
                     'user_id' => 'bar',
                     'is_disabled' => true,
+                ],
+                [
+                    'user_id' => 'baz',
+                    'is_disabled' => false,
                 ],
             ],
             $this->makeRequest(
@@ -133,6 +140,54 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                 [],
                 [
                     'user_id' => 'bar',
+                    'totp_key' => $totpKey,
+                ]
+            )
+        );
+    }
+
+    public function testVerifyOtpKeyWrong()
+    {
+        $otp = new Otp();
+        $totpSecret = 'CN2XAL23SIFTDFXZ';
+
+        // in theory this totp_key, 123456 could be correct at one point in
+        // time... then this test will fail!
+        $this->assertSame(
+            [
+                'ok' => false,
+                'error' => 'invalid OTP key',
+            ],
+            $this->makeRequest(
+                ['vpn-user-portal', 'aabbcc'],
+                'POST',
+                'verify_totp_key',
+                [],
+                [
+                    'user_id' => 'bar',
+                    'totp_key' => '123456',
+                ]
+            )
+        );
+    }
+
+    public function testVerifyOtpKeyReplay()
+    {
+        $otp = new Otp();
+        $totpKey = $otp->totp(Base32::decode('SWIXJ4V7VYALWH6E'));
+
+        $this->assertSame(
+            [
+                'ok' => false,
+                'error' => 'OTP key replay',
+            ],
+            $this->makeRequest(
+                ['vpn-user-portal', 'aabbcc'],
+                'POST',
+                'verify_totp_key',
+                [],
+                [
+                    'user_id' => 'baz',
                     'totp_key' => $totpKey,
                 ]
             )

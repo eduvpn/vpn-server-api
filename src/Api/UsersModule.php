@@ -70,11 +70,10 @@ class UsersModule implements ServiceModuleInterface
                     return new ApiErrorResponse('set_totp_secret', 'invalid OTP key');
                 }
 
-                // XXX use DateTime here, easier for testing
-
-                // XXX check if all these things worked!
-
+                // record the key that was used for validation to avoid replay
                 if (false === $this->storage->recordTotpKey($userId, $totpKey, new DateTime('now'))) {
+                    // this SHOULD never happen as the user does not have a TOTP
+                    // secret yet!
                     return new ApiErrorResponse('set_totp_secret', 'OTP key replay');
                 }
                 $this->storage->setTotpSecret($userId, $totpSecret);
