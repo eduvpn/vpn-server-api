@@ -98,6 +98,52 @@ class ConnectionsModule implements ServiceModuleInterface
         return new ApiResponse('connect');
     }
 
+    public function disconnect(Request $request)
+    {
+        $profileId = InputValidation::profileId($request->getPostParameter('profile_id'));
+        $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
+        $ip4 = InputValidation::ip4($request->getPostParameter('ip4'));
+        $ip6 = InputValidation::ip6($request->getPostParameter('ip6'));
+
+        $connectedAt = InputValidation::connectedAt($request->getPostParameter('connected_at'));
+        $disconnectedAt = InputValidation::disconnectedAt($request->getPostParameter('disconnected_at'));
+        $bytesTransferred = InputValidation::bytesTransferred($request->getPostParameter('bytes_transferred'));
+
+        if (false === $this->storage->clientDisconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)) {
+            return new ApiErrorResponse('disconnect', 'unable to write disconnect event to log');
+        }
+
+        return new ApiResponse('disconnect');
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
+        // we do not need 'otp_type', as only 'totp' is supported at the moment
+        InputValidation::otpType($request->getPostParameter('otp_type'));
+        $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
+
+        $certInfo = $this->storage->getUserCertificateInfo($commonName);
+        $userId = $certInfo['user_id'];
+
+        if (!$this->storage->hasTotpSecret($userId)) {
+            return new ApiErrorResponse('verify_otp', 'user has no OTP secret');
+        }
+
+        $totpSecret = $this->storage->getTotpSecret($userId);
+
+        $otp = new Otp();
+        if (!$otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
+            return new ApiErrorResponse('verify_otp', 'invalid OTP key');
+        }
+
+        if (false === $this->storage->recordTotpKey($userId, $totpKey, time())) {
+            return new ApiErrorResponse('verify_otp', 'OTP key replay');
+        }
+
+        return new ApiResponse('verify_otp');
+    }
+
     private function verifyConnection($profileId, $commonName)
     {
         // verify status of certificate/user
@@ -145,51 +191,5 @@ class ConnectionsModule implements ServiceModuleInterface
         }
 
         return false;
-    }
-
-    public function disconnect(Request $request)
-    {
-        $profileId = InputValidation::profileId($request->getPostParameter('profile_id'));
-        $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
-        $ip4 = InputValidation::ip4($request->getPostParameter('ip4'));
-        $ip6 = InputValidation::ip6($request->getPostParameter('ip6'));
-
-        $connectedAt = InputValidation::connectedAt($request->getPostParameter('connected_at'));
-        $disconnectedAt = InputValidation::disconnectedAt($request->getPostParameter('disconnected_at'));
-        $bytesTransferred = InputValidation::bytesTransferred($request->getPostParameter('bytes_transferred'));
-
-        if (false === $this->storage->clientDisconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)) {
-            return new ApiErrorResponse('disconnect', 'unable to write disconnect event to log');
-        }
-
-        return new ApiResponse('disconnect');
-    }
-
-    public function verifyOtp(Request $request)
-    {
-        $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
-        // we do not need 'otp_type', as only 'totp' is supported at the moment
-        InputValidation::otpType($request->getPostParameter('otp_type'));
-        $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
-
-        $certInfo = $this->storage->getUserCertificateInfo($commonName);
-        $userId = $certInfo['user_id'];
-
-        if (!$this->storage->hasTotpSecret($userId)) {
-            return new ApiErrorResponse('verify_otp', 'user has no OTP secret');
-        }
-
-        $totpSecret = $this->storage->getTotpSecret($userId);
-
-        $otp = new Otp();
-        if (!$otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
-            return new ApiErrorResponse('verify_otp', 'invalid OTP key');
-        }
-
-        if (false === $this->storage->recordTotpKey($userId, $totpKey, time())) {
-            return new ApiErrorResponse('verify_otp', 'OTP key replay');
-        }
-
-        return new ApiResponse('verify_otp');
     }
 }

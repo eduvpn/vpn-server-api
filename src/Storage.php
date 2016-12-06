@@ -34,25 +34,66 @@ class Storage
     {
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->db = $db;
-        // enable foreign keys
+        // enable foreign keys, only for SQLite!
         $this->db->query('PRAGMA foreign_keys = ON');
 
         $this->random = $random;
     }
 
+    public function getId($userId)
+    {
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    SELECT 
+        id
+    FROM 
+        users
+    WHERE user_id = :user_id
+SQL
+        );
+
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+        if (false !== $result = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            return $result['id'];
+        }
+
+        // user does not exist yet, add it
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    INSERT INTO 
+        users (
+            user_id
+        )
+    VALUES (
+        :user_id
+    )
+SQL
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $this->db->lastInsertId('id');
+    }
+
     public function getUsers()
     {
         $stmt = $this->db->prepare(
-            'SELECT external_user_id, is_disabled
-             FROM users'
+<<< 'SQL'
+    SELECT
+        user_id, 
+        is_disabled
+    FROM 
+        users
+SQL
         );
         $stmt->execute();
 
         $userList = [];
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $result) {
             $userList[] = [
-                'user_id' => $result['external_user_id'],
-                'is_disabled' => boolval($result['is_disabled']),
+                'user_id' => $result['user_id'],
+                'is_disabled' => (bool) $result['is_disabled'],
             ];
         }
 
@@ -62,16 +103,18 @@ class Storage
     public function getUserCertificateInfo($commonName)
     {
         $stmt = $this->db->prepare(
-            'SELECT 
-                u.external_user_id AS user_id, 
-                u.is_disabled AS user_is_disabled,
-                c.display_name AS display_name,
-                c.is_disabled AS certificate_is_disabled 
-             FROM 
-                users u, certificates c 
-             WHERE 
-                u.user_id = c.user_id AND 
-                c.common_name = :common_name'
+<<< 'SQL'
+    SELECT 
+        u.user_id AS user_id, 
+        u.is_disabled AS user_is_disabled,
+        c.display_name AS display_name,
+        c.is_disabled AS certificate_is_disabled 
+    FROM 
+        users u, certificates c 
+    WHERE 
+        u.id = c.user_id AND 
+        c.common_name = :common_name
+SQL
         );
 
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
@@ -80,186 +123,221 @@ class Storage
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    private function getInternalUserId($externalUserId)
+    public function getVootToken($userId)
     {
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'SELECT user_id
-             FROM users
-             WHERE external_user_id = :external_user_id'
+<<< 'SQL'
+    SELECT
+        voot_token
+    FROM 
+        voot_tokens
+    WHERE 
+        user_id = :user_id
+SQL
         );
-        $stmt->bindValue(':external_user_id', $externalUserId, PDO::PARAM_STR);
-        $stmt->execute();
-
-        if (false !== $result = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            return $result['user_id'];
-        }
-
-        // user does not exist yet, add it
-        $stmt = $this->db->prepare(
-            'INSERT INTO users (external_user_id, user_id) VALUES(:external_user_id, :user_id)'
-        );
-
-        $userId = $this->random->get(16);
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':external_user_id', $externalUserId, PDO::PARAM_STR);
-        $stmt->execute();
-
-        return $userId;
-    }
-
-    public function getVootToken($externalUserId)
-    {
-        $userId = $this->getInternalUserId($externalUserId);
-        $stmt = $this->db->prepare(
-            'SELECT voot_token
-             FROM voot_tokens
-             WHERE user_id = :user_id'
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchColumn();
     }
 
-    public function setVootToken($externalUserId, $vootToken)
+    public function setVootToken($userId, $vootToken)
     {
-        $userId = $this->getInternalUserId($externalUserId);
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'INSERT INTO voot_tokens (user_id, voot_token) VALUES(:user_id, :voot_token)'
+<<< 'SQL'
+    INSERT INTO voot_tokens 
+        (user_id, voot_token) 
+    VALUES
+        (:user_id, :voot_token)
+SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->bindValue(':voot_token', $vootToken, PDO::PARAM_STR);
 
         $stmt->execute();
 
+        // XXX deal with errors!
         return 1 === $stmt->rowCount();
     }
 
-    public function hasVootToken($externalUserId)
+    public function hasVootToken($userId)
     {
-        $userId = $this->getInternalUserId($externalUserId);
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'SELECT COUNT(*)
-             FROM voot_tokens
-             WHERE user_id = :user_id'
+<<< 'SQL'
+    SELECT
+        COUNT(*)
+    FROM 
+        voot_tokens
+    WHERE 
+        user_id = :user_id
+SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
-        return 1 === intval($stmt->fetchColumn());
+        return 1 === (int) $stmt->fetchColumn();
     }
 
-    public function deleteVootToken($externalUserId)
+    public function deleteVootToken($userId)
     {
-        $userId = $this->getInternalUserId($externalUserId);
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'DELETE FROM voot_tokens WHERE user_id = :user_id'
+<<< 'SQL'
+    DELETE FROM 
+        voot_tokens 
+    WHERE 
+        user_id = :user_id
+SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
 
         $stmt->execute();
-
+        // XXX error handling!
         return 1 === $stmt->rowCount();
     }
 
-    public function hasTotpSecret($externalUserId)
+    public function hasTotpSecret($userId)
     {
-        $userId = $this->getInternalUserId($externalUserId);
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'SELECT COUNT(*)
-             FROM totp_secrets
-             WHERE user_id = :user_id'
+<<< 'SQL'
+    SELECT
+        COUNT(*)
+    FROM 
+        totp_secrets
+    WHERE 
+        user_id = :user_id
+SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
-        return 1 === intval($stmt->fetchColumn());
+        return 1 === (int) $stmt->fetchColumn();
     }
 
-    public function getTotpSecret($externalUserId)
+    public function getTotpSecret($userId)
     {
-        $userId = $this->getInternalUserId($externalUserId);
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'SELECT totp_secret
-             FROM totp_secrets
-             WHERE user_id = :user_id'
+<<< 'SQL'
+    SELECT
+        totp_secret
+    FROM 
+        totp_secrets
+    WHERE 
+        user_id = :user_id
+SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchColumn();
     }
 
-    public function setTotpSecret($externalUserId, $totpSecret)
+    public function setTotpSecret($userId, $totpSecret)
     {
-        $userId = $this->getInternalUserId($externalUserId);
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'INSERT INTO totp_secrets (user_id, totp_secret) VALUES(:user_id, :totp_secret)'
+<<< 'SQL'
+    INSERT INTO totp_secrets 
+        (user_id, totp_secret) 
+    VALUES
+        (:user_id, :totp_secret)
+SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->bindValue(':totp_secret', $totpSecret, PDO::PARAM_STR);
 
         try {
             $stmt->execute();
+
+            return true;
         } catch (PDOException $e) {
             // unable to add the TOTP secret, probably uniqueness contrains
             return false;
         }
-
-        return true;
     }
 
-    public function deleteTotpSecret($externalUserId)
+    public function deleteTotpSecret($userId)
     {
-        $userId = $this->getInternalUserId($externalUserId);
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'DELETE FROM totp_secrets WHERE user_id = :user_id'
+<<< 'SQL'
+    DELETE FROM 
+        totp_secrets 
+    WHERE 
+        user_id = :user_id
+SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
 
         $stmt->execute();
 
+        // XXX error handling?
         return 1 === $stmt->rowCount();
     }
 
-    public function deleteUser($externalUserId)
+    public function deleteUser($userId)
     {
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'DELETE FROM users WHERE external_user_id = :external_user_id'
+<<< 'SQL'
+    DELETE FROM 
+        users 
+    WHERE 
+        id = :user_id
+SQL
         );
-        $stmt->bindValue(':external_user_id', $externalUserId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
 
         $stmt->execute();
-
+        // XXX error handling?
         return 1 === $stmt->rowCount();
     }
 
-    public function addCertificate($externalUserId, $commonName, $displayName, $validFrom, $validTo)
+    public function addCertificate($userId, $commonName, $displayName, $validFrom, $validTo)
     {
-        $userId = $this->getInternalUserId($externalUserId);
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'INSERT INTO certificates (common_name, user_id, display_name, valid_from, valid_to) VALUES(:common_name, :user_id, :display_name, :valid_from, :valid_to)'
+<<< 'SQL'
+    INSERT INTO certificates 
+        (common_name, user_id, display_name, valid_from, valid_to)
+    VALUES
+        (:common_name, :user_id, :display_name, :valid_from, :valid_to)
+SQL
         );
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->bindValue(':display_name', $displayName, PDO::PARAM_STR);
         $stmt->bindValue(':valid_from', $validFrom, PDO::PARAM_INT);
         $stmt->bindValue(':valid_to', $validTo, PDO::PARAM_INT);
 
         $stmt->execute();
-
+        // XXX
         return 1 === $stmt->rowCount();
     }
 
-    public function getCertificates($externalUserId)
+    public function getCertificates($userId)
     {
-        $userId = $this->getInternalUserId($externalUserId);
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'SELECT common_name, display_name, valid_from, valid_to, is_disabled
-             FROM certificates
-             WHERE user_id = :user_id'
+<<< 'SQL'
+    SELECT
+        common_name, 
+        display_name, 
+        valid_from, 
+        valid_to, 
+        is_disabled
+    FROM 
+        certificates
+    WHERE 
+        user_id = :user_id
+SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
         $certificateList = [];
@@ -267,9 +345,9 @@ class Storage
             $certificateList[] = [
                 'common_name' => $result['common_name'],
                 'display_name' => $result['display_name'],
-                'valid_from' => intval($result['valid_from']),
-                'valid_to' => intval($result['valid_to']),
-                'is_disabled' => boolval($result['is_disabled']),
+                'valid_from' => (int) $result['valid_from'],
+                'valid_to' => (int) $result['valid_to'],
+                'is_disabled' => (bool) $result['is_disabled'],
             ];
         }
 
@@ -279,45 +357,72 @@ class Storage
     public function disableCertificate($commonName)
     {
         $stmt = $this->db->prepare(
-            'UPDATE certificates SET is_disabled = 1 WHERE common_name = :common_name'
+<<< 'SQL'
+    UPDATE 
+        certificates 
+    SET 
+        is_disabled = 1 
+    WHERE
+        common_name = :common_name
+SQL
         );
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
 
         $stmt->execute();
-
+        // XXX
         return 1 === $stmt->rowCount();
     }
 
     public function deleteCertificate($commonName)
     {
         $stmt = $this->db->prepare(
-            'DELETE FROM certificates WHERE common_name = :common_name'
+<<< 'SQL'
+    DELETE FROM 
+        certificates 
+    WHERE 
+        common_name = :common_name
+SQL
         );
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
 
         $stmt->execute();
-
+        // XXX
         return 1 === $stmt->rowCount();
     }
 
     public function enableCertificate($commonName)
     {
         $stmt = $this->db->prepare(
-            'UPDATE certificates SET is_disabled = 0 WHERE common_name = :common_name'
+<<< 'SQL'
+    UPDATE 
+        certificates 
+    SET 
+        is_disabled = 0 
+    WHERE 
+        common_name = :common_name
+SQL
         );
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
 
         $stmt->execute();
-
+        // XXX
         return 1 === $stmt->rowCount();
     }
 
-    public function disableUser($externalUserId)
+    public function disableUser($userId)
     {
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'UPDATE users SET is_disabled = 1 WHERE external_user_id = :external_user_id'
+<<< 'SQL'
+    UPDATE
+        users 
+    SET 
+        is_disabled = 1 
+    WHERE 
+        id = :user_id
+SQL
         );
-        $stmt->bindValue(':external_user_id', $externalUserId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
 
         $stmt->execute();
 
@@ -326,12 +431,20 @@ class Storage
         return 1 === $stmt->rowCount();
     }
 
-    public function enableUser($externalUserId)
+    public function enableUser($userId)
     {
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'UPDATE users SET is_disabled = 0 WHERE external_user_id = :external_user_id'
+<<< 'SQL'
+    UPDATE
+        users 
+    SET 
+        is_disabled = 0 
+    WHERE 
+        id = :user_id
+SQL
         );
-        $stmt->bindValue(':external_user_id', $externalUserId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
 
         $stmt->execute();
 
@@ -340,34 +453,44 @@ class Storage
         return 1 === $stmt->rowCount();
     }
 
-    public function isDisabledUser($externalUserId)
+    public function isDisabledUser($userId)
     {
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'SELECT COUNT(*)
-             FROM users
-             WHERE external_user_id = :external_user_id AND is_disabled = 1'
+<<< 'SQL'
+    SELECT
+        COUNT(*)
+    FROM 
+        users
+    WHERE 
+        id = :user_id 
+    AND 
+        is_disabled = 1
+SQL
         );
-        $stmt->bindValue(':external_user_id', $externalUserId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->execute();
 
-        return 1 === intval($stmt->fetchColumn());
+        return 1 === (int) $stmt->fetchColumn();
     }
 
     public function getAllLogEntries()
     {
         $stmt = $this->db->prepare(
-            'SELECT 
-                 external_user_id AS user_id, 
-                 common_name, 
-                 connected_at, 
-                 disconnected_at, 
-                 bytes_transferred
-             FROM 
-                 connection_log
-             WHERE
-                 disconnected_at IS NOT NULL
-             ORDER BY
-                 connected_at'
+<<< 'SQL'
+    SELECT 
+        user_id,
+        common_name, 
+        connected_at, 
+        disconnected_at, 
+        bytes_transferred
+    FROM 
+        connection_log
+    WHERE
+        disconnected_at IS NOT NULL
+    ORDER BY
+        connected_at
+SQL
         );
 
         $stmt->execute();
@@ -377,32 +500,39 @@ class Storage
 
     public function clientConnect($profileId, $commonName, $ip4, $ip6, $connectedAt)
     {
+        // this query is so complex, because we want to store the user_id in the
+        // log as well, not just the common_name... the user may delete the
+        // certificate, or the user account may be deleted...
         $stmt = $this->db->prepare(
-            'INSERT INTO connection_log (
-                external_user_id,
-                profile_id,
-                common_name,
-                ip4,
-                ip6,
-                connected_at
-             ) 
-             VALUES(
-                (
-                    SELECT
-                        u.external_user_id
-                    FROM 
-                        users u, certificates c
-                    WHERE
-                        u.user_id = c.user_id
-                    AND
-                        c.common_name = :common_name
-                ),                
-                :profile_id, 
-                :common_name,
-                :ip4,
-                :ip6,
-                :connected_at
-             )'
+<<< 'SQL'
+    INSERT INTO connection_log 
+        (
+            user_id,
+            profile_id,
+            common_name,
+            ip4,
+            ip6,
+            connected_at
+        ) 
+    VALUES
+        (
+            (
+                SELECT
+                    u.user_id
+                FROM 
+                    users u, certificates c
+                WHERE
+                    u.id = c.user_id
+                AND
+                    c.common_name = :common_name
+            ),                
+            :profile_id, 
+            :common_name,
+            :ip4,
+            :ip6,
+            :connected_at
+        )
+SQL
         );
 
         $stmt->bindValue(':profile_id', $profileId, PDO::PARAM_STR);
@@ -412,24 +542,30 @@ class Storage
         $stmt->bindValue(':connected_at', $connectedAt, PDO::PARAM_INT);
 
         $stmt->execute();
-
+        // XXX
         return 1 === $stmt->rowCount();
     }
 
     public function clientDisconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)
     {
         $stmt = $this->db->prepare(
-            'UPDATE connection_log
-                SET 
-                    disconnected_at = :disconnected_at, 
-                    bytes_transferred = :bytes_transferred
-                WHERE 
-                    profile_id = :profile_id AND
-                    common_name = :common_name AND
-                    ip4 = :ip4 AND
-                    ip6 = :ip6 AND
-                    connected_at = :connected_at
-            '
+<<< 'SQL'
+    UPDATE 
+        connection_log
+    SET 
+        disconnected_at = :disconnected_at, 
+        bytes_transferred = :bytes_transferred
+    WHERE 
+        profile_id = :profile_id 
+    AND
+        common_name = :common_name 
+    AND
+        ip4 = :ip4 
+    AND
+        ip6 = :ip6 
+    AND
+        connected_at = :connected_at
+SQL
         );
 
         $stmt->bindValue(':profile_id', $profileId, PDO::PARAM_STR);
@@ -442,28 +578,31 @@ class Storage
 
         $stmt->execute();
 
+        // XXX
         return 1 === $stmt->rowCount();
     }
 
     public function getLogEntry($dateTimeUnix, $ipAddress)
     {
         $stmt = $this->db->prepare(
-            'SELECT 
-                 external_user_id AS user_id, 
-                 profile_id, 
-                 common_name, 
-                 ip4, 
-                 ip6, 
-                 connected_at, 
-                 disconnected_at
-             FROM
-                 connection_log
-             WHERE
-                (ip4 = :ip_address OR ip6 = :ip_address)
-             AND 
-                connected_at < :date_time_unix
-             AND 
-                (disconnected_at > :date_time_unix OR disconnected_at IS NULL)'
+<<< 'SQL'
+    SELECT 
+        user_id,
+        profile_id, 
+        common_name, 
+        ip4, 
+        ip6, 
+        connected_at, 
+        disconnected_at
+    FROM
+        connection_log
+    WHERE
+        (ip4 = :ip_address OR ip6 = :ip_address)
+    AND 
+        connected_at < :date_time_unix
+    AND 
+        (disconnected_at > :date_time_unix OR disconnected_at IS NULL)
+SQL
         );
         $stmt->bindValue(':ip_address', $ipAddress, PDO::PARAM_STR);
         $stmt->bindValue(':date_time_unix', $dateTimeUnix, PDO::PARAM_STR);
@@ -472,23 +611,19 @@ class Storage
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function recordTotpKey($externalUserId, $totpKey, $timeUnix)
+    public function recordTotpKey($userId, $totpKey, $timeUnix)
     {
-        $userId = $this->getInternalUserId($externalUserId);
+        $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
-            'INSERT INTO totp_log (
-                user_id,
-                totp_key,
-                time_unix
-             ) 
-             VALUES(
-                :user_id, 
-                :totp_key,
-                :time_unix
-             )'
+<<< 'SQL'
+    INSERT INTO totp_log 
+        (user_id, totp_key, time_unix)
+    VALUES
+        (:user_id, :totp_key, :time_unix)
+SQL
         );
 
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->bindValue(':totp_key', $totpKey, PDO::PARAM_STR);
         $stmt->bindValue(':time_unix', $timeUnix, PDO::PARAM_INT);
 
@@ -505,13 +640,14 @@ class Storage
     public function cleanConnectionLog($timeUnix)
     {
         $stmt = $this->db->prepare(
-            sprintf(
-                'DELETE FROM connection_log
-                 WHERE
-                     connected_at < :time_unix
-                 AND
-                     disconnected_at IS NOT NULL'
-            )
+<<< 'SQL'
+    DELETE FROM
+        connection_log
+    WHERE
+        connected_at < :time_unix
+    AND
+        disconnected_at IS NOT NULL'
+SQL
         );
 
         $stmt->bindValue(':time_unix', $timeUnix, PDO::PARAM_INT);
@@ -522,10 +658,12 @@ class Storage
     public function cleanTotpLog($timeUnix)
     {
         $stmt = $this->db->prepare(
-            sprintf(
-                'DELETE FROM totp_log
-                    WHERE time_unix < :time_unix'
-            )
+<<< 'SQL'
+    DELETE FROM 
+        totp_log
+    WHERE 
+        time_unix < :time_unix'
+SQL
         );
 
         $stmt->bindValue(':time_unix', $timeUnix, PDO::PARAM_INT);
@@ -536,7 +674,12 @@ class Storage
     public function motd()
     {
         $stmt = $this->db->prepare(
-            'SELECT motd_message FROM motd'
+<<< 'SQL'
+    SELECT
+        motd_message 
+    FROM 
+        motd
+SQL
         );
 
         $stmt->execute();
@@ -549,7 +692,12 @@ class Storage
         $this->deleteMotd();
 
         $stmt = $this->db->prepare(
-            'INSERT INTO motd (motd_message) VALUES(:motd_message)'
+<<< 'SQL'
+    INSERT INTO motd 
+        (motd_message) 
+    VALUES
+        (:motd_message)
+SQL
         );
 
         $stmt->bindValue(':motd_message', $motdMessage, PDO::PARAM_STR);
@@ -561,7 +709,9 @@ class Storage
     public function deleteMotd()
     {
         $stmt = $this->db->prepare(
-            'DELETE FROM motd'
+<<< 'SQL'
+    DELETE FROM motd
+SQL
         );
 
         $stmt->execute();
@@ -571,48 +721,74 @@ class Storage
 
     public function init()
     {
-        $queryList = [
-            'CREATE TABLE IF NOT EXISTS users (
-                user_id VARCHAR(255) PRIMARY KEY,
-                external_user_id VARCHAR(255) UNIQUE NOT NULL,
-                is_disabled BOOLEAN DEFAULT 0
-            )',
-            'CREATE TABLE IF NOT EXISTS voot_tokens (
-                voot_token VARCHAR(255) NOT NULL PRIMARY KEY,   
-                user_id VARCHAR(255) UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
-            )',
-            'CREATE TABLE IF NOT EXISTS totp_secrets (
-                totp_secret VARCHAR(255) NOT NULL PRIMARY KEY,   
-                user_id VARCHAR(255) UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
-            )',
-            'CREATE TABLE IF NOT EXISTS certificates (
-                common_name VARCHAR(255) NOT NULL PRIMARY KEY,
-                display_name VARCHAR(255) NOT NULL,
-                valid_from INTEGER NOT NULL,
-                valid_to INTEGER NOT NULL,
-                is_disabled BOOLEAN DEFAULT 0,
-                user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
-            )',
-            'CREATE TABLE IF NOT EXISTS connection_log (
-                external_user_id VARCHAR(255) NOT NULL,
-                common_name VARCHAR(255) NOT NULL,
-                profile_id VARCHAR(255) NOT NULL,
-                ip4 VARCHAR(255) NOT NULL,
-                ip6 VARCHAR(255) NOT NULL,
-                connected_at INTEGER NOT NULL,
-                disconnected_at INTEGER DEFAULT NULL,
-                bytes_transferred INTEGER DEFAULT NULL                
-            )',
-            'CREATE TABLE IF NOT EXISTS totp_log (
-                totp_key VARCHAR(255) NOT NULL,
-                time_unix INTEGER NOT NULL,
-                user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-                UNIQUE(user_id, totp_key)
-            )',
-            'CREATE TABLE IF NOT EXISTS motd (
-                motd_message TEXT NOT NULL
-            )',
-        ];
+        $queryList = [];
+        $queryList[] =
+<<< 'SQL'
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        user_id VARCHAR(255) UNIQUE NOT NULL,
+        is_disabled BOOLEAN DEFAULT 0
+    )
+SQL;
+
+        $queryList[] =
+<<< 'SQL'
+    CREATE TABLE IF NOT EXISTS voot_tokens (
+        voot_token VARCHAR(255) UNIQUE NOT NULL,
+        user_id INTEGER UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE
+    )
+SQL;
+
+        $queryList[] =
+<<< 'SQL'
+    CREATE TABLE IF NOT EXISTS totp_secrets (
+        totp_secret VARCHAR(255) UNIQUE NOT NULL,
+        user_id INTEGER UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE
+    )
+SQL;
+
+        $queryList[] =
+<<< 'SQL'
+    CREATE TABLE IF NOT EXISTS certificates (
+        common_name VARCHAR(255) UNIQUE NOT NULL,
+        display_name VARCHAR(255) NOT NULL,
+        valid_from INTEGER NOT NULL,
+        valid_to INTEGER NOT NULL,
+        is_disabled BOOLEAN DEFAULT 0,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+    )
+SQL;
+
+        $queryList[] =
+<<< 'SQL'
+    CREATE TABLE IF NOT EXISTS totp_log (
+        totp_key VARCHAR(255) NOT NULL,
+        time_unix INTEGER NOT NULL,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE (user_id, totp_key)
+    )
+SQL;
+
+        $queryList[] =
+<<< 'SQL'
+    CREATE TABLE IF NOT EXISTS connection_log (
+        user_id VARCHAR(255) NOT NULL,
+        common_name VARCHAR(255) NOT NULL,
+        profile_id VARCHAR(255) NOT NULL,
+        ip4 VARCHAR(255) NOT NULL,
+        ip6 VARCHAR(255) NOT NULL,
+        connected_at INTEGER NOT NULL,
+        disconnected_at INTEGER DEFAULT NULL,
+        bytes_transferred INTEGER DEFAULT NULL                
+    )
+SQL;
+
+        $queryList[] =
+<<< 'SQL'
+    CREATE TABLE IF NOT EXISTS motd (
+        motd_message TINYTEXT NOT NULL
+    )
+SQL;
 
         foreach ($queryList as $query) {
             $this->db->query($query);

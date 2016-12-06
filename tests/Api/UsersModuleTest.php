@@ -85,7 +85,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                 ],
                 [
                     'user_id' => 'bar',
-                    'is_disabled' => false,
+                    'is_disabled' => true,
                 ],
             ],
             $this->makeRequest(

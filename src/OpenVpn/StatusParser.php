@@ -34,7 +34,7 @@ class StatusParser
         $routingTableStart = 0;
         $globalStatsStart = 0;
 
-        for ($i = 0; $i < sizeof($statusData); ++$i) {
+        for ($i = 0; $i < count($statusData); ++$i) {
             if (0 === mb_strpos($statusData[$i], 'HEADER,CLIENT_LIST')) {
                 $clientListStart = $i;
             }
@@ -64,7 +64,7 @@ class StatusParser
     private static function parseClientList(array $clientList)
     {
         $parsedClientList = [];
-        for ($i = 1; $i < sizeof($clientList); ++$i) {
+        for ($i = 1; $i < count($clientList); ++$i) {
             $parsedClient = str_getcsv($clientList[$i]);
             $commonName = $parsedClient[1];
             if (array_key_exists($commonName, $parsedClientList)) {
@@ -82,7 +82,7 @@ class StatusParser
     private static function parseRoutingTable(array $routingTable)
     {
         $parsedRoutingTable = [];
-        for ($i = 1; $i < sizeof($routingTable); ++$i) {
+        for ($i = 1; $i < count($routingTable); ++$i) {
             $parsedRoute = str_getcsv($routingTable[$i]);
             $commonName = $parsedRoute[2];
             if (!array_key_exists($commonName, $parsedRoutingTable)) {
