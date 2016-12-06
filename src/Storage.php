@@ -20,24 +20,18 @@ namespace SURFnet\VPN\Server;
 
 use PDO;
 use PDOException;
-use SURFnet\VPN\Common\RandomInterface;
 
 class Storage
 {
     /** @var \PDO */
     private $db;
 
-    /** @var \SURFnet\VPN\Common\RandomInterface */
-    private $random;
-
-    public function __construct(PDO $db, RandomInterface $random)
+    public function __construct(PDO $db)
     {
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->db = $db;
         // enable foreign keys, only for SQLite!
         $this->db->query('PRAGMA foreign_keys = ON');
-
-        $this->random = $random;
     }
 
     public function getId($userId)

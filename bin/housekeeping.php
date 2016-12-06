@@ -19,7 +19,6 @@
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Common\CliParser;
-use SURFnet\VPN\Common\Random;
 use SURFnet\VPN\Server\Storage;
 
 try {
@@ -38,7 +37,7 @@ try {
 
     $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $opt->v('instance'));
     $db = new PDO(sprintf('sqlite://%s/db.sqlite', $dataDir));
-    $storage = new Storage($db, new Random());
+    $storage = new Storage($db);
 
     $storage->cleanConnectionLog(strtotime('now -32 days'));
     $storage->cleanTotpLog(strtotime('now -5 minutes'));

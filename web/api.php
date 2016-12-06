@@ -65,13 +65,10 @@ try {
     );
     $service->addBeforeHook('auth', $basicAuthentication);
 
-    $random = new Random();
-
     $storage = new Storage(
         new PDO(
             sprintf('sqlite://%s/db.sqlite', $dataDir)
-        ),
-        $random
+        )
     );
 
     $groupProviders = [];
@@ -157,7 +154,7 @@ try {
             $easyRsaCa,
             $storage,
             $tlsAuth,
-            $random
+            new Random()
         )
     );
 
