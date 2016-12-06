@@ -32,7 +32,7 @@ try {
     $p = new CliParser(
         'Update the API secrets used by the various components',
         [
-            'instance' => ['the instance to target, e.g. vpn.example', true, true],
+            'instance' => ['the VPN instance', true, false],
             'prefix' => ['the prefix of the installed modules (DEFAULT: /usr/share)', true, false],
         ]
     );
@@ -47,7 +47,7 @@ try {
         $prefix = $opt->v('prefix');
     }
 
-    $instanceId = $opt->v('instance');
+    $instanceId = $opt->e('instance') ? $opt->v('instance') : 'default';
 
     // api provider
     $configFile = sprintf('%s/vpn-server-api/config/%s/config.yaml', $prefix, $instanceId);

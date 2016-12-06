@@ -28,7 +28,7 @@ try {
     $p = new CliParser(
         'Get the connection status of an instance',
         [
-            'instance' => ['the instance', true, true],
+            'instance' => ['the VPN instance', true, false],
         ]
     );
 
@@ -38,7 +38,7 @@ try {
         exit(0);
     }
 
-    $instanceId = $opt->v('instance');
+    $instanceId = $opt->e('instance') ? $opt->v('instance') : 'default';
 
     $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
     $config = Config::fromFile($configFile);

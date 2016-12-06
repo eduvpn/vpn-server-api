@@ -28,7 +28,7 @@ try {
     $p = new CliParser(
         'Initialize the CA',
         [
-            'instance' => ['the instance', true, true],
+            'instance' => ['the VPN instance', true, false],
         ]
     );
 
@@ -38,16 +38,18 @@ try {
         exit(0);
     }
 
-    $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $opt->v('instance'));
+    $instanceId = $opt->e('instance') ? $opt->v('instance') : 'default';
+
+    $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
     $config = Config::fromFile($configFile);
 
     $easyRsaDir = sprintf('%s/easy-rsa', dirname(__DIR__));
-    $easyRsaDataDir = sprintf('%s/data/%s/easy-rsa', dirname(__DIR__), $opt->v('instance'));
+    $easyRsaDataDir = sprintf('%s/data/%s/easy-rsa', dirname(__DIR__), $instanceId);
 
     $ca = new EasyRsaCa($easyRsaDir, $easyRsaDataDir);
     $ca->init($config);
 
-    $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $opt->v('instance'));
+    $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
     $storage = new Storage(new PDO(sprintf('sqlite://%s/db.sqlite', $dataDir)));
     $storage->init();
 

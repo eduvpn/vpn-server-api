@@ -37,7 +37,7 @@ try {
     $p = new CliParser(
         'Automatically generate an IP address and basic config for a profile',
         [
-            'instance' => ['the instance to target, e.g. vpn.example', true, true],
+            'instance' => ['the VPN instance', true, false],
             'profile' => ['the profile to target, e.g. internet', true, true],
             'host' => ['the hostname clients connect to', true, true],
             'ext' => ['the external interface, e.g. eth0', true, true],
@@ -50,13 +50,15 @@ try {
         exit(0);
     }
 
+    $instanceId = $opt->e('instance') ? $opt->v('instance') : 'default';
+
     $v4 = sprintf('10.%s.%s.0/24', hexdec(bin2hex(random_bytes(1))), hexdec(bin2hex(random_bytes(1))));
     $v6 = sprintf('fd%s:%s:%s:%s::/60', bin2hex(random_bytes(1)), bin2hex(random_bytes(2)), bin2hex(random_bytes(2)), bin2hex(random_bytes(2) & hex2bin('fff0')));
 
     echo sprintf('IPv4 CIDR  : %s', $v4).PHP_EOL;
     echo sprintf('IPv6 prefix: %s', $v6).PHP_EOL;
 
-    $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $opt->v('instance'));
+    $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
     $config = Config::fromFile($configFile);
     $profileConfig = new ProfileConfig($config->v('vpnProfiles', $opt->v('profile')));
 

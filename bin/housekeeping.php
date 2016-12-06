@@ -25,7 +25,7 @@ try {
     $p = new CliParser(
         'remove old data from storage',
         [
-            'instance' => ['the instance', true, true],
+            'instance' => ['the VPN instance', true, false],
         ]
     );
 
@@ -35,7 +35,9 @@ try {
         exit(0);
     }
 
-    $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $opt->v('instance'));
+    $instanceId = $opt->e('instance') ? $opt->v('instance') : 'default';
+
+    $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
     $db = new PDO(sprintf('sqlite://%s/db.sqlite', $dataDir));
     $storage = new Storage($db);
 
