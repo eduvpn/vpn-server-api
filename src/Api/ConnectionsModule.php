@@ -18,9 +18,7 @@
 
 namespace SURFnet\VPN\Server\Api;
 
-use Base32\Base32;
 use DateTime;
-use Otp\Otp;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\ApiErrorResponse;
 use SURFnet\VPN\Common\Http\ApiResponse;
@@ -30,7 +28,9 @@ use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\ProfileConfig;
+use SURFnet\VPN\Server\Exception\TwoFactorException;
 use SURFnet\VPN\Server\Storage;
+use SURFnet\VPN\Server\TwoFactor;
 
 class ConnectionsModule implements ServiceModuleInterface
 {
@@ -127,19 +127,11 @@ class ConnectionsModule implements ServiceModuleInterface
         $certInfo = $this->storage->getUserCertificateInfo($commonName);
         $userId = $certInfo['user_id'];
 
-        if (!$this->storage->hasTotpSecret($userId)) {
-            return new ApiErrorResponse('verify_otp', 'user has no OTP secret');
-        }
-
-        $totpSecret = $this->storage->getTotpSecret($userId);
-
-        $otp = new Otp();
-        if (!$otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
-            return new ApiErrorResponse('verify_otp', 'invalid OTP key');
-        }
-
-        if (false === $this->storage->recordTotpKey($userId, $totpKey, new DateTime('now'))) {
-            return new ApiErrorResponse('verify_otp', 'OTP key replay');
+        $twoFactor = new TwoFactor($this->storage, new DateTime('now'));
+        try {
+            $twoFactor->verifyTotp($userId, $totpKey);
+        } catch (TwoFactorException $e) {
+            return new ApiErrorResponse('verify_otp', $e->getMessage());
         }
 
         return new ApiResponse('verify_otp');

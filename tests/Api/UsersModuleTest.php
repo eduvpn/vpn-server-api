@@ -156,7 +156,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'ok' => false,
-                'error' => 'invalid OTP key',
+                'error' => 'invalid TOTP key',
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
@@ -179,7 +179,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'ok' => false,
-                'error' => 'OTP key replay',
+                'error' => 'TOTP key replay',
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],

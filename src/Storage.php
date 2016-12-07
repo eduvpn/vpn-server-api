@@ -606,6 +606,25 @@ SQL
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getTotpAttemptCount($userId)
+    {
+        $userId = $this->getId($userId);
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+        SELECT
+            COUNT(*)
+        FROM 
+            totp_log
+        WHERE user_id = :user_id
+SQL
+        );
+
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
     public function recordTotpKey($userId, $totpKey, DateTime $dateTime)
     {
         $userId = $this->getId($userId);

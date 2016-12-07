@@ -18,9 +18,7 @@
 
 namespace SURFnet\VPN\Server\Api;
 
-use Base32\Base32;
 use DateTime;
-use Otp\Otp;
 use SURFnet\VPN\Common\Http\ApiErrorResponse;
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\AuthUtils;
@@ -28,7 +26,9 @@ use SURFnet\VPN\Common\Http\InputValidation;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
+use SURFnet\VPN\Server\Exception\TwoFactorException;
 use SURFnet\VPN\Server\Storage;
+use SURFnet\VPN\Server\TwoFactor;
 
 class UsersModule implements ServiceModuleInterface
 {
@@ -61,20 +61,14 @@ class UsersModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $totpSecret = InputValidation::totpSecret($request->getPostParameter('totp_secret'));
                 $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
+                $totpSecret = InputValidation::totpSecret($request->getPostParameter('totp_secret'));
 
-                $otp = new Otp();
-                if (false === $otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
-                    // wrong otp key
-                    return new ApiErrorResponse('set_totp_secret', 'invalid OTP key');
-                }
-
-                // record the key that was used for validation to avoid replay
-                if (false === $this->storage->recordTotpKey($userId, $totpKey, new DateTime('now'))) {
-                    // this SHOULD never happen as the user does not have a TOTP
-                    // secret yet!
-                    return new ApiErrorResponse('set_totp_secret', 'OTP key replay');
+                $twoFactor = new TwoFactor($this->storage, new DateTime('now'));
+                try {
+                    $twoFactor->verifyTotp($userId, $totpKey, $totpSecret);
+                } catch (TwoFactorException $e) {
+                    return new ApiErrorResponse('set_totp_secret', $e->getMessage());
                 }
                 $this->storage->setTotpSecret($userId, $totpSecret);
 
@@ -90,18 +84,11 @@ class UsersModule implements ServiceModuleInterface
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
                 $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
 
-                if (!$this->storage->hasTotpSecret($userId)) {
-                    return new ApiErrorResponse('verify_totp_key', 'user has no OTP secret');
-                }
-                $totpSecret = $this->storage->getTotpSecret($userId);
-
-                $otp = new Otp();
-                if (!$otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
-                    return new ApiErrorResponse('verify_totp_key', 'invalid OTP key');
-                }
-
-                if (false === $this->storage->recordTotpKey($userId, $totpKey, new DateTime('now'))) {
-                    return new ApiErrorResponse('verify_totp_key', 'OTP key replay');
+                $twoFactor = new TwoFactor($this->storage, new DateTime('now'));
+                try {
+                    $twoFactor->verifyTotp($userId, $totpKey);
+                } catch (TwoFactorException $e) {
+                    return new ApiErrorResponse('verify_totp_key', $e->getMessage());
                 }
 
                 return new ApiResponse('verify_totp_key');
