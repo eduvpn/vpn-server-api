@@ -18,55 +18,67 @@
 
 namespace SURFnet\VPN\Server\Api;
 
+use DateTime;
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\AuthUtils;
+use SURFnet\VPN\Common\Http\InputValidation;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Server\Storage;
 
-class MotdModule implements ServiceModuleInterface
+class SystemMessagesModule implements ServiceModuleInterface
 {
     /** @var \SURFnet\VPN\Server\Storage */
     private $storage;
 
-    public function __construct(Storage $storage)
+    /** @var \DateTime */
+    private $dateTime;
+
+    public function __construct(Storage $storage, DateTime $dateTime)
     {
         $this->storage = $storage;
+        $this->dateTime = $dateTime;
     }
 
     public function init(Service $service)
     {
         $service->get(
-            '/motd',
+            '/system_messages',
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
 
-                return new ApiResponse('motd', $this->storage->motd());
+                $type = InputValidation::messageType($request->getQueryParameter('message_type'));
+
+                return new ApiResponse('system_messages', $this->storage->systemMessages($type));
             }
         );
 
         $service->post(
-            '/set_motd',
+            '/add_system_message',
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
-                // we do NOT sanitize or verify motd_message as *everything*
-                // is allowed! It will never be used as-is for showing in the
+                $type = InputValidation::messageType($request->getPostParameter('message_type'));
+
+                // we do NOT sanitize or verify message as *everything* is
+                // allowed! It will never be used as-is for showing in the
                 // browser, as the user portal will escape it before showing
                 // and the apps MUST interprete it as "text/plain".
-                $motdMessage = $request->getPostParameter('motd_message');
+                $message = $request->getPostParameter('message_body');
 
-                return new ApiResponse('set_motd', $this->storage->setMotd($motdMessage));
+                return new ApiResponse('add_system_message', $this->storage->addSystemMessage($type, $message, $this->dateTime));
             }
         );
 
         $service->post(
-            '/delete_motd',
+            '/delete_system_message',
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
-                return new ApiResponse('delete_motd', $this->storage->deleteMotd());
+                $messageId = InputValidation::messageId($request->getPostParameter('message_id'));
+
+                return new ApiResponse('delete_system_message', $this->storage->deleteSystemMessage($messageId));
             }
         );
     }

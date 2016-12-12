@@ -685,49 +685,55 @@ SQL
         return $stmt->execute();
     }
 
-    public function motd()
+    public function systemMessages($type)
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
-        motd_message 
+        id, message, date_time 
     FROM 
-        motd
+        system_messages
+    WHERE
+        type = :type
 SQL
         );
 
+        $stmt->bindValue(':type', $type, PDO::PARAM_STR);
         $stmt->execute();
 
-        return $stmt->fetchColumn();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function setMotd($motdMessage)
+    public function addSystemMessage($type, $message, DateTime $dateTime)
     {
-        $this->deleteMotd();
-
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    INSERT INTO motd 
-        (motd_message) 
+    INSERT INTO system_messages 
+        (type, message, date_time) 
     VALUES
-        (:motd_message)
+        (:type, :message, :date_time)
 SQL
         );
 
-        $stmt->bindValue(':motd_message', $motdMessage, PDO::PARAM_STR);
+        $stmt->bindValue(':type', $type, PDO::PARAM_STR);
+        $stmt->bindValue(':message', $message, PDO::PARAM_STR);
+        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->execute();
 
         return 1 === $stmt->rowCount();
     }
 
-    public function deleteMotd()
+    public function deleteSystemMessage($messageId)
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    DELETE FROM motd
+    DELETE FROM 
+        system_messages
+    WHERE id = :message_id
 SQL
         );
 
+        $stmt->bindValue(':message_id', $messageId, PDO::PARAM_INT);
         $stmt->execute();
 
         return 1 === $stmt->rowCount();
@@ -799,8 +805,11 @@ SQL;
 
         $queryList[] =
 <<< 'SQL'
-    CREATE TABLE IF NOT EXISTS motd (
-        motd_message TINYTEXT NOT NULL
+    CREATE TABLE IF NOT EXISTS system_messages (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        type VARCHAR(255) NOT NULL DEFAULT "notification",
+        message TINYTEXT NOT NULL,
+        date_time DATETIME NOT NULL
     )
 SQL;
 

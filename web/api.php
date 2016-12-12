@@ -31,9 +31,9 @@ use SURFnet\VPN\Server\Api\CertificatesModule;
 use SURFnet\VPN\Server\Api\ConnectionsModule;
 use SURFnet\VPN\Server\Api\InfoModule;
 use SURFnet\VPN\Server\Api\LogModule;
-use SURFnet\VPN\Server\Api\MotdModule;
 use SURFnet\VPN\Server\Api\OpenVpnModule;
 use SURFnet\VPN\Server\Api\StatsModule;
+use SURFnet\VPN\Server\Api\SystemMessagesModule;
 use SURFnet\VPN\Server\Api\UsersModule;
 use SURFnet\VPN\Server\CA\EasyRsaCa;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
@@ -135,8 +135,9 @@ try {
     );
 
     $service->addModule(
-        new MotdModule(
-            $storage
+        new SystemMessagesModule(
+            $storage,
+            new DateTime()
         )
     );
 

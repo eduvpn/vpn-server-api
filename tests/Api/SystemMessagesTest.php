@@ -18,91 +18,107 @@
 
 namespace SURFnet\VPN\Server\Api;
 
-require_once sprintf('%s/Test/TestCa.php', dirname(__DIR__));
-
+use DateTime;
 use PDO;
 use PHPUnit_Framework_TestCase;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\Test\TestCa;
-use SURFnet\VPN\Server\TlsAuth;
 
-class CertificatesModuleTest extends PHPUnit_Framework_TestCase
+class SystemMessagesTest extends PHPUnit_Framework_TestCase
 {
     /** @var \SURFnet\VPN\Common\Http\Service */
     private $service;
 
     public function setUp()
     {
-        $random = $this->getMockBuilder('SURFnet\VPN\Common\RandomInterface')->getMock();
-        $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
-
         $storage = new Storage(
             new PDO('sqlite::memory:')
         );
         $storage->init();
+        $storage->addSystemMessage('motd', 'Hello World!', new DateTime('2016-01-01 06:00:00'));
 
         $this->service = new Service();
         $this->service->addModule(
-            new CertificatesModule(
-                new TestCa(),
+            new SystemMessagesModule(
                 $storage,
-                new TlsAuth(sprintf('%s/data', dirname(__DIR__))),
-                $random
+                new DateTime('2016-01-01 08:00:00')
             )
         );
 
         $bearerAuthentication = new BasicAuthenticationHook(
             [
-                'vpn-user-portal' => 'abcdef',
-                'vpn-admin-portal' => 'ffeedd',
-                'vpn-server-node' => 'aabbcc',
+                'vpn-admin-portal' => 'aabbcc',
             ]
         );
 
         $this->service->addBeforeHook('auth', $bearerAuthentication);
     }
 
-    public function testGenerateCert()
+    public function testGetSystemMessages()
     {
         $this->assertSame(
             [
-                'certificate' => 'ClientCert for random_1',
-                'private_key' => 'ClientKey for random_1',
-                'valid_from' => 1234567890,
-                'valid_to' => 2345678901,
-                'ta' => 'Test_Ta_Key',
-                'ca' => 'Ca',
+                [
+                    'id' => '1',
+                    'message' => 'Hello World!',
+                    'date_time' => '2016-01-01 06:00:00',
+                ],
             ],
             $this->makeRequest(
-                ['vpn-user-portal', 'abcdef'],
-                'POST',
-                'add_client_certificate',
-                [],
-                ['user_id' => 'foo', 'display_name' => 'bar']
+                ['vpn-admin-portal', 'aabbcc'],
+                'GET',
+                'system_messages',
+                ['message_type' => 'motd'],
+                []
             )
         );
     }
 
-    public function testGenerateServerCert()
+    public function testAddSystemMessage()
     {
+        $this->assertTrue(
+            $this->makeRequest(
+                ['vpn-admin-portal', 'aabbcc'],
+                'POST',
+                'add_system_message',
+                [],
+                ['message_type' => 'motd', 'message_body' => 'foo']
+            )
+        );
         $this->assertSame(
             [
-                'certificate' => 'ServerCert for vpn.example',
-                'private_key' => 'ServerCert for vpn.example',
-                'valid_from' => 1234567890,
-                'valid_to' => 2345678901,
-                'ta' => 'Test_Ta_Key',
-                'ca' => 'Ca',
+                [
+                    'id' => '1',
+                    'message' => 'Hello World!',
+                    'date_time' => '2016-01-01 06:00:00',
+                ],
+                [
+                    'id' => '2',
+                    'message' => 'foo',
+                    'date_time' => '2016-01-01 08:00:00',
+                ],
             ],
             $this->makeRequest(
-                ['vpn-server-node', 'aabbcc'],
+                ['vpn-admin-portal', 'aabbcc'],
+                'GET',
+                'system_messages',
+                ['message_type' => 'motd'],
+                []
+            )
+        );
+    }
+
+    public function testDeleteSystemMessage()
+    {
+        $this->assertTrue(
+            $this->makeRequest(
+                ['vpn-admin-portal', 'aabbcc'],
                 'POST',
-                'add_server_certificate',
+                'delete_system_message',
                 [],
-                ['common_name' => 'vpn.example']
+                ['message_id' => 1]
             )
         );
     }
