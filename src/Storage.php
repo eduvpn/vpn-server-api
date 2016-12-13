@@ -669,6 +669,22 @@ SQL
         return $stmt->execute();
     }
 
+    public function cleanUserMessages(DateTime $dateTime)
+    {
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    DELETE FROM
+        user_messages
+    WHERE
+        date_time < :date_time
+SQL
+        );
+
+        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+
+        return $stmt->execute();
+    }
+
     public function cleanTotpLog(DateTime $dateTime)
     {
         $stmt = $this->db->prepare(

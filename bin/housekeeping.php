@@ -43,6 +43,7 @@ try {
 
     $storage->cleanConnectionLog(strtotime('now -32 days'));
     $storage->cleanTotpLog(new DateTime('now -5 minutes'));
+    $storage->cleanUserMessages(new DateTime('now -32 days'));
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);
