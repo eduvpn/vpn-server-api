@@ -34,6 +34,7 @@ use SURFnet\VPN\Server\Api\LogModule;
 use SURFnet\VPN\Server\Api\OpenVpnModule;
 use SURFnet\VPN\Server\Api\StatsModule;
 use SURFnet\VPN\Server\Api\SystemMessagesModule;
+use SURFnet\VPN\Server\Api\UserMessagesModule;
 use SURFnet\VPN\Server\Api\UsersModule;
 use SURFnet\VPN\Server\CA\EasyRsaCa;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
@@ -138,6 +139,12 @@ try {
         new SystemMessagesModule(
             $storage,
             new DateTime()
+        )
+    );
+
+    $service->addModule(
+        new UserMessagesModule(
+            $storage
         )
     );
 

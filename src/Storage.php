@@ -739,6 +739,51 @@ SQL
         return 1 === $stmt->rowCount();
     }
 
+    public function userMessages($userId)
+    {
+        $userId = $this->getId($userId);
+
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    SELECT
+        id, type, message, date_time 
+    FROM 
+        user_messages
+    WHERE
+        user_id = :user_id
+    ORDER BY
+        date_time DESC
+SQL
+        );
+
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function addUserMessage($userId, $type, $message, DateTime $dateTime)
+    {
+        $userId = $this->getId($userId);
+
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    INSERT INTO user_messages 
+        (user_id, type, message, date_time) 
+    VALUES
+        (:user_id, :type, :message, :date_time)
+SQL
+        );
+
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':type', $type, PDO::PARAM_STR);
+        $stmt->bindValue(':message', $message, PDO::PARAM_STR);
+        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->execute();
+
+        return 1 === $stmt->rowCount();
+    }
+
     public function init()
     {
         $queryList = [];
@@ -810,6 +855,17 @@ SQL;
         type VARCHAR(255) NOT NULL DEFAULT "notification",
         message TINYTEXT NOT NULL,
         date_time DATETIME NOT NULL
+    )
+SQL;
+
+        $queryList[] =
+<<< 'SQL'
+    CREATE TABLE IF NOT EXISTS user_messages (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        type VARCHAR(255) NOT NULL DEFAULT "notification",
+        message TINYTEXT NOT NULL,
+        date_time DATETIME NOT NULL,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
     )
 SQL;
 

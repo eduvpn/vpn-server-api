@@ -92,6 +92,7 @@ class ConnectionsModule implements ServiceModuleInterface
             return $response;
         }
 
+        // XXX is this still relevant?
         if (false == $this->storage->clientConnect($profileId, $commonName, $ip4, $ip6, $connectedAt)) {
             return new ApiErrorResponse('connect', 'unable to write connect event to log');
         }
@@ -141,15 +142,22 @@ class ConnectionsModule implements ServiceModuleInterface
     {
         // verify status of certificate/user
         if (false === $result = $this->storage->getUserCertificateInfo($commonName)) {
+            // if a certificate does no longer exist, we cannot figure out the user
             return new ApiErrorResponse('connect', 'user or certificate does not exist');
         }
 
         if ($result['user_is_disabled']) {
-            return new ApiErrorResponse('connect', 'user is disabled');
+            $msg = 'unable to connect, user account is disabled';
+            $this->storage->addUserMessage($result['user_id'], 'error', $msg, new DateTime('now'));
+
+            return new ApiErrorResponse('connect', $msg);
         }
 
         if ($result['certificate_is_disabled']) {
-            return new ApiErrorResponse('connect', 'certificate is disabled');
+            $msg = sprintf('unable to connect, certificate "%s" is disabled', $result['display_name']);
+            $this->storage->addUserMessage($result['user_id'], 'error', $msg, new DateTime('now'));
+
+            return new ApiErrorResponse('connect', $msg);
         }
 
         return $this->verifyAcl($profileId, $result['user_id']);
@@ -167,7 +175,10 @@ class ConnectionsModule implements ServiceModuleInterface
             }
 
             if (false === self::isMember($userGroups, $profileConfig->v('aclGroupList'))) {
-                return new ApiErrorResponse('connect', 'user not in ACL');
+                $msg = 'unable to connect, user not in ACL';
+                $this->storage->addUserMessage($externalUserId, 'error', $msg, new DateTime('now'));
+
+                return new ApiErrorResponse('connect', $msg);
             }
         }
 
