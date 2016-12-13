@@ -119,6 +119,8 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
+                $this->storage->addUserMessage($userId, 'notification', 'TOTP secret deleted by an administrator', new DateTime('now'));
+
                 return new ApiResponse('delete_totp_secret', $this->storage->deleteTotpSecret($userId));
             }
         );
