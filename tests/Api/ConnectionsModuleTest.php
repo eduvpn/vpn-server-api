@@ -119,7 +119,7 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'ok' => false,
-                'error' => 'unable to connect, user not in ACL',
+                'error' => '[VPN] unable to connect, account not a member of required group',
             ],
             $this->makeRequest(
                 ['vpn-server-node', 'aabbcc'],

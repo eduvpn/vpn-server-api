@@ -68,9 +68,13 @@ class UsersModule implements ServiceModuleInterface
                 try {
                     $twoFactor->verifyTotp($userId, $totpKey, $totpSecret);
                 } catch (TwoFactorException $e) {
+                    $this->storage->addUserMessage($userId, 'notification', sprintf('TOTP validation failed: %s', $e->getMessage()), new DateTime('now'));
+
                     return new ApiErrorResponse('set_totp_secret', $e->getMessage());
                 }
                 $this->storage->setTotpSecret($userId, $totpSecret);
+
+                $this->storage->addUserMessage($userId, 'notification', 'TOTP secret set', new DateTime('now'));
 
                 return new ApiResponse('set_totp_secret');
             }
@@ -88,6 +92,8 @@ class UsersModule implements ServiceModuleInterface
                 try {
                     $twoFactor->verifyTotp($userId, $totpKey);
                 } catch (TwoFactorException $e) {
+                    $this->storage->addUserMessage($userId, 'notification', sprintf('TOTP validation failed: %s', $e->getMessage()), new DateTime('now'));
+
                     return new ApiErrorResponse('verify_totp_key', $e->getMessage());
                 }
 
@@ -169,6 +175,8 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
+                $this->storage->addUserMessage($userId, 'notification', 'account disabled by an administrator', new DateTime('now'));
+
                 return new ApiResponse('disable_user', $this->storage->disableUser($userId));
             }
         );
@@ -179,6 +187,8 @@ class UsersModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
+
+                $this->storage->addUserMessage($userId, 'notification', 'account enabled by an administrator', new DateTime('now'));
 
                 return new ApiResponse('enable_user', $this->storage->enableUser($userId));
             }

@@ -111,6 +111,7 @@ class ConnectionsModule implements ServiceModuleInterface
         $disconnectedAt = InputValidation::disconnectedAt($request->getPostParameter('disconnected_at'));
         $bytesTransferred = InputValidation::bytesTransferred($request->getPostParameter('bytes_transferred'));
 
+        // XXX is this still relevant?
         if (false === $this->storage->clientDisconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)) {
             return new ApiErrorResponse('disconnect', 'unable to write disconnect event to log');
         }
@@ -132,6 +133,8 @@ class ConnectionsModule implements ServiceModuleInterface
         try {
             $twoFactor->verifyTotp($userId, $totpKey);
         } catch (TwoFactorException $e) {
+            $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] OTP validation failed: %s', $e->getMessage()), new DateTime('now'));
+
             return new ApiErrorResponse('verify_otp', $e->getMessage());
         }
 
@@ -147,15 +150,15 @@ class ConnectionsModule implements ServiceModuleInterface
         }
 
         if ($result['user_is_disabled']) {
-            $msg = 'unable to connect, user account is disabled';
-            $this->storage->addUserMessage($result['user_id'], 'error', $msg, new DateTime('now'));
+            $msg = '[VPN] unable to connect, account is disabled';
+            $this->storage->addUserMessage($result['user_id'], 'notification', $msg, new DateTime('now'));
 
             return new ApiErrorResponse('connect', $msg);
         }
 
         if ($result['certificate_is_disabled']) {
-            $msg = sprintf('unable to connect, certificate "%s" is disabled', $result['display_name']);
-            $this->storage->addUserMessage($result['user_id'], 'error', $msg, new DateTime('now'));
+            $msg = sprintf('[VPN] unable to connect, certificate "%s" is disabled', $result['display_name']);
+            $this->storage->addUserMessage($result['user_id'], 'notification', $msg, new DateTime('now'));
 
             return new ApiErrorResponse('connect', $msg);
         }
@@ -175,8 +178,8 @@ class ConnectionsModule implements ServiceModuleInterface
             }
 
             if (false === self::isMember($userGroups, $profileConfig->v('aclGroupList'))) {
-                $msg = 'unable to connect, user not in ACL';
-                $this->storage->addUserMessage($externalUserId, 'error', $msg, new DateTime('now'));
+                $msg = '[VPN] unable to connect, account not a member of required group';
+                $this->storage->addUserMessage($externalUserId, 'notification', $msg, new DateTime('now'));
 
                 return new ApiErrorResponse('connect', $msg);
             }
