@@ -69,7 +69,7 @@ try {
         if (@file_exists($configFile)) {
             $config = Config::fromFile($configFile);
             $configData = $config->v();
-            $configData['apiProviders']['vpn-server-api']['userPass'] = $credentials[$configId];
+            $configData['apiPass'] = $credentials[$configId];
             Config::toFile($configFile, $configData, 0644);
         }
     }
