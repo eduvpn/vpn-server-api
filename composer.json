@@ -24,6 +24,13 @@
     "require": {
         "christian-riesen/otp": "^2.0",
         "eduvpn/common": "dev-master",
+        "ext-date": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-pcre": "*",
+        "ext-pdo": "*",
+        "ext-spl": "*",
         "guzzlehttp/guzzle": "^5.3",
         "php": ">=5.4.0"
     }
