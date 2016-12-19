@@ -488,7 +488,7 @@ SQL
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function clientConnect($profileId, $commonName, $ip4, $ip6, $connectedAt)
+    public function clientConnect($profileId, $commonName, $ip4, $ip6, DateTime $connectedAt)
     {
         // this query is so complex, because we want to store the user_id in the
         // log as well, not just the common_name... the user may delete the
@@ -529,14 +529,14 @@ SQL
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
         $stmt->bindValue(':ip4', $ip4, PDO::PARAM_STR);
         $stmt->bindValue(':ip6', $ip6, PDO::PARAM_STR);
-        $stmt->bindValue(':connected_at', $connectedAt, PDO::PARAM_INT);
+        $stmt->bindValue(':connected_at', $connectedAt->format('Y-m-d H:i:s'), PDO::PARAM_STR);
 
         $stmt->execute();
         // XXX
         return 1 === $stmt->rowCount();
     }
 
-    public function clientDisconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)
+    public function clientDisconnect($profileId, $commonName, $ip4, $ip6, DateTime $connectedAt, DateTime $disconnectedAt, $bytesTransferred)
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
@@ -562,8 +562,8 @@ SQL
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
         $stmt->bindValue(':ip4', $ip4, PDO::PARAM_STR);
         $stmt->bindValue(':ip6', $ip6, PDO::PARAM_STR);
-        $stmt->bindValue(':connected_at', $connectedAt, PDO::PARAM_INT);
-        $stmt->bindValue(':disconnected_at', $disconnectedAt, PDO::PARAM_INT);
+        $stmt->bindValue(':connected_at', $connectedAt->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':disconnected_at', $disconnectedAt->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->bindValue(':bytes_transferred', $bytesTransferred, PDO::PARAM_INT);
 
         $stmt->execute();
@@ -646,20 +646,20 @@ SQL
         return true;
     }
 
-    public function cleanConnectionLog($timeUnix)
+    public function cleanConnectionLog(DateTime $dateTime)
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
     DELETE FROM
         connection_log
     WHERE
-        connected_at < :time_unix
+        connected_at < :date_time
     AND
         disconnected_at IS NOT NULL
 SQL
         );
 
-        $stmt->bindValue(':time_unix', $timeUnix, PDO::PARAM_INT);
+        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
 
         return $stmt->execute();
     }
@@ -853,8 +853,8 @@ SQL;
         profile_id VARCHAR(255) NOT NULL,
         ip4 VARCHAR(255) NOT NULL,
         ip6 VARCHAR(255) NOT NULL,
-        connected_at INTEGER NOT NULL,
-        disconnected_at INTEGER DEFAULT NULL,
+        connected_at DATETIME NOT NULL,
+        disconnected_at DATETIME DEFAULT NULL,
         bytes_transferred INTEGER DEFAULT NULL                
     )
 SQL;

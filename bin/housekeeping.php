@@ -41,7 +41,7 @@ try {
     $db = new PDO(sprintf('sqlite://%s/db.sqlite', $dataDir));
     $storage = new Storage($db);
 
-    $storage->cleanConnectionLog(strtotime('now -32 days'));
+    $storage->cleanConnectionLog(new DateTime('now -32 days'));
     $storage->cleanTotpLog(new DateTime('now -5 minutes'));
     $storage->cleanUserMessages(new DateTime('now -32 days'));
 } catch (Exception $e) {

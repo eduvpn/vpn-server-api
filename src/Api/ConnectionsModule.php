@@ -93,7 +93,7 @@ class ConnectionsModule implements ServiceModuleInterface
         }
 
         // XXX is this still relevant?
-        if (false == $this->storage->clientConnect($profileId, $commonName, $ip4, $ip6, $connectedAt)) {
+        if (false == $this->storage->clientConnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)))) {
             return new ApiErrorResponse('connect', 'unable to write connect event to log');
         }
 
@@ -112,7 +112,7 @@ class ConnectionsModule implements ServiceModuleInterface
         $bytesTransferred = InputValidation::bytesTransferred($request->getPostParameter('bytes_transferred'));
 
         // XXX is this still relevant?
-        if (false === $this->storage->clientDisconnect($profileId, $commonName, $ip4, $ip6, $connectedAt, $disconnectedAt, $bytesTransferred)) {
+        if (false === $this->storage->clientDisconnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)), new DateTime(sprintf('@%d', $disconnectedAt)), $bytesTransferred)) {
             return new ApiErrorResponse('disconnect', 'unable to write disconnect event to log');
         }
 
