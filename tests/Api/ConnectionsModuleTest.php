@@ -19,6 +19,7 @@
 namespace SURFnet\VPN\Server\Api;
 
 use Base32\Base32;
+use DateTime;
 use Otp\Otp;
 use PDO;
 use PHPUnit_Framework_TestCase;
@@ -44,7 +45,7 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
             $random
         );
         $storage->init();
-        $storage->addCertificate('foo', '12345678901234567890123456789012', '12345678901234567890123456789012', 12345678, 23456789);
+        $storage->addCertificate('foo', '12345678901234567890123456789012', '12345678901234567890123456789012', new DateTime('@12345678'), new DateTime('@23456789'));
         $storage->setTotpSecret('foo', 'CN2XAL23SIFTDFXZ');
         $storage->clientConnect('internet', '12345678901234567890123456789012', '10.10.10.10', 'fd00:4242:4242:4242::', 12345678);
 

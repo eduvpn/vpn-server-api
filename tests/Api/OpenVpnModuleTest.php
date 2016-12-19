@@ -20,6 +20,7 @@ namespace SURFnet\VPN\Server\Api;
 
 require_once sprintf('%s/Test/TestSocket.php', dirname(__DIR__));
 
+use DateTime;
 use PDO;
 use PHPUnit_Framework_TestCase;
 use Psr\Log\NullLogger;
@@ -47,8 +48,8 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
             $random
         );
         $storage->init();
-        $storage->addCertificate('foo', '12345678901234567890123456789012', 'Display Name', 12345678, 23456789);
-        $storage->addCertificate('foo', '99123456789012345678901234567890', 'Display Name 2', 12345678, 23456789);
+        $storage->addCertificate('foo', '12345678901234567890123456789012', 'Display Name', new DateTime('@12345678'), new DateTime('@23456789'));
+        $storage->addCertificate('foo', '99123456789012345678901234567890', 'Display Name 2', new DateTime('@12345678'), new DateTime('@23456789'));
 
         $serverManager = new ServerManager(
             $config,

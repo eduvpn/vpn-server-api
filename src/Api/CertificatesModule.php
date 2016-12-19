@@ -70,7 +70,13 @@ class CertificatesModule implements ServiceModuleInterface
                 $certInfo['ta'] = $this->tlsAuth->get();
                 $certInfo['ca'] = $this->ca->caCert();
 
-                $this->storage->addCertificate($userId, $commonName, $displayName, $certInfo['valid_from'], $certInfo['valid_to']);
+                $this->storage->addCertificate(
+                    $userId,
+                    $commonName,
+                    $displayName,
+                    new DateTime(sprintf('@%d', $certInfo['valid_from'])),
+                    new DateTime(sprintf('@%d', $certInfo['valid_to']))
+                );
 
                 $this->storage->addUserMessage(
                     $userId,

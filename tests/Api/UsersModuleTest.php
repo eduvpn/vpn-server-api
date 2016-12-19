@@ -42,7 +42,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         );
         $storage->init();
 
-        $storage->addCertificate('foo', 'abcd1234', 'ABCD1234', 12345678, 23456789);
+        $storage->addCertificate('foo', 'abcd1234', 'ABCD1234', new DateTime('@12345678'), new DateTime('@23456789'));
 
         $storage->disableUser('bar');
         $storage->setTotpSecret('bar', 'CN2XAL23SIFTDFXZ');

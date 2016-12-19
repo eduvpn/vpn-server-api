@@ -293,7 +293,7 @@ SQL
         return 1 === $stmt->rowCount();
     }
 
-    public function addCertificate($userId, $commonName, $displayName, $validFrom, $validTo)
+    public function addCertificate($userId, $commonName, $displayName, DateTime $validFrom, DateTime $validTo)
     {
         $userId = $this->getId($userId);
         $stmt = $this->db->prepare(
@@ -307,8 +307,8 @@ SQL
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
         $stmt->bindValue(':display_name', $displayName, PDO::PARAM_STR);
-        $stmt->bindValue(':valid_from', $validFrom, PDO::PARAM_INT);
-        $stmt->bindValue(':valid_to', $validTo, PDO::PARAM_INT);
+        $stmt->bindValue(':valid_from', $validFrom->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':valid_to', $validTo->format('Y-m-d H:i:s'), PDO::PARAM_STR);
 
         $stmt->execute();
         // XXX
@@ -337,13 +337,8 @@ SQL
 
         $certificateList = [];
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $result) {
-            $certificateList[] = [
-                'common_name' => $result['common_name'],
-                'display_name' => $result['display_name'],
-                'valid_from' => (int) $result['valid_from'],
-                'valid_to' => (int) $result['valid_to'],
-                'is_disabled' => (bool) $result['is_disabled'],
-            ];
+            $result['is_disabled'] = (bool) $result['is_disabled'];
+            $certificateList[] = $result;
         }
 
         return $certificateList;
@@ -833,8 +828,8 @@ SQL;
     CREATE TABLE IF NOT EXISTS certificates (
         common_name VARCHAR(255) UNIQUE NOT NULL,
         display_name VARCHAR(255) NOT NULL,
-        valid_from INTEGER NOT NULL,
-        valid_to INTEGER NOT NULL,
+        valid_from DATETIME NOT NULL,
+        valid_to DATETIME NOT NULL,
         is_disabled BOOLEAN DEFAULT 0,
         user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
     )
