@@ -46,8 +46,8 @@ class CertificatesModuleTest extends PHPUnit_Framework_TestCase
                 $GLOBALS['DB_PASSWD']
             )
         );
+        $storage->drop(); // drop for MariaDB
         $storage->init();
-
         $this->service = new Service();
         $this->service->addModule(
             new CertificatesModule(

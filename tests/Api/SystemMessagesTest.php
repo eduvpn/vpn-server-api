@@ -40,6 +40,7 @@ class SystemMessagesTest extends PHPUnit_Framework_TestCase
                 $GLOBALS['DB_PASSWD']
             )
         );
+        $storage->drop(); // drop for MariaDB
         $storage->init();
         $storage->addSystemMessage('motd', 'Hello World!', new DateTime('2016-01-01 06:00:00'));
 

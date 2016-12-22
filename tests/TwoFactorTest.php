@@ -31,8 +31,13 @@ class TwoFactorTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $storage = new Storage(
-            new PDO('sqlite::memory:')
+            new PDO(
+                $GLOBALS['DB_DSN'],
+                $GLOBALS['DB_USER'],
+                $GLOBALS['DB_PASSWD']
+            )
         );
+        $storage->drop();
         $storage->init();
         $storage->setTotpSecret('foo', 'CN2XAL23SIFTDFXZ');
         $this->twoFactor = new TwoFactor($storage, new DateTime('now'));

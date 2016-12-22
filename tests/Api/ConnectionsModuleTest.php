@@ -48,6 +48,7 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
             ),
             $random
         );
+        $storage->drop(); // drop for MariaDB
         $storage->init();
         $storage->addCertificate('foo', '12345678901234567890123456789012', '12345678901234567890123456789012', new DateTime('@12345678'), new DateTime('@23456789'));
         $storage->setTotpSecret('foo', 'CN2XAL23SIFTDFXZ');

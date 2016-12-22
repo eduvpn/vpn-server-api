@@ -53,6 +53,7 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
             ),
             $random
         );
+        $storage->drop(); // drop for MariaDB
         $storage->init();
         $storage->setVootToken('foo', 'abcdef');
 

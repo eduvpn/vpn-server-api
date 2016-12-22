@@ -38,8 +38,13 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $storage = new Storage(
-            new PDO('sqlite::memory:')
+            new PDO(
+                $GLOBALS['DB_DSN'],
+                $GLOBALS['DB_USER'],
+                $GLOBALS['DB_PASSWD']
+            )
         );
+        $storage->drop(); // drop for MariaDB
         $storage->init();
 
         $storage->addCertificate('foo', 'abcd1234', 'ABCD1234', new DateTime('@12345678'), new DateTime('@23456789'));

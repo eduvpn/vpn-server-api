@@ -31,8 +31,10 @@ class Storage
     {
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->db = $db;
-        // enable foreign keys, only for SQLite!
-        $this->db->query('PRAGMA foreign_keys = ON');
+
+        if ('sqlite' === $this->db->getAttribute(PDO::ATTR_DRIVER_NAME)) {
+            $this->db->query('PRAGMA foreign_keys = ON');
+        }
     }
 
     public function getId($userId)
@@ -801,9 +803,9 @@ SQL
         $queryList[] =
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-        user_id VARCHAR(255) UNIQUE NOT NULL,
-        is_disabled BOOLEAN DEFAULT 0
+        id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        user_id VARCHAR(255) NOT NULL UNIQUE,
+        is_disabled BOOLEAN DEFAULT 0 NOT NULL
     )
 SQL;
 
@@ -862,7 +864,7 @@ SQL;
         $queryList[] =
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS system_messages (
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
         type VARCHAR(255) NOT NULL DEFAULT "notification",
         message TINYTEXT NOT NULL,
         date_time DATETIME NOT NULL
@@ -872,7 +874,7 @@ SQL;
         $queryList[] =
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS user_messages (
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
         type VARCHAR(255) NOT NULL DEFAULT "notification",
         message TINYTEXT NOT NULL,
         date_time DATETIME NOT NULL,
@@ -881,7 +883,28 @@ SQL;
 SQL;
 
         foreach ($queryList as $query) {
+            if ('sqlite' === $this->db->getAttribute(PDO::ATTR_DRIVER_NAME)) {
+                $query = str_replace('AUTO_INCREMENT', 'AUTOINCREMENT', $query);
+            }
             $this->db->query($query);
+        }
+    }
+
+    public function drop()
+    {
+        $tableList = [
+            'users',
+            'voot_tokens',
+            'totp_secrets',
+            'certificates',
+            'totp_log',
+            'connection_log',
+            'system_messages',
+            'user_messages',
+        ];
+
+        foreach ($tableList as $table) {
+            $this->db->query(sprintf('DROP TABLE IF EXISTS %s', $table));
         }
     }
 }

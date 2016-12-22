@@ -51,6 +51,7 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
             ),
             $random
         );
+        $storage->drop(); // drop for MariaDB
         $storage->init();
         $storage->addCertificate('foo', '12345678901234567890123456789012', 'Display Name', new DateTime('@12345678'), new DateTime('@23456789'));
         $storage->addCertificate('foo', '99123456789012345678901234567890', 'Display Name 2', new DateTime('@12345678'), new DateTime('@23456789'));
