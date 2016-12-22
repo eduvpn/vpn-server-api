@@ -44,7 +44,11 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
         $random = $this->getMockBuilder('SURFnet\VPN\Common\RandomInterface')->getMock();
         $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
         $storage = new Storage(
-            new PDO('sqlite::memory:'),
+            new PDO(
+                $GLOBALS['DB_DSN'],
+                $GLOBALS['DB_USER'],
+                $GLOBALS['DB_PASSWD']
+            ),
             $random
         );
         $storage->init();
