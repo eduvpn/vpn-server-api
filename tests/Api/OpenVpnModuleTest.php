@@ -40,18 +40,14 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $config = Config::fromFile(sprintf('%s/data/openvpn_module_config.yaml', __DIR__));
-
-        $random = $this->getMockBuilder('SURFnet\VPN\Common\RandomInterface')->getMock();
-        $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
         $storage = new Storage(
             new PDO(
                 $GLOBALS['DB_DSN'],
                 $GLOBALS['DB_USER'],
                 $GLOBALS['DB_PASSWD']
             ),
-            $random
+            new DateTime()
         );
-        $storage->drop(); // drop for MariaDB
         $storage->init();
         $storage->addCertificate('foo', '12345678901234567890123456789012', 'Display Name', new DateTime('@12345678'), new DateTime('@23456789'));
         $storage->addCertificate('foo', '99123456789012345678901234567890', 'Display Name 2', new DateTime('@12345678'), new DateTime('@23456789'));

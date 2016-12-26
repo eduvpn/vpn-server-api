@@ -18,7 +18,6 @@
 
 namespace SURFnet\VPN\Server\Api;
 
-use DateTime;
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\AuthUtils;
 use SURFnet\VPN\Common\Http\InputValidation;
@@ -32,13 +31,9 @@ class SystemMessagesModule implements ServiceModuleInterface
     /** @var \SURFnet\VPN\Server\Storage */
     private $storage;
 
-    /** @var \DateTime */
-    private $dateTime;
-
-    public function __construct(Storage $storage, DateTime $dateTime)
+    public function __construct(Storage $storage)
     {
         $this->storage = $storage;
-        $this->dateTime = $dateTime;
     }
 
     public function init(Service $service)
@@ -67,7 +62,7 @@ class SystemMessagesModule implements ServiceModuleInterface
                 // and the apps MUST interprete it as "text/plain".
                 $message = $request->getPostParameter('message_body');
 
-                return new ApiResponse('add_system_message', $this->storage->addSystemMessage($type, $message, $this->dateTime));
+                return new ApiResponse('add_system_message', $this->storage->addSystemMessage($type, $message));
             }
         );
 

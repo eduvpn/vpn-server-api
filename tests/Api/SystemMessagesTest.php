@@ -38,17 +38,16 @@ class SystemMessagesTest extends PHPUnit_Framework_TestCase
                 $GLOBALS['DB_DSN'],
                 $GLOBALS['DB_USER'],
                 $GLOBALS['DB_PASSWD']
-            )
+            ),
+            new DateTime('2016-01-01 08:00:00')
         );
-        $storage->drop(); // drop for MariaDB
         $storage->init();
-        $storage->addSystemMessage('motd', 'Hello World!', new DateTime('2016-01-01 06:00:00'));
+        $storage->addSystemMessage('motd', 'Hello World!');
 
         $this->service = new Service();
         $this->service->addModule(
             new SystemMessagesModule(
-                $storage,
-                new DateTime('2016-01-01 08:00:00')
+                $storage
             )
         );
 
@@ -68,7 +67,7 @@ class SystemMessagesTest extends PHPUnit_Framework_TestCase
                 [
                     'id' => '1',
                     'message' => 'Hello World!',
-                    'date_time' => '2016-01-01 06:00:00',
+                    'date_time' => '2016-01-01 08:00:00',
                 ],
             ],
             $this->makeRequest(
@@ -97,7 +96,7 @@ class SystemMessagesTest extends PHPUnit_Framework_TestCase
                 [
                     'id' => '1',
                     'message' => 'Hello World!',
-                    'date_time' => '2016-01-01 06:00:00',
+                    'date_time' => '2016-01-01 08:00:00',
                 ],
                 [
                     'id' => '2',

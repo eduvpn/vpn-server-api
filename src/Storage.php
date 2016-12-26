@@ -27,50 +27,18 @@ class Storage
     /** @var \PDO */
     private $db;
 
-    public function __construct(PDO $db)
+    /** @var \DateTime */
+    private $dateTime;
+
+    public function __construct(PDO $db, DateTime $dateTime)
     {
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        if ('sqlite' === $db->getAttribute(PDO::ATTR_DRIVER_NAME)) {
+            $db->query('PRAGMA foreign_keys = ON');
+        }
+
         $this->db = $db;
-
-        if ('sqlite' === $this->db->getAttribute(PDO::ATTR_DRIVER_NAME)) {
-            $this->db->query('PRAGMA foreign_keys = ON');
-        }
-    }
-
-    public function getId($userId)
-    {
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    SELECT 
-        id
-    FROM 
-        users
-    WHERE user_id = :user_id
-SQL
-        );
-
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->execute();
-        if (false !== $result = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            return $result['id'];
-        }
-
-        // user does not exist yet, add it
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    INSERT INTO 
-        users (
-            user_id
-        )
-    VALUES (
-        :user_id
-    )
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->execute();
-
-        return $this->db->lastInsertId('id');
+        $this->dateTime = $dateTime;
     }
 
     public function getUsers()
@@ -79,6 +47,7 @@ SQL
 <<< 'SQL'
     SELECT
         user_id, 
+        date_time,
         is_disabled
     FROM 
         users
@@ -109,7 +78,7 @@ SQL
     FROM 
         users u, certificates c 
     WHERE 
-        u.id = c.user_id AND 
+        u.user_id = c.user_id AND 
         c.common_name = :common_name
 SQL
         );
@@ -122,7 +91,7 @@ SQL
 
     public function getVootToken($userId)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
@@ -133,7 +102,7 @@ SQL
         user_id = :user_id
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
         return $stmt->fetchColumn();
@@ -141,7 +110,7 @@ SQL
 
     public function setVootToken($userId, $vootToken)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     INSERT INTO voot_tokens 
@@ -150,7 +119,7 @@ SQL
         (:user_id, :voot_token)
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->bindValue(':voot_token', $vootToken, PDO::PARAM_STR);
 
         $stmt->execute();
@@ -161,7 +130,7 @@ SQL
 
     public function hasVootToken($userId)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
@@ -172,7 +141,7 @@ SQL
         user_id = :user_id
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
         return 1 === (int) $stmt->fetchColumn();
@@ -180,7 +149,7 @@ SQL
 
     public function deleteVootToken($userId)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     DELETE FROM 
@@ -189,7 +158,7 @@ SQL
         user_id = :user_id
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
 
         $stmt->execute();
         // XXX error handling!
@@ -198,7 +167,7 @@ SQL
 
     public function hasTotpSecret($userId)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
@@ -209,7 +178,7 @@ SQL
         user_id = :user_id
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
         return 1 === (int) $stmt->fetchColumn();
@@ -217,7 +186,7 @@ SQL
 
     public function getTotpSecret($userId)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
@@ -228,7 +197,7 @@ SQL
         user_id = :user_id
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
         return $stmt->fetchColumn();
@@ -236,7 +205,7 @@ SQL
 
     public function setTotpSecret($userId, $totpSecret)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     INSERT INTO totp_secrets 
@@ -245,7 +214,7 @@ SQL
         (:user_id, :totp_secret)
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->bindValue(':totp_secret', $totpSecret, PDO::PARAM_STR);
 
         try {
@@ -260,7 +229,7 @@ SQL
 
     public function deleteTotpSecret($userId)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     DELETE FROM 
@@ -269,7 +238,7 @@ SQL
         user_id = :user_id
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
 
         $stmt->execute();
 
@@ -279,16 +248,16 @@ SQL
 
     public function deleteUser($userId)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     DELETE FROM 
         users 
     WHERE 
-        id = :user_id
+        user_id = :user_id
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
 
         $stmt->execute();
         // XXX error handling?
@@ -297,7 +266,7 @@ SQL
 
     public function addCertificate($userId, $commonName, $displayName, DateTime $validFrom, DateTime $validTo)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     INSERT INTO certificates 
@@ -307,7 +276,7 @@ SQL
 SQL
         );
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->bindValue(':display_name', $displayName, PDO::PARAM_STR);
         $stmt->bindValue(':valid_from', $validFrom->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->bindValue(':valid_to', $validTo->format('Y-m-d H:i:s'), PDO::PARAM_STR);
@@ -319,7 +288,7 @@ SQL
 
     public function getCertificates($userId)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
@@ -334,7 +303,7 @@ SQL
         user_id = :user_id
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
         $certificateList = [];
@@ -403,7 +372,7 @@ SQL
 
     public function disableUser($userId)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     UPDATE
@@ -411,10 +380,10 @@ SQL
     SET 
         is_disabled = 1 
     WHERE 
-        id = :user_id
+        user_id = :user_id
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
 
         $stmt->execute();
 
@@ -425,7 +394,7 @@ SQL
 
     public function enableUser($userId)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     UPDATE
@@ -433,10 +402,10 @@ SQL
     SET 
         is_disabled = 0 
     WHERE 
-        id = :user_id
+        user_id = :user_id
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
 
         $stmt->execute();
 
@@ -447,7 +416,7 @@ SQL
 
     public function isDisabledUser($userId)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
@@ -455,12 +424,12 @@ SQL
     FROM 
         users
     WHERE 
-        id = :user_id 
+        user_id = :user_id 
     AND 
         is_disabled = 1
 SQL
         );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
         return 1 === (int) $stmt->fetchColumn();
@@ -514,7 +483,7 @@ SQL
                 FROM 
                     users u, certificates c
                 WHERE
-                    u.id = c.user_id
+                    u.user_id = c.user_id
                 AND
                     c.common_name = :common_name
             ),                
@@ -605,7 +574,7 @@ SQL
 
     public function getTotpAttemptCount($userId)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
         SELECT
@@ -616,15 +585,15 @@ SQL
 SQL
         );
 
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
         return (int) $stmt->fetchColumn();
     }
 
-    public function recordTotpKey($userId, $totpKey, DateTime $dateTime)
+    public function recordTotpKey($userId, $totpKey)
     {
-        $userId = $this->getId($userId);
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     INSERT INTO totp_log 
@@ -634,9 +603,9 @@ SQL
 SQL
         );
 
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->bindValue(':totp_key', $totpKey, PDO::PARAM_STR);
-        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':date_time', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
 
         try {
             $stmt->execute();
@@ -717,7 +686,7 @@ SQL
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function addSystemMessage($type, $message, DateTime $dateTime)
+    public function addSystemMessage($type, $message)
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
@@ -730,7 +699,7 @@ SQL
 
         $stmt->bindValue(':type', $type, PDO::PARAM_STR);
         $stmt->bindValue(':message', $message, PDO::PARAM_STR);
-        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':date_time', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->execute();
 
         return 1 === $stmt->rowCount();
@@ -754,8 +723,7 @@ SQL
 
     public function userMessages($userId)
     {
-        $userId = $this->getId($userId);
-
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
@@ -769,16 +737,15 @@ SQL
 SQL
         );
 
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function addUserMessage($userId, $type, $message, DateTime $dateTime)
+    public function addUserMessage($userId, $type, $message)
     {
-        $userId = $this->getId($userId);
-
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     INSERT INTO user_messages 
@@ -788,10 +755,10 @@ SQL
 SQL
         );
 
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->bindValue(':type', $type, PDO::PARAM_STR);
         $stmt->bindValue(':message', $message, PDO::PARAM_STR);
-        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':date_time', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->execute();
 
         return 1 === $stmt->rowCount();
@@ -803,8 +770,8 @@ SQL
         $queryList[] =
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
-        user_id VARCHAR(255) NOT NULL UNIQUE,
+        user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
+        date_time DATETIME NOT NULL,
         is_disabled BOOLEAN DEFAULT 0 NOT NULL
     )
 SQL;
@@ -813,7 +780,7 @@ SQL;
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS voot_tokens (
         voot_token VARCHAR(255) UNIQUE NOT NULL,
-        user_id INTEGER UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE
+        user_id VARCHAR(255) UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
     )
 SQL;
 
@@ -821,7 +788,7 @@ SQL;
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS totp_secrets (
         totp_secret VARCHAR(255) UNIQUE NOT NULL,
-        user_id INTEGER UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE
+        user_id VARCHAR(255) UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
     )
 SQL;
 
@@ -833,7 +800,7 @@ SQL;
         valid_from DATETIME NOT NULL,
         valid_to DATETIME NOT NULL,
         is_disabled BOOLEAN DEFAULT 0,
-        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+        user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
     )
 SQL;
 
@@ -842,7 +809,7 @@ SQL;
     CREATE TABLE IF NOT EXISTS totp_log (
         totp_key VARCHAR(255) NOT NULL,
         date_time DATETIME NOT NULL,
-        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
         UNIQUE (user_id, totp_key)
     )
 SQL;
@@ -878,7 +845,7 @@ SQL;
         type VARCHAR(255) NOT NULL DEFAULT "notification",
         message TINYTEXT NOT NULL,
         date_time DATETIME NOT NULL,
-        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
+        user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
     )
 SQL;
 
@@ -890,21 +857,39 @@ SQL;
         }
     }
 
-    public function drop()
+    private function addUser($userId)
     {
-        $tableList = [
-            'users',
-            'voot_tokens',
-            'totp_secrets',
-            'certificates',
-            'totp_log',
-            'connection_log',
-            'system_messages',
-            'user_messages',
-        ];
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    SELECT 
+        COUNT(*)
+    FROM 
+        users
+    WHERE user_id = :user_id
+SQL
+        );
 
-        foreach ($tableList as $table) {
-            $this->db->query(sprintf('DROP TABLE IF EXISTS %s', $table));
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        if (1 !== (int) $stmt->fetchColumn()) {
+            // user does not exist yet
+            $stmt = $this->db->prepare(
+<<< 'SQL'
+    INSERT INTO 
+        users (
+            user_id,
+            date_time
+        )
+    VALUES (
+        :user_id,
+        :date_time
+    )
+SQL
+            );
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+            $stmt->bindValue(':date_time', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+            $stmt->execute();
         }
     }
 }

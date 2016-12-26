@@ -129,11 +129,11 @@ class ConnectionsModule implements ServiceModuleInterface
         $certInfo = $this->storage->getUserCertificateInfo($commonName);
         $userId = $certInfo['user_id'];
 
-        $twoFactor = new TwoFactor($this->storage, new DateTime('now'));
+        $twoFactor = new TwoFactor($this->storage);
         try {
             $twoFactor->verifyTotp($userId, $totpKey);
         } catch (TwoFactorException $e) {
-            $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] OTP validation failed: %s', $e->getMessage()), new DateTime('now'));
+            $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] OTP validation failed: %s', $e->getMessage()));
 
             return new ApiErrorResponse('verify_otp', $e->getMessage());
         }
@@ -151,14 +151,14 @@ class ConnectionsModule implements ServiceModuleInterface
 
         if ($result['user_is_disabled']) {
             $msg = '[VPN] unable to connect, account is disabled';
-            $this->storage->addUserMessage($result['user_id'], 'notification', $msg, new DateTime('now'));
+            $this->storage->addUserMessage($result['user_id'], 'notification', $msg);
 
             return new ApiErrorResponse('connect', $msg);
         }
 
         if ($result['certificate_is_disabled']) {
             $msg = sprintf('[VPN] unable to connect, certificate "%s" is disabled', $result['display_name']);
-            $this->storage->addUserMessage($result['user_id'], 'notification', $msg, new DateTime('now'));
+            $this->storage->addUserMessage($result['user_id'], 'notification', $msg);
 
             return new ApiErrorResponse('connect', $msg);
         }
@@ -179,7 +179,7 @@ class ConnectionsModule implements ServiceModuleInterface
 
             if (false === self::isMember($userGroups, $profileConfig->v('aclGroupList'))) {
                 $msg = '[VPN] unable to connect, account not a member of required group';
-                $this->storage->addUserMessage($externalUserId, 'notification', $msg, new DateTime('now'));
+                $this->storage->addUserMessage($externalUserId, 'notification', $msg);
 
                 return new ApiErrorResponse('connect', $msg);
             }

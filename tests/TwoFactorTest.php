@@ -35,12 +35,12 @@ class TwoFactorTest extends PHPUnit_Framework_TestCase
                 $GLOBALS['DB_DSN'],
                 $GLOBALS['DB_USER'],
                 $GLOBALS['DB_PASSWD']
-            )
+            ),
+            new DateTime()
         );
-        $storage->drop();
         $storage->init();
         $storage->setTotpSecret('foo', 'CN2XAL23SIFTDFXZ');
-        $this->twoFactor = new TwoFactor($storage, new DateTime('now'));
+        $this->twoFactor = new TwoFactor($storage);
     }
 
     /**

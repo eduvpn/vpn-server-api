@@ -42,13 +42,11 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                 $GLOBALS['DB_DSN'],
                 $GLOBALS['DB_USER'],
                 $GLOBALS['DB_PASSWD']
-            )
+            ),
+            new DateTime()
         );
-        $storage->drop(); // drop for MariaDB
         $storage->init();
-
         $storage->addCertificate('foo', 'abcd1234', 'ABCD1234', new DateTime('@12345678'), new DateTime('@23456789'));
-
         $storage->disableUser('bar');
         $storage->setTotpSecret('bar', 'CN2XAL23SIFTDFXZ');
         $storage->setVootToken('bar', '123456');
@@ -56,7 +54,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         // user "baz" has a secret, and already used a key for replay testing
         $storage->setTotpSecret('baz', 'SWIXJ4V7VYALWH6E');
         $otp = new Otp();
-        $storage->recordTotpKey('baz', $otp->totp(Base32::decode('SWIXJ4V7VYALWH6E')), new DateTime('now'));
+        $storage->recordTotpKey('baz', $otp->totp(Base32::decode('SWIXJ4V7VYALWH6E')));
 
         $config = Config::fromFile(sprintf('%s/data/user_groups_config.yaml', __DIR__));
         $groupProviders = [

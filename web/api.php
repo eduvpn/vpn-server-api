@@ -69,7 +69,8 @@ try {
     $storage = new Storage(
         new PDO(
             sprintf('sqlite://%s/db.sqlite', $dataDir)
-        )
+        ),
+        new DateTime('now')
     );
 
     $groupProviders = [];
@@ -137,8 +138,7 @@ try {
 
     $service->addModule(
         new SystemMessagesModule(
-            $storage,
-            new DateTime()
+            $storage
         )
     );
 

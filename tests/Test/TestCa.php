@@ -23,6 +23,14 @@ use SURFnet\VPN\Server\CA\CaInterface;
 
 class TestCa implements CaInterface
 {
+    /**
+     * Generate a certificate for the VPN server.
+     *
+     * @param string $commonName
+     *
+     * @return array the certificate, key in array with keys
+     *               'cert', 'key', 'valid_from' and 'valid_to'
+     */
     public function serverCert($commonName)
     {
         return [
@@ -33,6 +41,14 @@ class TestCa implements CaInterface
         ];
     }
 
+    /**
+     * Generate a certificate for a VPN client.
+     *
+     * @param string $commonName
+     *
+     * @return array the certificate and key in array with keys 'cert', 'key',
+     *               'valid_from' and 'valid_to'
+     */
     public function clientCert($commonName)
     {
         return [
@@ -43,6 +59,11 @@ class TestCa implements CaInterface
         ];
     }
 
+    /**
+     * Get the CA root certificate.
+     *
+     * @return string the CA certificate in PEM format
+     */
     public function caCert()
     {
         return 'Ca';

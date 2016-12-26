@@ -19,7 +19,6 @@
 namespace SURFnet\VPN\Server;
 
 use Base32\Base32;
-use DateTime;
 use Otp\Otp;
 use SURFnet\VPN\Server\Exception\TwoFactorException;
 
@@ -28,13 +27,9 @@ class TwoFactor
     /** @var Storage */
     private $storage;
 
-    /** @var \DateTime */
-    private $dateTime;
-
-    public function __construct(Storage $storage, DateTime $dateTime)
+    public function __construct(Storage $storage)
     {
         $this->storage = $storage;
-        $this->dateTime = $dateTime;
     }
 
     public function verifyTotp($userId, $totpKey, $totpSecret = null)
@@ -50,7 +45,7 @@ class TwoFactor
 
         // store the attempt even before validating it, to be able to count
         // the (failed) attempts
-        if (false === $this->storage->recordTotpKey($userId, $totpKey, $this->dateTime)) {
+        if (false === $this->storage->recordTotpKey($userId, $totpKey)) {
             throw new TwoFactorException('TOTP key replay');
         }
 

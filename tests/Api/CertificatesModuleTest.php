@@ -20,6 +20,7 @@ namespace SURFnet\VPN\Server\Api;
 
 require_once sprintf('%s/Test/TestCa.php', dirname(__DIR__));
 
+use DateTime;
 use PDO;
 use PHPUnit_Framework_TestCase;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
@@ -44,9 +45,9 @@ class CertificatesModuleTest extends PHPUnit_Framework_TestCase
                 $GLOBALS['DB_DSN'],
                 $GLOBALS['DB_USER'],
                 $GLOBALS['DB_PASSWD']
-            )
+            ),
+            new DateTime()
         );
-        $storage->drop(); // drop for MariaDB
         $storage->init();
         $this->service = new Service();
         $this->service->addModule(

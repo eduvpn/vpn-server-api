@@ -28,8 +28,8 @@ interface ManagementSocketInterface
      * @param int    $timeOut       the amount of time to wait before
      *                              giving up on trying to connect
      *
-     * @throws Exception\ServerSocketException if the socket cannot be opened
-     *                                         within timeout
+     * @throws \SURFnet\VPN\Server\OpenVpn\Exception\ServerSocketException if the socket cannot be opened
+     *                                                                     within timeout
      */
     public function open($socketAddress, $timeOut = 5);
 
@@ -40,15 +40,15 @@ interface ManagementSocketInterface
      *
      * @return array the response lines as array values
      *
-     * @throws Exception\ServerSocketException in case read/write fails or
-     *                                         socket is not open
+     * @throws \SURFnet\VPN\Server\OpenVpn\Exception\ServerSocketException in case read/write fails or
+     *                                                                     socket is not open
      */
     public function command($command);
 
     /**
      * Close the socket connection.
      *
-     * @throws Exception\ServerSocketException if socket is not open
+     * @throws \SURFnet\VPN\Server\OpenVpn\Exception\ServerSocketException if socket is not open
      */
     public function close();
 }

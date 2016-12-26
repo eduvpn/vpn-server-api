@@ -39,7 +39,7 @@ try {
 
     $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
     $db = new PDO(sprintf('sqlite://%s/db.sqlite', $dataDir));
-    $storage = new Storage($db);
+    $storage = new Storage($db, new DateTime('now'));
 
     $storage->cleanConnectionLog(new DateTime('now -32 days'));
     $storage->cleanTotpLog(new DateTime('now -5 minutes'));

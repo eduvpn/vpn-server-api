@@ -18,6 +18,7 @@
 
 namespace SURFnet\VPN\Server\Acl\Provider;
 
+use DateTime;
 use GuzzleHttp\Client;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Subscriber\Mock;
@@ -42,18 +43,14 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
         );
         $client->getEmitter()->attach($mock);
 
-        $random = $this->getMockBuilder('SURFnet\VPN\Common\RandomInterface')->getMock();
-        $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
-
         $storage = new Storage(
             new PDO(
                 $GLOBALS['DB_DSN'],
                 $GLOBALS['DB_USER'],
                 $GLOBALS['DB_PASSWD']
             ),
-            $random
+            new DateTime()
         );
-        $storage->drop(); // drop for MariaDB
         $storage->init();
         $storage->setVootToken('foo', 'abcdef');
 

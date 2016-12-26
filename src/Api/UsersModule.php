@@ -18,7 +18,6 @@
 
 namespace SURFnet\VPN\Server\Api;
 
-use DateTime;
 use SURFnet\VPN\Common\Http\ApiErrorResponse;
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\AuthUtils;
@@ -64,17 +63,17 @@ class UsersModule implements ServiceModuleInterface
                 $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
                 $totpSecret = InputValidation::totpSecret($request->getPostParameter('totp_secret'));
 
-                $twoFactor = new TwoFactor($this->storage, new DateTime('now'));
+                $twoFactor = new TwoFactor($this->storage);
                 try {
                     $twoFactor->verifyTotp($userId, $totpKey, $totpSecret);
                 } catch (TwoFactorException $e) {
-                    $this->storage->addUserMessage($userId, 'notification', sprintf('TOTP validation failed: %s', $e->getMessage()), new DateTime('now'));
+                    $this->storage->addUserMessage($userId, 'notification', sprintf('TOTP validation failed: %s', $e->getMessage()));
 
                     return new ApiErrorResponse('set_totp_secret', $e->getMessage());
                 }
                 $this->storage->setTotpSecret($userId, $totpSecret);
 
-                $this->storage->addUserMessage($userId, 'notification', 'TOTP secret set', new DateTime('now'));
+                $this->storage->addUserMessage($userId, 'notification', 'TOTP secret set');
 
                 return new ApiResponse('set_totp_secret');
             }
@@ -88,11 +87,11 @@ class UsersModule implements ServiceModuleInterface
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
                 $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
 
-                $twoFactor = new TwoFactor($this->storage, new DateTime('now'));
+                $twoFactor = new TwoFactor($this->storage);
                 try {
                     $twoFactor->verifyTotp($userId, $totpKey);
                 } catch (TwoFactorException $e) {
-                    $this->storage->addUserMessage($userId, 'notification', sprintf('TOTP validation failed: %s', $e->getMessage()), new DateTime('now'));
+                    $this->storage->addUserMessage($userId, 'notification', sprintf('TOTP validation failed: %s', $e->getMessage()));
 
                     return new ApiErrorResponse('verify_totp_key', $e->getMessage());
                 }
@@ -119,7 +118,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
-                $this->storage->addUserMessage($userId, 'notification', 'TOTP secret deleted by an administrator', new DateTime('now'));
+                $this->storage->addUserMessage($userId, 'notification', 'TOTP secret deleted by an administrator');
 
                 return new ApiResponse('delete_totp_secret', $this->storage->deleteTotpSecret($userId));
             }
@@ -177,7 +176,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
-                $this->storage->addUserMessage($userId, 'notification', 'account disabled by an administrator', new DateTime('now'));
+                $this->storage->addUserMessage($userId, 'notification', 'account disabled by an administrator');
 
                 return new ApiResponse('disable_user', $this->storage->disableUser($userId));
             }
@@ -190,7 +189,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
-                $this->storage->addUserMessage($userId, 'notification', 'account enabled by an administrator', new DateTime('now'));
+                $this->storage->addUserMessage($userId, 'notification', 'account enabled by an administrator');
 
                 return new ApiResponse('enable_user', $this->storage->enableUser($userId));
             }

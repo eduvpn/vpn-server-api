@@ -37,18 +37,14 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $random = $this->getMockBuilder('SURFnet\VPN\Common\RandomInterface')->getMock();
-        $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
-
         $storage = new Storage(
             new PDO(
                 $GLOBALS['DB_DSN'],
                 $GLOBALS['DB_USER'],
                 $GLOBALS['DB_PASSWD']
             ),
-            $random
+            new DateTime()
         );
-        $storage->drop(); // drop for MariaDB
         $storage->init();
         $storage->addCertificate('foo', '12345678901234567890123456789012', '12345678901234567890123456789012', new DateTime('@12345678'), new DateTime('@23456789'));
         $storage->setTotpSecret('foo', 'CN2XAL23SIFTDFXZ');

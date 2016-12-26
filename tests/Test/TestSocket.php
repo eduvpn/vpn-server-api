@@ -18,7 +18,7 @@
 
 namespace SURFnet\VPN\Server\Test;
 
-use SURFnet\VPN\Server\OpenVpn\ManagementSocketException;
+use SURFnet\VPN\Server\OpenVpn\Exception\ManagementSocketException;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocketInterface;
 
 /**
@@ -30,7 +30,7 @@ class TestSocket implements ManagementSocketInterface
     /** @var bool */
     private $connectFail;
 
-    /** @var string */
+    /** @var string|null */
     private $socketAddress;
 
     public function __construct($connectFail = false)
@@ -39,6 +39,17 @@ class TestSocket implements ManagementSocketInterface
         $this->socketAddress = null;
     }
 
+    /**
+     * Open the socket.
+     *
+     * @param string $socketAddress the socket to connect to, e.g.:
+     *                              "tcp://localhost:7505"
+     * @param int    $timeOut       the amount of time to wait before
+     *                              giving up on trying to connect
+     *
+     * @throws \SURFnet\VPN\Server\OpenVpn\Exception\ServerSocketException if the socket cannot be opened
+     *                                                                     within timeout
+     */
     public function open($socketAddress, $timeOut = 5)
     {
         $this->socketAddress = $socketAddress;
@@ -47,6 +58,16 @@ class TestSocket implements ManagementSocketInterface
         }
     }
 
+    /**
+     * Send an OpenVPN command and get the response.
+     *
+     * @param string $command a OpenVPN management command and parameters
+     *
+     * @return array the response lines as array values
+     *
+     * @throws \SURFnet\VPN\Server\OpenVpn\Exception\ServerSocketException in case read/write fails or
+     *                                                                     socket is not open
+     */
     public function command($command)
     {
         if ('status 2' === $command) {
@@ -65,6 +86,11 @@ class TestSocket implements ManagementSocketInterface
         }
     }
 
+    /**
+     * Close the socket connection.
+     *
+     * @throws \SURFnet\VPN\Server\OpenVpn\Exception\ServerSocketException if socket is not open
+     */
     public function close()
     {
         $this->socketAddress = null;

@@ -50,7 +50,12 @@ try {
     $ca->init($config);
 
     $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
-    $storage = new Storage(new PDO(sprintf('sqlite://%s/db.sqlite', $dataDir)));
+    $storage = new Storage(
+        new PDO(
+            sprintf('sqlite://%s/db.sqlite', $dataDir)
+        ),
+        new DateTime('now')
+    );
     $storage->init();
 
     $tlsAuth = new TlsAuth($dataDir);
