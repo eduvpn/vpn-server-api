@@ -97,7 +97,7 @@ SQL
     SELECT
         voot_token
     FROM 
-        voot_tokens
+        users
     WHERE 
         user_id = :user_id
 SQL
@@ -113,10 +113,12 @@ SQL
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    INSERT INTO voot_tokens 
-        (user_id, voot_token) 
-    VALUES
-        (:user_id, :voot_token)
+    UPDATE
+        users
+    SET
+        voot_token = :voot_token
+    WHERE
+        user_id = :user_id
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
@@ -136,9 +138,11 @@ SQL
     SELECT
         COUNT(*)
     FROM 
-        voot_tokens
+        users
     WHERE 
         user_id = :user_id
+    AND
+        voot_token NOT NULL
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
@@ -152,8 +156,10 @@ SQL
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    DELETE FROM 
-        voot_tokens 
+    UPDATE
+        users
+    SET
+        voot_token = NULL
     WHERE 
         user_id = :user_id
 SQL
@@ -173,9 +179,11 @@ SQL
     SELECT
         COUNT(*)
     FROM 
-        totp_secrets
+        users
     WHERE 
         user_id = :user_id
+    AND
+        totp_secret NOT NULL
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
@@ -192,7 +200,7 @@ SQL
     SELECT
         totp_secret
     FROM 
-        totp_secrets
+        users
     WHERE 
         user_id = :user_id
 SQL
@@ -208,23 +216,21 @@ SQL
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    INSERT INTO totp_secrets 
-        (user_id, totp_secret) 
-    VALUES
-        (:user_id, :totp_secret)
+    UPDATE
+        users
+    SET
+        totp_secret = :totp_secret
+    WHERE
+        user_id = :user_id
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->bindValue(':totp_secret', $totpSecret, PDO::PARAM_STR);
 
-        try {
-            $stmt->execute();
+        $stmt->execute();
 
-            return true;
-        } catch (PDOException $e) {
-            // unable to add the TOTP secret, probably uniqueness contrains
-            return false;
-        }
+        // XXX error handling!
+        return 1 === $stmt->rowCount();
     }
 
     public function deleteTotpSecret($userId)
@@ -232,8 +238,10 @@ SQL
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    DELETE FROM 
-        totp_secrets 
+    UPDATE
+        users
+    SET
+        totp_secret = NULL
     WHERE 
         user_id = :user_id
 SQL
@@ -771,26 +779,28 @@ SQL
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS users (
         user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
+        voot_token VARCHAR(255) DEFAULT NULL,
+        totp_secret VARCHAR(255) DEFAULT NULL,
         date_time DATETIME NOT NULL,
         is_disabled BOOLEAN DEFAULT 0 NOT NULL
     )
 SQL;
 
-        $queryList[] =
-<<< 'SQL'
-    CREATE TABLE IF NOT EXISTS voot_tokens (
-        voot_token VARCHAR(255) UNIQUE NOT NULL,
-        user_id VARCHAR(255) UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
-    )
-SQL;
+//        $queryList[] =
+//<<< 'SQL'
+//    CREATE TABLE IF NOT EXISTS voot_tokens (
+//        voot_token VARCHAR(255) UNIQUE NOT NULL,
+//        user_id VARCHAR(255) UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
+//    )
+//SQL;
 
-        $queryList[] =
-<<< 'SQL'
-    CREATE TABLE IF NOT EXISTS totp_secrets (
-        totp_secret VARCHAR(255) UNIQUE NOT NULL,
-        user_id VARCHAR(255) UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
-    )
-SQL;
+//        $queryList[] =
+//<<< 'SQL'
+//    CREATE TABLE IF NOT EXISTS totp_secrets (
+//        totp_secret VARCHAR(255) UNIQUE NOT NULL,
+//        user_id VARCHAR(255) UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
+//    )
+//SQL;
 
         $queryList[] =
 <<< 'SQL'
