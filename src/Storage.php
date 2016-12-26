@@ -786,22 +786,6 @@ SQL
     )
 SQL;
 
-//        $queryList[] =
-//<<< 'SQL'
-//    CREATE TABLE IF NOT EXISTS voot_tokens (
-//        voot_token VARCHAR(255) UNIQUE NOT NULL,
-//        user_id VARCHAR(255) UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
-//    )
-//SQL;
-
-//        $queryList[] =
-//<<< 'SQL'
-//    CREATE TABLE IF NOT EXISTS totp_secrets (
-//        totp_secret VARCHAR(255) UNIQUE NOT NULL,
-//        user_id VARCHAR(255) UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
-//    )
-//SQL;
-
         $queryList[] =
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS certificates (
