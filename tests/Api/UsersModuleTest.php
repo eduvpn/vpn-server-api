@@ -154,9 +154,6 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
     public function testVerifyOtpKeyWrong()
     {
-        $otp = new Otp();
-        $totpSecret = 'CN2XAL23SIFTDFXZ';
-
         // in theory this totp_key, 123456 could be correct at one point in
         // time... then this test will fail!
         $this->assertSame(
