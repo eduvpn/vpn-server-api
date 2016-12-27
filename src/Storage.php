@@ -41,6 +41,9 @@ class Storage
         $this->dateTime = $dateTime;
     }
 
+    /**
+     * @return array
+     */
     public function getUsers()
     {
         $stmt = $this->db->prepare(
@@ -69,6 +72,9 @@ SQL
         return $userList;
     }
 
+    /**
+     * @return array|false
+     */
     public function getUserCertificateInfo($commonName)
     {
         $stmt = $this->db->prepare(
@@ -92,6 +98,9 @@ SQL
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @return string|null
+     */
     public function getVootToken($userId)
     {
         $this->addUser($userId);
@@ -128,30 +137,28 @@ SQL
         $stmt->bindValue(':voot_token', $vootToken, PDO::PARAM_STR);
 
         $stmt->execute();
-
-        // XXX deal with errors!
-        return 1 === $stmt->rowCount();
     }
 
+    /**
+     * @return bool
+     */
     public function hasVootToken($userId)
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
-        COUNT(*)
+        voot_token
     FROM 
         users
     WHERE 
         user_id = :user_id
-    AND
-        voot_token NOT NULL
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
-        return 1 === (int) $stmt->fetchColumn();
+        return !is_null($stmt->fetchColumn());
     }
 
     public function deleteVootToken($userId)
@@ -170,31 +177,33 @@ SQL
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
 
         $stmt->execute();
-        // XXX error handling!
-        return 1 === $stmt->rowCount();
     }
 
+    /**
+     * @return bool
+     */
     public function hasTotpSecret($userId)
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
-        COUNT(*)
+        totp_secret
     FROM 
         users
     WHERE 
         user_id = :user_id
-    AND
-        totp_secret NOT NULL
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
-        return 1 === (int) $stmt->fetchColumn();
+        return !is_null($stmt->fetchColumn());
     }
 
+    /**
+     * @return string|null
+     */
     public function getTotpSecret($userId)
     {
         $this->addUser($userId);
@@ -231,9 +240,6 @@ SQL
         $stmt->bindValue(':totp_secret', $totpSecret, PDO::PARAM_STR);
 
         $stmt->execute();
-
-        // XXX error handling!
-        return 1 === $stmt->rowCount();
     }
 
     public function deleteTotpSecret($userId)
@@ -250,11 +256,7 @@ SQL
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-
         $stmt->execute();
-
-        // XXX error handling?
-        return 1 === $stmt->rowCount();
     }
 
     public function deleteUser($userId)
@@ -269,10 +271,7 @@ SQL
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-
         $stmt->execute();
-        // XXX error handling?
-        return 1 === $stmt->rowCount();
     }
 
     public function addCertificate($userId, $commonName, $displayName, DateTime $validFrom, DateTime $validTo)
@@ -291,12 +290,12 @@ SQL
         $stmt->bindValue(':display_name', $displayName, PDO::PARAM_STR);
         $stmt->bindValue(':valid_from', $validFrom->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->bindValue(':valid_to', $validTo->format('Y-m-d H:i:s'), PDO::PARAM_STR);
-
         $stmt->execute();
-        // XXX
-        return 1 === $stmt->rowCount();
     }
 
+    /**
+     * @return array
+     */
     public function getCertificates($userId)
     {
         $this->addUser($userId);
@@ -318,9 +317,9 @@ SQL
         $stmt->execute();
 
         $certificateList = [];
-        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $result) {
-            $result['is_disabled'] = (bool) $result['is_disabled'];
-            $certificateList[] = $result;
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $row['is_disabled'] = (bool) $row['is_disabled'];
+            $certificateList[] = $row;
         }
 
         return $certificateList;
@@ -339,10 +338,7 @@ SQL
 SQL
         );
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
-
         $stmt->execute();
-        // XXX
-        return 1 === $stmt->rowCount();
     }
 
     public function deleteCertificate($commonName)
@@ -356,10 +352,7 @@ SQL
 SQL
         );
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
-
         $stmt->execute();
-        // XXX
-        return 1 === $stmt->rowCount();
     }
 
     public function enableCertificate($commonName)
@@ -375,10 +368,7 @@ SQL
 SQL
         );
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
-
         $stmt->execute();
-        // XXX
-        return 1 === $stmt->rowCount();
     }
 
     public function disableUser($userId)
@@ -395,12 +385,7 @@ SQL
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-
         $stmt->execute();
-
-        // XXX it seems on update the rowCount is always 1, even if nothing was
-        // modified?
-        return 1 === $stmt->rowCount();
     }
 
     public function enableUser($userId)
@@ -417,35 +402,34 @@ SQL
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-
         $stmt->execute();
-
-        // XXX it seems on update the rowCount is always 1, even if nothing was
-        // modified?
-        return 1 === $stmt->rowCount();
     }
 
+    /**
+     * @return bool
+     */
     public function isDisabledUser($userId)
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
-        COUNT(*)
+        is_disabled
     FROM 
         users
     WHERE 
         user_id = :user_id 
-    AND 
-        is_disabled = 1
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
-        return 1 === (int) $stmt->fetchColumn();
+        return (bool) $stmt->fetchColumn();
     }
 
+    /**
+     * @return array
+     */
     public function getAllLogEntries()
     {
         $stmt = $this->db->prepare(
@@ -512,10 +496,7 @@ SQL
         $stmt->bindValue(':ip4', $ip4, PDO::PARAM_STR);
         $stmt->bindValue(':ip6', $ip6, PDO::PARAM_STR);
         $stmt->bindValue(':connected_at', $connectedAt->format('Y-m-d H:i:s'), PDO::PARAM_STR);
-
         $stmt->execute();
-        // XXX
-        return 1 === $stmt->rowCount();
     }
 
     public function clientDisconnect($profileId, $commonName, $ip4, $ip6, DateTime $connectedAt, DateTime $disconnectedAt, $bytesTransferred)
@@ -547,13 +528,12 @@ SQL
         $stmt->bindValue(':connected_at', $connectedAt->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->bindValue(':disconnected_at', $disconnectedAt->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->bindValue(':bytes_transferred', $bytesTransferred, PDO::PARAM_INT);
-
         $stmt->execute();
-
-        // XXX
-        return 1 === $stmt->rowCount();
     }
 
+    /**
+     * @return array|false
+     */
     public function getLogEntry($dateTimeUnix, $ipAddress)
     {
         $stmt = $this->db->prepare(
@@ -580,9 +560,14 @@ SQL
         $stmt->bindValue(':date_time_unix', $dateTimeUnix, PDO::PARAM_STR);
         $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // XXX can this also contain multiple results? I don't think so, but
+        // make sure!
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @return int
+     */
     public function getTotpAttemptCount($userId)
     {
         $this->addUser($userId);
@@ -602,6 +587,9 @@ SQL
         return (int) $stmt->fetchColumn();
     }
 
+    /**
+     * @return bool true if recording succeeds, false if it cannot due to replay
+     */
     public function recordTotpKey($userId, $totpKey)
     {
         $this->addUser($userId);
@@ -621,7 +609,7 @@ SQL
         try {
             $stmt->execute();
         } catch (PDOException $e) {
-            // unable to record the TOTP, probably uniqueness contrains
+            // unable to record the TOTP, most likely replay
             return false;
         }
 
@@ -678,6 +666,9 @@ SQL
         return $stmt->execute();
     }
 
+    /**
+     * @return array
+     */
     public function systemMessages($type)
     {
         $stmt = $this->db->prepare(
@@ -712,8 +703,6 @@ SQL
         $stmt->bindValue(':message', $message, PDO::PARAM_STR);
         $stmt->bindValue(':date_time', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->execute();
-
-        return 1 === $stmt->rowCount();
     }
 
     public function deleteSystemMessage($messageId)
@@ -728,10 +717,11 @@ SQL
 
         $stmt->bindValue(':message_id', $messageId, PDO::PARAM_INT);
         $stmt->execute();
-
-        return 1 === $stmt->rowCount();
     }
 
+    /**
+     * @return array
+     */
     public function userMessages($userId)
     {
         $this->addUser($userId);
@@ -771,8 +761,6 @@ SQL
         $stmt->bindValue(':message', $message, PDO::PARAM_STR);
         $stmt->bindValue(':date_time', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->execute();
-
-        return 1 === $stmt->rowCount();
     }
 
     public function init()
