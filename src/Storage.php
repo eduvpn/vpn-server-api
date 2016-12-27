@@ -48,6 +48,8 @@ class Storage
     SELECT
         user_id, 
         date_time,
+        totp_secret,
+        yubi_key,
         is_disabled
     FROM 
         users
@@ -56,10 +58,11 @@ SQL
         $stmt->execute();
 
         $userList = [];
-        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $result) {
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $userList[] = [
-                'user_id' => $result['user_id'],
-                'is_disabled' => (bool) $result['is_disabled'],
+                'user_id' => $row['user_id'],
+                'is_disabled' => (bool) $row['is_disabled'],
+                'two_factor' => !is_null($row['totp_secret']) || !is_null($row['yubi_key']),
             ];
         }
 
@@ -781,6 +784,7 @@ SQL
         user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
         voot_token VARCHAR(255) DEFAULT NULL,
         totp_secret VARCHAR(255) DEFAULT NULL,
+        yubi_key VARCHAR(255) DEFAULT NULL,
         date_time DATETIME NOT NULL,
         is_disabled BOOLEAN DEFAULT 0 NOT NULL
     )
