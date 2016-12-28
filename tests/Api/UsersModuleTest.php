@@ -88,17 +88,20 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                 [
                     'user_id' => 'foo',
                     'is_disabled' => false,
-                    'two_factor' => false,
+                    'has_yubi_key' => false,
+                    'has_totp_secret' => false,
                 ],
                 [
                     'user_id' => 'bar',
                     'is_disabled' => true,
-                    'two_factor' => true,
+                    'has_yubi_key' => false,
+                    'has_totp_secret' => true,
                 ],
                 [
                     'user_id' => 'baz',
                     'is_disabled' => false,
-                    'two_factor' => true,
+                    'has_yubi_key' => false,
+                    'has_totp_secret' => true,
                 ],
             ],
             $this->makeRequest(

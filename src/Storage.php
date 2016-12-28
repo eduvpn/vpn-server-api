@@ -65,7 +65,8 @@ SQL
             $userList[] = [
                 'user_id' => $row['user_id'],
                 'is_disabled' => (bool) $row['is_disabled'],
-                'two_factor' => !is_null($row['totp_secret']) || !is_null($row['yubi_key']),
+                'has_yubi_key' => !is_null($row['yubi_key']),
+                'has_totp_secret' => !is_null($row['totp_secret']),
             ];
         }
 
