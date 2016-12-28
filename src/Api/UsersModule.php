@@ -63,6 +63,11 @@ class UsersModule implements ServiceModuleInterface
                 $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
                 $totpSecret = InputValidation::totpSecret($request->getPostParameter('totp_secret'));
 
+                // check if there is already a TOTP secret registered
+                if ($this->storage->hasTotpSecret($userId)) {
+                    return new ApiErrorResponse('set_totp_secret', 'already enrolled for TOTP');
+                }
+
                 $twoFactor = new TwoFactor($this->storage);
                 try {
                     $twoFactor->verifyTotp($userId, $totpKey, $totpSecret);
@@ -71,6 +76,7 @@ class UsersModule implements ServiceModuleInterface
 
                     return new ApiErrorResponse('set_totp_secret', $e->getMessage());
                 }
+
                 $this->storage->setTotpSecret($userId, $totpSecret);
 
                 $this->storage->addUserMessage($userId, 'notification', 'TOTP secret set');
