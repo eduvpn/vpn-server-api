@@ -41,7 +41,7 @@ class Stats
             $userId = $entry['user_id'];
             $connectedAt = $entry['connected_at'];
             $disconnectedAt = $entry['disconnected_at'];
-            $connectedAtDateTime = DateTime::createFromFormat('U', $entry['connected_at']);
+            $connectedAtDateTime = new DateTime($entry['connected_at']);
             $dateOfConnection = $connectedAtDateTime->format('Y-m-d');
 
             if (!array_key_exists($dateOfConnection, $statsData)) {
