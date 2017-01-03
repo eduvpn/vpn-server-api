@@ -170,12 +170,12 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
             $this->makeRequest(
                 ['vpn-server-node', 'aabbcc'],
                 'POST',
-                'verify_otp',
+                'verify_two_factor',
                 [],
                 [
                     'common_name' => '12345678901234567890123456789012',
-                    'otp_type' => 'totp',
-                    'totp_key' => $totpKey,
+                    'two_factor_type' => 'totp',
+                    'two_factor_value' => $totpKey,
                 ]
             )
         );

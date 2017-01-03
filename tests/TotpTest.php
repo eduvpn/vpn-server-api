@@ -21,12 +21,12 @@ namespace SURFnet\VPN\Server;
 use DateTime;
 use PDO;
 use PHPUnit_Framework_TestCase;
-use SURFnet\VPN\Server\Exception\TwoFactorException;
+use SURFnet\VPN\Server\Exception\TotpException;
 
-class TwoFactorTest extends PHPUnit_Framework_TestCase
+class TotpTest extends PHPUnit_Framework_TestCase
 {
-    /** @var TwoFactor */
-    private $twoFactor;
+    /** @var Totp */
+    private $totp;
 
     public function setUp()
     {
@@ -40,22 +40,23 @@ class TwoFactorTest extends PHPUnit_Framework_TestCase
         );
         $storage->init();
         $storage->setTotpSecret('foo', 'CN2XAL23SIFTDFXZ');
-        $this->twoFactor = new TwoFactor($storage);
+
+        $this->totp = new Totp($storage);
     }
 
     /**
-     * @expectedException \SURFnet\VPN\Server\Exception\TwoFactorException
+     * @expectedException \SURFnet\VPN\Server\Exception\TotpException
      * @expectedExceptionMessage too many attempts at TOTP
      */
     public function testTooManyReplays()
     {
         for ($i = 0; $i < 10; ++$i) {
             try {
-                $this->twoFactor->verifyTotp('foo', (string) 123456 + $i);
-            } catch (TwoFactorException $e) {
+                $this->totp->verify('foo', (string) 123456 + $i);
+            } catch (TotpException $e) {
                 $this->assertSame('invalid TOTP key', $e->getMessage());
             }
         }
-        $this->twoFactor->verifyTotp('foo', '555555');
+        $this->totp->verify('foo', '555555');
     }
 }

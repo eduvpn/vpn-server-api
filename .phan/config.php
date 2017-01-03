@@ -5,6 +5,7 @@ return [
         'bin',
         'src',
         'web',
+        'vendor/fkooman/yubitwee',
         'vendor/christian-riesen/otp',
         'vendor/christian-riesen/base32',
         'vendor/eduvpn/common',

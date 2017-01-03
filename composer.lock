@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "eb2e250facfe51b827e10c6b6ded3576",
-    "content-hash": "8fbd2c2d8efa09e2f5de91deb5eb0eff",
+    "hash": "0b02bf98201d96bd9bec765f17cce7bc",
+    "content-hash": "ffbbc36237d848bbda7028c946c33d0b",
     "packages": [
         {
             "name": "christian-riesen/base32",
@@ -126,12 +126,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "f372adeae4b8f41f76711c2da1364739ed5e4b55"
+                "reference": "7b27a5135979c7be2ad05680b52a1e3bd7d8cf35"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/f372adeae4b8f41f76711c2da1364739ed5e4b55",
-                "reference": "f372adeae4b8f41f76711c2da1364739ed5e4b55",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/7b27a5135979c7be2ad05680b52a1e3bd7d8cf35",
+                "reference": "7b27a5135979c7be2ad05680b52a1e3bd7d8cf35",
                 "shasum": ""
             },
             "require": {
@@ -166,7 +166,47 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2016-12-15 11:07:36"
+            "time": "2017-01-02 11:07:38"
+        },
+        {
+            "name": "fkooman/yubitwee",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fkooman/php-yubitwee",
+                "reference": "0bbc9e60fbed98516484de717b626bd92e9ba7da"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fkooman/php-yubitwee/zipball/0bbc9e60fbed98516484de717b626bd92e9ba7da",
+                "reference": "0bbc9e60fbed98516484de717b626bd92e9ba7da",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-hash": "*",
+                "ext-pcre": "*",
+                "ext-spl": "*",
+                "paragonie/random_compat": "^2.0",
+                "symfony/polyfill-php56": "^1.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "fkooman\\YubiTwee\\": "src/"
+                }
+            },
+            "license": [
+                "AGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "email": "fkooman@tuxed.net",
+                    "name": "François Kooman"
+                }
+            ],
+            "description": "YubiKey Validator",
+            "time": "2017-01-03 09:19:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -720,7 +760,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "eduvpn/common": 20
+        "eduvpn/common": 20,
+        "fkooman/yubitwee": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

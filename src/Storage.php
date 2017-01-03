@@ -52,7 +52,7 @@ class Storage
         user_id, 
         date_time,
         totp_secret,
-        yubi_key,
+        yubi_key_id,
         is_disabled
     FROM 
         users
@@ -65,7 +65,7 @@ SQL
             $userList[] = [
                 'user_id' => $row['user_id'],
                 'is_disabled' => (bool) $row['is_disabled'],
-                'has_yubi_key' => !is_null($row['yubi_key']),
+                'has_yubi_key_id' => !is_null($row['yubi_key_id']),
                 'has_totp_secret' => !is_null($row['totp_secret']),
             ];
         }
@@ -252,6 +252,86 @@ SQL
         users
     SET
         totp_secret = NULL
+    WHERE 
+        user_id = :user_id
+SQL
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+    }
+
+    public function setYubiKeyId($userId, $yubiKeyId)
+    {
+        $this->addUser($userId);
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    UPDATE
+        users
+    SET
+        yubi_key_id = :yubi_key_id
+    WHERE
+        user_id = :user_id
+SQL
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':yubi_key_id', $yubiKeyId, PDO::PARAM_STR);
+
+        $stmt->execute();
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasYubiKeyId($userId)
+    {
+        $this->addUser($userId);
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    SELECT
+        yubi_key_id
+    FROM 
+        users
+    WHERE 
+        user_id = :user_id
+SQL
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return !is_null($stmt->fetchColumn());
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getYubiKeyId($userId)
+    {
+        $this->addUser($userId);
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    SELECT
+        yubi_key_id
+    FROM 
+        users
+    WHERE 
+        user_id = :user_id
+SQL
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetchColumn();
+    }
+
+    public function deleteYubiKeyId($userId)
+    {
+        $this->addUser($userId);
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    UPDATE
+        users
+    SET
+        yubi_key_id = NULL
     WHERE 
         user_id = :user_id
 SQL
@@ -773,7 +853,7 @@ SQL
         user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
         voot_token VARCHAR(255) DEFAULT NULL,
         totp_secret VARCHAR(255) DEFAULT NULL,
-        yubi_key VARCHAR(255) DEFAULT NULL,
+        yubi_key_id VARCHAR(255) DEFAULT NULL,
         date_time DATETIME NOT NULL,
         is_disabled BOOLEAN DEFAULT 0 NOT NULL
     )

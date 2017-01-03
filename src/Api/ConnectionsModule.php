@@ -28,9 +28,11 @@ use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\ProfileConfig;
-use SURFnet\VPN\Server\Exception\TwoFactorException;
+use SURFnet\VPN\Server\Exception\TotpException;
+use SURFnet\VPN\Server\Exception\YubiKeyException;
 use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\TwoFactor;
+use SURFnet\VPN\Server\Totp;
+use SURFnet\VPN\Server\YubiKey;
 
 class ConnectionsModule implements ServiceModuleInterface
 {
@@ -71,11 +73,11 @@ class ConnectionsModule implements ServiceModuleInterface
         );
 
         $service->post(
-            '/verify_otp',
+            '/verify_two_factor',
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
-                return $this->verifyOtp($request);
+                return $this->verifyTwoFactor($request);
             }
         );
     }
@@ -113,26 +115,44 @@ class ConnectionsModule implements ServiceModuleInterface
         return new ApiResponse('disconnect');
     }
 
-    public function verifyOtp(Request $request)
+    public function verifyTwoFactor(Request $request)
     {
         $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
-        // we do not need 'otp_type', as only 'totp' is supported at the moment
-        InputValidation::otpType($request->getPostParameter('otp_type'));
-        $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
+        $twoFactorType = InputValidation::twoFactorType($request->getPostParameter('two_factor_type'));
 
         $certInfo = $this->storage->getUserCertificateInfo($commonName);
         $userId = $certInfo['user_id'];
 
-        $twoFactor = new TwoFactor($this->storage);
-        try {
-            $twoFactor->verifyTotp($userId, $totpKey);
-        } catch (TwoFactorException $e) {
-            $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] OTP validation failed: %s', $e->getMessage()));
+        switch ($twoFactorType) {
+            case 'yubi':
+                $yubiKeyOtp = InputValidation::yubiKeyOtp($request->getPostParameter('two_factor_value'));
+                // XXX make sure user has a yubiKeyId first!
+                $yubiKeyId = $this->storage->getYubiKeyId($userId);
+                try {
+                    $yubiKey = new YubiKey();
+                    $yubiKey->verify($userId, $yubiKeyOtp, $yubiKeyId);
+                } catch (YubiKeyException $e) {
+                    $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] YubiKey OTP validation failed: %s', $e->getMessage()));
 
-            return new ApiErrorResponse('verify_otp', $e->getMessage());
+                    return new ApiErrorResponse('verify_two_factor', $e->getMessage());
+                }
+                break;
+            case 'totp':
+                $totpKey = InputValidation::totpKey($request->getPostParameter('two_factor_value'));
+                try {
+                    $totp = new Totp($this->storage);
+                    $totp->verify($userId, $totpKey);
+                } catch (TotpException $e) {
+                    $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] TOTP validation failed: %s', $e->getMessage()));
+
+                    return new ApiErrorResponse('verify_two_factor', $e->getMessage());
+                }
+                break;
+            default:
+                return new ApiErrorResponse('verify_two_factor', 'invalid two factor type');
         }
 
-        return new ApiResponse('verify_otp');
+        return new ApiResponse('verify_two_factor');
     }
 
     private function verifyConnection($profileId, $commonName)

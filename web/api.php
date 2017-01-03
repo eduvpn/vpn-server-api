@@ -112,6 +112,7 @@ try {
 
     $service->addModule(
         new UsersModule(
+            $config,
             $storage,
             $groupProviders
         )

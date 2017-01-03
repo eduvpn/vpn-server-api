@@ -66,6 +66,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $this->service = new Service();
         $this->service->addModule(
             new UsersModule(
+                $config,
                 $storage,
                 $groupProviders
             )
@@ -88,19 +89,19 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                 [
                     'user_id' => 'foo',
                     'is_disabled' => false,
-                    'has_yubi_key' => false,
+                    'has_yubi_key_id' => false,
                     'has_totp_secret' => false,
                 ],
                 [
                     'user_id' => 'bar',
                     'is_disabled' => true,
-                    'has_yubi_key' => false,
+                    'has_yubi_key_id' => false,
                     'has_totp_secret' => true,
                 ],
                 [
                     'user_id' => 'baz',
                     'is_disabled' => false,
-                    'has_yubi_key' => false,
+                    'has_yubi_key_id' => false,
                     'has_totp_secret' => true,
                 ],
             ],
@@ -162,7 +163,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'ok' => false,
-                'error' => 'invalid TOTP key',
+                'error' => 'TOTP validation failed: invalid TOTP key',
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
@@ -185,7 +186,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'ok' => false,
-                'error' => 'TOTP key replay',
+                'error' => 'TOTP validation failed: TOTP key replay',
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],

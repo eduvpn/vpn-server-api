@@ -20,6 +20,6 @@ namespace SURFnet\VPN\Server\Exception;
 
 use Exception;
 
-class TwoFactorException extends Exception
+class TotpException extends Exception
 {
 }

@@ -20,9 +20,9 @@ namespace SURFnet\VPN\Server;
 
 use Base32\Base32;
 use Otp\Otp;
-use SURFnet\VPN\Server\Exception\TwoFactorException;
+use SURFnet\VPN\Server\Exception\TotpException;
 
-class TwoFactor
+class Totp
 {
     /** @var Storage */
     private $storage;
@@ -32,13 +32,13 @@ class TwoFactor
         $this->storage = $storage;
     }
 
-    public function verifyTotp($userId, $totpKey, $totpSecret = null)
+    public function verify($userId, $totpKey, $totpSecret = null)
     {
         // for the enroll phase totpSecret is also provided, use that then
         // instead of fetching one from the DB
         if (is_null($totpSecret)) {
             if (!$this->storage->hasTotpSecret($userId)) {
-                throw new TwoFactorException('user has no TOTP secret');
+                throw new TotpException('user has no TOTP secret');
             }
             $totpSecret = $this->storage->getTotpSecret($userId);
         }
@@ -46,16 +46,16 @@ class TwoFactor
         // store the attempt even before validating it, to be able to count
         // the (failed) attempts
         if (false === $this->storage->recordTotpKey($userId, $totpKey)) {
-            throw new TwoFactorException('TOTP key replay');
+            throw new TotpException('TOTP key replay');
         }
 
         if (10 < $this->storage->getTotpAttemptCount($userId)) {
-            throw new TwoFactorException('too many attempts at TOTP');
+            throw new TotpException('too many attempts at TOTP');
         }
 
         $otp = new Otp();
         if (!$otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
-            throw new TwoFactorException('invalid TOTP key');
+            throw new TotpException('invalid TOTP key');
         }
     }
 }

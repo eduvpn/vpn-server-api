@@ -19,6 +19,11 @@
             "no-api": true,
             "type": "vcs",
             "url": "https://github.com/eduvpn/vpn-lib-common"
+        },
+        {
+            "no-api": true,
+            "type": "vcs",
+            "url": "https://github.com/fkooman/php-yubitwee"
         }
     ],
     "require": {
@@ -31,6 +36,7 @@
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-spl": "*",
+        "fkooman/yubitwee": "dev-master",
         "guzzlehttp/guzzle": "^5.3",
         "php": ">=5.4.0"
     }
