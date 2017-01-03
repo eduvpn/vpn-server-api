@@ -1,4 +1,4 @@
 /phpunit.xml
 /vendor
 /data
-/config/*/*.yaml
+/config/*/*.php

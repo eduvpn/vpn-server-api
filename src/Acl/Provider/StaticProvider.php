@@ -43,16 +43,16 @@ class StaticProvider implements ProviderInterface
     {
         $memberOf = [];
 
-        $groupIdList = array_keys($this->config->v());
+        $groupIdList = array_keys($this->config->toArray());
         foreach ($groupIdList as $groupId) {
-            $memberList = $this->config->v($groupId, 'members');
+            $memberList = $this->config->getSection($groupId)->getSection('members')->toArray();
             if (!is_array($memberList) || !in_array($userId, $memberList)) {
                 continue;
             }
 
             $memberOf[] = [
                 'id' => $groupId,
-                'displayName' => $this->config->v($groupId, 'displayName'),
+                'displayName' => $this->config->getSection($groupId)->getItem('displayName'),
             ];
         }
 

@@ -183,15 +183,15 @@ class ConnectionsModule implements ServiceModuleInterface
     private function verifyAcl($profileId, $externalUserId)
     {
         // verify ACL
-        $profileConfig = new ProfileConfig($this->config->v('vpnProfiles', $profileId));
-        if ($profileConfig->v('enableAcl')) {
+        $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
+        if ($profileConfig->getItem('enableAcl')) {
             // ACL enabled
             $userGroups = [];
             foreach ($this->groupProviders as $groupProvider) {
                 $userGroups = array_merge($userGroups, $groupProvider->getGroups($externalUserId));
             }
 
-            if (false === self::isMember($userGroups, $profileConfig->v('aclGroupList'))) {
+            if (false === self::isMember($userGroups, $profileConfig->getSection('aclGroupList')->toArray())) {
                 $msg = '[VPN] unable to connect, account not a member of required group';
                 $this->storage->addUserMessage($externalUserId, 'notification', $msg);
 
@@ -204,6 +204,7 @@ class ConnectionsModule implements ServiceModuleInterface
 
     private static function isMember(array $memberOf, array $aclGroupList)
     {
+        //        var_dump($aclGroupList);
         // one of the groups must be listed in the profile ACL list
         foreach ($memberOf as $memberGroup) {
             if (in_array($memberGroup['id'], $aclGroupList)) {

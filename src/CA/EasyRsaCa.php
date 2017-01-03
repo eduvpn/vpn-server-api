@@ -50,10 +50,10 @@ class EasyRsaCa implements CaInterface
             $configData = [
                 sprintf('set_var EASYRSA "%s"', $this->easyRsaDir),
                 sprintf('set_var EASYRSA_PKI "%s/pki"', $this->easyRsaDataDir),
-                sprintf('set_var EASYRSA_KEY_SIZE %d', $config->i('CA', 'key_size')),
-                sprintf('set_var EASYRSA_CA_EXPIRE %d', $config->i('CA', 'ca_expire')),
-                sprintf('set_var EASYRSA_CERT_EXPIRE %d', $config->i('CA', 'cert_expire')),
-                sprintf('set_var EASYRSA_REQ_CN	"%s"', $config->s('CA', 'ca_cn')),
+                sprintf('set_var EASYRSA_KEY_SIZE %d', $config->getSection('CA')->getItem('key_size')),
+                sprintf('set_var EASYRSA_CA_EXPIRE %d', $config->getSection('CA')->getItem('ca_expire')),
+                sprintf('set_var EASYRSA_CERT_EXPIRE %d', $config->getSection('CA')->getItem('cert_expire')),
+                sprintf('set_var EASYRSA_REQ_CN	"%s"', $config->getSection('CA')->getItem('ca_cn')),
                 'set_var EASYRSA_BATCH "1"',
             ];
 

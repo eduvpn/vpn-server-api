@@ -30,12 +30,12 @@ try {
     );
 
     $opt = $p->parse($argv);
-    if ($opt->e('help')) {
+    if ($opt->hasItem('help')) {
         echo $p->help();
         exit(0);
     }
 
-    $instanceId = $opt->e('instance') ? $opt->v('instance') : 'default';
+    $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
 
     $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
     $db = new PDO(sprintf('sqlite://%s/db.sqlite', $dataDir));

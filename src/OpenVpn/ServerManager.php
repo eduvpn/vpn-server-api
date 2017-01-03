@@ -52,13 +52,13 @@ class ServerManager
         $clientConnections = [];
 
         // loop over all profiles
-        foreach (array_keys($this->config->v('vpnProfiles')) as $profileId) {
-            $profileConfig = new ProfileConfig($this->config->v('vpnProfiles', $profileId));
+        foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
+            $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
             $managementIp = $this->getManagementIp($profileConfig);
 
             $profileConnections = [];
             // loop over all processes
-            for ($i = 0; $i < $profileConfig->v('processCount'); ++$i) {
+            for ($i = 0; $i < $profileConfig->getItem('processCount'); ++$i) {
                 // add all connections from this instance to profileConnections
                 try {
                     // open the socket connection
@@ -104,12 +104,12 @@ class ServerManager
     {
         $clientsKilled = 0;
         // loop over all profiles
-        foreach (array_keys($this->config->v('vpnProfiles')) as $profileId) {
-            $profileConfig = new ProfileConfig($this->config->v('vpnProfiles', $profileId));
+        foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
+            $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
             $managementIp = $this->getManagementIp($profileConfig);
 
             // loop over all processes
-            for ($i = 0; $i < $profileConfig->v('processCount'); ++$i) {
+            for ($i = 0; $i < $profileConfig->getItem('processCount'); ++$i) {
                 // add all kills from this instance to profileKills
                 try {
                     // open the socket connection
@@ -146,10 +146,10 @@ class ServerManager
 
     private function getManagementIp(ProfileConfig $profileConfig)
     {
-        if ('auto' === $profileConfig->v('managementIp')) {
-            return sprintf('10.42.%d.%d', 100 + $this->config->v('instanceNumber'), 100 + $profileConfig->v('profileNumber'));
+        if ('auto' === $profileConfig->getItem('managementIp')) {
+            return sprintf('10.42.%d.%d', 100 + $this->config->getItem('instanceNumber'), 100 + $profileConfig->getItem('profileNumber'));
         }
 
-        return $profileConfig->v('managementIp');
+        return $profileConfig->getItem('managementIp');
     }
 }

@@ -56,10 +56,10 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $otp = new Otp();
         $storage->recordTotpKey('baz', $otp->totp(Base32::decode('SWIXJ4V7VYALWH6E')));
 
-        $config = Config::fromFile(sprintf('%s/data/user_groups_config.yaml', __DIR__));
+        $config = Config::fromFile(sprintf('%s/data/user_groups_config.php', __DIR__));
         $groupProviders = [
             new StaticProvider(
-                new Config($config->v('groupProviders', 'StaticProvider'))
+                $config->getSection('groupProviders')->getSection('StaticProvider')
             ),
         ];
 

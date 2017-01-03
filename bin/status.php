@@ -33,14 +33,14 @@ try {
     );
 
     $opt = $p->parse($argv);
-    if ($opt->e('help')) {
+    if ($opt->hasItem('help')) {
         echo $p->help();
         exit(0);
     }
 
-    $instanceId = $opt->e('instance') ? $opt->v('instance') : 'default';
+    $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
 
-    $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
+    $configFile = sprintf('%s/config/%s/config.php', dirname(__DIR__), $instanceId);
     $config = Config::fromFile($configFile);
 
     $serverManager = new ServerManager(

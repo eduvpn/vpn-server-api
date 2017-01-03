@@ -31,7 +31,7 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $config = Config::fromFile(sprintf('%s/data/info_module_config.yaml', __DIR__));
+        $config = Config::fromFile(sprintf('%s/data/info_module_config.php', __DIR__));
 
         $this->service = new Service();
         $this->service->addModule(

@@ -20,7 +20,6 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\Config;
-use Symfony\Component\Yaml\Yaml;
 
 $credentials = [
     'vpn-user-portal' => bin2hex(random_bytes(16)),
@@ -38,21 +37,21 @@ try {
     );
 
     $opt = $p->parse($argv);
-    if ($opt->e('help')) {
+    if ($opt->hasItem('help')) {
         echo $p->help();
         exit(0);
     }
     $prefix = '/usr/share';
-    if ($opt->e('prefix')) {
-        $prefix = $opt->v('prefix');
+    if ($opt->hasItem('prefix')) {
+        $prefix = $opt->getItem('prefix');
     }
 
-    $instanceId = $opt->e('instance') ? $opt->v('instance') : 'default';
+    $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
 
     // api provider
-    $configFile = sprintf('%s/vpn-server-api/config/%s/config.yaml', $prefix, $instanceId);
+    $configFile = sprintf('%s/vpn-server-api/config/%s/config.php', $prefix, $instanceId);
     $config = Config::fromFile($configFile);
-    $configData = $config->v();
+    $configData = $config->toArray();
     $configData['apiConsumers']['vpn-user-portal'] = $credentials['vpn-user-portal'];
     $configData['apiConsumers']['vpn-admin-portal'] = $credentials['vpn-admin-portal'];
     $configData['apiConsumers']['vpn-server-node'] = $credentials['vpn-server-node'];
@@ -60,15 +59,15 @@ try {
 
     // consumers
     $consumerConfigFiles = [
-        'vpn-user-portal' => sprintf('%s/vpn-user-portal/config/%s/config.yaml', $prefix, $instanceId),
-        'vpn-admin-portal' => sprintf('%s/vpn-admin-portal/config/%s/config.yaml', $prefix, $instanceId),
-        'vpn-server-node' => sprintf('%s/vpn-server-node/config/%s/config.yaml', $prefix, $instanceId),
+        'vpn-user-portal' => sprintf('%s/vpn-user-portal/config/%s/config.php', $prefix, $instanceId),
+        'vpn-admin-portal' => sprintf('%s/vpn-admin-portal/config/%s/config.php', $prefix, $instanceId),
+        'vpn-server-node' => sprintf('%s/vpn-server-node/config/%s/config.php', $prefix, $instanceId),
     ];
 
     foreach ($consumerConfigFiles as $configId => $configFile) {
         if (@file_exists($configFile)) {
             $config = Config::fromFile($configFile);
-            $configData = $config->v();
+            $configData = $config->toArray();
             $configData['apiPass'] = $credentials[$configId];
             Config::toFile($configFile, $configData, 0644);
         }

@@ -47,12 +47,12 @@ try {
     );
 
     $opt = $p->parse($argv);
-    if ($opt->e('help')) {
+    if ($opt->hasItem('help')) {
         echo $p->help();
         exit(0);
     }
 
-    $instanceId = $opt->e('instance') ? $opt->v('instance') : 'default';
+    $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
 
     $v4 = sprintf('10.%s.%s.0/24', hexdec(bin2hex(random_bytes(1))), hexdec(bin2hex(random_bytes(1))));
     $v6 = sprintf('fd%s:%s:%s:%s::/60', bin2hex(random_bytes(1)), bin2hex(random_bytes(2)), bin2hex(random_bytes(2)), bin2hex(random_bytes(2) & hex2bin('fff0')));
@@ -60,24 +60,24 @@ try {
     echo sprintf('IPv4 CIDR  : %s', $v4).PHP_EOL;
     echo sprintf('IPv6 prefix: %s', $v6).PHP_EOL;
 
-    $configFile = sprintf('%s/config/%s/config.yaml', dirname(__DIR__), $instanceId);
+    $configFile = sprintf('%s/config/%s/config.php', dirname(__DIR__), $instanceId);
     $config = Config::fromFile($configFile);
-    $profileConfig = new ProfileConfig($config->v('vpnProfiles', $opt->v('profile')));
+    $profileConfig = new ProfileConfig($config->getSection('vpnProfiles')->getSection($opt->getItem('profile'))->toArray());
 
-    $configData = $config->v();
-    $profileConfigData = $profileConfig->v();
+    $configData = $config->toArray();
+    $profileConfigData = $profileConfig->toArray();
 
     $profileConfigData['range'] = $v4;
     $profileConfigData['range6'] = $v6;
-    $profileConfigData['hostName'] = $opt->v('host');
-    $profileConfigData['extIf'] = $opt->v('ext');
-    if ($opt->e('reject4')) {
+    $profileConfigData['hostName'] = $opt->getItem('host');
+    $profileConfigData['extIf'] = $opt->getItem('ext');
+    if ($opt->hasItem('reject4')) {
         $profileConfigData['reject4'] = true;
     }
-    if ($opt->e('reject6')) {
+    if ($opt->hasItem('reject6')) {
         $profileConfigData['reject6'] = true;
     }
-    $configData['vpnProfiles'][$opt->v('profile')] = $profileConfigData;
+    $configData['vpnProfiles'][$opt->getItem('profile')] = $profileConfigData;
 
     Config::toFile($configFile, $configData, 0644);
 } catch (Exception $e) {

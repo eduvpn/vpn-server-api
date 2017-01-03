@@ -56,12 +56,12 @@ try {
     $configDir = sprintf('%s/config/%s', dirname(__DIR__), $instanceId);
 
     $config = Config::fromFile(
-        sprintf('%s/config.yaml', $configDir)
+        sprintf('%s/config.php', $configDir)
     );
 
     $service = new Service();
     $basicAuthentication = new BasicAuthenticationHook(
-        $config->v('apiConsumers'),
+        $config->getSection('apiConsumers')->toArray(),
         'vpn-server-backend'
     );
     $service->addBeforeHook('auth', $basicAuthentication);
@@ -74,22 +74,18 @@ try {
     );
 
     $groupProviders = [];
-    if ($config->e('groupProviders')) {
-        $enabledProviders = array_keys($config->v('groupProviders'));
+    if ($config->hasSection('groupProviders')) {
+        $enabledProviders = array_keys($config->getSection('groupProviders')->toArray());
         // StaticProvider
         if (in_array('StaticProvider', $enabledProviders)) {
             $groupProviders[] = new StaticProvider(
-                new Config(
-                    $config->v('groupProviders', 'StaticProvider')
-                )
+                $config->getSection('groupProviders')->getSection('StaticProvider')
             );
         }
         // VootProvider
         if (in_array('VootProvider', $enabledProviders)) {
             $groupProviders[] = new VootProvider(
-                new Config(
-                    $config->v('groupProviders', 'VootProvider')
-                ),
+                $config->getSection('groupProviders')->getSection('VootProvider'),
                 $storage,
                 new Client()
             );

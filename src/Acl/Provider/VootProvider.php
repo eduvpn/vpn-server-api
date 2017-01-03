@@ -67,7 +67,7 @@ class VootProvider implements ProviderInterface
     {
         try {
             return $this->client->get(
-                $this->config->v('apiUrl'),
+                $this->config->getItem('apiUrl'),
                 [
                     'headers' => [
                         'Authorization' => sprintf('Bearer %s', $bearerToken),
