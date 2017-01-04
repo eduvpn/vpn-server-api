@@ -18,28 +18,38 @@
 
 namespace SURFnet\VPN\Server\Acl\Provider;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\TransferException;
-use SURFnet\VPN\Common\Config;
+use RuntimeException;
 use SURFnet\VPN\Server\Acl\ProviderInterface;
 use SURFnet\VPN\Server\Storage;
 
 class VootProvider implements ProviderInterface
 {
-    /** @var \SURFnet\VPN\Common\Config */
-    private $config;
-
     /** @var \SURFnet\VPN\Server\Storage */
     private $storage;
 
-    /** @var \GuzzleHttp\Client */
-    private $client;
+    /** @var VootClientInterface */
+    private $vootClient;
 
-    public function __construct(Config $config, Storage $storage, Client $client)
+    /** @var string */
+    private $vootUri;
+
+    /** @var resource */
+    private $curlChannel;
+
+    public function __construct(Storage $storage, VootClientInterface $vootClient, $vootUri)
     {
-        $this->config = $config;
         $this->storage = $storage;
-        $this->client = $client;
+        $this->vootClient = $vootClient;
+        $this->vootUri = $vootUri;
+
+        if (false === $this->curlChannel = curl_init()) {
+            throw new RuntimeException('unable to create cURL channel');
+        }
+    }
+
+    public function __destruct()
+    {
+        curl_close($this->curlChannel);
     }
 
     /**
@@ -52,31 +62,28 @@ class VootProvider implements ProviderInterface
      */
     public function getGroups($userId)
     {
-        // XXX combine this request with get to not require 2 queries
-        if (!$this->storage->hasVootToken($userId)) {
+        $vootToken = $this->storage->getVootToken($userId);
+        if (is_null($vootToken)) {
             return [];
         }
 
         // fetch the groups and extract the membership data
         return self::extractMembership(
-            $this->fetchGroups($this->storage->getVootToken($userId))
+            $this->fetchGroups($vootToken)
         );
     }
 
     private function fetchGroups($bearerToken)
     {
-        try {
-            return $this->client->get(
-                $this->config->getItem('apiUrl'),
-                [
-                    'headers' => [
-                        'Authorization' => sprintf('Bearer %s', $bearerToken),
-                    ],
-                ]
-            )->json();
-        } catch (TransferException $e) {
+        list($responseCode, $responseData) = $this->vootClient->get($this->vootUri, $bearerToken);
+
+        if (200 !== $responseCode) {
+            // we should probably log some stuff here, but for now just assume
+            // there are no groups for the user...
             return [];
         }
+
+        return $responseData;
     }
 
     private static function extractMembership(array $responseData)

@@ -19,12 +19,8 @@
 namespace SURFnet\VPN\Server\Acl\Provider;
 
 use DateTime;
-use GuzzleHttp\Client;
-use GuzzleHttp\Message\Response;
-use GuzzleHttp\Subscriber\Mock;
 use PDO;
 use PHPUnit_Framework_TestCase;
-use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\Storage;
 
 class VootProviderTest extends PHPUnit_Framework_TestCase
@@ -34,14 +30,13 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $client = new Client();
-        $mock = new Mock(
-            [
-                file_get_contents(sprintf('%s/data/response.json', __DIR__)),
-                file_get_contents(sprintf('%s/data/response_invalid_token.json', __DIR__)),
-            ]
+        $vootClient = $this->getMockBuilder('\SURFnet\VPN\Server\Acl\Provider\VootClientInterface')->getMock();
+        $vootClient->method('get')->will(
+            $this->onConsecutiveCalls(
+                [200, json_decode(file_get_contents(sprintf('%s/data/response.json', __DIR__)), true)],
+                [401, json_decode(file_get_contents(sprintf('%s/data/response_invalid_token.json', __DIR__)), true)]
+            )
         );
-        $client->getEmitter()->attach($mock);
 
         $storage = new Storage(
             new PDO(
@@ -55,9 +50,9 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
         $storage->setVootToken('foo', 'abcdef');
 
         $this->vootProvider = new VootProvider(
-            new Config(['apiUrl' => 'https://voot.surfconext.nl/me/groups']),
             $storage,
-            $client
+            $vootClient,
+            'https://voot.surfconext.nl/me/groups'
         );
     }
 

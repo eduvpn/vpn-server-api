@@ -1,17 +1,1 @@
-HTTP/1.1 200 OK
-Date: Sat, 03 Dec 2016 16:05:24 GMT
-Server: Apache-Coyote/1.1
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 1; mode=block
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-X-Application-Context: application:9191
-Content-Type: application/json;charset=UTF-8
-Connection: close
-Transfer-Encoding: chunked
-Strict-Transport-Security: max-age=15768000
-Set-Cookie: HTTPSERVERID=JAPP3; path=/; HttpOnly; Secure
-
 [{"id":"urn:collab:group:surfteams.nl:nl:surfnet:diensten:eduvpn","displayName":"EduVPN","description":null,"sourceID":"SURFteams","membership":{"basic":"member"}},{"id":"urn:collab:group:surfteams.nl:nl:surfnet:diensten:eduvpn-test","displayName":"eduVPN-test","description":"Testgroup voor SURFconext Teams integration on labrat testserver.","sourceID":"SURFteams","membership":{"basic":"manager"}},{"id":"urn:collab:group:surfteams.nl:nl:surfnet:diensten:enabling_dynamic_services_2015","displayName":"Enabling Dynamic Services 2015","description":"Team voor het regelen van autorisatie op de wiki voor het project EDS als onderdeel van P3 geintegreerde federatieve einfra.","sourceID":"SURFteams","membership":{"basic":"member"}},{"id":"urn:collab:group:surfteams.nl:nl:surfnet:diensten:surfcloud_utrecht_users","displayName":"SURFcloud Utrecht users","description":null,"sourceID":"SURFteams","membership":{"basic":"member"}}]

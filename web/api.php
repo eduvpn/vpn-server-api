@@ -17,7 +17,6 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
-use GuzzleHttp\Client;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
@@ -25,6 +24,7 @@ use SURFnet\VPN\Common\Http\Response;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Common\Random;
+use SURFnet\VPN\Server\Acl\Provider\CurlVootClient;
 use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
 use SURFnet\VPN\Server\Acl\Provider\VootProvider;
 use SURFnet\VPN\Server\Api\CertificatesModule;
@@ -85,9 +85,9 @@ try {
         // VootProvider
         if (in_array('VootProvider', $enabledProviders)) {
             $groupProviders[] = new VootProvider(
-                $config->getSection('groupProviders')->getSection('VootProvider'),
                 $storage,
-                new Client()
+                new CurlVootClient(),
+                $config->getSection('groupProviders')->getSection('VootProvider')->getItem('apiUrl')
             );
         }
     }

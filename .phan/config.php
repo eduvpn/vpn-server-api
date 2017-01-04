@@ -10,7 +10,6 @@ return [
         'vendor/christian-riesen/base32',
         'vendor/eduvpn/common',
         'vendor/psr/log',
-        'vendor/guzzlehttp/guzzle',
     ],
     'exclude_analysis_directory_list' => [
         'vendor/',
