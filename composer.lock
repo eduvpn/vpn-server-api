@@ -126,12 +126,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "f0f3ad16b8f26c2d17879f4e0202f4e44730062a"
+                "reference": "ee1a1244b43b033571ed02f29baec22960ebac59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/f0f3ad16b8f26c2d17879f4e0202f4e44730062a",
-                "reference": "f0f3ad16b8f26c2d17879f4e0202f4e44730062a",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/ee1a1244b43b033571ed02f29baec22960ebac59",
+                "reference": "ee1a1244b43b033571ed02f29baec22960ebac59",
                 "shasum": ""
             },
             "require": {
@@ -166,7 +166,7 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2017-01-04 00:21:16"
+            "time": "2017-01-04 09:57:02"
         },
         {
             "name": "fkooman/yubitwee",
