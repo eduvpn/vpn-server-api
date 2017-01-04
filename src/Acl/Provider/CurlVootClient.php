@@ -41,7 +41,9 @@ class CurlVootClient implements VootClientInterface
     {
         $curlOptions = [
             CURLOPT_URL => $requestUri,
-//            CURLOPT_USERPWD => sprintf('%s:%s', $this->authInfo[0], $this->authInfo[1]),
+            CURLOPT_HTTPHEADER => [
+                sprintf('Authorization: Bearer %s', $bearerToken),
+            ],
             CURLOPT_HEADER => 0,
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_FOLLOWLOCATION => 0,
@@ -53,7 +55,8 @@ class CurlVootClient implements VootClientInterface
         }
 
         if (false === $responseData = curl_exec($this->curlChannel)) {
-            throw new RuntimeException('failure performing the HTTP request');
+            $curlError = curl_error($this->curlChannel);
+            throw new RuntimeException(sprintf('failure performing the HTTP request: "%s"', $curlError));
         }
 
         return [
