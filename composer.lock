@@ -4,7 +4,6 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "423e79ad943dd6be311c2138e7f6201a",
     "content-hash": "19ad6431ffa2808c1a0b03f76ff44901",
     "packages": [
         {
@@ -59,20 +58,20 @@
                 "encode",
                 "rfc4648"
             ],
-            "time": "2016-05-05 11:49:03"
+            "time": "2016-05-05T11:49:03+00:00"
         },
         {
             "name": "christian-riesen/otp",
-            "version": "2.2.0",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ChristianRiesen/otp.git",
-                "reference": "b441f8338c0375df3e288225acefb943c0b3cb05"
+                "reference": "83f941e1ad6f7a2ff318e30cbf5b3219e63a9a62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ChristianRiesen/otp/zipball/b441f8338c0375df3e288225acefb943c0b3cb05",
-                "reference": "b441f8338c0375df3e288225acefb943c0b3cb05",
+                "url": "https://api.github.com/repos/ChristianRiesen/otp/zipball/83f941e1ad6f7a2ff318e30cbf5b3219e63a9a62",
+                "reference": "83f941e1ad6f7a2ff318e30cbf5b3219e63a9a62",
                 "shasum": ""
             },
             "require": {
@@ -118,7 +117,7 @@
                 "rfc6238",
                 "totp"
             ],
-            "time": "2016-06-10 14:47:22"
+            "time": "2017-01-08T16:58:00+00:00"
         },
         {
             "name": "eduvpn/common",
@@ -174,12 +173,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-yubitwee",
-                "reference": "8f561ec52fe6b496136cec49ae279386715a1ddb"
+                "reference": "0586b91cc8469f7b6bdf4aa1744c6d202bb5c86d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-yubitwee/zipball/8f561ec52fe6b496136cec49ae279386715a1ddb",
-                "reference": "8f561ec52fe6b496136cec49ae279386715a1ddb",
+                "url": "https://api.github.com/repos/fkooman/php-yubitwee/zipball/0586b91cc8469f7b6bdf4aa1744c6d202bb5c86d",
+                "reference": "0586b91cc8469f7b6bdf4aa1744c6d202bb5c86d",
                 "shasum": ""
             },
             "require": {
@@ -206,7 +205,7 @@
                 }
             ],
             "description": "YubiKey Validator",
-            "time": "2017-01-03 21:34:02"
+            "time": "2017-01-12 09:37:19"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -248,7 +247,7 @@
                 "hashing",
                 "password"
             ],
-            "time": "2014-11-20 16:49:30"
+            "time": "2014-11-20T16:49:30+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -296,7 +295,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2016-11-07 23:38:38"
+            "time": "2016-11-07T23:38:38+00:00"
         },
         {
             "name": "psr/log",
@@ -343,7 +342,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10 12:19:37"
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "symfony/polyfill-php55",
@@ -399,7 +398,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-11-14 01:06:16"
+            "time": "2016-11-14T01:06:16+00:00"
         },
         {
             "name": "symfony/polyfill-php56",
@@ -455,7 +454,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-11-14 01:06:16"
+            "time": "2016-11-14T01:06:16+00:00"
         },
         {
             "name": "symfony/polyfill-php70",
@@ -514,7 +513,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-11-14 01:06:16"
+            "time": "2016-11-14T01:06:16+00:00"
         },
         {
             "name": "symfony/polyfill-util",
@@ -566,7 +565,7 @@
                 "polyfill",
                 "shim"
             ],
-            "time": "2016-11-14 01:06:16"
+            "time": "2016-11-14T01:06:16+00:00"
         }
     ],
     "packages-dev": [],
