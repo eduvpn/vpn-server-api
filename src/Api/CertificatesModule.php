@@ -66,9 +66,6 @@ class CertificatesModule implements ServiceModuleInterface
                 // generate a random string as the certificate's CN
                 $commonName = $this->random->get(16);
                 $certInfo = $this->ca->clientCert($commonName);
-                // add TLS Auth
-                $certInfo['ta'] = $this->tlsAuth->get();
-                $certInfo['ca'] = $this->ca->caCert();
 
                 $this->storage->addCertificate(
                     $userId,
@@ -85,6 +82,24 @@ class CertificatesModule implements ServiceModuleInterface
                 );
 
                 return new ApiResponse('add_client_certificate', $certInfo, 201);
+            }
+        );
+
+        /*
+         * This provides the CA (public) certificate and the "tls-auth" key
+         * for this instance. The API call has a terrible name...
+         */
+        $service->get(
+            '/server_info',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+
+                $serverInfo = [
+                    'ta' => $this->tlsAuth->get(),
+                    'ca' => $this->ca->caCert(),
+                ];
+
+                return new ApiResponse('server_info', $serverInfo);
             }
         );
 

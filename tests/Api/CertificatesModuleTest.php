@@ -78,8 +78,6 @@ class CertificatesModuleTest extends PHPUnit_Framework_TestCase
                 'private_key' => 'ClientKey for random_1',
                 'valid_from' => 1234567890,
                 'valid_to' => 2345678901,
-                'ta' => 'Test_Ta_Key',
-                'ca' => 'Ca',
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'abcdef'],
@@ -87,6 +85,23 @@ class CertificatesModuleTest extends PHPUnit_Framework_TestCase
                 'add_client_certificate',
                 [],
                 ['user_id' => 'foo', 'display_name' => 'bar']
+            )
+        );
+    }
+
+    public function testServerInfo()
+    {
+        $this->assertSame(
+            [
+                'ta' => 'Test_Ta_Key',
+                'ca' => 'Ca',
+            ],
+            $this->makeRequest(
+                ['vpn-user-portal', 'abcdef'],
+                'GET',
+                'server_info',
+                [],
+                []
             )
         );
     }
