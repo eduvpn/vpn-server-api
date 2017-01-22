@@ -615,7 +615,7 @@ SQL
     /**
      * @return array|false
      */
-    public function getLogEntry($dateTimeUnix, $ipAddress)
+    public function getLogEntry(DateTime $dateTime, $ipAddress)
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
@@ -632,13 +632,13 @@ SQL
     WHERE
         (ip4 = :ip_address OR ip6 = :ip_address)
     AND 
-        connected_at < :date_time_unix
+        connected_at < :date_time
     AND 
-        (disconnected_at > :date_time_unix OR disconnected_at IS NULL)
+        (disconnected_at > :date_time OR disconnected_at IS NULL)
 SQL
         );
         $stmt->bindValue(':ip_address', $ipAddress, PDO::PARAM_STR);
-        $stmt->bindValue(':date_time_unix', $dateTimeUnix, PDO::PARAM_STR);
+        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->execute();
 
         // XXX can this also contain multiple results? I don't think so, but
