@@ -38,6 +38,7 @@
         "ext-pdo": "*",
         "ext-spl": "*",
         "fkooman/yubitwee": "dev-master",
+        "paragonie/constant_time_encoding": "^1",
         "php": ">=5.4.0"
     }
 }
