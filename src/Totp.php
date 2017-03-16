@@ -18,8 +18,8 @@
 
 namespace SURFnet\VPN\Server;
 
-use Base32\Base32;
 use Otp\Otp;
+use ParagonIE\ConstantTime\Encoding;
 use SURFnet\VPN\Server\Exception\TotpException;
 
 class Totp
@@ -54,7 +54,7 @@ class Totp
         }
 
         $otp = new Otp();
-        if (!$otp->checkTotp(Base32::decode($totpSecret), $totpKey)) {
+        if (!$otp->checkTotp(Encoding::base32DecodeUpper($totpSecret), $totpKey)) {
             throw new TotpException('invalid TOTP key');
         }
     }

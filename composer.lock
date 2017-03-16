@@ -7,82 +7,26 @@
     "content-hash": "61c29556fe600b19cedce72f3b95ddde",
     "packages": [
         {
-            "name": "christian-riesen/base32",
-            "version": "1.3.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ChristianRiesen/base32.git",
-                "reference": "0a31e50c0fa9b1692d077c86ac188eecdcbaf7fa"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ChristianRiesen/base32/zipball/0a31e50c0fa9b1692d077c86ac188eecdcbaf7fa",
-                "reference": "0a31e50c0fa9b1692d077c86ac188eecdcbaf7fa",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.*",
-                "satooshi/php-coveralls": "0.*"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Base32\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christian Riesen",
-                    "email": "chris.riesen@gmail.com",
-                    "homepage": "http://christianriesen.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Base32 encoder/decoder according to RFC 4648",
-            "homepage": "https://github.com/ChristianRiesen/base32",
-            "keywords": [
-                "base32",
-                "decode",
-                "encode",
-                "rfc4648"
-            ],
-            "time": "2016-05-05T11:49:03+00:00"
-        },
-        {
             "name": "christian-riesen/otp",
-            "version": "2.3.0",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ChristianRiesen/otp.git",
-                "reference": "83f941e1ad6f7a2ff318e30cbf5b3219e63a9a62"
+                "reference": "f29c9eb9f9a7117a9e9912dac2f474120061260d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ChristianRiesen/otp/zipball/83f941e1ad6f7a2ff318e30cbf5b3219e63a9a62",
-                "reference": "83f941e1ad6f7a2ff318e30cbf5b3219e63a9a62",
+                "url": "https://api.github.com/repos/ChristianRiesen/otp/zipball/f29c9eb9f9a7117a9e9912dac2f474120061260d",
+                "reference": "f29c9eb9f9a7117a9e9912dac2f474120061260d",
                 "shasum": ""
             },
             "require": {
-                "christian-riesen/base32": "^1.0",
+                "paragonie/constant_time_encoding": "^1|^2",
+                "paragonie/random_compat": "^1|^2",
                 "php": ">=5.4.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.8"
-            },
-            "suggest": {
-                "paragonie/random_compat": "Optional polyfill for a more secure random generator for pre PHP7 versions"
             },
             "type": "library",
             "extra": {
@@ -117,7 +61,7 @@
                 "rfc6238",
                 "totp"
             ],
-            "time": "2017-01-08T16:58:00+00:00"
+            "time": "2017-03-16T15:46:10+00:00"
         },
         {
             "name": "eduvpn/common",
@@ -125,12 +69,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "ee497fc26e20141aefbc639dae7822b93a4a631f"
+                "reference": "ba5fefd05aa97d5f494c3b9b02be7791e9ca63ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/ee497fc26e20141aefbc639dae7822b93a4a631f",
-                "reference": "ee497fc26e20141aefbc639dae7822b93a4a631f",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/ba5fefd05aa97d5f494c3b9b02be7791e9ca63ce",
+                "reference": "ba5fefd05aa97d5f494c3b9b02be7791e9ca63ce",
                 "shasum": ""
             },
             "require": {
@@ -146,7 +90,9 @@
                 "ext-spl": "*",
                 "ircmaxell/password-compat": "^1.0",
                 "php": ">= 5.4.0",
-                "psr/log": "^1.0"
+                "psr/log": "^1.0",
+                "twig/extensions": "^1",
+                "twig/twig": "^1"
             },
             "type": "library",
             "autoload": {
@@ -164,7 +110,7 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2017-02-15 09:51:53"
+            "time": "2017-03-16 12:19:20"
         },
         {
             "name": "fkooman/yubitwee",
@@ -313,6 +259,54 @@
             "time": "2016-06-13T01:00:24+00:00"
         },
         {
+            "name": "paragonie/random_compat",
+            "version": "v2.0.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paragonie/random_compat.git",
+                "reference": "634bae8e911eefa89c1abfbf1b66da679ac8f54d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/634bae8e911eefa89c1abfbf1b66da679ac8f54d",
+                "reference": "634bae8e911eefa89c1abfbf1b66da679ac8f54d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*|5.*"
+            },
+            "suggest": {
+                "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/random.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Paragon Initiative Enterprises",
+                    "email": "security@paragonie.com",
+                    "homepage": "https://paragonie.com"
+                }
+            ],
+            "description": "PHP 5.x polyfill for random_bytes() and random_int() from PHP 7",
+            "keywords": [
+                "csprng",
+                "pseudorandom",
+                "random"
+            ],
+            "time": "2017-03-13T16:27:32+00:00"
+        },
+        {
             "name": "psr/log",
             "version": "1.0.2",
             "source": {
@@ -358,6 +352,120 @@
                 "psr-3"
             ],
             "time": "2016-10-10T12:19:37+00:00"
+        },
+        {
+            "name": "twig/extensions",
+            "version": "v1.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twigphp/Twig-extensions.git",
+                "reference": "f0bb8431c8691f5a39f1017d9a5967a082bf01ff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twigphp/Twig-extensions/zipball/f0bb8431c8691f5a39f1017d9a5967a082bf01ff",
+                "reference": "f0bb8431c8691f5a39f1017d9a5967a082bf01ff",
+                "shasum": ""
+            },
+            "require": {
+                "twig/twig": "~1.20|~2.0"
+            },
+            "require-dev": {
+                "symfony/translation": "~2.3"
+            },
+            "suggest": {
+                "symfony/translation": "Allow the time_diff output to be translated"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Twig_Extensions_": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Common additional features for Twig that do not directly belong in core",
+            "homepage": "http://twig.sensiolabs.org/doc/extensions/index.html",
+            "keywords": [
+                "i18n",
+                "text"
+            ],
+            "time": "2016-10-25T17:34:14+00:00"
+        },
+        {
+            "name": "twig/twig",
+            "version": "v1.32.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twigphp/Twig.git",
+                "reference": "9935b662e24d6e634da88901ab534cc12e8c728f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/9935b662e24d6e634da88901ab534cc12e8c728f",
+                "reference": "9935b662e24d6e634da88901ab534cc12e8c728f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.7"
+            },
+            "require-dev": {
+                "psr/container": "^1.0",
+                "symfony/debug": "~2.7",
+                "symfony/phpunit-bridge": "~3.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.32-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Twig_": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com",
+                    "homepage": "http://fabien.potencier.org",
+                    "role": "Lead Developer"
+                },
+                {
+                    "name": "Armin Ronacher",
+                    "email": "armin.ronacher@active-4.com",
+                    "role": "Project Founder"
+                },
+                {
+                    "name": "Twig Team",
+                    "homepage": "http://twig.sensiolabs.org/contributors",
+                    "role": "Contributors"
+                }
+            ],
+            "description": "Twig, the flexible, fast, and secure template language for PHP",
+            "homepage": "http://twig.sensiolabs.org",
+            "keywords": [
+                "templating"
+            ],
+            "time": "2017-02-27T00:07:03+00:00"
         }
     ],
     "packages-dev": [],

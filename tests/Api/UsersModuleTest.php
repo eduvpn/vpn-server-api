@@ -18,9 +18,9 @@
 
 namespace SURFnet\VPN\Server\Api;
 
-use Base32\Base32;
 use DateTime;
 use Otp\Otp;
+use ParagonIE\ConstantTime\Encoding;
 use PDO;
 use PHPUnit_Framework_TestCase;
 use SURFnet\VPN\Common\Config;
@@ -54,7 +54,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         // user "baz" has a secret, and already used a key for replay testing
         $storage->setTotpSecret('baz', 'SWIXJ4V7VYALWH6E');
         $otp = new Otp();
-        $storage->recordTotpKey('baz', $otp->totp(Base32::decode('SWIXJ4V7VYALWH6E')));
+        $storage->recordTotpKey('baz', $otp->totp(Encoding::base32DecodeUpper('SWIXJ4V7VYALWH6E')));
 
         $config = Config::fromFile(sprintf('%s/data/user_groups_config.php', __DIR__));
         $groupProviders = [
@@ -119,7 +119,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
     {
         $otp = new Otp();
         $totpSecret = 'MM7TTLHPA7WZOJFB';
-        $totpKey = $otp->totp(Base32::decode($totpSecret));
+        $totpKey = $otp->totp(Encoding::base32DecodeUpper($totpSecret));
 
         $this->assertTrue(
             $this->makeRequest(
@@ -140,7 +140,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
     {
         $otp = new Otp();
         $totpSecret = 'CN2XAL23SIFTDFXZ';
-        $totpKey = $otp->totp(Base32::decode($totpSecret));
+        $totpKey = $otp->totp(Encoding::base32DecodeUpper($totpSecret));
 
         $this->assertTrue(
             $this->makeRequest(
@@ -181,7 +181,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
     public function testVerifyOtpKeyReplay()
     {
         $otp = new Otp();
-        $totpKey = $otp->totp(Base32::decode('SWIXJ4V7VYALWH6E'));
+        $totpKey = $otp->totp(Encoding::base32DecodeUpper('SWIXJ4V7VYALWH6E'));
 
         $this->assertSame(
             [

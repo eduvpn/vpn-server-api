@@ -18,9 +18,9 @@
 
 namespace SURFnet\VPN\Server\Api;
 
-use Base32\Base32;
 use DateTime;
 use Otp\Otp;
+use ParagonIE\ConstantTime\Encoding;
 use PDO;
 use PHPUnit_Framework_TestCase;
 use SURFnet\VPN\Common\Config;
@@ -162,7 +162,7 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
     {
         $otp = new Otp();
         $totpSecret = 'CN2XAL23SIFTDFXZ';
-        $totpKey = $otp->totp(Base32::decode($totpSecret));
+        $totpKey = $otp->totp(Encoding::base32DecodeUpper($totpSecret));
 
         $this->assertTrue(
             $this->makeRequest(
