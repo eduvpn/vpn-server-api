@@ -144,6 +144,10 @@ return [
 //        // An extensible protocol for dynamic exchange of group and authorization
 //        // data (http://openvoot.org)
 //        'VootProvider' => [
+//            'clientId' => 'my_client_id',
+//            'clientSecret' => 'my_client_secret',
+//            'authorizationEndpoint' => 'https://authz.surfconext.nl/oauth/authorize',
+//            'tokenEndpoint' => 'https://authz.surfconext.nl/oauth/token',
 //            'apiUrl' => 'https://voot.surfconext.nl/me/groups',
 //        ],
     ],

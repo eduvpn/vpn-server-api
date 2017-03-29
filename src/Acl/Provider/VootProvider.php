@@ -18,38 +18,21 @@
 
 namespace SURFnet\VPN\Server\Acl\Provider;
 
-use RuntimeException;
+use fkooman\OAuth\Client\BearerClient;
 use SURFnet\VPN\Server\Acl\ProviderInterface;
-use SURFnet\VPN\Server\Storage;
 
 class VootProvider implements ProviderInterface
 {
-    /** @var \SURFnet\VPN\Server\Storage */
-    private $storage;
-
-    /** @var VootClientInterface */
-    private $vootClient;
+    /** @var \fkooman\OAuth\Client\BearerClient */
+    private $bearerClient;
 
     /** @var string */
     private $vootUri;
 
-    /** @var resource */
-    private $curlChannel;
-
-    public function __construct(Storage $storage, VootClientInterface $vootClient, $vootUri)
+    public function __construct(BearerClient $bearerClient, $vootUri)
     {
-        $this->storage = $storage;
-        $this->vootClient = $vootClient;
+        $this->bearerClient = $bearerClient;
         $this->vootUri = $vootUri;
-
-        if (false === $this->curlChannel = curl_init()) {
-            throw new RuntimeException('unable to create cURL channel');
-        }
-    }
-
-    public function __destruct()
-    {
-        curl_close($this->curlChannel);
     }
 
     /**
@@ -62,28 +45,27 @@ class VootProvider implements ProviderInterface
      */
     public function getGroups($userId)
     {
-        $vootToken = $this->storage->getVootToken($userId);
-        if (is_null($vootToken)) {
-            return [];
-        }
+        $this->bearerClient->setUserId($userId);
 
         // fetch the groups and extract the membership data
         return self::extractMembership(
-            $this->fetchGroups($vootToken)
+            $this->fetchGroups()
         );
     }
 
-    private function fetchGroups($bearerToken)
+    private function fetchGroups()
     {
-        list($responseCode, $responseData) = $this->vootClient->get($this->vootUri, $bearerToken);
+        if (false === $response = $this->bearerClient->get($this->vootUri)) {
+            return [];
+        }
 
-        if (200 !== $responseCode) {
+        if (!$response->isOkay()) {
             // we should probably log some stuff here, but for now just assume
             // there are no groups for the user...
             return [];
         }
 
-        return $responseData;
+        return $response->json();
     }
 
     private static function extractMembership(array $responseData)

@@ -19,6 +19,11 @@
 namespace SURFnet\VPN\Server\Acl\Provider;
 
 use DateTime;
+use fkooman\OAuth\Client\AccessToken;
+use fkooman\OAuth\Client\BearerClient;
+use fkooman\OAuth\Client\Http\Response;
+use fkooman\OAuth\Client\OAuth2Client;
+use fkooman\OAuth\Client\Provider;
 use PDO;
 use PHPUnit_Framework_TestCase;
 use SURFnet\VPN\Server\Storage;
@@ -30,11 +35,11 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $vootClient = $this->getMockBuilder('\SURFnet\VPN\Server\Acl\Provider\VootClientInterface')->getMock();
+        $vootClient = $this->getMockBuilder('\fkooman\OAuth\Client\Http\HttpClientInterface')->getMock();
         $vootClient->method('get')->will(
             $this->onConsecutiveCalls(
-                [200, json_decode(file_get_contents(sprintf('%s/data/response.json', __DIR__)), true)],
-                [401, json_decode(file_get_contents(sprintf('%s/data/response_invalid_token.json', __DIR__)), true)]
+                new Response(200, file_get_contents(sprintf('%s/data/response.json', __DIR__))),
+                new Response(401, file_get_contents(sprintf('%s/data/response_invalid_token.json', __DIR__)))
             )
         );
 
@@ -47,11 +52,26 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
             new DateTime()
         );
         $storage->init();
-        $storage->setVootToken('foo', 'abcdef');
+        $storage->setAccessToken('foo', new AccessToken('AT', 'bearer', 'foo_bar', 'RT', new DateTime('2016-01-02')));
+
+        $random = $this->getMockBuilder('fkooman\OAuth\Client\RandomInterface')->getMock();
+        $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
+
+        $oauthClient = new OAuth2Client(
+            new Provider('a', 'b', 'c', 'd'),
+            $vootClient,
+            $random,
+            new DateTime('2016-01-01')
+        );
 
         $this->vootProvider = new VootProvider(
-            $storage,
-            $vootClient,
+            new BearerClient(
+                $oauthClient,
+                $storage,
+                null,
+                null,
+                new DateTime('2016-01-01')
+            ),
             'https://voot.surfconext.nl/me/groups'
         );
     }

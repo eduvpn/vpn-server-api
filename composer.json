@@ -24,6 +24,11 @@
             "no-api": true,
             "type": "vcs",
             "url": "https://github.com/fkooman/php-yubitwee"
+        },
+        {
+            "no-api": true,
+            "type": "vcs",
+            "url": "https://github.com/fkooman/php-oauth2-client"
         }
     ],
     "require": {
@@ -37,6 +42,7 @@
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-spl": "*",
+        "fkooman/oauth2-client": "dev-master",
         "fkooman/yubitwee": "dev-master",
         "paragonie/constant_time_encoding": "^1",
         "php": ">=5.4.0"

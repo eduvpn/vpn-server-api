@@ -19,10 +19,12 @@
 namespace SURFnet\VPN\Server;
 
 use DateTime;
+use fkooman\OAuth\Client\AccessToken;
+use fkooman\OAuth\Client\TokenStorageInterface;
 use PDO;
 use PDOException;
 
-class Storage
+class Storage implements TokenStorageInterface
 {
     /** @var \PDO */
     private $db;
@@ -844,6 +846,32 @@ SQL
         $stmt->execute();
     }
 
+    // TokenStorageInterface
+
+    /**
+     * @param string $userId
+     *
+     * @return AccessToken|null
+     */
+    public function getAccessToken($userId)
+    {
+        if ($this->hasVootToken($userId)) {
+            return AccessToken::fromJson($this->getVootToken($userId));
+        }
+
+        return null;
+    }
+
+    public function setAccessToken($userId, AccessToken $accessToken)
+    {
+        $this->setVootToken($userId, $accessToken->json());
+    }
+
+    public function deleteAccessToken($userId, AccessToken $accessToken)
+    {
+        $this->deleteVootToken($userId);
+    }
+
     public function init()
     {
         $queryList = [];
@@ -851,7 +879,7 @@ SQL
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS users (
         user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
-        voot_token VARCHAR(255) DEFAULT NULL,
+        voot_token TEXT DEFAULT NULL,
         totp_secret VARCHAR(255) DEFAULT NULL,
         yubi_key_id VARCHAR(255) DEFAULT NULL,
         date_time DATETIME NOT NULL,

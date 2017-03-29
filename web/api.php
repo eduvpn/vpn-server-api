@@ -17,6 +17,9 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
+use fkooman\OAuth\Client\BearerClient;
+use fkooman\OAuth\Client\OAuth2Client;
+use fkooman\OAuth\Client\Provider;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
@@ -24,7 +27,6 @@ use SURFnet\VPN\Common\Http\Response;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Common\Random;
-use SURFnet\VPN\Server\Acl\Provider\CurlVootClient;
 use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
 use SURFnet\VPN\Server\Acl\Provider\VootProvider;
 use SURFnet\VPN\Server\Api\CertificatesModule;
@@ -84,9 +86,17 @@ try {
         }
         // VootProvider
         if (in_array('VootProvider', $enabledProviders)) {
+            $provider = new Provider(
+                $config->getSection('groupProviders')->getSection('VootProvider')->getItem('clientId'),
+                $config->getSection('groupProviders')->getSection('VootProvider')->getItem('clientSecret'),
+                $config->getSection('groupProviders')->getSection('VootProvider')->getItem('authorizationEndpoint'),
+                $config->getSection('groupProviders')->getSection('VootProvider')->getItem('tokenEndpoint')
+            );
+            $oauthClient = new OAuth2Client(
+                $provider
+            );
             $groupProviders[] = new VootProvider(
-                $storage,
-                new CurlVootClient(),
+                new BearerClient($oauthClient, $storage),
                 $config->getSection('groupProviders')->getSection('VootProvider')->getItem('apiUrl')
             );
         }

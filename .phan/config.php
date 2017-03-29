@@ -10,6 +10,7 @@ return [
         'vendor/christian-riesen/otp',
         'vendor/eduvpn/common',
         'vendor/psr/log',
+        'vendor/fkooman/oauth2-client',
     ],
     'exclude_analysis_directory_list' => [
         'vendor/',

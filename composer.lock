@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "61c29556fe600b19cedce72f3b95ddde",
+    "content-hash": "53c120bd8ca67fb77c817d38561ad77e",
     "packages": [
         {
             "name": "christian-riesen/otp",
@@ -69,12 +69,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "ba5fefd05aa97d5f494c3b9b02be7791e9ca63ce"
+                "reference": "51aab300a874add30142e1832ccd2974f27d8dff"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/ba5fefd05aa97d5f494c3b9b02be7791e9ca63ce",
-                "reference": "ba5fefd05aa97d5f494c3b9b02be7791e9ca63ce",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/51aab300a874add30142e1832ccd2974f27d8dff",
+                "reference": "51aab300a874add30142e1832ccd2974f27d8dff",
                 "shasum": ""
             },
             "require": {
@@ -110,7 +110,52 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2017-03-16 12:19:20"
+            "time": "2017-03-29 20:48:39"
+        },
+        {
+            "name": "fkooman/oauth2-client",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fkooman/php-oauth2-client",
+                "reference": "4878829d33b810f935e1be51d0e0698e5f06d14a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/4878829d33b810f935e1be51d0e0698e5f06d14a",
+                "reference": "4878829d33b810f935e1be51d0e0698e5f06d14a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-date": "*",
+                "ext-json": "*",
+                "ext-spl": "*",
+                "paragonie/constant_time_encoding": "^1|^2",
+                "paragonie/random_compat": "^1|^2",
+                "php": ">=5.4.0",
+                "psr/log": "^1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "fkooman\\OAuth\\Client\\": "src/"
+                }
+            },
+            "license": [
+                "AGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "email": "fkooman@tuxed.net",
+                    "name": "François Kooman"
+                }
+            ],
+            "description": "Very simple OAuth 2.0 client",
+            "time": "2017-03-22 11:34:20"
         },
         {
             "name": "fkooman/yubitwee",
@@ -407,16 +452,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.32.0",
+            "version": "v1.33.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "9935b662e24d6e634da88901ab534cc12e8c728f"
+                "reference": "05cf49921b13f6f01d3cfdf9018cfa7a8086fd5a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/9935b662e24d6e634da88901ab534cc12e8c728f",
-                "reference": "9935b662e24d6e634da88901ab534cc12e8c728f",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/05cf49921b13f6f01d3cfdf9018cfa7a8086fd5a",
+                "reference": "05cf49921b13f6f01d3cfdf9018cfa7a8086fd5a",
                 "shasum": ""
             },
             "require": {
@@ -425,12 +470,12 @@
             "require-dev": {
                 "psr/container": "^1.0",
                 "symfony/debug": "~2.7",
-                "symfony/phpunit-bridge": "~3.2"
+                "symfony/phpunit-bridge": "~3.3@dev"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.32-dev"
+                    "dev-master": "1.33-dev"
                 }
             },
             "autoload": {
@@ -465,7 +510,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2017-02-27T00:07:03+00:00"
+            "time": "2017-03-22T15:40:09+00:00"
         }
     ],
     "packages-dev": [],
@@ -473,6 +518,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "eduvpn/common": 20,
+        "fkooman/oauth2-client": 20,
         "fkooman/yubitwee": 20
     },
     "prefer-stable": false,
