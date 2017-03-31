@@ -123,7 +123,7 @@ SQL
         return $stmt->fetchColumn();
     }
 
-    public function setVootToken($userId, $vootToken)
+    public function setVootToken($userId, AccessToken $vootToken)
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
@@ -137,7 +137,7 @@ SQL
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':voot_token', $vootToken, PDO::PARAM_STR);
+        $stmt->bindValue(':voot_token', $vootToken->json(), PDO::PARAM_STR);
 
         $stmt->execute();
     }
@@ -864,7 +864,7 @@ SQL
 
     public function setAccessToken($userId, AccessToken $accessToken)
     {
-        $this->setVootToken($userId, $accessToken->json());
+        $this->setVootToken($userId, $accessToken);
     }
 
     public function deleteAccessToken($userId, AccessToken $accessToken)

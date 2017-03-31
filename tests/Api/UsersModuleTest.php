@@ -19,6 +19,7 @@
 namespace SURFnet\VPN\Server\Api;
 
 use DateTime;
+use fkooman\OAuth\Client\AccessToken;
 use Otp\Otp;
 use ParagonIE\ConstantTime\Encoding;
 use PDO;
@@ -49,7 +50,11 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $storage->addCertificate('foo', 'abcd1234', 'ABCD1234', new DateTime('@12345678'), new DateTime('@23456789'));
         $storage->disableUser('bar');
         $storage->setTotpSecret('bar', 'CN2XAL23SIFTDFXZ');
-        $storage->setVootToken('bar', '123456');
+
+//    public function __construct($accessToken, $tokenType, $scope, $refreshToken, DateTime $expiresAt)
+
+        $vootToken = new AccessToken('12345', 'bearer', 'foo', null, new DateTime('2016-01-01'));
+        $storage->setVootToken('bar', $vootToken);
 
         // user "baz" has a secret, and already used a key for replay testing
         $storage->setTotpSecret('baz', 'SWIXJ4V7VYALWH6E');
