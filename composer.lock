@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "53c120bd8ca67fb77c817d38561ad77e",
+    "content-hash": "46a3b228a028ac873836f812ba43bf8f",
     "packages": [
         {
             "name": "christian-riesen/otp",
@@ -159,16 +159,16 @@
         },
         {
             "name": "fkooman/yubitwee",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/fkooman/php-yubitwee",
-                "reference": "b5ba783164f9e04810ee07d0337b4acb78d161e1"
+                "url": "https://github.com/fkooman/php-yubitwee.git",
+                "reference": "5bff2f1a28742a6251157421fa0a97337474ea59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-yubitwee/zipball/b5ba783164f9e04810ee07d0337b4acb78d161e1",
-                "reference": "b5ba783164f9e04810ee07d0337b4acb78d161e1",
+                "url": "https://api.github.com/repos/fkooman/php-yubitwee/zipball/5bff2f1a28742a6251157421fa0a97337474ea59",
+                "reference": "5bff2f1a28742a6251157421fa0a97337474ea59",
                 "shasum": ""
             },
             "require": {
@@ -187,17 +187,18 @@
                     "fkooman\\YubiTwee\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "AGPL-3.0"
             ],
             "authors": [
                 {
-                    "email": "fkooman@tuxed.net",
-                    "name": "François Kooman"
+                    "name": "François Kooman",
+                    "email": "fkooman@tuxed.net"
                 }
             ],
             "description": "YubiKey Validator",
-            "time": "2017-02-20 20:05:33"
+            "time": "2017-04-11T15:32:56+00:00"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -518,8 +519,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "eduvpn/common": 20,
-        "fkooman/oauth2-client": 20,
-        "fkooman/yubitwee": 20
+        "fkooman/oauth2-client": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
