@@ -54,7 +54,14 @@ try {
 
     $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
 
-    $v4 = sprintf('10.%s.%s.0/24', hexdec(bin2hex(random_bytes(1))), hexdec(bin2hex(random_bytes(1))));
+    $secondByte = 0;
+    // make sure the second part of the IP address is never 42, because we use
+    // that for communication between the nodes in a multi node setup
+    do {
+        $secondByte = hexdec(bin2hex(random_bytes(1)));
+    } while (42 === $secondByte);
+
+    $v4 = sprintf('10.%s.%s.0/24', $secondByte, hexdec(bin2hex(random_bytes(1))));
     $v6 = sprintf('fd%s:%s:%s:%s::/60', bin2hex(random_bytes(1)), bin2hex(random_bytes(2)), bin2hex(random_bytes(2)), bin2hex(random_bytes(2) & hex2bin('fff0')));
 
     echo sprintf('IPv4 CIDR  : %s', $v4).PHP_EOL;
