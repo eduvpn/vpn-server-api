@@ -20,12 +20,12 @@ namespace SURFnet\VPN\Server\Acl\Provider;
 
 use DateTime;
 use fkooman\OAuth\Client\AccessToken;
-use fkooman\OAuth\Client\BearerClient;
 use fkooman\OAuth\Client\Http\Response;
 use fkooman\OAuth\Client\OAuth2Client;
 use fkooman\OAuth\Client\Provider;
 use PDO;
 use PHPUnit_Framework_TestCase;
+use Psr\Log\NullLogger;
 use SURFnet\VPN\Server\Storage;
 
 class VootProviderTest extends PHPUnit_Framework_TestCase
@@ -59,19 +59,15 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
 
         $oauthClient = new OAuth2Client(
             new Provider('a', 'b', 'c', 'd'),
+            $storage,
             $vootClient,
             $random,
+            new NullLogger(),
             new DateTime('2016-01-01')
         );
 
         $this->vootProvider = new VootProvider(
-            new BearerClient(
-                $oauthClient,
-                $storage,
-                null,
-                null,
-                new DateTime('2016-01-01')
-            ),
+            $oauthClient,
             'https://voot.surfconext.nl/me/groups'
         );
     }

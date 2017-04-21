@@ -851,7 +851,7 @@ SQL
     /**
      * @param string $userId
      *
-     * @return AccessToken|null
+     * @return AccessToken|false
      */
     public function getAccessToken($userId)
     {
@@ -859,14 +859,22 @@ SQL
             return AccessToken::fromJson($this->getVootToken($userId));
         }
 
-        return null;
+        return false;
     }
 
+    /**
+     * @param string      $userId
+     * @param AccessToken $accessToken
+     */
     public function setAccessToken($userId, AccessToken $accessToken)
     {
         $this->setVootToken($userId, $accessToken);
     }
 
+    /**
+     * @param string      $userId
+     * @param AccessToken $accessToken
+     */
     public function deleteAccessToken($userId, AccessToken $accessToken)
     {
         $this->deleteVootToken($userId);

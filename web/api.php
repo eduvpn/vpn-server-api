@@ -17,9 +17,11 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
-use fkooman\OAuth\Client\BearerClient;
+use fkooman\OAuth\Client\Http\CurlHttpClient;
 use fkooman\OAuth\Client\OAuth2Client;
 use fkooman\OAuth\Client\Provider;
+use fkooman\OAuth\Client\Random as OAuthRandom;
+use Psr\Log\NullLogger;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
@@ -93,10 +95,15 @@ try {
                 $config->getSection('groupProviders')->getSection('VootProvider')->getItem('tokenEndpoint')
             );
             $oauthClient = new OAuth2Client(
-                $provider
+                $provider,
+                $storage,
+                new CurlHttpClient(),
+                new OAuthRandom(),
+                new NullLogger(),
+                new DateTime()
             );
             $groupProviders[] = new VootProvider(
-                new BearerClient($oauthClient, $storage),
+                $oauthClient,
                 $config->getSection('groupProviders')->getSection('VootProvider')->getItem('apiUrl')
             );
         }

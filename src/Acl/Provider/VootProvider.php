@@ -18,20 +18,20 @@
 
 namespace SURFnet\VPN\Server\Acl\Provider;
 
-use fkooman\OAuth\Client\BearerClient;
+use fkooman\OAuth\Client\OAuth2Client;
 use SURFnet\VPN\Server\Acl\ProviderInterface;
 
 class VootProvider implements ProviderInterface
 {
-    /** @var \fkooman\OAuth\Client\BearerClient */
-    private $bearerClient;
+    /** @var \fkooman\OAuth\Client\OAuth2Client */
+    private $client;
 
     /** @var string */
     private $vootUri;
 
-    public function __construct(BearerClient $bearerClient, $vootUri)
+    public function __construct(OAuth2Client $client, $vootUri)
     {
-        $this->bearerClient = $bearerClient;
+        $this->client = $client;
         $this->vootUri = $vootUri;
     }
 
@@ -45,7 +45,7 @@ class VootProvider implements ProviderInterface
      */
     public function getGroups($userId)
     {
-        $this->bearerClient->setUserId($userId);
+        $this->client->setUserId($userId);
 
         // fetch the groups and extract the membership data
         return self::extractMembership(
@@ -55,8 +55,9 @@ class VootProvider implements ProviderInterface
 
     private function fetchGroups()
     {
-        if (false === $response = $this->bearerClient->get($this->vootUri)) {
+        if (false === $response = $this->client->get('groups', $this->vootUri)) {
             return [];
+            // XXX need to delete the token?
         }
 
         if (!$response->isOkay()) {
