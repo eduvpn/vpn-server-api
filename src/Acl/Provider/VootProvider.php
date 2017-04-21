@@ -18,18 +18,18 @@
 
 namespace SURFnet\VPN\Server\Acl\Provider;
 
-use fkooman\OAuth\Client\OAuth2Client;
+use fkooman\OAuth\Client\OAuthClient;
 use SURFnet\VPN\Server\Acl\ProviderInterface;
 
 class VootProvider implements ProviderInterface
 {
-    /** @var \fkooman\OAuth\Client\OAuth2Client */
+    /** @var \fkooman\OAuth\Client\OAuthClient */
     private $client;
 
     /** @var string */
     private $vootUri;
 
-    public function __construct(OAuth2Client $client, $vootUri)
+    public function __construct(OAuthClient $client, $vootUri)
     {
         $this->client = $client;
         $this->vootUri = $vootUri;

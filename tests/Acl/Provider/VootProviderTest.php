@@ -21,7 +21,7 @@ namespace SURFnet\VPN\Server\Acl\Provider;
 use DateTime;
 use fkooman\OAuth\Client\AccessToken;
 use fkooman\OAuth\Client\Http\Response;
-use fkooman\OAuth\Client\OAuth2Client;
+use fkooman\OAuth\Client\OAuthClient;
 use fkooman\OAuth\Client\Provider;
 use PDO;
 use PHPUnit_Framework_TestCase;
@@ -57,7 +57,7 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
         $random = $this->getMockBuilder('fkooman\OAuth\Client\RandomInterface')->getMock();
         $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
 
-        $oauthClient = new OAuth2Client(
+        $oauthClient = new OAuthClient(
             new Provider('a', 'b', 'c', 'd'),
             $storage,
             $vootClient,

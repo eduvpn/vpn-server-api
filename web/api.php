@@ -18,7 +18,7 @@
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
 use fkooman\OAuth\Client\Http\CurlHttpClient;
-use fkooman\OAuth\Client\OAuth2Client;
+use fkooman\OAuth\Client\OAuthClient;
 use fkooman\OAuth\Client\Provider;
 use fkooman\OAuth\Client\Random as OAuthRandom;
 use Psr\Log\NullLogger;
@@ -94,7 +94,7 @@ try {
                 $config->getSection('groupProviders')->getSection('VootProvider')->getItem('authorizationEndpoint'),
                 $config->getSection('groupProviders')->getSection('VootProvider')->getItem('tokenEndpoint')
             );
-            $oauthClient = new OAuth2Client(
+            $oauthClient = new OAuthClient(
                 $provider,
                 $storage,
                 new CurlHttpClient(),
