@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace SURFnet\VPN\Server\Api;
+namespace SURFnet\VPN\Server\Tests\Api;
 
 use DateTime;
 use fkooman\OAuth\Client\AccessToken;
@@ -29,6 +29,7 @@ use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
+use SURFnet\VPN\Server\Api\UsersModule;
 use SURFnet\VPN\Server\Storage;
 
 class UsersModuleTest extends PHPUnit_Framework_TestCase
@@ -50,8 +51,6 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $storage->addCertificate('foo', 'abcd1234', 'ABCD1234', new DateTime('@12345678'), new DateTime('@23456789'));
         $storage->disableUser('bar');
         $storage->setTotpSecret('bar', 'CN2XAL23SIFTDFXZ');
-
-//    public function __construct($accessToken, $tokenType, $scope, $refreshToken, DateTime $expiresAt)
 
         $vootToken = new AccessToken('12345', 'bearer', 'foo', null, new DateTime('2016-01-01'));
         $storage->setVootToken('bar', $vootToken);

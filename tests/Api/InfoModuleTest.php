@@ -16,13 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace SURFnet\VPN\Server\Api;
+namespace SURFnet\VPN\Server\Tests\Api;
 
 use PHPUnit_Framework_TestCase;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
+use SURFnet\VPN\Server\Api\InfoModule;
 
 class InfoModuleTest extends PHPUnit_Framework_TestCase
 {

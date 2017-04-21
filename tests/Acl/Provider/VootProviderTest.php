@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace SURFnet\VPN\Server\Acl\Provider;
+namespace SURFnet\VPN\Server\Tests\Acl\Provider;
 
 use DateTime;
 use fkooman\OAuth\Client\AccessToken;
@@ -26,6 +26,7 @@ use fkooman\OAuth\Client\Provider;
 use PDO;
 use PHPUnit_Framework_TestCase;
 use Psr\Log\NullLogger;
+use SURFnet\VPN\Server\Acl\Provider\VootProvider;
 use SURFnet\VPN\Server\Storage;
 
 class VootProviderTest extends PHPUnit_Framework_TestCase

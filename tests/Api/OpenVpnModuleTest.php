@@ -16,9 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace SURFnet\VPN\Server\Api;
-
-require_once sprintf('%s/Test/TestSocket.php', dirname(__DIR__));
+namespace SURFnet\VPN\Server\Tests\Api;
 
 use DateTime;
 use PDO;
@@ -28,9 +26,10 @@ use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
+use SURFnet\VPN\Server\Api\OpenVpnModule;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
 use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\Test\TestSocket;
+use SURFnet\VPN\Server\Tests\TestSocket;
 
 class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
 {

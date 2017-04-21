@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace SURFnet\VPN\Server\Test;
+namespace SURFnet\VPN\Server\Tests;
 
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\CA\CaInterface;

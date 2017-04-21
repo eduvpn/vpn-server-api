@@ -16,12 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace SURFnet\VPN\Server;
+namespace SURFnet\VPN\Server\Tests;
 
 use DateTime;
 use PDO;
 use PHPUnit_Framework_TestCase;
 use SURFnet\VPN\Server\Exception\TotpException;
+use SURFnet\VPN\Server\Storage;
+use SURFnet\VPN\Server\Totp;
 
 class TotpTest extends PHPUnit_Framework_TestCase
 {
