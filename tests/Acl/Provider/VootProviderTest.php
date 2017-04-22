@@ -25,7 +25,6 @@ use fkooman\OAuth\Client\OAuthClient;
 use fkooman\OAuth\Client\Provider;
 use PDO;
 use PHPUnit_Framework_TestCase;
-use Psr\Log\NullLogger;
 use SURFnet\VPN\Server\Acl\Provider\VootProvider;
 use SURFnet\VPN\Server\Storage;
 
@@ -61,11 +60,11 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
         $oauthClient = new OAuthClient(
             new Provider('a', 'b', 'c', 'd'),
             $storage,
-            $vootClient,
-            $random,
-            new NullLogger(),
-            new DateTime('2016-01-01')
+            $vootClient
         );
+
+        $oauthClient->setRandom($random);
+        $oauthClient->setDateTime(new DateTime('2016-01-01'));
 
         $this->vootProvider = new VootProvider(
             $oauthClient,

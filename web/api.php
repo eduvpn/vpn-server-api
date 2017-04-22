@@ -20,8 +20,6 @@ require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 use fkooman\OAuth\Client\Http\CurlHttpClient;
 use fkooman\OAuth\Client\OAuthClient;
 use fkooman\OAuth\Client\Provider;
-use fkooman\OAuth\Client\Random as OAuthRandom;
-use Psr\Log\NullLogger;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
@@ -97,10 +95,7 @@ try {
             $oauthClient = new OAuthClient(
                 $provider,
                 $storage,
-                new CurlHttpClient(),
-                new OAuthRandom(),
-                new NullLogger(),
-                new DateTime()
+                new CurlHttpClient()
             );
             $groupProviders[] = new VootProvider(
                 $oauthClient,
