@@ -118,12 +118,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-oauth2-client",
-                "reference": "f7fd98da2917bbc09d87a371bda77f4194ae6f5e"
+                "reference": "8fc84e11113be1901c605a782008e9be8c96b9ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/f7fd98da2917bbc09d87a371bda77f4194ae6f5e",
-                "reference": "f7fd98da2917bbc09d87a371bda77f4194ae6f5e",
+                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/8fc84e11113be1901c605a782008e9be8c96b9ba",
+                "reference": "8fc84e11113be1901c605a782008e9be8c96b9ba",
                 "shasum": ""
             },
             "require": {
@@ -157,7 +157,7 @@
                 }
             ],
             "description": "Very simple OAuth 2.0 client",
-            "time": "2017-04-21 20:33:26"
+            "time": "2017-04-22 08:53:53"
         },
         {
             "name": "fkooman/yubitwee",

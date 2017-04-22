@@ -37,7 +37,7 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $vootClient = $this->getMockBuilder('\fkooman\OAuth\Client\Http\HttpClientInterface')->getMock();
-        $vootClient->method('get')->will(
+        $vootClient->method('send')->will(
             $this->onConsecutiveCalls(
                 new Response(200, file_get_contents(sprintf('%s/data/response.json', __DIR__))),
                 new Response(401, file_get_contents(sprintf('%s/data/response_invalid_token.json', __DIR__)))
