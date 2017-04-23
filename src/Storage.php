@@ -853,7 +853,7 @@ SQL
      *
      * @return AccessToken|false
      */
-    public function getAccessToken($userId)
+    public function getAccessToken($userId, $requestScope)
     {
         if ($this->hasVootToken($userId)) {
             return AccessToken::fromJson($this->getVootToken($userId));

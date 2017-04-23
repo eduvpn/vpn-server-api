@@ -52,7 +52,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $storage->disableUser('bar');
         $storage->setTotpSecret('bar', 'CN2XAL23SIFTDFXZ');
 
-        $vootToken = new AccessToken('12345', 'bearer', 'foo', null, new DateTime('2016-01-01'));
+        $vootToken = new AccessToken('12345', 'bearer', 'groups', null, new DateTime('2016-01-01'));
         $storage->setVootToken('bar', $vootToken);
 
         // user "baz" has a secret, and already used a key for replay testing
@@ -237,6 +237,8 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
     public function testSetVootToken()
     {
+        $vootToken = new AccessToken('AT', 'bearer', 'groups', 'RT', new DateTime('2016-01-02'));
+
         $this->assertTrue(
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
@@ -245,7 +247,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                 [],
                 [
                     'user_id' => 'foo',
-                    'voot_token' => 'bar',
+                    'voot_token' => $vootToken->json(),
                 ]
             )
         );
