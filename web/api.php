@@ -93,10 +93,10 @@ try {
                 $config->getSection('groupProviders')->getSection('VootProvider')->getItem('tokenEndpoint')
             );
             $oauthClient = new OAuthClient(
-                $provider,
                 $storage,
                 new CurlHttpClient()
             );
+            $oauthClient->addProvider('voot', $provider);
             $groupProviders[] = new VootProvider(
                 $oauthClient,
                 $config->getSection('groupProviders')->getSection('VootProvider')->getItem('apiUrl')

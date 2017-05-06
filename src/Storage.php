@@ -853,7 +853,7 @@ SQL
      *
      * @return AccessToken|false
      */
-    public function getAccessToken($userId, $requestScope)
+    public function getAccessToken($userId, $providerId, $requestScope)
     {
         if ($this->hasVootToken($userId)) {
             return AccessToken::fromJson($this->getVootToken($userId));
@@ -866,7 +866,7 @@ SQL
      * @param string      $userId
      * @param AccessToken $accessToken
      */
-    public function setAccessToken($userId, AccessToken $accessToken)
+    public function setAccessToken($userId, $providerId, AccessToken $accessToken)
     {
         $this->setVootToken($userId, $accessToken);
     }
@@ -875,7 +875,7 @@ SQL
      * @param string      $userId
      * @param AccessToken $accessToken
      */
-    public function deleteAccessToken($userId, AccessToken $accessToken)
+    public function deleteAccessToken($userId, $providerId, AccessToken $accessToken)
     {
         $this->deleteVootToken($userId);
     }

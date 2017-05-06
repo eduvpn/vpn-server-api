@@ -52,17 +52,16 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
             new DateTime()
         );
         $storage->init();
-        $storage->setAccessToken('foo', new AccessToken('AT', 'bearer', 'groups', 'RT', new DateTime('2016-01-02')));
+        $storage->setAccessToken('foo', 'voot', new AccessToken('AT', 'bearer', 'groups', 'RT', new DateTime('2016-01-02')));
 
         $random = $this->getMockBuilder('fkooman\OAuth\Client\RandomInterface')->getMock();
         $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
 
         $oauthClient = new OAuthClient(
-            new Provider('a', 'b', 'c', 'd'),
             $storage,
             $vootClient
         );
-
+        $oauthClient->addProvider('voot', new Provider('a', 'b', 'c', 'd'));
         $oauthClient->setRandom($random);
         $oauthClient->setDateTime(new DateTime('2016-01-01'));
 
