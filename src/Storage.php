@@ -137,7 +137,7 @@ SQL
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':voot_token', $vootToken->json(), PDO::PARAM_STR);
+        $stmt->bindValue(':voot_token', $vootToken->toStorage(), PDO::PARAM_STR);
 
         $stmt->execute();
     }
@@ -856,7 +856,7 @@ SQL
     public function getAccessToken($userId, $providerId, $requestScope)
     {
         if ($this->hasVootToken($userId)) {
-            return AccessToken::fromJson($this->getVootToken($userId));
+            return AccessToken::fromStorage($this->getVootToken($userId));
         }
 
         return false;

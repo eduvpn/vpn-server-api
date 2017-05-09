@@ -38,8 +38,8 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
         $vootClient = $this->getMockBuilder('\fkooman\OAuth\Client\Http\HttpClientInterface')->getMock();
         $vootClient->method('send')->will(
             $this->onConsecutiveCalls(
-                new Response(200, file_get_contents(sprintf('%s/data/response.json', __DIR__))),
-                new Response(401, file_get_contents(sprintf('%s/data/response_invalid_token.json', __DIR__)))
+                new Response(200, file_get_contents(sprintf('%s/data/response.json', __DIR__)), ['Content-Type' => 'application/json']),
+                new Response(401, file_get_contents(sprintf('%s/data/response_invalid_token.json', __DIR__)), ['Content-Type' => 'application/json'])
             )
         );
 
@@ -52,7 +52,21 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
             new DateTime()
         );
         $storage->init();
-        $storage->setAccessToken('foo', 'voot', new AccessToken('AT', 'bearer', 'groups', 'RT', new DateTime('2016-01-02')));
+//        $storage->setAccessToken('foo', 'voot', new AccessToken('AT', 'bearer', 'groups', 'RT', new DateTime('2016-01-02')));
+        $storage->setAccessToken(
+            'foo',
+            'voot',
+            AccessToken::fromStorage(
+                json_encode([
+                    'access_token' => 'AT',
+                    'token_type' => 'bearer',
+                    'scope' => 'groups',
+                    'refresh_token' => 'RT',
+                    'expires_in' => 3600,
+                    'issued_at' => '2016-01-02 00:00:00',
+                ])
+            )
+        );
 
         $random = $this->getMockBuilder('fkooman\OAuth\Client\RandomInterface')->getMock();
         $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));

@@ -52,7 +52,18 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         $storage->disableUser('bar');
         $storage->setTotpSecret('bar', 'CN2XAL23SIFTDFXZ');
 
-        $vootToken = new AccessToken('12345', 'bearer', 'groups', null, new DateTime('2016-01-01'));
+//        $vootToken = new AccessToken('12345', 'bearer', 'groups', null, new DateTime('2016-01-01'));
+        $vootToken = AccessToken::fromStorage(
+            json_encode([
+                'access_token' => '12345',
+                'token_type' => 'bearer',
+                'scope' => 'groups',
+                'refresh_token' => null,
+                'expires_in' => 3600,
+                'issued_at' => '2016-01-01 00:00:00',
+            ])
+        );
+
         $storage->setVootToken('bar', $vootToken);
 
         // user "baz" has a secret, and already used a key for replay testing
@@ -237,7 +248,17 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 
     public function testSetVootToken()
     {
-        $vootToken = new AccessToken('AT', 'bearer', 'groups', 'RT', new DateTime('2016-01-02'));
+        //        $vootToken = new AccessToken('AT', 'bearer', 'groups', 'RT', new DateTime('2016-01-02'));
+        $vootToken = AccessToken::fromStorage(
+            json_encode([
+                'access_token' => 'AT',
+                'token_type' => 'bearer',
+                'scope' => 'groups',
+                'refresh_token' => 'RT',
+                'expires_in' => 3600,
+                'issued_at' => '2016-01-02 00:00:00',
+            ])
+        );
 
         $this->assertTrue(
             $this->makeRequest(
@@ -247,7 +268,7 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
                 [],
                 [
                     'user_id' => 'foo',
-                    'voot_token' => $vootToken->json(),
+                    'voot_token' => $vootToken->toStorage(),
                 ]
             )
         );
