@@ -96,7 +96,7 @@ try {
                 $storage,
                 new CurlHttpClient()
             );
-            $oauthClient->addProvider('voot', $provider);
+            $oauthClient->setProvider($provider);
             $groupProviders[] = new VootProvider(
                 $oauthClient,
                 $config->getSection('groupProviders')->getSection('VootProvider')->getItem('apiUrl')

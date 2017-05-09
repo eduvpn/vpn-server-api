@@ -851,23 +851,25 @@ SQL
     /**
      * @param string $userId
      *
-     * @return AccessToken|false
+     * @return array
      */
-    public function getAccessToken($userId, $providerId, $requestScope)
+    public function getAccessToken($userId)
     {
         $vootToken = $this->getVootToken($userId);
-        if (!is_null($vootToken)) {
-            return AccessToken::fromStorage($vootToken);
+        if (is_null($vootToken)) {
+            return [];
         }
 
-        return false;
+        return [
+            AccessToken::fromStorage($vootToken),
+        ];
     }
 
     /**
      * @param string      $userId
      * @param AccessToken $accessToken
      */
-    public function setAccessToken($userId, $providerId, AccessToken $accessToken)
+    public function addAccessToken($userId, AccessToken $accessToken)
     {
         $this->setVootToken($userId, $accessToken);
     }
@@ -876,7 +878,7 @@ SQL
      * @param string      $userId
      * @param AccessToken $accessToken
      */
-    public function deleteAccessToken($userId, $providerId, AccessToken $accessToken)
+    public function deleteAccessToken($userId, AccessToken $accessToken)
     {
         $this->deleteVootToken($userId);
     }

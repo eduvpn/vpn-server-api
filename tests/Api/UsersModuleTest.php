@@ -55,6 +55,8 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
 //        $vootToken = new AccessToken('12345', 'bearer', 'groups', null, new DateTime('2016-01-01'));
         $vootToken = AccessToken::fromStorage(
             json_encode([
+                'provider_id' => 'foo|bar',
+                'user_id' => 'foo',
                 'access_token' => '12345',
                 'token_type' => 'bearer',
                 'scope' => 'groups',
@@ -251,6 +253,8 @@ class UsersModuleTest extends PHPUnit_Framework_TestCase
         //        $vootToken = new AccessToken('AT', 'bearer', 'groups', 'RT', new DateTime('2016-01-02'));
         $vootToken = AccessToken::fromStorage(
             json_encode([
+                'provider_id' => 'foo|bar',
+                'user_id' => 'foo',
                 'access_token' => 'AT',
                 'token_type' => 'bearer',
                 'scope' => 'groups',

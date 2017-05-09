@@ -53,11 +53,12 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
         );
         $storage->init();
 //        $storage->setAccessToken('foo', 'voot', new AccessToken('AT', 'bearer', 'groups', 'RT', new DateTime('2016-01-02')));
-        $storage->setAccessToken(
+        $storage->addAccessToken(
             'foo',
-            'voot',
             AccessToken::fromStorage(
                 json_encode([
+                    'provider_id' => 'c|a',
+                    'user_id' => 'foo',
                     'access_token' => 'AT',
                     'token_type' => 'bearer',
                     'scope' => 'groups',
@@ -75,7 +76,7 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
             $storage,
             $vootClient
         );
-        $oauthClient->addProvider('voot', new Provider('a', 'b', 'c', 'd'));
+        $oauthClient->setProvider(new Provider('a', 'b', 'c', 'd'));
         $oauthClient->setRandom($random);
         $oauthClient->setDateTime(new DateTime('2016-01-01'));
 
