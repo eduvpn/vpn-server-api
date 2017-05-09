@@ -855,8 +855,9 @@ SQL
      */
     public function getAccessToken($userId, $providerId, $requestScope)
     {
-        if ($this->hasVootToken($userId)) {
-            return AccessToken::fromStorage($this->getVootToken($userId));
+        $vootToken = $this->getVootToken($userId);
+        if (!is_null($vootToken)) {
+            return AccessToken::fromStorage($vootToken);
         }
 
         return false;
