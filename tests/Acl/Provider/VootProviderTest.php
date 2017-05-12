@@ -53,9 +53,9 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
         );
         $storage->init();
 //        $storage->setAccessToken('foo', 'voot', new AccessToken('AT', 'bearer', 'groups', 'RT', new DateTime('2016-01-02')));
-        $storage->addAccessToken(
+        $storage->storeAccessToken(
             'foo',
-            AccessToken::fromStorage(
+            AccessToken::fromJson(
                 json_encode([
                     'provider_id' => 'c|a',
                     'user_id' => 'foo',

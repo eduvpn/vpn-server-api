@@ -244,7 +244,7 @@ class UsersModule implements ServiceModuleInterface
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
                 // load the POSTed AccessToken from JSON
-                $vootToken = AccessToken::fromStorage($request->getPostParameter('voot_token'));
+                $vootToken = AccessToken::fromJson($request->getPostParameter('voot_token'));
                 $this->storage->setVootToken($userId, $vootToken);
 
                 return new ApiResponse('set_voot_token');
