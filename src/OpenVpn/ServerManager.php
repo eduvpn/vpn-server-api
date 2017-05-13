@@ -58,7 +58,7 @@ class ServerManager
 
             $profileConnections = [];
             // loop over all processes
-            for ($i = 0; $i < $profileConfig->getItem('processCount'); ++$i) {
+            for ($i = 0; $i < count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
                 // add all connections from this instance to profileConnections
                 try {
                     // open the socket connection
@@ -109,7 +109,7 @@ class ServerManager
             $managementIp = $this->getManagementIp($profileConfig);
 
             // loop over all processes
-            for ($i = 0; $i < $profileConfig->getItem('processCount'); ++$i) {
+            for ($i = 0; $i < count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
                 // add all kills from this instance to profileKills
                 try {
                     // open the socket connection
