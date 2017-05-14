@@ -109,13 +109,11 @@ return [
             'blockSmb' => false,
 
             // The protocols and ports the OpenVPN processes should use, MUST be
-            // either 1, 2, 4 or 8 entries
-            // DEFAULT = ['udp/1194', 'tcp/1194', 'udp/1195', 'tcp/1195']
+            // either 1, 2, 4 or 8 proto/port combinations
+            // DEFAULT = ['udp/1194', 'tcp/1194']
             'vpnProtoPorts' => [
                 'udp/1194',
-                'tcp/1194',
-                'udp/1195',
-                'tcp/1195',
+                'tcp/1194'
             ],
 
             // Hide the profile from the user portal, i.e. do not allow the user to
