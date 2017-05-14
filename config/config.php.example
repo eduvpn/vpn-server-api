@@ -111,7 +111,7 @@ return [
             // The protocols and ports the OpenVPN processes should use, MUST be
             // either 1, 2, 4 or 8 entries
             // DEFAULT = ['udp/1194', 'tcp/1194', 'udp/1195', 'tcp/1195']
-            'vpnProtoPorts' [
+            'vpnProtoPorts' => [
                 'udp/1194',
                 'tcp/1194',
                 'udp/1195',
