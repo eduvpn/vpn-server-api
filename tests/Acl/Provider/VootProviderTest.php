@@ -27,6 +27,8 @@ use PDO;
 use PHPUnit_Framework_TestCase;
 use SURFnet\VPN\Server\Acl\Provider\VootProvider;
 use SURFnet\VPN\Server\Storage;
+use SURFnet\VPN\Server\Tests\TestOAuthClientRandom;
+use SURFnet\VPN\Server\Tests\TestOAuthClientSession;
 
 class VootProviderTest extends PHPUnit_Framework_TestCase
 {
@@ -69,17 +71,14 @@ class VootProviderTest extends PHPUnit_Framework_TestCase
             )
         );
 
-        $random = $this->getMockBuilder('fkooman\OAuth\Client\RandomInterface')->getMock();
-        $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
-
         $oauthClient = new OAuthClient(
             $storage,
-            $vootClient
+            $vootClient,
+            new TestOAuthClientSession(),
+            new TestOAuthClientRandom(),
+            new DateTime('2016-01-01')
         );
         $oauthClient->setProvider(new Provider('a', 'b', 'c', 'd'));
-        $oauthClient->setRandom($random);
-        $oauthClient->setDateTime(new DateTime('2016-01-01'));
-
         $this->vootProvider = new VootProvider(
             $oauthClient,
             'https://voot.surfconext.nl/me/groups'

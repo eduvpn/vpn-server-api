@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e13986842ee524db7ed39e5232aba8dc",
+    "content-hash": "445ea1dc0a13907c22ba2f837ca81045",
     "packages": [
         {
             "name": "christian-riesen/otp",
@@ -69,12 +69,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "efd5c11e06cc396ee73e1d66798d77779fb854ca"
+                "reference": "975157f643491daea3ccffdb4a9e55612e905e39"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/efd5c11e06cc396ee73e1d66798d77779fb854ca",
-                "reference": "efd5c11e06cc396ee73e1d66798d77779fb854ca",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/975157f643491daea3ccffdb4a9e55612e905e39",
+                "reference": "975157f643491daea3ccffdb4a9e55612e905e39",
                 "shasum": ""
             },
             "require": {
@@ -88,6 +88,7 @@
                 "ext-pcre": "*",
                 "ext-session": "*",
                 "ext-spl": "*",
+                "fkooman/secookie": "dev-master",
                 "ircmaxell/password-compat": "^1.0",
                 "php": ">= 5.4.0",
                 "psr/log": "^1.0",
@@ -114,7 +115,7 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2017-05-13 17:26:19"
+            "time": "2017-06-06 17:43:54"
         },
         {
             "name": "fkooman/oauth2-client",
@@ -122,12 +123,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-oauth2-client",
-                "reference": "411235ac24eb828412c241ce8bc886e32d7e67ac"
+                "reference": "84bd95a0afe6e15eee37f698a5ac23425e188c18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/411235ac24eb828412c241ce8bc886e32d7e67ac",
-                "reference": "411235ac24eb828412c241ce8bc886e32d7e67ac",
+                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/84bd95a0afe6e15eee37f698a5ac23425e188c18",
+                "reference": "84bd95a0afe6e15eee37f698a5ac23425e188c18",
                 "shasum": ""
             },
             "require": {
@@ -145,7 +146,7 @@
                 "symfony/polyfill-php56": "^1.3"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8"
+                "phpunit/phpunit": "^5.7"
             },
             "type": "library",
             "autoload": {
@@ -164,20 +165,61 @@
                 }
             ],
             "description": "Very simple OAuth 2.0 client",
-            "time": "2017-05-12 10:26:16"
+            "time": "2017-06-07 12:34:55"
         },
         {
-            "name": "fkooman/yubitwee",
-            "version": "1.0.0",
+            "name": "fkooman/secookie",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/fkooman/php-yubitwee.git",
-                "reference": "5bff2f1a28742a6251157421fa0a97337474ea59"
+                "url": "https://github.com/fkooman/php-secookie",
+                "reference": "12b467334317d1f4a95b12b74b0dcb7a991917ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-yubitwee/zipball/5bff2f1a28742a6251157421fa0a97337474ea59",
-                "reference": "5bff2f1a28742a6251157421fa0a97337474ea59",
+                "url": "https://api.github.com/repos/fkooman/php-secookie/zipball/12b467334317d1f4a95b12b74b0dcb7a991917ae",
+                "reference": "12b467334317d1f4a95b12b74b0dcb7a991917ae",
+                "shasum": ""
+            },
+            "require": {
+                "ext-date": "*",
+                "ext-session": "*",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "fkooman\\SeCookie\\": "src/",
+                    "fkooman\\SeCookie\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "email": "fkooman@tuxed.net",
+                    "name": "François Kooman"
+                }
+            ],
+            "description": "Very simple Cookie and PHP Session library",
+            "time": "2017-06-06 18:00:45"
+        },
+        {
+            "name": "fkooman/yubitwee",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fkooman/php-yubitwee.git",
+                "reference": "bf8e5f1106b11a3f50b1113d3db6609294a488da"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fkooman/php-yubitwee/zipball/bf8e5f1106b11a3f50b1113d3db6609294a488da",
+                "reference": "bf8e5f1106b11a3f50b1113d3db6609294a488da",
                 "shasum": ""
             },
             "require": {
@@ -190,15 +232,19 @@
                 "paragonie/constant_time_encoding": "^1|^2",
                 "php": ">=5.4"
             },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7"
+            },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "fkooman\\YubiTwee\\": "src/"
+                    "fkooman\\YubiTwee\\": "src/",
+                    "fkooman\\YubiTwee\\Tests\\": "tests/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "AGPL-3.0"
+                "MIT"
             ],
             "authors": [
                 {
@@ -207,7 +253,7 @@
                 }
             ],
             "description": "YubiKey Validator",
-            "time": "2017-04-11T15:32:56+00:00"
+            "time": "2017-06-01T14:56:00+00:00"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -518,23 +564,24 @@
         },
         {
             "name": "twig/extensions",
-            "version": "v1.4.1",
+            "version": "v1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig-extensions.git",
-                "reference": "f0bb8431c8691f5a39f1017d9a5967a082bf01ff"
+                "reference": "d6d74d6f3213a9574c460c4390c25a1a67c17cc3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig-extensions/zipball/f0bb8431c8691f5a39f1017d9a5967a082bf01ff",
-                "reference": "f0bb8431c8691f5a39f1017d9a5967a082bf01ff",
+                "url": "https://api.github.com/repos/twigphp/Twig-extensions/zipball/d6d74d6f3213a9574c460c4390c25a1a67c17cc3",
+                "reference": "d6d74d6f3213a9574c460c4390c25a1a67c17cc3",
                 "shasum": ""
             },
             "require": {
-                "twig/twig": "~1.20|~2.0"
+                "twig/twig": "~1.27|~2.0"
             },
             "require-dev": {
-                "symfony/translation": "~2.3"
+                "symfony/phpunit-bridge": "~3.3@dev",
+                "symfony/translation": "~2.3|~3.0"
             },
             "suggest": {
                 "symfony/translation": "Allow the time_diff output to be translated"
@@ -542,12 +589,15 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.4-dev"
+                    "dev-master": "1.5-dev"
                 }
             },
             "autoload": {
                 "psr-0": {
                     "Twig_Extensions_": "lib/"
+                },
+                "psr-4": {
+                    "Twig\\Extensions\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -566,24 +616,24 @@
                 "i18n",
                 "text"
             ],
-            "time": "2016-10-25T17:34:14+00:00"
+            "time": "2017-05-24T06:24:07+00:00"
         },
         {
             "name": "twig/twig",
-            "version": "v1.33.2",
+            "version": "v1.34.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "dd6ca96227917e1e85b41c7c3cc6507b411e0927"
+                "reference": "55e4beb721a044db9e31ae0470024fc205b6a008"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/dd6ca96227917e1e85b41c7c3cc6507b411e0927",
-                "reference": "dd6ca96227917e1e85b41c7c3cc6507b411e0927",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/55e4beb721a044db9e31ae0470024fc205b6a008",
+                "reference": "55e4beb721a044db9e31ae0470024fc205b6a008",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2.7"
+                "php": ">=5.3.3"
             },
             "require-dev": {
                 "psr/container": "^1.0",
@@ -593,12 +643,15 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.33-dev"
+                    "dev-master": "1.34-dev"
                 }
             },
             "autoload": {
                 "psr-0": {
                     "Twig_": "lib/"
+                },
+                "psr-4": {
+                    "Twig\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -628,7 +681,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2017-04-20T17:39:48+00:00"
+            "time": "2017-06-06T03:56:50+00:00"
         }
     ],
     "packages-dev": [
@@ -1337,23 +1390,23 @@
         },
         {
             "name": "sebastian/diff",
-            "version": "1.4.1",
+            "version": "1.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/diff.git",
-                "reference": "13edfd8706462032c2f52b4b862974dd46b71c9e"
+                "reference": "7f066a26a962dbe58ddea9f72a4e82874a3975a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/13edfd8706462032c2f52b4b862974dd46b71c9e",
-                "reference": "13edfd8706462032c2f52b4b862974dd46b71c9e",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/7f066a26a962dbe58ddea9f72a4e82874a3975a4",
+                "reference": "7f066a26a962dbe58ddea9f72a4e82874a3975a4",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": "^5.3.3 || ^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.8"
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.0"
             },
             "type": "library",
             "extra": {
@@ -1385,7 +1438,7 @@
             "keywords": [
                 "diff"
             ],
-            "time": "2015-12-08T07:14:41+00:00"
+            "time": "2017-05-22T07:24:03+00:00"
         },
         {
             "name": "sebastian/environment",
@@ -1645,16 +1698,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.2.8",
+            "version": "v3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "acec26fcf7f3031e094e910b94b002fa53d4e4d6"
+                "reference": "9752a30000a8ca9f4b34b5227d15d0101b96b063"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/acec26fcf7f3031e094e910b94b002fa53d4e4d6",
-                "reference": "acec26fcf7f3031e094e910b94b002fa53d4e4d6",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/9752a30000a8ca9f4b34b5227d15d0101b96b063",
+                "reference": "9752a30000a8ca9f4b34b5227d15d0101b96b063",
                 "shasum": ""
             },
             "require": {
@@ -1669,7 +1722,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.2-dev"
+                    "dev-master": "3.3-dev"
                 }
             },
             "autoload": {
@@ -1696,7 +1749,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-05-01T14:55:58+00:00"
+            "time": "2017-06-02T22:05:06+00:00"
         },
         {
             "name": "webmozart/assert",
@@ -1753,7 +1806,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "eduvpn/common": 20,
-        "fkooman/oauth2-client": 20
+        "fkooman/oauth2-client": 20,
+        "fkooman/secookie": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
