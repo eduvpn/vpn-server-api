@@ -39,6 +39,7 @@ use SURFnet\VPN\Server\Api\SystemMessagesModule;
 use SURFnet\VPN\Server\Api\UserMessagesModule;
 use SURFnet\VPN\Server\Api\UsersModule;
 use SURFnet\VPN\Server\CA\EasyRsaCa;
+use SURFnet\VPN\Server\NullSession;
 use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
 use SURFnet\VPN\Server\Storage;
@@ -94,7 +95,8 @@ try {
             );
             $oauthClient = new OAuthClient(
                 $storage,
-                new CurlHttpClient()
+                new CurlHttpClient(),
+                new NullSession()
             );
             $oauthClient->setProvider($provider);
             $groupProviders[] = new VootProvider(
