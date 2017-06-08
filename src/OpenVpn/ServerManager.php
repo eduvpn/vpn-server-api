@@ -50,11 +50,13 @@ class ServerManager
     public function connections()
     {
         $clientConnections = [];
+        $instanceNumber = $this->config->getItem('instanceNumber');
 
         // loop over all profiles
         foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
             $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
-            $managementIp = $this->getManagementIp($profileConfig);
+            $managementIp = $profileConfig->getItem('managementIp');
+            $profileNumber = $profileConfig->getItem('profileNumber');
 
             $profileConnections = [];
             // loop over all processes
@@ -66,7 +68,7 @@ class ServerManager
                         sprintf(
                             'tcp://%s:%d',
                             $managementIp,
-                            11940 + $i
+                            11940 + $this->toPort($instanceNumber, $profileNumber, $i)
                         )
                     );
                     $profileConnections = array_merge(
@@ -79,9 +81,9 @@ class ServerManager
                     // we log the error, but continue with the next instance
                     $this->logger->error(
                         sprintf(
-                            'error with socket "%s:%s", message: "%s"',
+                            'error with socket "tcp://%s:%d", message: "%s"',
                             $managementIp,
-                            11940 + $i,
+                            11940 + $this->toPort($instanceNumber, $profileNumber, $i),
                             $e->getMessage()
                         )
                     );
@@ -103,10 +105,13 @@ class ServerManager
     public function kill($commonName)
     {
         $clientsKilled = 0;
+        $instanceNumber = $this->config->getItem('instanceNumber');
+
         // loop over all profiles
         foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
             $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
-            $managementIp = $this->getManagementIp($profileConfig);
+            $managementIp = $profileConfig->getItem('managementIp');
+            $profileNumber = $profileConfig->getItem('profileNumber');
 
             // loop over all processes
             for ($i = 0; $i < count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
@@ -117,7 +122,7 @@ class ServerManager
                         sprintf(
                             'tcp://%s:%d',
                             $managementIp,
-                            11940 + $i
+                            11940 + $this->toPort($instanceNumber, $profileNumber, $i)
                         )
                     );
 
@@ -131,9 +136,9 @@ class ServerManager
                     // we log the error, but continue with the next instance
                     $this->logger->error(
                         sprintf(
-                            'error with socket "%s:%s", message: "%s"',
+                            'error with socket "tcp://%s:%d", message: "%s"',
                             $managementIp,
-                            11940 + $i,
+                            11940 + $this->toPort($instanceNumber, $profileNumber, $i),
                             $e->getMessage()
                         )
                     );
@@ -144,12 +149,13 @@ class ServerManager
         return 0 !== $clientsKilled;
     }
 
-    private function getManagementIp(ProfileConfig $profileConfig)
+    private function toPort($instanceNumber, $profileNumber, $processNumber)
     {
-        if ('auto' === $profileConfig->getItem('managementIp')) {
-            return sprintf('10.42.%d.%d', 100 + $this->config->getItem('instanceNumber'), 100 + $profileConfig->getItem('profileNumber'));
-        }
+        // convert an instanceNumber, $profileNumber and $processNumber to a management port
 
-        return $profileConfig->getItem('managementIp');
+        // instanceId = 6 bits (max 64)
+        // profileNumber = 4 bits (max 16)
+        // processNumber = 4 bits  (max 16)
+        return ($instanceNumber - 1 << 8) | ($profileNumber - 1 << 4) | ($processNumber);
     }
 }

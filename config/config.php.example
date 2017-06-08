@@ -52,9 +52,8 @@ return [
             // DEFAULT = '::'
             'listen' => '::',
 
-            // Override the assigned managementIp based on instanceNumber and
-            // profileNumber with a chosen IP
-            // DEFAULT = auto (10.42.<INSTANCE_ID>+100.<PROFILE_NUMBER>+100)
+            // The IP address to use for connecting to OpenVPN processes
+            // DEFAULT = '127.0.0.1'
             'managementIp' => '127.0.0.1',
 
             // Whether or not to NAT the range and range6 network to the extIf
