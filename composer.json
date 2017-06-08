@@ -19,17 +19,7 @@
         {
             "no-api": true,
             "type": "vcs",
-            "url": "https://github.com/fkooman/php-secookie"
-        },
-        {
-            "no-api": true,
-            "type": "vcs",
             "url": "https://github.com/eduvpn/vpn-lib-common"
-        },
-        {
-            "no-api": true,
-            "type": "vcs",
-            "url": "https://github.com/fkooman/php-oauth2-client"
         }
     ],
     "require": {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "445ea1dc0a13907c22ba2f837ca81045",
+    "content-hash": "f41dc6bb909ccda2ee0e53a3e0c502fe",
     "packages": [
         {
             "name": "christian-riesen/otp",
@@ -69,12 +69,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "975157f643491daea3ccffdb4a9e55612e905e39"
+                "reference": "1bda5adbbcc64d8efbcfc73bcc9212cfabcc06c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/975157f643491daea3ccffdb4a9e55612e905e39",
-                "reference": "975157f643491daea3ccffdb4a9e55612e905e39",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/1bda5adbbcc64d8efbcfc73bcc9212cfabcc06c4",
+                "reference": "1bda5adbbcc64d8efbcfc73bcc9212cfabcc06c4",
                 "shasum": ""
             },
             "require": {
@@ -115,14 +115,14 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2017-06-06 17:43:54"
+            "time": "2017-06-08 11:31:43"
         },
         {
             "name": "fkooman/oauth2-client",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/fkooman/php-oauth2-client",
+                "url": "https://github.com/fkooman/php-oauth2-client.git",
                 "reference": "84bd95a0afe6e15eee37f698a5ac23425e188c18"
             },
             "dist": {
@@ -172,13 +172,13 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/fkooman/php-secookie",
-                "reference": "12b467334317d1f4a95b12b74b0dcb7a991917ae"
+                "url": "https://github.com/fkooman/php-secookie.git",
+                "reference": "a5ec58c122d781c4b8ab94503c034ddd5945039b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-secookie/zipball/12b467334317d1f4a95b12b74b0dcb7a991917ae",
-                "reference": "12b467334317d1f4a95b12b74b0dcb7a991917ae",
+                "url": "https://api.github.com/repos/fkooman/php-secookie/zipball/a5ec58c122d781c4b8ab94503c034ddd5945039b",
+                "reference": "a5ec58c122d781c4b8ab94503c034ddd5945039b",
                 "shasum": ""
             },
             "require": {
@@ -196,17 +196,18 @@
                     "fkooman\\SeCookie\\Tests\\": "tests/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
-                    "email": "fkooman@tuxed.net",
-                    "name": "François Kooman"
+                    "name": "François Kooman",
+                    "email": "fkooman@tuxed.net"
                 }
             ],
             "description": "Very simple Cookie and PHP Session library",
-            "time": "2017-06-06 18:00:45"
+            "time": "2017-06-08 11:20:37"
         },
         {
             "name": "fkooman/yubitwee",
@@ -620,16 +621,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.34.2",
+            "version": "v1.34.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "55e4beb721a044db9e31ae0470024fc205b6a008"
+                "reference": "451c6f4197e113e24c1c85bc3fc8c2d77adeff2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/55e4beb721a044db9e31ae0470024fc205b6a008",
-                "reference": "55e4beb721a044db9e31ae0470024fc205b6a008",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/451c6f4197e113e24c1c85bc3fc8c2d77adeff2e",
+                "reference": "451c6f4197e113e24c1c85bc3fc8c2d77adeff2e",
                 "shasum": ""
             },
             "require": {
@@ -681,7 +682,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2017-06-06T03:56:50+00:00"
+            "time": "2017-06-07T18:45:17+00:00"
         }
     ],
     "packages-dev": [
