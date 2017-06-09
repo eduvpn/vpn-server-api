@@ -81,7 +81,10 @@ return [
             // IPv4 and IPv6 address of DNS server(s) to push to the client, only
             // used when defaultGateway is true
             // DEFAULT  = []
-            'dns' => ['8.8.8.8', '8.8.4.4', '2001:4860:4860::8888', '2001:4860:4860::8844'],
+            // Google Public DNS (https://developers.google.com/speed/public-dns/)
+            //'dns' => ['8.8.8.8', '8.8.4.4', '2001:4860:4860::8888', '2001:4860:4860::8844'],
+            // DNS.WATCH (https://dns.watch/)
+            'dns' => ['84.200.69.80', '84.200.70.40', '2001:1608:10:25::1c04:b12f', '2001:1608:10:25::9249:d69b'],
 
             // Whether or not to enable two-factor authentication
             // DEFAULT = false
