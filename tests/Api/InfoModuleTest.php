@@ -74,6 +74,7 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                         'tcp/1194',
                     ],
                     'hideProfile' => false,
+                    'tlsCrypt' => false,
                     'profileNumber' => 1,
                     'displayName' => 'Internet Access',
                     'extIf' => 'eth0',
