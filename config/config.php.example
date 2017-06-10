@@ -122,6 +122,9 @@ return [
             // choose it
             // DEFAULT = false
             'hideProfile' => false,
+
+            // use TLS crypt instead of TLS auth (OpenVPN >= 2.4 client only)
+            'tlsCrypt' => false,
         ],
     ],
 
