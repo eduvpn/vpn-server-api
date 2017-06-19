@@ -73,15 +73,15 @@ class TestSocket implements ManagementSocketInterface
         if ('status 2' === $command) {
             if ('tcp://127.0.0.1:11940' === $this->socketAddress) {
                 // send back the returnData as an array
-                return explode("\n", file_get_contents(__DIR__.'/data/socket/openvpn_23_status.txt'));
+                return explode("\n", file_get_contents(__DIR__.'/data/socket/status_with_clients.txt'));
             } else {
-                return explode("\n", file_get_contents(__DIR__.'/data/socket/openvpn_23_status_no_clients.txt'));
+                return explode("\n", file_get_contents(__DIR__.'/data/socket/status_no_clients.txt'));
             }
         } elseif ('kill' === $command) {
             if ('tcp://127.0.0.1:11940' === $this->socketAddress) {
-                return explode("\n", file_get_contents(__DIR__.'/data/socket/openvpn_23_kill_success.txt'));
+                return explode("\n", file_get_contents(__DIR__.'/data/socket/kill_success.txt'));
             } else {
-                return explode("\n", file_get_contents(__DIR__.'/data/socket/openvpn_23_kill_error.txt'));
+                return explode("\n", file_get_contents(__DIR__.'/data/socket/kill_error.txt'));
             }
         }
     }

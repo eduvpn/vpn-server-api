@@ -49,7 +49,7 @@ class OpenVpnModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
                 $clientConnections = $this->serverManager->connections();
-                // augment the connection info with the actual user info
+                // add user information to connection information
                 foreach ($clientConnections as $k => $v) {
                     foreach ($v['connections'] as $k1 => $v2) {
                         $clientConnections[$k]['connections'][$k1] = array_merge($v2, $this->storage->getUserCertificateInfo($v2['common_name']));

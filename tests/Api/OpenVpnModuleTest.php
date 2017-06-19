@@ -48,8 +48,9 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
             new DateTime()
         );
         $storage->init();
-        $storage->addCertificate('foo', '12345678901234567890123456789012', 'Display Name', new DateTime('@12345678'), new DateTime('@23456789'));
-        $storage->addCertificate('foo', '99123456789012345678901234567890', 'Display Name 2', new DateTime('@12345678'), new DateTime('@23456789'));
+
+        $storage->addCertificate('foo', 'f3bb6f8efb4dc64be35e1044cf1b5e76', 'Display Name', new DateTime('@12345678'), new DateTime('@23456789'));
+        $storage->addCertificate('foo', '78f4a3c26062a434b01892e2b23126d1', 'Display Name 2', new DateTime('@12345678'), new DateTime('@23456789'));
 
         $serverManager = new ServerManager(
             $config,
@@ -82,11 +83,10 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                     'id' => 'internet',
                     'connections' => [
                         [
-                            'common_name' => '12345678901234567890123456789012',
-                            'proto' => 6,
+                            'common_name' => 'f3bb6f8efb4dc64be35e1044cf1b5e76',
                             'virtual_address' => [
-                                'fd77:6bac:e591:8203::1001',
-                                '10.120.188.195',
+                                '10.128.7.3',
+                                'fd60:4a08:2f59:ba0::1001',
                             ],
                             'user_id' => 'foo',
                             'user_is_disabled' => '0',
@@ -94,11 +94,10 @@ class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
                             'certificate_is_disabled' => '0',
                         ],
                         [
-                            'common_name' => '99123456789012345678901234567890',
-                            'proto' => 4,
+                            'common_name' => '78f4a3c26062a434b01892e2b23126d1',
                             'virtual_address' => [
-                                '10.120.188.194',
-                                'fd77:6bac:e591:8203::1000',
+                                '10.128.7.4',
+                                'fd60:4a08:2f59:ba0::1002',
                             ],
                             'user_id' => 'foo',
                             'user_is_disabled' => '0',

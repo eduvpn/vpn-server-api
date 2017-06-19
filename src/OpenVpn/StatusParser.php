@@ -20,77 +20,35 @@ namespace SURFnet\VPN\Server\OpenVpn;
 
 /**
  * Parses the response from the OpenVPN `status 2` command.
- *
- * NOTE: The OpenVPN instance MUST NOT have --duplicate-cn in the configuration
- * as we do not deal with multiple connections with the same CN, due to bugs in
- * udp6 status report where the client port is not mentioned in the
- * 'Real Address' column
  */
 class StatusParser
 {
     public static function parse(array $statusData)
     {
-        $clientListStart = 0;
-        $routingTableStart = 0;
-        $globalStatsStart = 0;
+        $clientList = [];
 
-        for ($i = 0; $i < count($statusData); ++$i) {
-            if (0 === mb_strpos($statusData[$i], 'HEADER,CLIENT_LIST')) {
-                $clientListStart = $i;
-            }
-            if (0 === mb_strpos($statusData[$i], 'HEADER,ROUTING_TABLE')) {
-                $routingTableStart = $i;
-            }
-            if (0 === mb_strpos($statusData[$i], 'GLOBAL_STATS')) {
-                $globalStatsStart = $i;
-            }
+        // find "HEADER,CLIENT_LIST"
+        $i = 0;
+        while (0 !== strpos($statusData[$i], 'HEADER,CLIENT_LIST')) {
+            ++$i;
         }
-
-        $parsedClientList = self::parseClientList(array_slice($statusData, $clientListStart, $routingTableStart - $clientListStart));
-        $parsedRoutingTable = self::parseRoutingTable(array_slice($statusData, $routingTableStart, $globalStatsStart - $routingTableStart));
-
-        // merge routing table in client list
-        foreach (array_keys($parsedClientList) as $key) {
-            if (!array_key_exists($key, $parsedRoutingTable)) {
-                $parsedClientList[$key]['virtual_address'] = [];
-            } else {
-                $parsedClientList[$key]['virtual_address'] = $parsedRoutingTable[$key];
-            }
-        }
-
-        return array_values($parsedClientList);
-    }
-
-    private static function parseClientList(array $clientList)
-    {
-        $parsedClientList = [];
-        for ($i = 1; $i < count($clientList); ++$i) {
-            $parsedClient = str_getcsv($clientList[$i]);
-            $commonName = $parsedClient[1];
-            if (array_key_exists($commonName, $parsedClientList)) {
-                //syslog(LOG_ERR('duplicate common name, possibly --duplicate-cn enabled in server configuration'));
-            }
-            $parsedClientList[$commonName] = [
-                'common_name' => $commonName,
-                'proto' => 3 === substr_count($parsedClient[2], '.') ? 4 : 6,
+        $clientKeys = array_slice(str_getcsv($statusData[$i]), 2);
+        ++$i;
+        // iterate over all CLIENT_LIST entries
+        while (0 === strpos($statusData[$i], 'CLIENT_LIST')) {
+            $clientValues = str_getcsv($statusData[$i]);
+            array_shift($clientValues);
+            $clientInfo = array_combine($clientKeys, $clientValues);
+            $clientList[] = [
+                'common_name' => $clientInfo['Common Name'],
+                'virtual_address' => [
+                    $clientInfo['Virtual Address'],
+                    $clientInfo['Virtual IPv6 Address'],
+                ],
             ];
+            ++$i;
         }
 
-        return $parsedClientList;
-    }
-
-    private static function parseRoutingTable(array $routingTable)
-    {
-        $parsedRoutingTable = [];
-        for ($i = 1; $i < count($routingTable); ++$i) {
-            $parsedRoute = str_getcsv($routingTable[$i]);
-            $commonName = $parsedRoute[2];
-            if (!array_key_exists($commonName, $parsedRoutingTable)) {
-                $parsedRoutingTable[$commonName] = [];
-            }
-            $parsedRoutingTable[$commonName][] = $parsedRoute[1];
-        }
-
-        return $parsedRoutingTable;
+        return $clientList;
     }
 }
