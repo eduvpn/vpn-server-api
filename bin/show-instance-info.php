@@ -18,39 +18,66 @@
  */
 require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
 
+use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\Config;
 
-$baseDir = dirname(__DIR__);
-$configDir = sprintf('%s/config', $baseDir);
+try {
+    $baseDir = dirname(__DIR__);
+    $configDir = sprintf('%s/config', $baseDir);
 
-$instanceList = [];
+    $p = new CliParser(
+        'Show Instance and Profile Information',
+        [
+            'free-instance-number' => ['show the first free instanceNumber', false, false],
+        ]
+    );
 
-foreach (glob(sprintf('%s/*', $configDir), GLOB_ONLYDIR) as $dirName) {
-    $instanceId = basename($dirName);
+    $opt = $p->parse($argv);
+    if ($opt->hasItem('help')) {
+        echo $p->help();
+        exit(0);
+    }
 
-    $configFile = sprintf('%s/%s/config.php', $configDir, $instanceId);
-    $config = Config::fromFile($configFile);
+    $instanceList = [];
+    $instanceNumberList = [];
 
-    $instanceNumber = $config->getItem('instanceNumber');
-    $instanceList[$instanceId] = [
-        'instanceNumber' => $instanceNumber,
-        'profileInfo' => [],
-    ];
+    foreach (glob(sprintf('%s/*', $configDir), GLOB_ONLYDIR) as $dirName) {
+        $instanceId = basename($dirName);
 
-    $vpnProfiles = $config->getSection('vpnProfiles');
-    $profileIdList = array_keys($vpnProfiles->toArray());
-    foreach ($profileIdList as $profileId) {
-        $profileNumber = $vpnProfiles->getSection($profileId)->getItem('profileNumber');
-        $instanceList[$instanceId]['profileInfo'][] = [
-            'profileId' => $profileId,
-            'profileNumber' => $profileNumber,
+        $configFile = sprintf('%s/%s/config.php', $configDir, $instanceId);
+        $config = Config::fromFile($configFile);
+
+        $instanceNumber = $config->getItem('instanceNumber');
+        $instanceNumberList[] = $instanceNumber;
+        $instanceList[$instanceId] = [
+            'instanceNumber' => $instanceNumber,
+            'profileInfo' => [],
         ];
-    }
-}
 
-foreach ($instanceList as $k => $v) {
-    echo sprintf('[%d] (%s)', $v['instanceNumber'], $k).PHP_EOL;
-    foreach ($v['profileInfo'] as $p) {
-        echo "\t".sprintf('[%d] (%s)', $p['profileNumber'], $p['profileId']).PHP_EOL;
+        $vpnProfiles = $config->getSection('vpnProfiles');
+        $profileIdList = array_keys($vpnProfiles->toArray());
+        foreach ($profileIdList as $profileId) {
+            $profileNumber = $vpnProfiles->getSection($profileId)->getItem('profileNumber');
+            $instanceList[$instanceId]['profileInfo'][] = [
+                'profileId' => $profileId,
+                'profileNumber' => $profileNumber,
+            ];
+        }
     }
+
+    if ($opt->hasItem('free-instance-number')) {
+        sort($instanceNumberList);
+        echo end($instanceNumberList) + 1 .PHP_EOL;
+        exit(0);
+    }
+
+    foreach ($instanceList as $k => $v) {
+        echo sprintf('[%d] (%s)', $v['instanceNumber'], $k).PHP_EOL;
+        foreach ($v['profileInfo'] as $p) {
+            echo "\t".sprintf('[%d] (%s)', $p['profileNumber'], $p['profileId']).PHP_EOL;
+        }
+    }
+} catch (Exception $e) {
+    echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
+    exit(1);
 }
