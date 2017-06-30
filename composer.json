@@ -24,7 +24,7 @@
     ],
     "require": {
         "christian-riesen/otp": "^2.0",
-        "eduvpn/common": "dev-master",
+        "eduvpn/common": "^1",
         "ext-curl": "*",
         "ext-date": "*",
         "ext-json": "*",
@@ -34,7 +34,7 @@
         "ext-pdo": "*",
         "ext-spl": "*",
         "fkooman/oauth2-client": "dev-master",
-        "fkooman/secookie": "dev-master",
+        "fkooman/secookie": "^1",
         "fkooman/yubitwee": "^1",
         "paragonie/constant_time_encoding": "^1",
         "php": ">=5.4.0"
