@@ -33,7 +33,7 @@
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-spl": "*",
-        "fkooman/oauth2-client": "^1",
+        "fkooman/oauth2-client": "^5",
         "fkooman/secookie": "^1",
         "fkooman/yubitwee": "^1",
         "paragonie/constant_time_encoding": "^1",
