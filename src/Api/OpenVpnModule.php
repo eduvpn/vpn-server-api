@@ -43,7 +43,11 @@ class OpenVpnModule implements ServiceModuleInterface
                 // add user information to connection information
                 foreach ($clientConnections as $k => $v) {
                     foreach ($v['connections'] as $k1 => $v2) {
-                        $clientConnections[$k]['connections'][$k1] = array_merge($v2, $this->storage->getUserCertificateInfo($v2['common_name']));
+                        if (false === $certInfo = $this->storage->getUserCertificateInfo($v2['common_name'])) {
+                            error_log(sprintf('"common_name "%s" not found', $v2['common_name']));
+                            continue;
+                        }
+                        $clientConnections[$k]['connections'][$k1] = array_merge($v2, $certInfo);
                     }
                 }
 
