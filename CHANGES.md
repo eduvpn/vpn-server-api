@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.2 (TBD)
+## 1.0.2 (2017-07-23)
 - another attempt at fixing #62
 
 ## 1.0.1 (2017-07-21)
