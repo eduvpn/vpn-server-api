@@ -45,6 +45,7 @@ class OpenVpnModule implements ServiceModuleInterface
                     foreach ($v['connections'] as $k1 => $v2) {
                         if (false === $certInfo = $this->storage->getUserCertificateInfo($v2['common_name'])) {
                             error_log(sprintf('"common_name "%s" not found', $v2['common_name']));
+                            unset($clientConnections[$k]['connections'][$k1]);
                             continue;
                         }
                         $clientConnections[$k]['connections'][$k1] = array_merge($v2, $certInfo);
