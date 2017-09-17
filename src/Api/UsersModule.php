@@ -126,7 +126,7 @@ class UsersModule implements ServiceModuleInterface
                 $userId = InputValidation::userId($request->getQueryParameter('user_id'));
 
                 $yubiKeyId = $this->storage->getYubiKeyId($userId);
-                if (is_null($yubiKeyId)) {
+                if (null === $yubiKeyId) {
                     return new ApiResponse('yubi_key_id', false);
                 }
 

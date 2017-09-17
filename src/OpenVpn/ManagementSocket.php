@@ -30,6 +30,7 @@ class ManagementSocket implements ManagementSocketInterface
      *
      * @param string $socketAddress the socket to connect to, e.g.:
      *                              "tcp://localhost:7505"
+     * @param int    $timeOut
      */
     public function open($socketAddress, $timeOut = 5)
     {
@@ -49,10 +50,10 @@ class ManagementSocket implements ManagementSocketInterface
      *
      * @param string $command a OpenVPN management command and parameters
      *
-     * @return array the response lines as array values
-     *
      * @throws Exception\ServerSocketException in case read/write fails or
      *                                         socket is not open
+     *
+     * @return array the response lines as array values
      */
     public function command($command)
     {
@@ -106,7 +107,7 @@ class ManagementSocket implements ManagementSocketInterface
 
     private function requireOpenSocket()
     {
-        if (is_null($this->socket)) {
+        if (null === $this->socket) {
             throw new ManagementSocketException('socket not open');
         }
     }

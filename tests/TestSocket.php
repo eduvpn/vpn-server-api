@@ -54,10 +54,10 @@ class TestSocket implements ManagementSocketInterface
      *
      * @param string $command a OpenVPN management command and parameters
      *
-     * @return array the response lines as array values
-     *
      * @throws \SURFnet\VPN\Server\OpenVpn\Exception\ServerSocketException in case read/write fails or
      *                                                                     socket is not open
+     *
+     * @return array the response lines as array values
      */
     public function command($command)
     {

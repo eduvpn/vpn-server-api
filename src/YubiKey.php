@@ -23,7 +23,7 @@ class YubiKey
             $response = $validator->verify($yubiKeyOtp);
 
             if ($response->success()) {
-                if (!is_null($yubiKeyId)) {
+                if (null !== $yubiKeyId) {
                     // the yubiKeyId MUST match the Id from the validation
                     // response
                     if ($yubiKeyId !== $response->id()) {

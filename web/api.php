@@ -71,13 +71,13 @@ try {
     if ($config->hasSection('groupProviders')) {
         $enabledProviders = array_keys($config->getSection('groupProviders')->toArray());
         // StaticProvider
-        if (in_array('StaticProvider', $enabledProviders)) {
+        if (in_array('StaticProvider', $enabledProviders, true)) {
             $groupProviders[] = new StaticProvider(
                 $config->getSection('groupProviders')->getSection('StaticProvider')
             );
         }
         // VootProvider
-        if (in_array('VootProvider', $enabledProviders)) {
+        if (in_array('VootProvider', $enabledProviders, true)) {
             $provider = new Provider(
                 $config->getSection('groupProviders')->getSection('VootProvider')->getItem('clientId'),
                 $config->getSection('groupProviders')->getSection('VootProvider')->getItem('clientSecret'),

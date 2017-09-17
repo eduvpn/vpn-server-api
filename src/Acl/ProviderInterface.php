@@ -14,7 +14,7 @@ interface ProviderInterface
     /**
      * Get the groups a user is a member of.
      *
-     * @param string userId the userID of the user to request the groups of
+     * @param string $userId the userID of the user to request the groups of
      *
      * @return array the groups as an array containing the keys "id" and
      *               "displayName", empty array if no groups are available for this user

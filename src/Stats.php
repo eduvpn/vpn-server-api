@@ -43,7 +43,7 @@ class Stats
                 ];
             }
 
-            if (is_null($disconnectedAt)) {
+            if (null === $disconnectedAt) {
                 $activeUserCount += 1;
             }
 
@@ -57,7 +57,7 @@ class Stats
             }
             $timeConnection[$connectedAt][] = 'C';
 
-            if (!is_null($disconnectedAt)) {
+            if (null !== $disconnectedAt) {
                 if (!array_key_exists($disconnectedAt, $timeConnection)) {
                     $timeConnection[$disconnectedAt] = [];
                 }
@@ -65,12 +65,12 @@ class Stats
             }
 
             // unique user list per day
-            if (!in_array($userId, $statsData[$dateOfConnection]['unique_user_list'])) {
+            if (!in_array($userId, $statsData[$dateOfConnection]['unique_user_list'], true)) {
                 $statsData[$dateOfConnection]['unique_user_list'][] = $userId;
             }
 
             // unique user list for the whole logging period
-            if (!in_array($userId, $uniqueUsers)) {
+            if (!in_array($userId, $uniqueUsers, true)) {
                 $uniqueUsers[] = $userId;
             }
         }

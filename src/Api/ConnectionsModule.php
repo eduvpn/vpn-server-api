@@ -198,7 +198,7 @@ class ConnectionsModule implements ServiceModuleInterface
         //        var_dump($aclGroupList);
         // one of the groups must be listed in the profile ACL list
         foreach ($memberOf as $memberGroup) {
-            if (in_array($memberGroup['id'], $aclGroupList)) {
+            if (in_array($memberGroup['id'], $aclGroupList, true)) {
                 return true;
             }
         }

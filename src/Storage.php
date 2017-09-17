@@ -58,8 +58,8 @@ SQL
             $userList[] = [
                 'user_id' => $row['user_id'],
                 'is_disabled' => (bool) $row['is_disabled'],
-                'has_yubi_key_id' => !is_null($row['yubi_key_id']),
-                'has_totp_secret' => !is_null($row['totp_secret']),
+                'has_yubi_key_id' => null !== $row['yubi_key_id'],
+                'has_totp_secret' => null !== $row['totp_secret'],
             ];
         }
 
@@ -67,6 +67,8 @@ SQL
     }
 
     /**
+     * @param string $commonName
+     *
      * @return array|false
      */
     public function getUserCertificateInfo($commonName)
@@ -93,6 +95,8 @@ SQL
     }
 
     /**
+     * @param mixed $userId
+     *
      * @return string|null
      */
     public function getVootToken($userId)
@@ -134,6 +138,8 @@ SQL
     }
 
     /**
+     * @param mixed $userId
+     *
      * @return bool
      */
     public function hasVootToken($userId)
@@ -152,7 +158,7 @@ SQL
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
-        return !is_null($stmt->fetchColumn());
+        return null !== $stmt->fetchColumn();
     }
 
     public function deleteVootToken($userId)
@@ -174,6 +180,8 @@ SQL
     }
 
     /**
+     * @param mixed $userId
+     *
      * @return bool
      */
     public function hasTotpSecret($userId)
@@ -192,10 +200,12 @@ SQL
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
-        return !is_null($stmt->fetchColumn());
+        return null !== $stmt->fetchColumn();
     }
 
     /**
+     * @param mixed $userId
+     *
      * @return string|null
      */
     public function getTotpSecret($userId)
@@ -273,6 +283,8 @@ SQL
     }
 
     /**
+     * @param mixed $userId
+     *
      * @return bool
      */
     public function hasYubiKeyId($userId)
@@ -291,10 +303,12 @@ SQL
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
-        return !is_null($stmt->fetchColumn());
+        return null !== $stmt->fetchColumn();
     }
 
     /**
+     * @param mixed $userId
+     *
      * @return string|null
      */
     public function getYubiKeyId($userId)
@@ -368,6 +382,8 @@ SQL
     }
 
     /**
+     * @param mixed $userId
+     *
      * @return array
      */
     public function getCertificates($userId)
@@ -480,6 +496,8 @@ SQL
     }
 
     /**
+     * @param mixed $userId
+     *
      * @return bool
      */
     public function isDisabledUser($userId)
@@ -606,6 +624,8 @@ SQL
     }
 
     /**
+     * @param mixed $ipAddress
+     *
      * @return array|false
      */
     public function getLogEntry(DateTime $dateTime, $ipAddress)
@@ -640,6 +660,8 @@ SQL
     }
 
     /**
+     * @param mixed $userId
+     *
      * @return int
      */
     public function getTotpAttemptCount($userId)
@@ -662,6 +684,9 @@ SQL
     }
 
     /**
+     * @param mixed $userId
+     * @param mixed $totpKey
+     *
      * @return bool true if recording succeeds, false if it cannot due to replay
      */
     public function recordTotpKey($userId, $totpKey)
@@ -741,6 +766,8 @@ SQL
     }
 
     /**
+     * @param mixed $type
+     *
      * @return array
      */
     public function systemMessages($type)
@@ -794,6 +821,8 @@ SQL
     }
 
     /**
+     * @param mixed $userId
+     *
      * @return array
      */
     public function userMessages($userId)
@@ -847,7 +876,7 @@ SQL
     public function getAccessTokenList($userId)
     {
         $vootToken = $this->getVootToken($userId);
-        if (is_null($vootToken)) {
+        if (null === $vootToken) {
             return [];
         }
 

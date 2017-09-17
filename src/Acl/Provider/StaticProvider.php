@@ -25,7 +25,7 @@ class StaticProvider implements ProviderInterface
     /**
      * Get the groups a user is a member of.
      *
-     * @param string userId the userID of the user to request the groups of
+     * @param string $userId the userID of the user to request the groups of
      *
      * @return array the groups as an array containing the keys "id" and
      *               "displayName", empty array if no groups are available for this user
@@ -37,7 +37,7 @@ class StaticProvider implements ProviderInterface
         $groupIdList = array_keys($this->config->toArray());
         foreach ($groupIdList as $groupId) {
             $memberList = $this->config->getSection($groupId)->getSection('members')->toArray();
-            if (!is_array($memberList) || !in_array($userId, $memberList)) {
+            if (!is_array($memberList) || !in_array($userId, $memberList, true)) {
                 continue;
             }
 
