@@ -95,7 +95,7 @@ SQL
     }
 
     /**
-     * @param mixed $userId
+     * @param string $userId
      *
      * @return string|null
      */
@@ -138,7 +138,7 @@ SQL
     }
 
     /**
-     * @param mixed $userId
+     * @param string $userId
      *
      * @return bool
      */
@@ -180,7 +180,7 @@ SQL
     }
 
     /**
-     * @param mixed $userId
+     * @param string $userId
      *
      * @return bool
      */
@@ -204,7 +204,7 @@ SQL
     }
 
     /**
-     * @param mixed $userId
+     * @param string $userId
      *
      * @return string|null
      */
@@ -283,7 +283,7 @@ SQL
     }
 
     /**
-     * @param mixed $userId
+     * @param string $userId
      *
      * @return bool
      */
@@ -307,7 +307,7 @@ SQL
     }
 
     /**
-     * @param mixed $userId
+     * @param string $userId
      *
      * @return string|null
      */
@@ -382,7 +382,7 @@ SQL
     }
 
     /**
-     * @param mixed $userId
+     * @param string $userId
      *
      * @return array
      */
@@ -496,7 +496,7 @@ SQL
     }
 
     /**
-     * @param mixed $userId
+     * @param string $userId
      *
      * @return bool
      */
@@ -624,7 +624,7 @@ SQL
     }
 
     /**
-     * @param mixed $ipAddress
+     * @param string $ipAddress
      *
      * @return array|false
      */
@@ -660,7 +660,7 @@ SQL
     }
 
     /**
-     * @param mixed $userId
+     * @param string $userId
      *
      * @return int
      */
@@ -684,8 +684,8 @@ SQL
     }
 
     /**
-     * @param mixed $userId
-     * @param mixed $totpKey
+     * @param string $userId
+     * @param string $totpKey
      *
      * @return bool true if recording succeeds, false if it cannot due to replay
      */
@@ -766,7 +766,7 @@ SQL
     }
 
     /**
-     * @param mixed $type
+     * @param string $type
      *
      * @return array
      */
@@ -821,7 +821,7 @@ SQL
     }
 
     /**
-     * @param mixed $userId
+     * @param string $userId
      *
      * @return array
      */
