@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.3 (2017-09-19)
+- increase TOTP attempt count to 60 from 10 per hour (issue #64)
+
 ## 1.0.2 (2017-07-23)
 - another attempt at fixing #62
 

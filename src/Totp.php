@@ -40,7 +40,7 @@ class Totp
             throw new TotpException('TOTP key replay');
         }
 
-        if (10 < $this->storage->getTotpAttemptCount($userId)) {
+        if (60 < $this->storage->getTotpAttemptCount($userId)) {
             throw new TotpException('too many attempts at TOTP');
         }
 

@@ -43,7 +43,7 @@ class TotpTest extends PHPUnit_Framework_TestCase
      */
     public function testTooManyReplays()
     {
-        for ($i = 0; $i < 10; ++$i) {
+        for ($i = 0; $i < 60; ++$i) {
             try {
                 $this->totp->verify('foo', (string) 123456 + $i);
             } catch (TotpException $e) {
