@@ -9,6 +9,7 @@
 
 namespace SURFnet\VPN\Server\Acl\Provider;
 
+use fkooman\OAuth\Client\Exception\OAuthServerException;
 use fkooman\OAuth\Client\OAuthClient;
 use SURFnet\VPN\Server\Acl\ProviderInterface;
 
@@ -46,14 +47,20 @@ class VootProvider implements ProviderInterface
 
     private function fetchGroups()
     {
-        if (false === $response = $this->client->get('groups', $this->vootUri)) {
+        try {
+            if (false === $response = $this->client->get('groups', $this->vootUri)) {
+                // we do not have an access_token, it expired or was revoked
+                return [];
+            }
+        } catch (OAuthServerException $e) {
+            // there was a problem at the server, they were unable to respond
+            // to our request...
             return [];
-            // XXX need to delete the token?
         }
 
         if (!$response->isOkay()) {
-            // we should probably log some stuff here, but for now just assume
-            // there are no groups for the user...
+            // something is wrong at the server (or with the request), we
+            // just assume there are no groups for the user...
             return [];
         }
 
