@@ -34,12 +34,11 @@
         "ext-pdo": "*",
         "ext-spl": "*",
         "fkooman/oauth2-client": "^5",
-        "fkooman/secookie": "^1",
         "fkooman/yubitwee": "^1",
         "paragonie/constant_time_encoding": "^1",
         "php": ">=5.4.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8"
+        "phpunit/phpunit": "^4|^5"
     }
 }

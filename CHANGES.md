@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.5 (2017-10-23)
+- handle VOOT error more gracefully now
+- remove `fkooman/secookie` requirement
+- update unit test for new `eduvpn/common`
+
 ## 1.0.4 (2017-10-04)
 - fix security issue with 2FA where any YubiKey OTP would be accepted to 
   connect to VPN service when user was not enrolled for YubiKey 2FA
