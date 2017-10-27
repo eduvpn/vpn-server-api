@@ -6,7 +6,15 @@
  * Copyright: 2016-2017, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
-require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
+$baseDir = dirname(__DIR__);
+
+// find the autoloader (package installs, composer)
+foreach (['src', 'vendor'] as $autoloadDir) {
+    if (@file_exists(sprintf('%s/%s/autoload.php', $baseDir, $autoloadDir))) {
+        require_once sprintf('%s/%s/autoload.php', $baseDir, $autoloadDir);
+        break;
+    }
+}
 
 use fkooman\OAuth\Client\Http\CurlHttpClient;
 use fkooman\OAuth\Client\OAuthClient;
@@ -46,8 +54,8 @@ try {
         $instanceId = $request->getServerName();
     }
 
-    $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
-    $configDir = sprintf('%s/config/%s', dirname(__DIR__), $instanceId);
+    $dataDir = sprintf('%s/data/%s', $baseDir, $instanceId);
+    $configDir = sprintf('%s/config/%s', $baseDir, $instanceId);
 
     $config = Config::fromFile(
         sprintf('%s/config.php', $configDir)
@@ -150,7 +158,7 @@ try {
         )
     );
 
-    $easyRsaDir = sprintf('%s/easy-rsa', dirname(__DIR__));
+    $easyRsaDir = sprintf('%s/easy-rsa', $baseDir);
     $easyRsaDataDir = sprintf('%s/easy-rsa', $dataDir);
 
     $easyRsaCa = new EasyRsaCa(

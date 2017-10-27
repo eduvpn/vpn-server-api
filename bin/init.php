@@ -7,7 +7,15 @@
  * Copyright: 2016-2017, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
-require_once sprintf('%s/vendor/autoload.php', dirname(__DIR__));
+$baseDir = dirname(__DIR__);
+
+// find the autoloader (package installs, composer)
+foreach (['src', 'vendor'] as $autoloadDir) {
+    if (@file_exists(sprintf('%s/%s/autoload.php', $baseDir, $autoloadDir))) {
+        require_once sprintf('%s/%s/autoload.php', $baseDir, $autoloadDir);
+        break;
+    }
+}
 
 use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\Config;
@@ -31,16 +39,16 @@ try {
 
     $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
 
-    $configFile = sprintf('%s/config/%s/config.php', dirname(__DIR__), $instanceId);
+    $configFile = sprintf('%s/config/%s/config.php', $baseDir, $instanceId);
     $config = Config::fromFile($configFile);
 
-    $easyRsaDir = sprintf('%s/easy-rsa', dirname(__DIR__));
-    $easyRsaDataDir = sprintf('%s/data/%s/easy-rsa', dirname(__DIR__), $instanceId);
+    $easyRsaDir = sprintf('%s/easy-rsa', $baseDir);
+    $easyRsaDataDir = sprintf('%s/data/%s/easy-rsa', $baseDir, $instanceId);
 
     $ca = new EasyRsaCa($easyRsaDir, $easyRsaDataDir);
     $ca->init($config);
 
-    $dataDir = sprintf('%s/data/%s', dirname(__DIR__), $instanceId);
+    $dataDir = sprintf('%s/data/%s', $baseDir, $instanceId);
     $storage = new Storage(
         new PDO(
             sprintf('sqlite://%s/db.sqlite', $dataDir)
