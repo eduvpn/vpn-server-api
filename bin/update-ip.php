@@ -40,8 +40,6 @@ try {
             'profile' => ['the profile to target, e.g. internet', true, true],
             'host' => ['the hostname clients connect to', true, true],
             'ext' => ['the external interface, e.g. eth0', true, true],
-            'reject4' => ['do not forward IPv4 traffic', false, false],
-            'reject6' => ['do not forward IPv6 traffic', false, false],
         ]
     );
 
@@ -77,12 +75,6 @@ try {
     $profileConfigData['range6'] = $v6;
     $profileConfigData['hostName'] = $opt->getItem('host');
     $profileConfigData['extIf'] = $opt->getItem('ext');
-    if ($opt->hasItem('reject4')) {
-        $profileConfigData['reject4'] = true;
-    }
-    if ($opt->hasItem('reject6')) {
-        $profileConfigData['reject6'] = true;
-    }
     $configData['vpnProfiles'][$opt->getItem('profile')] = $profileConfigData;
 
     Config::toFile($configFile, $configData, 0644);
