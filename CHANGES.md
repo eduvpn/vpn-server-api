@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6 (...)
+- remove `--reject4` and `--reject6` arguments from `update-ip` script
+- refactor code to ease RPM/DEB packaging
+
 ## 1.0.5 (2017-10-23)
 - handle VOOT error more gracefully now
 - remove `fkooman/secookie` requirement
