@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.6 (...)
+## 1.0.6 (2017-10-30)
 - remove `--reject4` and `--reject6` arguments from `update-ip` script
 - refactor code to ease RPM/DEB packaging
 
