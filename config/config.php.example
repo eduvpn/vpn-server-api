@@ -83,6 +83,8 @@ return [
             // DEFAULT  = []
             // Google Public DNS (https://developers.google.com/speed/public-dns/)
             //'dns' => ['8.8.8.8', '8.8.4.4', '2001:4860:4860::8888', '2001:4860:4860::8844'],
+            // Quad9 (https://www.quad9.net)
+            //'dns' => ['9.9.9.9', '2620:fe::fe'],
             // DNS.WATCH (https://dns.watch/)
             'dns' => ['84.200.69.80', '84.200.70.40', '2001:1608:10:25::1c04:b12f', '2001:1608:10:25::9249:d69b'],
 
