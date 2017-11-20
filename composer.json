@@ -8,7 +8,11 @@
     ],
     "autoload": {
         "psr-4": {
-            "SURFnet\\VPN\\Server\\": "src/",
+            "SURFnet\\VPN\\Server\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "SURFnet\\VPN\\Server\\Tests\\": "tests/"
         }
     },
@@ -24,7 +28,7 @@
     ],
     "require": {
         "christian-riesen/otp": "^2.0",
-        "eduvpn/common": "dev-master",
+        "eduvpn/common": "^1",
         "ext-curl": "*",
         "ext-date": "*",
         "ext-json": "*",

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "1c5069f9adceebe3562e20aa0e377b1d",
+    "content-hash": "e74667c7c3f8c53e8160de145503e9cb",
     "packages": [
         {
             "name": "christian-riesen/otp",
@@ -65,16 +65,16 @@
         },
         {
             "name": "eduvpn/common",
-            "version": "dev-master",
+            "version": "1.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "8a6b72f402343e5c06b61b1532e37264295a3bda"
+                "reference": "f4ca927898e78ea5ba663041e898053c9f260cc4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/8a6b72f402343e5c06b61b1532e37264295a3bda",
-                "reference": "8a6b72f402343e5c06b61b1532e37264295a3bda",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/f4ca927898e78ea5ba663041e898053c9f260cc4",
+                "reference": "f4ca927898e78ea5ba663041e898053c9f260cc4",
                 "shasum": ""
             },
             "require": {
@@ -117,7 +117,7 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2017-11-20T13:10:36+00:00"
+            "time": "2017-11-20T13:59:21+00:00"
         },
         {
             "name": "fkooman/oauth2-client",
@@ -2009,9 +2009,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "eduvpn/common": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
