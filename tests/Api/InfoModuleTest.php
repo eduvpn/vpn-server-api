@@ -67,6 +67,7 @@ class InfoModuleTest extends PHPUnit_Framework_TestCase
                     'hideProfile' => false,
                     'tlsCrypt' => false,
                     'authPlugin' => false,
+                    'enableCompression' => true,
                     'profileNumber' => 1,
                     'displayName' => 'Internet Access',
                     'extIf' => 'eth0',

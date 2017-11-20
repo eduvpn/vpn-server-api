@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e74667c7c3f8c53e8160de145503e9cb",
+    "content-hash": "1c5069f9adceebe3562e20aa0e377b1d",
     "packages": [
         {
             "name": "christian-riesen/otp",
@@ -65,16 +65,16 @@
         },
         {
             "name": "eduvpn/common",
-            "version": "1.0.6",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "ad800dfd71c10528225c1cae758835792306d96e"
+                "reference": "8a6b72f402343e5c06b61b1532e37264295a3bda"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/ad800dfd71c10528225c1cae758835792306d96e",
-                "reference": "ad800dfd71c10528225c1cae758835792306d96e",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/8a6b72f402343e5c06b61b1532e37264295a3bda",
+                "reference": "8a6b72f402343e5c06b61b1532e37264295a3bda",
                 "shasum": ""
             },
             "require": {
@@ -98,7 +98,7 @@
                 "twig/twig": "^1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4|^5"
+                "phpunit/phpunit": "^4.8.35|^5|^6"
             },
             "type": "library",
             "autoload": {
@@ -117,20 +117,20 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2017-10-26T09:22:49+00:00"
+            "time": "2017-11-20T13:10:36+00:00"
         },
         {
             "name": "fkooman/oauth2-client",
-            "version": "5.0.1",
+            "version": "5.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-oauth2-client.git",
-                "reference": "2ffbe7b8387238e98a6da5f916ffc21b62a0771a"
+                "reference": "af4d0f91f478f9cec520f5c145389967905fbc6a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/2ffbe7b8387238e98a6da5f916ffc21b62a0771a",
-                "reference": "2ffbe7b8387238e98a6da5f916ffc21b62a0771a",
+                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/af4d0f91f478f9cec520f5c145389967905fbc6a",
+                "reference": "af4d0f91f478f9cec520f5c145389967905fbc6a",
                 "shasum": ""
             },
             "require": {
@@ -148,7 +148,7 @@
                 "symfony/polyfill-php56": "^1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^5"
+                "phpunit/phpunit": "^4.8.35|^5|^6"
             },
             "type": "library",
             "autoload": {
@@ -168,7 +168,7 @@
                 }
             ],
             "description": "Very simple OAuth 2.0 client",
-            "time": "2017-09-18T18:42:36+00:00"
+            "time": "2017-11-16T11:36:50+00:00"
         },
         {
             "name": "fkooman/secookie",
@@ -1249,16 +1249,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "5.7.23",
+            "version": "5.7.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "78532d5269d984660080d8e0f4c99c5c2ea65ffe"
+                "reference": "4b1c822a68ae6577df38a59eb49b046712ec0f6a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/78532d5269d984660080d8e0f4c99c5c2ea65ffe",
-                "reference": "78532d5269d984660080d8e0f4c99c5c2ea65ffe",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4b1c822a68ae6577df38a59eb49b046712ec0f6a",
+                "reference": "4b1c822a68ae6577df38a59eb49b046712ec0f6a",
                 "shasum": ""
             },
             "require": {
@@ -1283,7 +1283,7 @@
                 "sebastian/object-enumerator": "~2.0",
                 "sebastian/resource-operations": "~1.0",
                 "sebastian/version": "~1.0.3|~2.0",
-                "symfony/yaml": "~2.1|~3.0"
+                "symfony/yaml": "~2.1|~3.0|~4.0"
             },
             "conflict": {
                 "phpdocumentor/reflection-docblock": "3.0.2"
@@ -1327,7 +1327,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-10-15T06:13:55+00:00"
+            "time": "2017-11-14T14:50:51+00:00"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -1903,16 +1903,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.3.10",
+            "version": "v3.3.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "8c7bf1e7d5d6b05a690b715729cb4cd0c0a99c46"
+                "reference": "0938408c4faa518d95230deabb5f595bf0de31b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/8c7bf1e7d5d6b05a690b715729cb4cd0c0a99c46",
-                "reference": "8c7bf1e7d5d6b05a690b715729cb4cd0c0a99c46",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/0938408c4faa518d95230deabb5f595bf0de31b9",
+                "reference": "0938408c4faa518d95230deabb5f595bf0de31b9",
                 "shasum": ""
             },
             "require": {
@@ -1954,7 +1954,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-10-05T14:43:42+00:00"
+            "time": "2017-11-10T18:26:04+00:00"
         },
         {
             "name": "webmozart/assert",
@@ -2009,7 +2009,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "eduvpn/common": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

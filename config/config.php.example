@@ -130,6 +130,10 @@ return [
 
             // use TLS crypt instead of TLS auth (OpenVPN >= 2.4 client only)
             'tlsCrypt' => false,
+
+            // Enable data channel compression (--comp-lzo)
+            // DEFAULT = true
+            'enableCompression' => false,
         ],
     ],
 

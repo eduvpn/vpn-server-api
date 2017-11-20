@@ -24,7 +24,7 @@
     ],
     "require": {
         "christian-riesen/otp": "^2.0",
-        "eduvpn/common": "^1",
+        "eduvpn/common": "dev-master",
         "ext-curl": "*",
         "ext-date": "*",
         "ext-json": "*",
