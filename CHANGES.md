@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.7 (...)
+## 1.0.7 (2017-11-20)
 - support disabling compression, disable by default for new deploys
   - *NOTE* changing this with client configurations in the field WILL break 
     them!
