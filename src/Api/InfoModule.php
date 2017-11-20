@@ -47,7 +47,9 @@ class InfoModule implements ServiceModuleInterface
                 $profileList = [];
                 foreach ($this->config->getSection('vpnProfiles')->toArray() as $profileId => $profileData) {
                     $profileConfig = new ProfileConfig($profileData);
-                    $profileList[$profileId] = $profileConfig->toArray();
+                    $profileConfigArray = $profileConfig->toArray();
+                    ksort($profileConfigArray);
+                    $profileList[$profileId] = $profileConfigArray;
                 }
 
                 return new ApiResponse('profile_list', $profileList);

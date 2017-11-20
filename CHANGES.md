@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.8 (...)
+- sort profile config for "Info" page in admin portal
+
 ## 1.0.7 (2017-11-20)
 - support disabling compression, disable by default for new deploys
   - *NOTE* changing this with client configurations in the field WILL break 
