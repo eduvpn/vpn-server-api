@@ -1,7 +1,9 @@
 # Changelog
 
 ## 1.0.7 (...)
-- support disabling compression
+- support disabling compression, disable by default for new deploys
+  - *NOTE* changing this with client configurations in the field WILL break 
+    them!
 
 ## 1.0.6 (2017-10-30)
 - remove `--reject4` and `--reject6` arguments from `update-ip` script
