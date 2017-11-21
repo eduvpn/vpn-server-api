@@ -120,7 +120,7 @@ return [
             // DEFAULT = ['udp/1194', 'tcp/1194']
             'vpnProtoPorts' => [
                 'udp/1194',
-                'tcp/1194'
+                'tcp/1194',
             ],
 
             // Hide the profile from the user portal, i.e. do not allow the user to
@@ -161,6 +161,18 @@ return [
 //            'authorizationEndpoint' => 'https://authz.surfconext.nl/oauth/authorize',
 //            'tokenEndpoint' => 'https://authz.surfconext.nl/oauth/token',
 //            'apiUrl' => 'https://voot.surfconext.nl/me/groups',
+//        ],
+
+//        // LDAP
+//        'LdapProvider' => [
+//            'host' => 'ldap.example.org',
+//            'port' => 389,
+//            'useSsl' => false,
+//            'useStartTls' => false,
+//            'groupDn' => 'ou=Groups,dc=example,dc=org',
+//            // place {{UID}} somewhere in the query... it will be replaced
+//            // by the user's ID when performing LDAP queries
+//            'queryTemplate' => 'uniqueMember=uid={{UID}},ou=People,dc=example,dc=org',
 //        ],
     ],
 ];

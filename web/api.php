@@ -26,6 +26,7 @@ use SURFnet\VPN\Common\Http\Response;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Common\Random;
+use SURFnet\VPN\Server\Acl\Provider\LdapProvider;
 use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
 use SURFnet\VPN\Server\Acl\Provider\VootProvider;
 use SURFnet\VPN\Server\Api\CertificatesModule;
@@ -43,6 +44,7 @@ use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
 use SURFnet\VPN\Server\Storage;
 use SURFnet\VPN\Server\TlsAuth;
+use Symfony\Component\Ldap\LdapClient;
 
 $logger = new Logger('vpn-server-api');
 
@@ -101,6 +103,22 @@ try {
             $groupProviders[] = new VootProvider(
                 $oauthClient,
                 $config->getSection('groupProviders')->getSection('VootProvider')->getItem('apiUrl')
+            );
+        }
+        if (in_array('LdapProvider', $enabledProviders, true)) {
+            $ldapConfig = $config->getSection('groupProviders')->getSection('LdapProvider');
+            $ldapClient = new LdapClient(
+                $ldapConfig->getItem('host'),
+                $ldapConfig->getItem('port'),
+                3,
+                $ldapConfig->getItem('useSsl'),
+                $ldapConfig->getItem('useStartTls')
+            );
+            $ldapClient->bind(null, null);  // XXX anonymous bind for now
+            $groupProviders[] = new LdapProvider(
+                $ldapClient,
+                $ldapConfig->getItem('groupDn'),
+                $ldapConfig->getItem('queryTemplate')
             );
         }
     }
