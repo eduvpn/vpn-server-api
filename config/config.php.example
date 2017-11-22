@@ -165,14 +165,12 @@ return [
 
 //        // LDAP
 //        'LdapProvider' => [
-//            'host' => 'ldap.example.org',
-//            'port' => 389,
-//            'useSsl' => false,
-//            'useStartTls' => false,
+//            'ldapUri' => 'ldap://ldap.example.org:389',
+//            //'ldapUri' => 'ldaps://ldap.example.org:636',
 //            'groupDn' => 'ou=Groups,dc=example,dc=org',
 //            // place {{UID}} somewhere in the query... it will be replaced
 //            // by the user's ID when performing LDAP queries
-//            'queryTemplate' => 'uniqueMember=uid={{UID}},ou=People,dc=example,dc=org',
+//            'filterTemplate' => 'uniqueMember=uid={{UID}},ou=People,dc=example,dc=org',
 //        ],
     ],
 ];

@@ -9,29 +9,47 @@
 
 namespace SURFnet\VPN\Server\Acl\Provider;
 
+use SURFnet\VPN\Server\Acl\Provider\Exception\LdapProviderException;
 use SURFnet\VPN\Server\Acl\ProviderInterface;
-use Symfony\Component\Ldap\LdapClient;
 
 class LdapProvider implements ProviderInterface
 {
-    /** @var \Symfony\Component\Ldap\LdapClient */
-    private $ldap;
+    /** @var resource */
+    private $ldapResource;
 
     /** @var string */
     private $groupDn;
 
     /** @var string */
-    private $queryTemplate;
+    private $filterTemplate;
 
     /**
+     * @param string $ldapUri
      * @param string $groupDn
-     * @param string $queryTemplate
+     * @param string $filterTemplate
      */
-    public function __construct(LdapClient $ldap, $groupDn, $queryTemplate)
+    public function __construct($ldapUri, $groupDn, $filterTemplate)
     {
-        $this->ldap = $ldap;
+        $this->ldapResource = @ldap_connect($ldapUri);
+        if (false === $this->ldapResource) {
+            // only with very old OpenLDAP will it ever return false...
+            throw new LdapProviderException(sprintf('unacceptable LDAP URI "%s"', $ldapUri));
+        }
         $this->groupDn = $groupDn;
-        $this->queryTemplate = $queryTemplate;
+        $this->filterTemplate = $filterTemplate;
+    }
+
+    /**
+     * @param string|null $bindUser
+     * @param string|null $bindPass
+     *
+     * @return void
+     */
+    public function bind($bindUser = null, $bindPass = null)
+    {
+        if (false === @ldap_bind($this->ldapResource, $bindUser, $bindPass)) {
+            throw new LdapProviderException('unable to bind to LDAP server');
+        }
     }
 
     /**
@@ -39,18 +57,33 @@ class LdapProvider implements ProviderInterface
      */
     public function getGroups($userId)
     {
-        $q = str_replace('{{UID}}', $userId, $this->queryTemplate);
-        $queryResults = $this->ldap->find($this->groupDn, $q, 'description');
-
-        $memberOf = [];
-        for ($i = 0; $i < $queryResults['count']; ++$i) {
-            $memberOf[] = [
-                'id' => $queryResults[$i]['dn'],
-                'displayName' => $queryResults[$i]['description'][0],
-            ];
+        // XXX we probably do NOT want to throw exceptions here...
+        $searchFilter = str_replace('{{UID}}', $userId, $this->filterTemplate);
+        $searchResource = @ldap_search(
+            $this->ldapResource,    // link_identifier
+            $this->groupDn,         // base_dn
+            $searchFilter,          // filter
+            ['description'],        // attributes (dn is always returned...)
+            1,                      // attrsonly
+            0,                      // sizelimit
+            10                      // timelimit
+        );
+        if (false === $searchResource) {
+            throw new LdapProviderException('unable to perform LDAP search');
         }
 
-        error_log(var_export($memberOf, true));
+        $ldapEntries = @ldap_get_entries($this->ldapResource, $searchResource);
+        if (false === $ldapEntries) {
+            throw new LdapProviderException('unable to get LDAP entries');
+        }
+
+        $memberOf = [];
+        for ($i = 0; $i < $ldapEntries['count']; ++$i) {
+            $memberOf[] = [
+                'id' => $ldapEntries[$i]['dn'],
+                'displayName' => $ldapEntries[$i]['description'][0],
+            ];
+        }
 
         return $memberOf;
     }

@@ -32,6 +32,7 @@
         "ext-curl": "*",
         "ext-date": "*",
         "ext-json": "*",
+        "ext-ldap": "*",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-pcre": "*",
@@ -40,8 +41,7 @@
         "fkooman/oauth2-client": "^5",
         "fkooman/yubitwee": "^1",
         "paragonie/constant_time_encoding": "^1",
-        "php": ">=5.4.0",
-        "symfony/ldap": "^2.8"
+        "php": ">=5.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^4|^5"
