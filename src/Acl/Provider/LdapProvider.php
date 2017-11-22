@@ -64,7 +64,7 @@ class LdapProvider implements ProviderInterface
             $this->groupDn,         // base_dn
             $searchFilter,          // filter
             ['description'],        // attributes (dn is always returned...)
-            1,                      // attrsonly
+            0,                      // attrsonly
             0,                      // sizelimit
             10                      // timelimit
         );
