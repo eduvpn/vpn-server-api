@@ -1,5 +1,3 @@
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/eduvpn/vpn-server-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/eduvpn/vpn-server-api/?branch=master)
-
 VPN Server API.
 
 # Third Party Software
