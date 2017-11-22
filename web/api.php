@@ -109,6 +109,7 @@ try {
             $ldapConfig = $config->getSection('groupProviders')->getSection('LdapProvider');
             $ldapClient = new LdapClient($ldapConfig->getItem('ldapUri'));
             $groupProviders[] = new LdapProvider(
+                $logger,
                 $ldapClient,
                 $ldapConfig->getItem('groupDn'),
                 $ldapConfig->getItem('filterTemplate')
