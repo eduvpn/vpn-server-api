@@ -26,6 +26,7 @@ use SURFnet\VPN\Common\Http\Response;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Common\Random;
+use SURFnet\VPN\Server\Acl\Provider\LdapClient;
 use SURFnet\VPN\Server\Acl\Provider\LdapProvider;
 use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
 use SURFnet\VPN\Server\Acl\Provider\VootProvider;
@@ -106,8 +107,9 @@ try {
         }
         if (in_array('LdapProvider', $enabledProviders, true)) {
             $ldapConfig = $config->getSection('groupProviders')->getSection('LdapProvider');
+            $ldapClient = new LdapClient($ldapConfig->getItem('ldapUri'));
             $groupProviders[] = new LdapProvider(
-                $ldapConfig->getItem('ldapUri'),
+                $ldapClient,
                 $ldapConfig->getItem('groupDn'),
                 $ldapConfig->getItem('filterTemplate')
             );

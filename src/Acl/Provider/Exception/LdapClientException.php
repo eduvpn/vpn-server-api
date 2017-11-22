@@ -11,6 +11,6 @@ namespace SURFnet\VPN\Server\Acl\Provider\Exception;
 
 use Exception;
 
-class LdapProviderException extends Exception
+class LdapClientException extends Exception
 {
 }
