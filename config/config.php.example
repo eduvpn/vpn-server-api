@@ -165,8 +165,8 @@ return [
 
 //        // LDAP
 //        'LdapProvider' => [
-//            'ldapUri' => 'ldap://ldap.example.org:389',
-//            //'ldapUri' => 'ldaps://ldap.example.org:636',
+//            'ldapUri' => 'ldap://ldap.example.org',
+//            //'ldapUri' => 'ldaps://ldap.example.org',
 //            'groupDn' => 'ou=Groups,dc=example,dc=org',
 //            // place {{UID}} somewhere in the query... it will be replaced
 //            // by the user's ID when performing LDAP queries
