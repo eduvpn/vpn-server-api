@@ -10,7 +10,8 @@
 namespace SURFnet\VPN\Server\Acl\Provider;
 
 use Psr\Log\LoggerInterface;
-use SURFnet\VPN\Server\Acl\Provider\Exception\LdapClientException;
+use SURFnet\VPN\Common\Exception\LdapClientException;
+use SURFnet\VPN\Common\LdapClient;
 use SURFnet\VPN\Server\Acl\ProviderInterface;
 
 class LdapProvider implements ProviderInterface
@@ -18,7 +19,7 @@ class LdapProvider implements ProviderInterface
     /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
-    /** @var LdapClient */
+    /** @var \SURFnet\VPN\Common\LdapClient */
     private $ldapClient;
 
     /** @var string */
@@ -44,7 +45,7 @@ class LdapProvider implements ProviderInterface
      */
     public function getGroups($userId)
     {
-        $searchFilter = str_replace('{{UID}}', $userId, $this->filterTemplate);
+        $searchFilter = str_replace('{{UID}}', LdapClient::escapeFilter($userId), $this->filterTemplate);
         try {
             $ldapEntries = $this->ldapClient->search(
                 $this->groupDn,
@@ -63,7 +64,7 @@ class LdapProvider implements ProviderInterface
             return $memberOf;
         } catch (LdapClientException $e) {
             // an error occurred, log it, and for now assume user has no
-            // group membership
+            // group membership(s)
             $this->logger->error($e->getMessage());
 
             return [];

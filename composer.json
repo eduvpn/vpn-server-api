@@ -32,7 +32,6 @@
         "ext-curl": "*",
         "ext-date": "*",
         "ext-json": "*",
-        "ext-ldap": "*",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-pcre": "*",

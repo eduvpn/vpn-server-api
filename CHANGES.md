@@ -1,8 +1,8 @@
 # Changelog
 
-## 1.0.8 (...)
+## 1.1.0 (2017-11-23)
 - sort profile config for "Info" page in admin portal
-- experimental support for LDAP ACL Provider
+- LDAP ACL Provider
 
 ## 1.0.7 (2017-11-20)
 - support disabling compression, disable by default for new deploys
