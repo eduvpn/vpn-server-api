@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 (2017-11-24)
+- make it possible to configure binding to LDAP before retrieving group
+  membership
+
 ## 1.1.0 (2017-11-23)
 - sort profile config for "Info" page in admin portal
 - LDAP ACL Provider
