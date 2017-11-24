@@ -28,16 +28,32 @@ class LdapProvider implements ProviderInterface
     /** @var string */
     private $filterTemplate;
 
+    /** @var string|null */
+    private $bindDn;
+
+    /** @var string|null */
+    private $bindPass;
+
     /**
-     * @param string $groupDn
-     * @param string $filterTemplate
+     * @param string      $groupDn
+     * @param string      $filterTemplate
+     * @param string|null $bindDn
+     * @param string|null $bindPass
      */
-    public function __construct(LoggerInterface $logger, LdapClient $ldapClient, $groupDn, $filterTemplate)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        LdapClient $ldapClient,
+        $groupDn,
+        $filterTemplate,
+        $bindDn,
+        $bindPass
+    ) {
         $this->logger = $logger;
         $this->ldapClient = $ldapClient;
         $this->groupDn = $groupDn;
         $this->filterTemplate = $filterTemplate;
+        $this->bindDn = $bindDn;
+        $this->bindPass = $bindPass;
     }
 
     /**
@@ -47,6 +63,7 @@ class LdapProvider implements ProviderInterface
     {
         $searchFilter = str_replace('{{UID}}', LdapClient::escapeFilter($userId), $this->filterTemplate);
         try {
+            $this->ldapClient->bind($this->bindDn, $this->bindPass);
             $ldapEntries = $this->ldapClient->search(
                 $this->groupDn,
                 $searchFilter,

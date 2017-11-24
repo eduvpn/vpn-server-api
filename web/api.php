@@ -112,7 +112,9 @@ try {
                 $logger,
                 $ldapClient,
                 $ldapConfig->getItem('groupDn'),
-                $ldapConfig->getItem('filterTemplate')
+                $ldapConfig->getItem('filterTemplate'),
+                $ldapConfig->hasItem('bindDn') ? $ldapConfig->getItem('bindDn') : null,
+                $ldapConfig->hasItem('bindPass') ? $ldapConfig->getItem('bindPass') : null
             );
         }
     }

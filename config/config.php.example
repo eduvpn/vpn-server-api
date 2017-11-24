@@ -165,12 +165,12 @@ return [
 
 //        // LDAP
 //        'LdapProvider' => [
-//            'ldapUri' => 'ldap://ldap.example.org',
-//            //'ldapUri' => 'ldaps://ldap.example.org',
-//            'groupDn' => 'ou=Groups,dc=example,dc=org',
-//            // place {{UID}} somewhere in the query... it will be replaced
-//            // by the user's ID when performing LDAP queries
-//            'filterTemplate' => 'uniqueMember=uid={{UID}},ou=People,dc=example,dc=org',
+//            'ldapUri' => 'ldaps://ipa.example.org',
+//            'groupDn' => 'cn=groups,cn=accounts,dc=example,dc=org',
+//            // {{UID}} will be replaced by the actual user ID
+//            'filterTemplate' => 'member=uid={{UID}},cn=users,cn=accounts,dc=example,dc=org',
+//            //'bindDn' => 'uid=system,cn=users,cn=accounts,dc=example,dc=org',
+//            //'bindPass' => 'foobarbaz',
 //        ],
     ],
 ];
