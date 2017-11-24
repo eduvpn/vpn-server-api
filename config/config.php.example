@@ -169,7 +169,7 @@ return [
 //            'groupDn' => 'cn=groups,cn=accounts,dc=example,dc=org',
 //            // {{UID}} will be replaced by the actual user ID
 //            'filterTemplate' => 'member=uid={{UID}},cn=users,cn=accounts,dc=example,dc=org',
-//            //'bindDn' => 'uid=system,cn=users,cn=accounts,dc=example,dc=org',
+//            //'bindDn' => 'uid=vpn,cn=sysaccounts,cn=etc,dc=example,dc=org',
 //            //'bindPass' => 'foobarbaz',
 //        ],
     ],
