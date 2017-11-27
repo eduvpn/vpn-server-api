@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2 (...)
+- switch to `cn` attribute to retrieve name of group(s) instead of 
+  `description`
+
 ## 1.1.1 (2017-11-24)
 - make it possible to configure binding to LDAP before retrieving group
   membership

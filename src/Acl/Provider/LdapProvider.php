@@ -67,14 +67,14 @@ class LdapProvider implements ProviderInterface
             $ldapEntries = $this->ldapClient->search(
                 $this->groupDn,
                 $searchFilter,
-                ['description']
+                ['cn']
             );
 
             $memberOf = [];
             for ($i = 0; $i < $ldapEntries['count']; ++$i) {
                 $memberOf[] = [
                     'id' => $ldapEntries[$i]['dn'],
-                    'displayName' => $ldapEntries[$i]['description'][0],
+                    'displayName' => $ldapEntries[$i]['cn'][0],
                 ];
             }
 
