@@ -6,6 +6,7 @@
 - update `fkooman/oauth-client` to 
   [6.0.0](https://github.com/fkooman/php-oauth2-client/blob/master/CHANGES.md#600-2017-11-27)
 - update LDAP configuration example
+- support Active Directory for retrieving group membership from LDAP
 
 ## 1.1.1 (2017-11-24)
 - make it possible to configure binding to LDAP before retrieving group

@@ -23,10 +23,16 @@ class LdapProvider implements ProviderInterface
     private $ldapClient;
 
     /** @var string */
-    private $groupDn;
+    private $groupBaseDn;
 
     /** @var string */
-    private $filterTemplate;
+    private $memberFilterTemplate;
+
+    /** @var string|null */
+    private $userBaseDn;
+
+    /** @var string|null */
+    private $userIdFilterTemplate;
 
     /** @var string|null */
     private $bindDn;
@@ -35,23 +41,29 @@ class LdapProvider implements ProviderInterface
     private $bindPass;
 
     /**
-     * @param string      $groupDn
-     * @param string      $filterTemplate
+     * @param string      $groupBaseDn
+     * @param string      $memberFilterTemplate
+     * @param string|null $userBaseDn
+     * @param string|null $userIdFilterTemplate
      * @param string|null $bindDn
      * @param string|null $bindPass
      */
     public function __construct(
         LoggerInterface $logger,
         LdapClient $ldapClient,
-        $groupDn,
-        $filterTemplate,
-        $bindDn,
-        $bindPass
+        $groupBaseDn,
+        $memberFilterTemplate,
+        $userBaseDn = null,
+        $userIdFilterTemplate = null,
+        $bindDn = null,
+        $bindPass = null
     ) {
         $this->logger = $logger;
         $this->ldapClient = $ldapClient;
-        $this->groupDn = $groupDn;
-        $this->filterTemplate = $filterTemplate;
+        $this->groupBaseDn = $groupBaseDn;
+        $this->memberFilterTemplate = $memberFilterTemplate;
+        $this->userBaseDn = $userBaseDn;
+        $this->userIdFilterTemplate = $userIdFilterTemplate;
         $this->bindDn = $bindDn;
         $this->bindPass = $bindPass;
     }
@@ -61,12 +73,13 @@ class LdapProvider implements ProviderInterface
      */
     public function getGroups($userId)
     {
-        $searchFilter = str_replace('{{UID}}', LdapClient::escapeFilter($userId), $this->filterTemplate);
         try {
             $this->ldapClient->bind($this->bindDn, $this->bindPass);
+
+            $memberFilter = $this->getMemberFilter($userId);
             $ldapEntries = $this->ldapClient->search(
-                $this->groupDn,
-                $searchFilter,
+                $this->groupBaseDn,
+                $memberFilter,
                 ['cn']
             );
 
@@ -86,5 +99,32 @@ class LdapProvider implements ProviderInterface
 
             return [];
         }
+    }
+
+    /**
+     * @param string $userId
+     *
+     * @return string
+     */
+    private function getMemberFilter($userId)
+    {
+        if (null === $this->userBaseDn) {
+            return str_replace('{{UID}}', LdapClient::escapeFilter($userId), $this->memberFilterTemplate);
+        }
+
+        // we first have to determine the user DN as we can't directly use
+        // the userId in the memberFilter
+        $userIdFilter = str_replace('{{UID}}', LdapClient::escapeFilter($userId), $this->userIdFilterTemplate);
+        $ldapEntries = $this->ldapClient->search(
+            $this->userBaseDn,
+            $userIdFilter
+        );
+        if (1 !== $ldapEntries['count']) {
+            // we did not find the user's DN, or too many
+            return [];
+        }
+        $userDn = $ldapEntries[0]['dn'];
+
+        return str_replace('{{DN}}', $userDn, $this->memberFilterTemplate);
     }
 }

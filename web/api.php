@@ -108,11 +108,18 @@ try {
         if (in_array('LdapProvider', $enabledProviders, true)) {
             $ldapConfig = $config->getSection('groupProviders')->getSection('LdapProvider');
             $ldapClient = new LdapClient($ldapConfig->getItem('ldapUri'));
+
+            // backwards compatible support for old "groupDn" and "filterTemplate". remove in 2.0
+            $groupBaseDn = $ldapConfig->hasItem('groupDn') ? $ldapConfig->getItem('groupDn') : $ldapConfig->getItem('groupBaseDn');
+            $memberFilterTemplate = $ldapConfig->hasItem('filterTemplate') ? $ldapConfig->getItem('filterTemplate') : $ldapConfig->getItem('memberFilterTemplate');
+
             $groupProviders[] = new LdapProvider(
                 $logger,
                 $ldapClient,
-                $ldapConfig->getItem('groupDn'),
-                $ldapConfig->getItem('filterTemplate'),
+                $groupBaseDn,
+                $memberFilterTemplate,
+                $ldapConfig->hasItem('userBaseDn') ? $ldapConfig->getItem('userBaseDn') : null,
+                $ldapConfig->hasItem('userIdFilterTemplate') ? $ldapConfig->getItem('userIdFilterTemplate') : null,
                 $ldapConfig->hasItem('bindDn') ? $ldapConfig->getItem('bindDn') : null,
                 $ldapConfig->hasItem('bindPass') ? $ldapConfig->getItem('bindPass') : null
             );
