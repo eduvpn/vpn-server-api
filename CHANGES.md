@@ -1,8 +1,11 @@
 # Changelog
 
-## 1.1.2 (...)
+## 1.2.0 (...)
 - switch to `cn` attribute to retrieve name of group(s) instead of 
   `description`
+- update `fkooman/oauth-client` to 
+  [6.0.0](https://github.com/fkooman/php-oauth2-client/blob/master/CHANGES.md#600-2017-11-27)
+- update LDAP configuration example
 
 ## 1.1.1 (2017-11-24)
 - make it possible to configure binding to LDAP before retrieving group

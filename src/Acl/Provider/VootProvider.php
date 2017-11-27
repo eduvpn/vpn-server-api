@@ -9,7 +9,7 @@
 
 namespace SURFnet\VPN\Server\Acl\Provider;
 
-use fkooman\OAuth\Client\Exception\OAuthServerException;
+use fkooman\OAuth\Client\Exception\TokenException;
 use fkooman\OAuth\Client\OAuthClient;
 use SURFnet\VPN\Server\Acl\ProviderInterface;
 
@@ -44,18 +44,23 @@ class VootProvider implements ProviderInterface
     {
         try {
             if (false === $response = $this->client->get('groups', $this->vootUri)) {
-                // we do not have an access_token, it expired or was revoked
+                // we do not have an access_token, it expired, was revoked, was
+                // not accepted by the VOOT endpoint or the refresh_token is no
+                // longer valid (needs new authorization through browser!)
+                //
+                // XXX how to inform the user of this as this basically means
+                // that users cannot connect to VPN (if group membership was
+                // required) until they login to the portal again
                 return [];
             }
-        } catch (OAuthServerException $e) {
-            // there was a problem at the server, they were unable to respond
-            // to our request...
+        } catch (TokenException $e) {
+            // unable to use refresh_token, unexpected error from server
             return [];
         }
 
         if (!$response->isOkay()) {
-            // something is wrong at the server (or with the request), we
-            // just assume there are no groups for the user...
+            // VOOT responses should be HTTP 200 responses... there is
+            // something else wrong...
             return [];
         }
 
