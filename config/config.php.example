@@ -181,7 +181,7 @@ return [
 //            'memberFilterTemplate' => 'member={{DN}}',
 //            'userBaseDn' => 'cn=Users,dc=example,dc=org',
 //            // {{UID}} will be replaced by the actual user ID
-//            'userIdFilterTemplate => 'sAMAccountName={{UID}}',
+//            'userIdFilterTemplate' => 'sAMAccountName={{UID}}',
 //            'bindDn' => 'cn=Administrator,cn=Users,dc=example,dc=org',
 //            'bindPass' => 's3cr3t',
 //        ],
