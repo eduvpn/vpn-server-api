@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0 (...)
+## 1.2.0 (2017-11-28)
 - switch to `cn` attribute to retrieve name of group(s) instead of 
   `description`
 - update `fkooman/oauth-client` to 
