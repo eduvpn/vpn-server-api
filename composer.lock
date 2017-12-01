@@ -65,16 +65,16 @@
         },
         {
             "name": "eduvpn/common",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "d9ebc2b4a197ce491fea98b0a21c9bde4f6b1c5d"
+                "reference": "0aa297d77d147ed7cd20197f8be69394317135a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/d9ebc2b4a197ce491fea98b0a21c9bde4f6b1c5d",
-                "reference": "d9ebc2b4a197ce491fea98b0a21c9bde4f6b1c5d",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/0aa297d77d147ed7cd20197f8be69394317135a3",
+                "reference": "0aa297d77d147ed7cd20197f8be69394317135a3",
                 "shasum": ""
             },
             "require": {
@@ -118,20 +118,20 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2017-11-23T09:02:19+00:00"
+            "time": "2017-11-27T18:59:20+00:00"
         },
         {
             "name": "fkooman/oauth2-client",
-            "version": "6.0.0",
+            "version": "6.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-oauth2-client.git",
-                "reference": "0bf8148accd68c92473188dcdc499154d306f0fb"
+                "reference": "68aa51e8f3bacb073fc4397409bec227b31db24d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/0bf8148accd68c92473188dcdc499154d306f0fb",
-                "reference": "0bf8148accd68c92473188dcdc499154d306f0fb",
+                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/68aa51e8f3bacb073fc4397409bec227b31db24d",
+                "reference": "68aa51e8f3bacb073fc4397409bec227b31db24d",
                 "shasum": ""
             },
             "require": {
@@ -168,7 +168,7 @@
                 }
             ],
             "description": "Very simple OAuth 2.0 client",
-            "time": "2017-11-27T18:14:47+00:00"
+            "time": "2017-11-28T09:45:11+00:00"
         },
         {
             "name": "fkooman/secookie",
@@ -1909,23 +1909,26 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.3.13",
+            "version": "v4.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "0938408c4faa518d95230deabb5f595bf0de31b9"
+                "reference": "7be8741ce5dce9943f41a9269f6828b66e726776"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/0938408c4faa518d95230deabb5f595bf0de31b9",
-                "reference": "0938408c4faa518d95230deabb5f595bf0de31b9",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/7be8741ce5dce9943f41a9269f6828b66e726776",
+                "reference": "7be8741ce5dce9943f41a9269f6828b66e726776",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.5.9|>=7.0.8"
+                "php": "^7.1.3"
+            },
+            "conflict": {
+                "symfony/console": "<3.4"
             },
             "require-dev": {
-                "symfony/console": "~2.8|~3.0"
+                "symfony/console": "~3.4|~4.0"
             },
             "suggest": {
                 "symfony/console": "For validating YAML files using the lint command"
@@ -1933,7 +1936,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.3-dev"
+                    "dev-master": "4.0-dev"
                 }
             },
             "autoload": {
@@ -1960,7 +1963,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-10T18:26:04+00:00"
+            "time": "2017-11-29T13:42:03+00:00"
         },
         {
             "name": "webmozart/assert",
