@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.1 (...)
+## 1.2.1 (2017-12-13)
 - cleanup autoloading
 - update `eduvpn/common`
 - update embedded easy-rsa
