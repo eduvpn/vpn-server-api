@@ -68,7 +68,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $yubiKey = new YubiKey();
                 try {
-                    $yubiKeyId = $yubiKey->verify($userId, $yubiKeyOtp);
+                    $yubiKeyId = $yubiKey->getVerifiedId($yubiKeyOtp);
                     $this->storage->setYubiKeyId($userId, $yubiKeyId);
                     $this->storage->addUserMessage($userId, 'notification', sprintf('YubiKey ID "%s" registered', $yubiKeyId));
 
@@ -89,17 +89,22 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
                 $yubiKeyOtp = InputValidation::yubiKeyOtp($request->getPostParameter('yubi_key_otp'));
-                $yubiKeyId = $this->storage->getYubiKeyId($userId);
 
-                // XXX make sure we have a registered yubiKeyID first?!
+                $expectedYubiKeyId = $this->storage->getYubiKeyId($userId);
+                if (null === $expectedYubiKeyId) {
+                    $msg = 'YubiKey: user not enrolled';
+                    $this->storage->addUserMessage($userId, 'notification', $msg);
+
+                    return new ApiErrorResponse('verify_yubi_key_otp', $msg);
+                }
 
                 $yubiKey = new YubiKey();
                 try {
-                    $yubiKey->verify($userId, $yubiKeyOtp, $yubiKeyId);
+                    $yubiKey->verifyOtpForId($yubiKeyOtp, $expectedYubiKeyId);
 
                     return new ApiResponse('verify_yubi_key_otp');
                 } catch (YubiKeyException $e) {
-                    $msg = sprintf('YubiKey OTP verification failed: %s', $e->getMessage());
+                    $msg = sprintf('YubiKey: %s', $e->getMessage());
                     $this->storage->addUserMessage($userId, 'notification', $msg);
 
                     return new ApiErrorResponse('verify_yubi_key_otp', $msg);

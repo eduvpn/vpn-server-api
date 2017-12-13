@@ -3,6 +3,8 @@
 ## 1.2.1 (...)
 - cleanup autoloading
 - update `eduvpn/common`
+- update embedded easy-rsa
+- make YubiKey validating more robust and simplify code
 
 ## 1.2.0 (2017-11-28)
 - switch to `cn` attribute to retrieve name of group(s) instead of 

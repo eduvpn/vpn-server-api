@@ -176,7 +176,7 @@ class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
         $this->assertSame(
             [
                 'ok' => false,
-                'error' => '[VPN] YubiKey OTP validation failed: user not enrolled with YubiKey',
+                'error' => '[VPN] YubiKey: user not enrolled',
             ],
             $this->makeRequest(
                 ['vpn-server-node', 'aabbcc'],

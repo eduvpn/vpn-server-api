@@ -16,27 +16,37 @@ use SURFnet\VPN\Server\Exception\YubiKeyException;
 
 class YubiKey
 {
-    public function verify($userId, $yubiKeyOtp, $yubiKeyId = null)
+    /**
+     * @param string $yubiKeyOtp
+     *
+     * @return string
+     */
+    public function getVerifiedId($yubiKeyOtp)
     {
         try {
             $validator = new Validator(new CurlMultiHttpClient());
             $response = $validator->verify($yubiKeyOtp);
 
-            if ($response->success()) {
-                if (null !== $yubiKeyId) {
-                    // the yubiKeyId MUST match the Id from the validation
-                    // response
-                    if ($yubiKeyId !== $response->id()) {
-                        throw new YubiKeyException('user not bound to this YubiKey ID');
-                    }
-                }
-
-                return $response->id();
+            if (!$response->success()) {
+                throw new YubiKeyException(sprintf('YubiKey OTP is not valid: %s', $response->status()));
             }
 
-            throw new YubiKeyException(sprintf('YubiKey OTP is not valid: %s', $response->status()));
+            return $response->id();
         } catch (YubiTweeException $e) {
             throw new YubiKeyException(sprintf('YubiKey OTP validation failed: %s', $e->getMessage()));
+        }
+    }
+
+    /**
+     * @param string $yubiKeyOtp
+     * @param string $expectedYubiKeyId
+     *
+     * @return void
+     */
+    public function verifyOtpForId($yubiKeyOtp, $expectedYubiKeyId)
+    {
+        if ($expectedYubiKeyId !== $this->getVerifiedId($yubiKeyOtp)) {
+            throw new YubiKeyException('Used YubiKey does not match expected YubiKey for user');
         }
     }
 }
