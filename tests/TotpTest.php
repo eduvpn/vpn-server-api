@@ -45,7 +45,7 @@ class TotpTest extends PHPUnit_Framework_TestCase
     {
         for ($i = 0; $i < 60; ++$i) {
             try {
-                $this->totp->verify('foo', (string) 123456 + $i);
+                $this->totp->verify('foo', (string) (123456 + $i));
             } catch (TotpException $e) {
                 $this->assertSame('invalid TOTP key', $e->getMessage());
             }
