@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.2 (...)
+## 1.2.2 (2017-12-14)
 - update `eduvpn/common`
 - fix test for new `christian-riesen/otp`
 
