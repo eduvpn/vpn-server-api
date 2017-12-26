@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.3 (...)
+- make quad9 the default DNS for new deploys
+
 ## 1.2.2 (2017-12-14)
 - update `eduvpn/common`
 - fix test for new `christian-riesen/otp`
