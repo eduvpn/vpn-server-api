@@ -83,13 +83,13 @@ return [
             // DEFAULT  = []
             // Google Public DNS (https://developers.google.com/speed/public-dns/)
             //'dns' => ['8.8.8.8', '8.8.4.4', '2001:4860:4860::8888', '2001:4860:4860::8844'],
-            // Quad9 (https://www.quad9.net)
-            //'dns' => ['9.9.9.9', '2620:fe::fe'],
             // UncensoredDNS (https://blog.uncensoreddns.org/)
             //'dns' => ['91.239.100.100', '2001:67c:28a4::'], // anycast.censurfridns.dk
             //'dns' => ['89.233.43.71', '2a01:3a0:53:53::'],  // unicast.censurfridns.dk
             // DNS.WATCH (https://dns.watch/)
-            'dns' => ['84.200.69.80', '84.200.70.40', '2001:1608:10:25::1c04:b12f', '2001:1608:10:25::9249:d69b'],
+            //'dns' => ['84.200.69.80', '84.200.70.40', '2001:1608:10:25::1c04:b12f', '2001:1608:10:25::9249:d69b'],
+            // Quad9 (https://www.quad9.net)
+            'dns' => ['9.9.9.9', '2620:fe::fe'],
 
             // Whether or not to enable two-factor authentication
             // DEFAULT = false
