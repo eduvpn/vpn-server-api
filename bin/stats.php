@@ -13,6 +13,7 @@ $baseDir = dirname(__DIR__);
 require_once sprintf('%s/vendor/autoload.php', $baseDir);
 
 use SURFnet\VPN\Common\CliParser;
+use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\FileIO;
 use SURFnet\VPN\Server\Stats;
 use SURFnet\VPN\Server\Storage;
@@ -33,14 +34,19 @@ try {
 
     $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
 
+    $configFile = sprintf('%s/config/%s/config.php', $baseDir, $instanceId);
+    $config = Config::fromFile($configFile);
+
     $dataDir = sprintf('%s/data/%s', $baseDir, $instanceId);
     $db = new PDO(sprintf('sqlite://%s/db.sqlite', $dataDir));
     $storage = new Storage($db, new DateTime('now'));
 
     $outFile = sprintf('%s/stats.json', $dataDir);
 
-    $stats = new Stats(new DateTime());
-    $statsData = $stats->get($storage->getAllLogEntries());
+    $stats = new Stats($storage, new DateTime());
+    $statsData = $stats->get(
+        array_keys($config->getSection('vpnProfiles')->toArray())
+    );
 
     FileIO::writeJsonFile(
         $outFile,

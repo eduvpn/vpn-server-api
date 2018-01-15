@@ -520,9 +520,11 @@ SQL
     }
 
     /**
+     * @param string $profileId
+     *
      * @return array
      */
-    public function getAllLogEntries()
+    public function getLogEntries($profileId)
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
@@ -535,12 +537,15 @@ SQL
     FROM 
         connection_log
     WHERE
+        profile_id = :profile_id
+    AND
         disconnected_at IS NOT NULL
     ORDER BY
         connected_at
 SQL
         );
 
+        $stmt->bindValue(':profile_id', $profileId, PDO::PARAM_STR);
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
