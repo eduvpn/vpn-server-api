@@ -15,13 +15,13 @@ use fkooman\OAuth\Client\Http\Response;
 use fkooman\OAuth\Client\OAuthClient;
 use fkooman\OAuth\Client\Provider;
 use PDO;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use SURFnet\VPN\Server\Acl\Provider\VootProvider;
 use SURFnet\VPN\Server\Storage;
 use SURFnet\VPN\Server\Tests\TestOAuthClientRandom;
 use SURFnet\VPN\Server\Tests\TestOAuthClientSession;
 
-class VootProviderTest extends PHPUnit_Framework_TestCase
+class VootProviderTest extends TestCase
 {
     /** @var VootProvider */
     private $vootProvider;

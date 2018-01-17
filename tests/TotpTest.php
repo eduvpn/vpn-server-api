@@ -11,12 +11,12 @@ namespace SURFnet\VPN\Server\Tests;
 
 use DateTime;
 use PDO;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use SURFnet\VPN\Server\Exception\TotpException;
 use SURFnet\VPN\Server\Storage;
 use SURFnet\VPN\Server\Totp;
 
-class TotpTest extends PHPUnit_Framework_TestCase
+class TotpTest extends TestCase
 {
     /** @var Totp */
     private $totp;

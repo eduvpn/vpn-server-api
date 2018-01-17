@@ -11,14 +11,14 @@ namespace SURFnet\VPN\Server\Tests\Api;
 
 use DateTime;
 use PDO;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Server\Api\SystemMessagesModule;
 use SURFnet\VPN\Server\Storage;
 
-class SystemMessagesTest extends PHPUnit_Framework_TestCase
+class SystemMessagesTest extends TestCase
 {
     /** @var \SURFnet\VPN\Common\Http\Service */
     private $service;

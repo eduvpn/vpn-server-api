@@ -13,7 +13,7 @@ use DateTime;
 use Otp\Otp;
 use ParagonIE\ConstantTime\Encoding;
 use PDO;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
@@ -22,7 +22,7 @@ use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
 use SURFnet\VPN\Server\Api\ConnectionsModule;
 use SURFnet\VPN\Server\Storage;
 
-class ConnectionsModuleTest extends PHPUnit_Framework_TestCase
+class ConnectionsModuleTest extends TestCase
 {
     /** @var \SURFnet\VPN\Common\Http\Service */
     private $service;

@@ -11,7 +11,7 @@ namespace SURFnet\VPN\Server\Tests\Api;
 
 use DateTime;
 use PDO;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
@@ -22,7 +22,7 @@ use SURFnet\VPN\Server\OpenVpn\ServerManager;
 use SURFnet\VPN\Server\Storage;
 use SURFnet\VPN\Server\Tests\TestSocket;
 
-class OpenVpnModuleTest extends PHPUnit_Framework_TestCase
+class OpenVpnModuleTest extends TestCase
 {
     /** @var \SURFnet\VPN\Common\Http\Service */
     private $service;
