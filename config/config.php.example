@@ -12,7 +12,7 @@ return [
     'CA' => [
         'key_size' => 4096,
         'ca_expire' => 1826,
-        'cert_expire' => 365,
+        'cert_expire' => 180,
         'ca_cn' => 'VPN CA',
     ],
 

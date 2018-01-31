@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.4 (...)
+- change default expiry of (server/client) certificates to 180 days
+
 ## 1.2.3 (2018-01-17)
 - make quad9 the default DNS for new deploys
 - split out statistics per profile instead of "global"
