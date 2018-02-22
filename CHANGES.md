@@ -2,6 +2,8 @@
 
 ## 1.2.4 (...)
 - change default expiry of (server/client) certificates to 180 days
+- enable `tlsCrypt` dropping 2.3 client support for new deploys, will keep 
+  working for existing deploys
 
 ## 1.2.3 (2018-01-17)
 - make quad9 the default DNS for new deploys
