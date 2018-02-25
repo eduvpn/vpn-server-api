@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.4 (...)
+## 1.2.4 (2018-02-25)
 - change default expiry of (server/client) certificates to 180 days
 - enable `tlsCrypt` dropping 2.3 client support for new deploys, will keep 
   working for existing deploys
