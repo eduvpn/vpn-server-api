@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.5 (...)
+## 1.2.5 (2018-02-26)
 - introduce `exposedVpnProtoPorts` to allow listing different protocols/ports
   from what the OpenVPN processes listen on, e.g. for `tcp/443` port sharing
 
