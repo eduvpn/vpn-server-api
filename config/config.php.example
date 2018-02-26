@@ -123,6 +123,15 @@ return [
                 'tcp/1194',
             ],
 
+            // List the protocols and ports exposed to the VPN clients. Useful
+            // for OpenVPN port sharing. When empty (or missing), uses list 
+            // from vpnProtoPorts
+            // DEFAULT = []
+            'exposedVpnProtoPorts' => [
+                // 'udp/1194',
+                // 'tcp/443'
+            ],
+
             // Hide the profile from the user portal, i.e. do not allow the user to
             // choose it
             // DEFAULT = false
