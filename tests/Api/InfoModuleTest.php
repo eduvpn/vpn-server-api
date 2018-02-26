@@ -58,6 +58,7 @@ class InfoModuleTest extends TestCase
                       'enableAcl' => false,
                       'enableCompression' => true,
                       'enableLog' => false,
+                      'exposedVpnProtoPorts' => [],
                       'extIf' => 'eth0',
                       'hideProfile' => false,
                       'hostName' => 'vpn.example',
