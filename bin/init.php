@@ -40,8 +40,7 @@ try {
     $easyRsaDir = sprintf('%s/easy-rsa', $baseDir);
     $easyRsaDataDir = sprintf('%s/data/%s/easy-rsa', $baseDir, $instanceId);
 
-    $ca = new EasyRsaCa($easyRsaDir, $easyRsaDataDir);
-    $ca->init($config);
+    $ca = new EasyRsaCa($config, $easyRsaDir, $easyRsaDataDir);
 
     $dataDir = sprintf('%s/data/%s', $baseDir, $instanceId);
     $storage = new Storage(

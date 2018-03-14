@@ -16,35 +16,40 @@ use SURFnet\VPN\Server\CA\Exception\CaException;
 
 class EasyRsaCa implements CaInterface
 {
+    /** @var \SURFnet\VPN\Common\Config */
+    private $config;
+
     /** @var string */
     private $easyRsaDir;
 
     /** @var string */
     private $easyRsaDataDir;
 
-    public function __construct($easyRsaDir, $easyRsaDataDir)
+    /**
+     * @param \SURFnet\VPN\Common\Config $config
+     * @param string                     $easyRsaDir
+     * @param string                     $easyRsaDataDir
+     */
+    public function __construct(Config $config, $easyRsaDir, $easyRsaDataDir)
     {
+        $this->config = $config;
         $this->easyRsaDir = $easyRsaDir;
         $this->easyRsaDataDir = $easyRsaDataDir;
-        FileIO::createDir($this->easyRsaDataDir, 0700);
+        $this->init();
     }
 
-    /**
-     * Initialize the CA.
-     *
-     * @param \SURFnet\VPN\Common\Config $config the CA configuration
-     */
-    public function init(Config $config)
+    public function init()
     {
+        FileIO::createDir($this->easyRsaDataDir, 0700);
+
         // only initialize when unitialized, prevent destroying existing CA
         if (!@file_exists(sprintf('%s/vars', $this->easyRsaDataDir))) {
             $configData = [
                 sprintf('set_var EASYRSA "%s"', $this->easyRsaDir),
                 sprintf('set_var EASYRSA_PKI "%s/pki"', $this->easyRsaDataDir),
-                sprintf('set_var EASYRSA_KEY_SIZE %d', $config->getSection('CA')->getItem('key_size')),
-                sprintf('set_var EASYRSA_CA_EXPIRE %d', $config->getSection('CA')->getItem('ca_expire')),
-                sprintf('set_var EASYRSA_CERT_EXPIRE %d', $config->getSection('CA')->getItem('cert_expire')),
-                sprintf('set_var EASYRSA_REQ_CN	"%s"', $config->getSection('CA')->getItem('ca_cn')),
+                sprintf('set_var EASYRSA_KEY_SIZE %d', $this->config->getSection('CA')->getItem('key_size')),
+                sprintf('set_var EASYRSA_CA_EXPIRE %d', $this->config->getSection('CA')->getItem('ca_expire')),
+                sprintf('set_var EASYRSA_REQ_CN	"%s"', $this->config->getSection('CA')->getItem('ca_cn')),
                 'set_var EASYRSA_BATCH "1"',
             ];
 
@@ -85,7 +90,14 @@ class EasyRsaCa implements CaInterface
             throw new CaException(sprintf('certificate with commonName "%s" already exists', $commonName));
         }
 
-        $this->execEasyRsa(['build-server-full', $commonName, 'nopass']);
+        // check if we have a server_cert_expire
+        if ($this->config->getSection('CA')->hasItem('server_cert_expire')) {
+            $serverCertExpire = $this->config->getSection('CA')->getItem('server_cert_expire');
+        } else {
+            $serverCertExpire = $this->config->getSection('CA')->getItem('cert_expire');
+        }
+
+        $this->execEasyRsa([sprintf('--days=%d', $serverCertExpire), 'build-server-full', $commonName, 'nopass']);
 
         return $this->certInfo($commonName);
     }
@@ -104,7 +116,17 @@ class EasyRsaCa implements CaInterface
             throw new CaException(sprintf('certificate with commonName "%s" already exists', $commonName));
         }
 
-        $this->execEasyRsa(['build-client-full', $commonName, 'nopass']);
+        $this->execEasyRsa(
+            [
+                sprintf(
+                    '--days=%d',
+                    $this->config->getSection('CA')->getItem('cert_expire')
+                ),
+                'build-client-full',
+                $commonName,
+                'nopass',
+            ]
+        );
 
         return $this->certInfo($commonName);
     }

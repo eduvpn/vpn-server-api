@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.6 (...)
+- allow different certificate expiry days for client and server certificates, 
+  they will also immediately be used, not requiring a new "init" of the CA. 
+  By default server cert expiry will be 365 days, client cert will be 180 days
+  (issue #66)
+
 ## 1.2.5 (2018-02-26)
 - introduce `exposedVpnProtoPorts` to allow listing different protocols/ports
   from what the OpenVPN processes listen on, e.g. for `tcp/443` port sharing
