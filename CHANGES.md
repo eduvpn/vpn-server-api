@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.6 (...)
+## 1.2.6 (2018-03-15)
 - allow different certificate expiry days for client and server certificates, 
   they will also immediately be used, not requiring a new "init" of the CA. 
   By default server cert expiry will be 365 days, client cert will be 180 days
