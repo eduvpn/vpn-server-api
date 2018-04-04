@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3058f0788d3efebe5310546290fd9158",
+    "content-hash": "38557481f46489208da935fb4f4b8685",
     "packages": [
         {
             "name": "christian-riesen/otp",
@@ -66,16 +66,16 @@
         },
         {
             "name": "eduvpn/common",
-            "version": "1.1.9",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "4711eb8eb9debf68eb43ce29c9e14c535d6df4aa"
+                "reference": "08be1bb05223386e6f5e25b084298df914495592"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/4711eb8eb9debf68eb43ce29c9e14c535d6df4aa",
-                "reference": "4711eb8eb9debf68eb43ce29c9e14c535d6df4aa",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/08be1bb05223386e6f5e25b084298df914495592",
+                "reference": "08be1bb05223386e6f5e25b084298df914495592",
                 "shasum": ""
             },
             "require": {
@@ -89,6 +89,7 @@
                 "ext-mbstring": "*",
                 "ext-pcre": "*",
                 "ext-pdo": "*",
+                "ext-radius": "*",
                 "ext-spl": "*",
                 "fkooman/secookie": "^2",
                 "ircmaxell/password-compat": "^1",
@@ -120,20 +121,20 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2018-03-15T21:51:44+00:00"
+            "time": "2018-04-04T17:19:17+00:00"
         },
         {
             "name": "fkooman/oauth2-client",
-            "version": "6.0.1",
+            "version": "6.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-oauth2-client.git",
-                "reference": "68aa51e8f3bacb073fc4397409bec227b31db24d"
+                "reference": "bfb6b75c45812515e61ead526447197bdf08821f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/68aa51e8f3bacb073fc4397409bec227b31db24d",
-                "reference": "68aa51e8f3bacb073fc4397409bec227b31db24d",
+                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/bfb6b75c45812515e61ead526447197bdf08821f",
+                "reference": "bfb6b75c45812515e61ead526447197bdf08821f",
                 "shasum": ""
             },
             "require": {
@@ -170,7 +171,7 @@
                 }
             ],
             "description": "Very simple OAuth 2.0 client",
-            "time": "2017-11-28T09:45:11+00:00"
+            "time": "2018-03-21T22:19:37+00:00"
         },
         {
             "name": "fkooman/secookie",
@@ -216,16 +217,16 @@
         },
         {
             "name": "fkooman/yubitwee",
-            "version": "1.1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-yubitwee.git",
-                "reference": "9f6587319ae11839619c3448e5e9775da5deceb8"
+                "reference": "ae04cd0dd186a6aaa940284b2bd58a16002b6035"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-yubitwee/zipball/9f6587319ae11839619c3448e5e9775da5deceb8",
-                "reference": "9f6587319ae11839619c3448e5e9775da5deceb8",
+                "url": "https://api.github.com/repos/fkooman/php-yubitwee/zipball/ae04cd0dd186a6aaa940284b2bd58a16002b6035",
+                "reference": "ae04cd0dd186a6aaa940284b2bd58a16002b6035",
                 "shasum": ""
             },
             "require": {
@@ -240,7 +241,7 @@
                 "symfony/polyfill-php56": "^1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4|^5"
+                "phpunit/phpunit": "^4.8.35|^5|^6"
             },
             "type": "library",
             "autoload": {
@@ -260,7 +261,7 @@
                 }
             ],
             "description": "YubiKey OTP Validator library",
-            "time": "2017-10-30T13:26:28+00:00"
+            "time": "2018-03-22T18:19:01+00:00"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -628,16 +629,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v1.35.2",
+            "version": "v1.35.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "9c24f2cd39dc1906b76879e099970b7e53724601"
+                "reference": "b48680b6eb7d16b5025b9bfc4108d86f6b8af86f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/9c24f2cd39dc1906b76879e099970b7e53724601",
-                "reference": "9c24f2cd39dc1906b76879e099970b7e53724601",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/b48680b6eb7d16b5025b9bfc4108d86f6b8af86f",
+                "reference": "b48680b6eb7d16b5025b9bfc4108d86f6b8af86f",
                 "shasum": ""
             },
             "require": {
@@ -645,8 +646,8 @@
             },
             "require-dev": {
                 "psr/container": "^1.0",
-                "symfony/debug": "~2.7",
-                "symfony/phpunit-bridge": "~3.3@dev"
+                "symfony/debug": "^2.7",
+                "symfony/phpunit-bridge": "^3.3"
             },
             "type": "library",
             "extra": {
@@ -689,7 +690,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2018-03-03T16:21:29+00:00"
+            "time": "2018-03-20T04:25:58+00:00"
         }
     ],
     "packages-dev": [
@@ -2153,7 +2154,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "eduvpn/common": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
