@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.7 (2018-04-05)
+- fix test with updated `eduvpn/common`
+
 ## 1.2.6 (2018-03-15)
 - allow different certificate expiry days for client and server certificates, 
   they will also immediately be used, not requiring a new "init" of the CA. 
