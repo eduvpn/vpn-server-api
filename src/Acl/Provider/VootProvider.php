@@ -11,8 +11,8 @@ namespace SURFnet\VPN\Server\Acl\Provider;
 
 use fkooman\OAuth\Client\Exception\TokenException;
 use fkooman\OAuth\Client\OAuthClient;
-use SURFnet\VPN\Server\Acl\ProviderInterface;
 use fkooman\OAuth\Client\Provider;
+use SURFnet\VPN\Server\Acl\ProviderInterface;
 
 class VootProvider implements ProviderInterface
 {

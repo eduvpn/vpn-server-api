@@ -54,7 +54,7 @@ class Stats
                     ];
                 }
 
-                $statsData[$dateOfConnection]['number_of_connections'] += 1;
+                ++$statsData[$dateOfConnection]['number_of_connections'];
                 $statsData[$dateOfConnection]['bytes_transferred'] += $entry['bytes_transferred'];
 
                 // add it to table to be able to determine max concurrent connection
