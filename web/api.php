@@ -91,12 +91,12 @@ try {
             );
             $oauthClient = new OAuthClient(
                 $storage,
-                new CurlHttpClient(),
-                new NullSession()
+                new CurlHttpClient()
             );
-            $oauthClient->setProvider($provider);
+            $oauthClient->setSession(new NullSession());
             $groupProviders[] = new VootProvider(
                 $oauthClient,
+                $provider,
                 $config->getSection('groupProviders')->getSection('VootProvider')->getItem('apiUrl')
             );
         }

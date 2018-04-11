@@ -12,18 +12,23 @@ namespace SURFnet\VPN\Server\Acl\Provider;
 use fkooman\OAuth\Client\Exception\TokenException;
 use fkooman\OAuth\Client\OAuthClient;
 use SURFnet\VPN\Server\Acl\ProviderInterface;
+use fkooman\OAuth\Client\Provider;
 
 class VootProvider implements ProviderInterface
 {
     /** @var \fkooman\OAuth\Client\OAuthClient */
     private $client;
 
+    /** @var \fkooman\OAuth\Client\Provider */
+    private $provider;
+
     /** @var string */
     private $vootUri;
 
-    public function __construct(OAuthClient $client, $vootUri)
+    public function __construct(OAuthClient $client, Provider $provider, $vootUri)
     {
         $this->client = $client;
+        $this->provider = $provider;
         $this->vootUri = $vootUri;
     }
 
@@ -32,18 +37,16 @@ class VootProvider implements ProviderInterface
      */
     public function getGroups($userId)
     {
-        $this->client->setUserId($userId);
-
         // fetch the groups and extract the membership data
         return self::extractMembership(
-            $this->fetchGroups()
+            $this->fetchGroups($userId)
         );
     }
 
-    private function fetchGroups()
+    private function fetchGroups($userId)
     {
         try {
-            if (false === $response = $this->client->get('groups', $this->vootUri)) {
+            if (false === $response = $this->client->get($this->provider, $userId, 'groups', $this->vootUri)) {
                 // we do not have an access_token, it expired, was revoked, was
                 // not accepted by the VOOT endpoint or the refresh_token is no
                 // longer valid (needs new authorization through browser!)
