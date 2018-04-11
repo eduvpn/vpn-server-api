@@ -64,14 +64,14 @@ class VootProviderTest extends TestCase
 
         $oauthClient = new OAuthClient(
             $storage,
-            $vootClient,
-            new TestOAuthClientSession(),
-            new TestOAuthClientRandom(),
-            new DateTime('2016-01-01')
+            $vootClient
         );
-        $oauthClient->setProvider(new Provider('a', 'b', 'c', 'd'));
+        $oauthClient->setSession(new TestOAuthClientSession());
+        $oauthClient->setRandom(new TestOAuthClientRandom());
+        $oauthClient->setDateTime(new DateTime('2016-01-01'));
         $this->vootProvider = new VootProvider(
             $oauthClient,
+            new Provider('a', 'b', 'c', 'd'),
             'https://voot.surfconext.nl/me/groups'
         );
     }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d2c81819cb5de8b1177890af44d0585c",
+    "content-hash": "45b30491b697c625375a8bdf8db8364f",
     "packages": [
         {
             "name": "christian-riesen/otp",
@@ -125,16 +125,16 @@
         },
         {
             "name": "fkooman/oauth2-client",
-            "version": "dev-simplify-api",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-oauth2-client.git",
-                "reference": "c26226e8ba50c44079b635db139b1a4284dcb4bf"
+                "reference": "8059054f834c9d638b5a2333ca9083cd5b730e10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/c26226e8ba50c44079b635db139b1a4284dcb4bf",
-                "reference": "c26226e8ba50c44079b635db139b1a4284dcb4bf",
+                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/8059054f834c9d638b5a2333ca9083cd5b730e10",
+                "reference": "8059054f834c9d638b5a2333ca9083cd5b730e10",
                 "shasum": ""
             },
             "require": {
@@ -171,7 +171,7 @@
                 }
             ],
             "description": "Very simple OAuth 2.0 client",
-            "time": "2018-04-11T12:30:32+00:00"
+            "time": "2018-04-11T15:37:28+00:00"
         },
         {
             "name": "fkooman/secookie",
