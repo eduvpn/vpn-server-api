@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.8 (...)
+- update for `fkooman/oauth2-client` version 7
+
 ## 1.2.7 (2018-04-05)
 - fix test with updated `eduvpn/common`
 
