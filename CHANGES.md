@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.8 (...)
+## 1.2.8 (2018-04-12)
 - update for `fkooman/oauth2-client` version 7
 - add `1.1.1.1` as example in configuration file
 

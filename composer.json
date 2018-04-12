@@ -37,7 +37,7 @@
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-spl": "*",
-        "fkooman/oauth2-client": "dev-master",
+        "fkooman/oauth2-client": "^7",
         "fkooman/yubitwee": "^1",
         "paragonie/constant_time_encoding": "^1",
         "php": ">=5.4"
