@@ -57,9 +57,13 @@ return [
             // DEFAULT = '127.0.0.1'
             'managementIp' => '127.0.0.1',
 
-            // Whether or not to NAT the range and range6 network to the extIf
+            // Whether or not to NAT the range network to the extIf
             // DEFAULT = false
-            'useNat' => true,
+            'enableNat4' => true,
+
+            // Whether or not to NAT the range6 network to the extIf
+            // DEFAULT = true
+            'enableNat6' => true,
 
             // Do not forward IPv4 traffic, useful for creating an IPv6 only VPN
             // DEFAULT = false

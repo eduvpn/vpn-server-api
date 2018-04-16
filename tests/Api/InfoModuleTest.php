@@ -57,6 +57,8 @@ class InfoModuleTest extends TestCase
                       'enableAcl' => false,
                       'enableCompression' => true,
                       'enableLog' => false,
+                      'enableNat4' => false,
+                      'enableNat6' => false,
                       'exposedVpnProtoPorts' => [],
                       'extIf' => 'eth0',
                       'hideProfile' => false,
@@ -72,7 +74,6 @@ class InfoModuleTest extends TestCase
                       ],
                       'tlsCrypt' => false,
                       'twoFactor' => false,
-                      'useNat' => false,
                       'vpnProtoPorts' => [
                         0 => 'udp/1194',
                         1 => 'tcp/1194',
