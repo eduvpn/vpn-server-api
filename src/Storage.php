@@ -79,7 +79,9 @@ SQL
         u.user_id AS user_id, 
         u.is_disabled AS user_is_disabled,
         c.display_name AS display_name,
-        c.is_disabled AS certificate_is_disabled 
+        c.is_disabled AS certificate_is_disabled,
+        c.valid_from,
+        c.valid_to
     FROM 
         users u, certificates c 
     WHERE 

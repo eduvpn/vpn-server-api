@@ -83,6 +83,8 @@ class OpenVpnModuleTest extends TestCase
                             'user_is_disabled' => '0',
                             'display_name' => 'Display Name',
                             'certificate_is_disabled' => '0',
+                            'valid_from' => '1970-05-23 21:21:18',
+                            'valid_to' => '1970-09-29 11:46:29',
                         ],
                         [
                             'common_name' => '78f4a3c26062a434b01892e2b23126d1',
@@ -94,6 +96,8 @@ class OpenVpnModuleTest extends TestCase
                             'user_is_disabled' => '0',
                             'display_name' => 'Display Name 2',
                             'certificate_is_disabled' => '0',
+                            'valid_from' => '1970-05-23 21:21:18',
+                            'valid_to' => '1970-09-29 11:46:29',
                         ],
                     ],
                 ],
