@@ -39,10 +39,10 @@
         "ext-spl": "*",
         "fkooman/oauth2-client": "^7",
         "fkooman/yubitwee": "^1",
-        "paragonie/constant_time_encoding": "^1",
+        "paragonie/constant_time_encoding": "^1|^2",
         "php": ">=5.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8.35|^5|^6"
+        "phpunit/phpunit": "^4.8.35|^5|^6|^7"
     }
 }
