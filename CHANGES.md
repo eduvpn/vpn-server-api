@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.10 (...)
+## 1.2.10 (2018-05-03)
 - expose the `valid_from` and `valid_to` values of certificates when providing
   certificate information
 
