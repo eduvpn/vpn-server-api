@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "christian-riesen/otp",
-            "version": "2.5.0",
+            "version": "2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ChristianRiesen/otp.git",
-                "reference": "a6c095fb36f6404aa1078d2dfd717aa95c1b5267"
+                "reference": "9b31f024114b3b5bc393a1fb4b0ad19cb7931e81"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ChristianRiesen/otp/zipball/a6c095fb36f6404aa1078d2dfd717aa95c1b5267",
-                "reference": "a6c095fb36f6404aa1078d2dfd717aa95c1b5267",
+                "url": "https://api.github.com/repos/ChristianRiesen/otp/zipball/9b31f024114b3b5bc393a1fb4b0ad19cb7931e81",
+                "reference": "9b31f024114b3b5bc393a1fb4b0ad19cb7931e81",
                 "shasum": ""
             },
             "require": {
@@ -62,20 +62,20 @@
                 "rfc6238",
                 "totp"
             ],
-            "time": "2017-12-14T11:04:02+00:00"
+            "time": "2018-05-04T09:41:44+00:00"
         },
         {
             "name": "eduvpn/common",
-            "version": "1.1.13",
+            "version": "1.1.15",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "9b5cf0ddbc6359f8a7ff95141508d2ac6367fd9c"
+                "reference": "7757af7d2a40a56f3caea017a8c192641131e0ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/9b5cf0ddbc6359f8a7ff95141508d2ac6367fd9c",
-                "reference": "9b5cf0ddbc6359f8a7ff95141508d2ac6367fd9c",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/7757af7d2a40a56f3caea017a8c192641131e0ef",
+                "reference": "7757af7d2a40a56f3caea017a8c192641131e0ef",
                 "shasum": ""
             },
             "require": {
@@ -121,20 +121,20 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2018-04-16T14:56:27+00:00"
+            "time": "2018-05-16T13:07:18+00:00"
         },
         {
             "name": "fkooman/oauth2-client",
-            "version": "7.0.0",
+            "version": "7.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-oauth2-client.git",
-                "reference": "93d6b0ab533e109bb16e19d499ac7d800915e506"
+                "reference": "901880724a1566c72caa8f5c13c064e949294bf7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/93d6b0ab533e109bb16e19d499ac7d800915e506",
-                "reference": "93d6b0ab533e109bb16e19d499ac7d800915e506",
+                "url": "https://api.github.com/repos/fkooman/php-oauth2-client/zipball/901880724a1566c72caa8f5c13c064e949294bf7",
+                "reference": "901880724a1566c72caa8f5c13c064e949294bf7",
                 "shasum": ""
             },
             "require": {
@@ -149,6 +149,7 @@
                 "paragonie/constant_time_encoding": "^1|^2",
                 "paragonie/random_compat": "^1|^2",
                 "php": ">=5.4",
+                "psr/log": "^1.0",
                 "symfony/polyfill-php56": "^1"
             },
             "require-dev": {
@@ -171,7 +172,7 @@
                 }
             ],
             "description": "Very simple OAuth 2.0 client",
-            "time": "2018-04-12T08:14:19+00:00"
+            "time": "2018-05-18T15:50:10+00:00"
         },
         {
             "name": "fkooman/secookie",

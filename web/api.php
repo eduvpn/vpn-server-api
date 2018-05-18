@@ -91,7 +91,7 @@ try {
             );
             $oauthClient = new OAuthClient(
                 $storage,
-                new CurlHttpClient()
+                new CurlHttpClient([], $logger)
             );
             $oauthClient->setSession(new NullSession());
             $groupProviders[] = new VootProvider(
