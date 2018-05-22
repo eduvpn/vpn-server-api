@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.11 (2018-05-22)
+- enable logging in OAuth client
+
 ## 1.2.10 (2018-05-03)
 - expose the `valid_from` and `valid_to` values of certificates when providing
   certificate information
