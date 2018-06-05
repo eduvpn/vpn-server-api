@@ -45,8 +45,8 @@ class OpenVpnModuleTest extends TestCase
 
         $serverManager = new ServerManager(
             $config,
-            new TestSocket(),
-            new NullLogger()
+            new NullLogger(),
+            new TestSocket()
         );
 
         $this->service = new Service();

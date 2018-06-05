@@ -9,10 +9,11 @@
 
 namespace SURFnet\VPN\Server\OpenVpn;
 
+use LC\OpenVpn\ConnectionManager;
+use LC\OpenVpn\ManagementSocketInterface;
 use Psr\Log\LoggerInterface;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\ProfileConfig;
-use SURFnet\VPN\Server\OpenVpn\Exception\ManagementSocketException;
 
 /**
  * Manage all OpenVPN processes controlled by this service.
@@ -22,17 +23,17 @@ class ServerManager
     /** @var \SURFnet\VPN\Common\Config */
     private $config;
 
-    /** @var ManagementSocketInterface */
-    private $managementSocket;
-
     /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
-    public function __construct(Config $config, ManagementSocketInterface $managementSocket, LoggerInterface $logger)
+    /** @var \LC\OpenVpn\ManagementSocketInterface */
+    private $managementSocket;
+
+    public function __construct(Config $config, LoggerInterface $logger, ManagementSocketInterface $managementSocket)
     {
         $this->config = $config;
-        $this->managementSocket = $managementSocket;
         $this->logger = $logger;
+        $this->managementSocket = $managementSocket;
     }
 
     /**
@@ -50,37 +51,17 @@ class ServerManager
             $profileNumber = $profileConfig->getItem('profileNumber');
 
             $profileConnections = [];
-            // loop over all processes
+            $socketAddressList = [];
             for ($i = 0; $i < count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
-                // add all connections from this instance to profileConnections
-                try {
-                    // open the socket connection
-                    $this->managementSocket->open(
-                        sprintf(
-                            'tcp://%s:%d',
-                            $managementIp,
-                            11940 + $this->toPort($instanceNumber, $profileNumber, $i)
-                        )
-                    );
-                    $profileConnections = array_merge(
-                        $profileConnections,
-                        StatusParser::parse($this->managementSocket->command('status 2'))
-                    );
-                    // close the socket connection
-                    $this->managementSocket->close();
-                } catch (ManagementSocketException $e) {
-                    // we log the error, but continue with the next instance
-                    $this->logger->error(
-                        sprintf(
-                            'error with socket "tcp://%s:%d", message: "%s"',
-                            $managementIp,
-                            11940 + $this->toPort($instanceNumber, $profileNumber, $i),
-                            $e->getMessage()
-                        )
-                    );
-                }
+                $socketAddressList[] = sprintf(
+                    'tcp://%s:%d',
+                    $managementIp,
+                    11940 + $this->toPort($instanceNumber, $profileNumber, $i)
+                );
             }
-            // we add the profileConnections to the clientConnections array
+
+            $connectionManager = new ConnectionManager($socketAddressList, $this->logger, $this->managementSocket);
+            $profileConnections += $connectionManager->connections();
             $clientConnections[] = ['id' => $profileId, 'connections' => $profileConnections];
         }
 
@@ -88,14 +69,12 @@ class ServerManager
     }
 
     /**
-     * Disconnect all clients with this CN from all profiles and instances
-     * managed by this service.
+     * @param string $commonName
      *
-     * @param string $commonName the CN to kill
+     * @return int
      */
     public function kill($commonName)
     {
-        $clientsKilled = 0;
         $instanceNumber = $this->config->getItem('instanceNumber');
 
         // loop over all profiles
@@ -104,40 +83,21 @@ class ServerManager
             $managementIp = $profileConfig->getItem('managementIp');
             $profileNumber = $profileConfig->getItem('profileNumber');
 
-            // loop over all processes
+            $socketAddressList = [];
             for ($i = 0; $i < count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
-                // add all kills from this instance to profileKills
-                try {
-                    // open the socket connection
-                    $this->managementSocket->open(
-                        sprintf(
-                            'tcp://%s:%d',
-                            $managementIp,
-                            11940 + $this->toPort($instanceNumber, $profileNumber, $i)
-                        )
-                    );
-
-                    $response = $this->managementSocket->command(sprintf('kill %s', $commonName));
-                    if (0 === mb_strpos($response[0], 'SUCCESS: ')) {
-                        ++$clientsKilled;
-                    }
-                    // close the socket connection
-                    $this->managementSocket->close();
-                } catch (ManagementSocketException $e) {
-                    // we log the error, but continue with the next instance
-                    $this->logger->error(
-                        sprintf(
-                            'error with socket "tcp://%s:%d", message: "%s"',
-                            $managementIp,
-                            11940 + $this->toPort($instanceNumber, $profileNumber, $i),
-                            $e->getMessage()
-                        )
-                    );
-                }
+                $socketAddressList[] = sprintf(
+                    'tcp://%s:%d',
+                    $managementIp,
+                    11940 + $this->toPort($instanceNumber, $profileNumber, $i)
+                );
             }
+
+            $connectionManager = new ConnectionManager($socketAddressList, $this->logger, $this->managementSocket);
+
+            return $connectionManager->disconnect([$commonName]);
         }
 
-        return 0 !== $clientsKilled;
+        return 0;
     }
 
     private function toPort($instanceNumber, $profileNumber, $processNumber)

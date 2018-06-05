@@ -24,9 +24,14 @@
             "no-api": true,
             "type": "vcs",
             "url": "https://github.com/eduvpn/vpn-lib-common"
+        },
+        {
+            "type": "vcs",
+            "url": "https://git.tuxed.net/fkooman/php-openvpn-connection-manager"
         }
     ],
     "require": {
+        "LC/openvpn-connection-manager": "dev-master",
         "christian-riesen/otp": "^2.0",
         "eduvpn/common": "^1",
         "ext-curl": "*",

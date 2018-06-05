@@ -14,6 +14,7 @@ require_once sprintf('%s/vendor/autoload.php', $baseDir);
 use fkooman\OAuth\Client\Http\CurlHttpClient;
 use fkooman\OAuth\Client\OAuthClient;
 use fkooman\OAuth\Client\Provider;
+use LC\OpenVpn\ManagementSocket;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
@@ -36,7 +37,6 @@ use SURFnet\VPN\Server\Api\UserMessagesModule;
 use SURFnet\VPN\Server\Api\UsersModule;
 use SURFnet\VPN\Server\CA\EasyRsaCa;
 use SURFnet\VPN\Server\NullSession;
-use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
 use SURFnet\VPN\Server\Storage;
 use SURFnet\VPN\Server\TlsAuth;
@@ -151,7 +151,7 @@ try {
 
     $service->addModule(
         new OpenVpnModule(
-            new ServerManager($config, new ManagementSocket(), $logger),
+            new ServerManager($config, $logger, new ManagementSocket()),
             $storage
         )
     );

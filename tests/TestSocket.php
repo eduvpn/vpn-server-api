@@ -9,8 +9,7 @@
 
 namespace SURFnet\VPN\Server\Tests;
 
-use SURFnet\VPN\Server\OpenVpn\Exception\ManagementSocketException;
-use SURFnet\VPN\Server\OpenVpn\ManagementSocketInterface;
+use LC\OpenVpn\ManagementSocketInterface;
 
 /**
  * Abstraction to use the OpenVPN management interface using a socket
@@ -18,72 +17,45 @@ use SURFnet\VPN\Server\OpenVpn\ManagementSocketInterface;
  */
 class TestSocket implements ManagementSocketInterface
 {
-    /** @var bool */
-    private $connectFail;
-
-    /** @var string|null */
-    private $socketAddress;
-
-    public function __construct($connectFail = false)
-    {
-        $this->connectFail = $connectFail;
-        $this->socketAddress = null;
-    }
-
     /**
-     * Open the socket.
+     * @param string $socketAddress
+     * @param int    $timeOut
      *
-     * @param string $socketAddress the socket to connect to, e.g.:
-     *                              "tcp://localhost:7505"
-     * @param int    $timeOut       the amount of time to wait before
-     *                              giving up on trying to connect
-     *
-     * @throws \SURFnet\VPN\Server\OpenVpn\Exception\ServerSocketException if the socket cannot be opened
-     *                                                                     within timeout
+     * @return void
      */
     public function open($socketAddress, $timeOut = 5)
     {
-        $this->socketAddress = $socketAddress;
-        if ($this->connectFail) {
-            throw new ManagementSocketException('unable to connect to socket');
-        }
+        // NOP
     }
 
     /**
-     * Send an OpenVPN command and get the response.
+     * @param string $command
      *
-     * @param string $command a OpenVPN management command and parameters
-     *
-     * @throws \SURFnet\VPN\Server\OpenVpn\Exception\ServerSocketException in case read/write fails or
-     *                                                                     socket is not open
-     *
-     * @return array the response lines as array values
+     * @return array<string>
      */
     public function command($command)
     {
-        if ('status 2' === $command) {
-            if ('tcp://127.0.0.1:11940' === $this->socketAddress) {
-                // send back the returnData as an array
-                return explode("\n", file_get_contents(__DIR__.'/data/socket/status_with_clients.txt'));
-            } else {
-                return explode("\n", file_get_contents(__DIR__.'/data/socket/status_no_clients.txt'));
-            }
-        } elseif ('kill' === $command) {
-            if ('tcp://127.0.0.1:11940' === $this->socketAddress) {
-                return explode("\n", file_get_contents(__DIR__.'/data/socket/kill_success.txt'));
-            } else {
-                return explode("\n", file_get_contents(__DIR__.'/data/socket/kill_error.txt'));
-            }
-        }
+        return [
+            0 => 'TITLE,OpenVPN 2.4.2 x86_64-redhat-linux-gnu [Fedora EPEL patched] [SSL (OpenSSL)] [LZO] [LZ4] [EPOLL] [PKCS11] [MH/PKTINFO] [AEAD] built on May 11 2017',
+            1 => 'TIME,Mon Jun 19 15:15:31 2017,1497885331',
+            2 => 'HEADER,CLIENT_LIST,Common Name,Real Address,Virtual Address,Virtual IPv6 Address,Bytes Received,Bytes Sent,Connected Since,Connected Since (time_t),Username,Client ID,Peer ID',
+            3 => 'CLIENT_LIST,f3bb6f8efb4dc64be35e1044cf1b5e76,80.78.70.3,10.128.7.3,fd60:4a08:2f59:ba0::1001,11072,11568,Mon Jun 19 15:14:05 2017,1497885245,UNDEF,1,0',
+            4 => 'CLIENT_LIST,78f4a3c26062a434b01892e2b23126d1,80.78.70.3,10.128.7.4,fd60:4a08:2f59:ba0::1002,9006,5770,Mon Jun 19 15:15:22 2017,1497885322,UNDEF,2,1',
+            5 => 'HEADER,ROUTING_TABLE,Virtual Address,Common Name,Real Address,Last Ref,Last Ref (time_t)',
+            6 => 'ROUTING_TABLE,10.128.7.3,f3bb6f8efb4dc64be35e1044cf1b5e76,80.78.70.3,Mon Jun 19 15:15:31 2017,1497885331',
+            7 => 'ROUTING_TABLE,10.128.7.4,78f4a3c26062a434b01892e2b23126d1,80.78.70.3,Mon Jun 19 15:15:30 2017,1497885330',
+            8 => 'ROUTING_TABLE,fd60:4a08:2f59:ba0::1001,f3bb6f8efb4dc64be35e1044cf1b5e76,80.78.70.3,Mon Jun 19 15:15:30 2017,1497885330',
+            9 => 'ROUTING_TABLE,fd60:4a08:2f59:ba0::1002,78f4a3c26062a434b01892e2b23126d1,80.78.70.3,Mon Jun 19 15:15:23 2017,1497885323',
+            10 => 'GLOBAL_STATS,Max bcast/mcast queue length,0',
+            11 => 'END',
+        ];
     }
 
     /**
-     * Close the socket connection.
-     *
-     * @throws \SURFnet\VPN\Server\OpenVpn\Exception\ServerSocketException if socket is not open
+     * @return void
      */
     public function close()
     {
-        $this->socketAddress = null;
+        // NOP
     }
 }
