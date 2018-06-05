@@ -72,7 +72,7 @@ class InfoModuleTest extends TestCase
                       'reject6' => false,
                       'routes' => [
                       ],
-                      'tlsCrypt' => false,
+                      'tlsProtection' => 'tls-crypt',
                       'twoFactor' => false,
                       'vpnProtoPorts' => [
                         0 => 'udp/1194',

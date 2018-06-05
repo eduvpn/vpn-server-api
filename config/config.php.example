@@ -144,9 +144,11 @@ return [
             // DEFAULT = false
             'hideProfile' => false,
 
-            // use TLS crypt instead of TLS auth (OpenVPN >= 2.4 client only)
-            // DEFAULT = false
-            'tlsCrypt' => true,
+            // Protect to TLS control channel with PSK
+            // DEFAULT = tls-crypt
+            'tlsProtection' => 'tls-crypt',
+            //'tlsProtection' => 'tls-auth',
+            //'tlsProtection' => false,
 
             // Enable data channel compression (--comp-lzo)
             // DEFAULT = true

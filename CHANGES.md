@@ -2,6 +2,9 @@
 
 ## 1.2.12 (...)
 - use `LC/openvpn-connection-manager`
+- introduce `tlsProtection` as replacement for `tlsCrypt` to make it possible
+  to select `tls-auth`, `tls-crypt` (default) or `false` (no `tls-crypt`, no 
+  `tls-auth`)
 
 ## 1.2.11 (2018-05-22)
 - enable logging in OAuth client
