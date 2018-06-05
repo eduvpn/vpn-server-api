@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a63044e368d69fd11c5cb2347cb0d722",
+    "content-hash": "78aeffd1acd63fe59a6ea3a54e602cb0",
     "packages": [
         {
             "name": "LC/openvpn-connection-manager",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://git.tuxed.net/fkooman/php-openvpn-connection-manager",
-                "reference": "73fc666c3a9cc123292932900824aaef8a70ffb0"
+                "reference": "33df070849c176a3b466650a51d13c1bb7cd575f"
             },
             "require": {
                 "php": ">=5.4",
@@ -41,7 +41,7 @@
                     "name": "François Kooman"
                 }
             ],
-            "time": "2018-06-05T09:08:22+00:00"
+            "time": "2018-06-05T10:55:14+00:00"
         },
         {
             "name": "christian-riesen/otp",
@@ -2120,9 +2120,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "lc/openvpn-connection-manager": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
