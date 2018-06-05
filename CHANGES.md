@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.12 (...)
+- use `LC/openvpn-connection-manager`
+
 ## 1.2.11 (2018-05-22)
 - enable logging in OAuth client
 
