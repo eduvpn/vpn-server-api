@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.13 (2018-06-06)
+- fix `status` CLI tool
+
 ## 1.2.12 (2018-06-06)
 - use `LC/openvpn-connection-manager`
 - introduce `tlsProtection` as replacement for `tlsCrypt` to make it possible

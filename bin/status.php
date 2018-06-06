@@ -12,10 +12,10 @@ $baseDir = dirname(__DIR__);
 /** @psalm-suppress UnresolvableInclude */
 require_once sprintf('%s/vendor/autoload.php', $baseDir);
 
+use LC\OpenVpn\ManagementSocket;
 use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Logger;
-use SURFnet\VPN\Server\OpenVpn\ManagementSocket;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
 
 try {
@@ -39,8 +39,8 @@ try {
 
     $serverManager = new ServerManager(
         $config,
-        new ManagementSocket(),
-        new Logger($argv[0])
+        new Logger($argv[0]),
+        new ManagementSocket()
     );
 
     $output = [
