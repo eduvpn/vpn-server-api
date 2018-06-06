@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.12 (...)
+## 1.2.12 (2018-06-06)
 - use `LC/openvpn-connection-manager`
 - introduce `tlsProtection` as replacement for `tlsCrypt` to make it possible
   to select `tls-auth`, `tls-crypt` (default) or `false` (no `tls-crypt`, no 

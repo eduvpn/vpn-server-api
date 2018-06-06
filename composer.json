@@ -33,7 +33,7 @@
     "require": {
         "LC/openvpn-connection-manager": "^1",
         "christian-riesen/otp": "^2.0",
-        "eduvpn/common": "dev-master",
+        "eduvpn/common": "^1",
         "ext-curl": "*",
         "ext-date": "*",
         "ext-json": "*",
