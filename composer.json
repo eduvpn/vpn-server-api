@@ -27,7 +27,7 @@
         },
         {
             "type": "vcs",
-            "url": "https://git.tuxed.net/fkooman/php-openvpn-connection-manager"
+            "url": "https://git.tuxed.net/LC/php-openvpn-connection-manager"
         }
     ],
     "require": {

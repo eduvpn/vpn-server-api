@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "78aeffd1acd63fe59a6ea3a54e602cb0",
+    "content-hash": "a7f78731496bbacc06946db328b38087",
     "packages": [
         {
             "name": "LC/openvpn-connection-manager",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
-                "url": "https://git.tuxed.net/fkooman/php-openvpn-connection-manager",
-                "reference": "33df070849c176a3b466650a51d13c1bb7cd575f"
+                "url": "https://git.tuxed.net/LC/php-openvpn-connection-manager",
+                "reference": "8171917609dfd0a331a8460d16ded7bba6334e15"
             },
             "require": {
                 "php": ">=5.4",
@@ -41,7 +41,8 @@
                     "name": "François Kooman"
                 }
             ],
-            "time": "2018-06-05T10:55:14+00:00"
+            "description": "Manage client connections to OpenVPN processes",
+            "time": "2018-06-07T08:29:24+00:00"
         },
         {
             "name": "christian-riesen/otp",
@@ -388,24 +389,23 @@
         },
         {
             "name": "paragonie/random_compat",
-            "version": "v2.99.99",
+            "version": "v2.0.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "35469243ebbb9be5086cff57538cac6da2c36852"
+                "reference": "f6ce7dd93628088e1017fb5dd73b0b9fec7df9e5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/35469243ebbb9be5086cff57538cac6da2c36852",
-                "reference": "35469243ebbb9be5086cff57538cac6da2c36852",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/f6ce7dd93628088e1017fb5dd73b0b9fec7df9e5",
+                "reference": "f6ce7dd93628088e1017fb5dd73b0b9fec7df9e5",
                 "shasum": ""
             },
             "require": {
-                "php": "^7"
+                "php": ">=5.2.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.*|5.*",
-                "vimeo/psalm": "^1"
+                "phpunit/phpunit": "4.*|5.*"
             },
             "suggest": {
                 "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
@@ -434,7 +434,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2018-06-06T05:12:00+00:00"
+            "time": "2018-06-06T17:40:22+00:00"
         },
         {
             "name": "psr/log",
