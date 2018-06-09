@@ -145,7 +145,7 @@ return [
             'hideProfile' => false,
 
             // Protect to TLS control channel with PSK
-            // DEFAULT = tls-crypt
+            // DEFAULT = tls-auth
             'tlsProtection' => 'tls-crypt',
             //'tlsProtection' => 'tls-auth',
             //'tlsProtection' => false,
