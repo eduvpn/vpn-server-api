@@ -25,6 +25,7 @@ return  [
       'profileNumber' => 1,
       'displayName' => 'Internet Access',
       'extIf' => 'eth0',
+      'vpnProtoPorts' => ['udp/1194'],
       'range' => '10.0.0.0/24',
       'range6' => 'fd00:4242:4242::/48',
       'hostName' => 'vpn.example',
