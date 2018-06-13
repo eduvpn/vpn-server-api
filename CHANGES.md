@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.14 (2018-06-13)
+- fix unit test with bug fix release of `LC/openvpn-connection-manager`
+- update dependencies
+
 ## 1.2.13 (2018-06-06)
 - fix `status` CLI tool
 
