@@ -14,6 +14,7 @@ use fkooman\OAuth\Client\AccessToken;
 use fkooman\OAuth\Client\TokenStorageInterface;
 use PDO;
 use PDOException;
+use RuntimeException;
 
 class Storage implements TokenStorageInterface
 {
@@ -910,6 +911,9 @@ SQL
         $this->deleteVootToken($userId);
     }
 
+    /**
+     * @return void
+     */
     public function init()
     {
         $queryList = [];
@@ -957,7 +961,8 @@ SQL;
         ip6 VARCHAR(255) NOT NULL,
         connected_at DATETIME NOT NULL,
         disconnected_at DATETIME DEFAULT NULL,
-        bytes_transferred INTEGER DEFAULT NULL                
+        bytes_transferred INTEGER DEFAULT NULL,
+        client_lost BOOLEAN DEFAULT 0
     )
 SQL;
 
@@ -982,12 +987,99 @@ SQL;
     )
 SQL;
 
+        $this->exec($queryList);
+        $this->addVersionTable('2018061401');
+    }
+
+    /**
+     * @return void
+     */
+    public function update()
+    {
+        $version = $this->getVersion();
+        if (null === $version) {
+            // create version table
+            $this->addVersionTable($version);
+        }
+
+        switch ($version) {
+            case '2018061401':
+                // do nothing, we are up to date
+                return;
+            default:
+                $this->to2018061401();
+        }
+    }
+
+    /**
+     * @param array $queryList
+     *
+     * @return void
+     */
+    private function exec(array $queryList)
+    {
         foreach ($queryList as $query) {
             if ('sqlite' === $this->db->getAttribute(PDO::ATTR_DRIVER_NAME)) {
                 $query = str_replace('AUTO_INCREMENT', 'AUTOINCREMENT', $query);
             }
-            $this->db->query($query);
+            $this->db->exec($query);
         }
+    }
+
+    /**
+     * @param null|string $version
+     *
+     * @return void
+     */
+    private function addVersionTable($version)
+    {
+        $queryList = [];
+        $queryList[] =
+<<< 'SQL'
+    CREATE TABLE IF NOT EXISTS version (
+        version VARCHAR(255) NOT NULL,
+        update_in_progress BOOL DEFAULT 0
+    )
+SQL;
+        if (null !== $version) {
+            $queryList[] = 'INSERT INTO version (version) VALUES("'.$version.'")';
+        }
+
+        $this->exec($queryList);
+    }
+
+    /**
+     * @return null|string
+     */
+    private function getVersion()
+    {
+        $stmt = $this->db->prepare('SELECT version FROM version');
+        $stmt->execute();
+        $schemaVersion = $stmt->fetchColumn();
+        $stmt->closeCursor();
+
+        return $schemaVersion;
+    }
+
+    /**
+     * Add column client_lost to connection_log table.
+     *
+     * @return void
+     */
+    private function to2018061401()
+    {
+        if (1 !== $this->db->exec('UPDATE version SET update_in_progress = 1 WHERE update_in_progress = 0')) {
+            throw new RuntimeException('database schema update in progress');
+        }
+        $this->db->beginTransaction();
+        $this->db->exec('DELETE FROM version');
+        $this->db->exec('ALTER TABLE connection_log RENAME TO _connection_log_tmp');
+        $this->init();
+        $this->db->exec(
+            'INSERT INTO connection_log (user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred) SELECT user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred FROM _connection_log_tmp'
+        );
+        $this->db->commit();
+        $this->db->exec('DROP TABLE _connection_log_tmp');
     }
 
     private function addUser($userId)
