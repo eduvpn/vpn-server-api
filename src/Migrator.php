@@ -126,8 +126,8 @@ class Migrator
             return $currentVersion;
         } catch (PDOException $e) {
             // create table
-            $this->exec('CREATE TABLE IF NOT EXISTS version (current_version TEXT NOT NULL)');
-            $this->exec('INSERT INTO version (current_version) VALUES("0000000000")');
+            $this->dbh->exec('CREATE TABLE IF NOT EXISTS version (current_version TEXT NOT NULL)');
+            $this->dbh->exec('INSERT INTO version (current_version) VALUES("0000000000")');
 
             return '0000000000';
         }
