@@ -1038,11 +1038,11 @@ SQL;
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS version (
         version VARCHAR(255) NOT NULL,
-        update_in_progress BOOL DEFAULT 0
+        update_in_progress BOOLEAN DEFAULT 0
     )
 SQL;
         if (null !== $version) {
-            $queryList[] = 'INSERT INTO version (version) VALUES("'.$version.'")';
+            $queryList[] = sprintf('INSERT INTO version (version) VALUES("%s")', $version);
         }
 
         $this->exec($queryList);
