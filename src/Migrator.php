@@ -11,10 +11,11 @@ namespace SURFnet\VPN\Server;
 
 use PDO;
 use PDOException;
-use RuntimeException;
 
 class Migrator
 {
+    const NO_VERSION = '0000000000';
+
     /** @var \PDO */
     private $dbh;
 
@@ -22,7 +23,7 @@ class Migrator
     private $schemaVersion;
 
     /** @var array<string, array> */
-    private $migrationList = [];
+    private $updateList = [];
 
     /**
      * @param \PDO   $dbh
@@ -30,27 +31,22 @@ class Migrator
      */
     public function __construct(PDO $dbh, $schemaVersion)
     {
+        $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->dbh = $dbh;
         $this->schemaVersion = $schemaVersion;
     }
 
     /**
-     * @param array<string> $queryList
+     * @param array $queryList
      *
      * @return void
      */
-    public function init(array $queryList)
+    public function init(array $queryList = [])
     {
-        $queryList = \array_merge(
-            $queryList,
-            [
-                'CREATE TABLE IF NOT EXISTS version (current_version TEXT NOT NULL)',
-                \sprintf('INSERT INTO version (current_version) VALUES("%s")', $this->schemaVersion),
-            ]
-        );
         foreach ($queryList as $dbQuery) {
             $this->dbh->exec($dbQuery);
         }
+        $this->createVersionTable($this->schemaVersion);
     }
 
     /**
@@ -60,9 +56,9 @@ class Migrator
      *
      * @return void
      */
-    public function addMigration($fromVersion, $toVersion, array $queryList)
+    public function addUpdate($fromVersion, $toVersion, array $queryList)
     {
-        $this->migrationList[\sprintf('%s:%s', $fromVersion, $toVersion)] = $queryList;
+        $this->updateList[\sprintf('%s:%s', $fromVersion, $toVersion)] = $queryList;
     }
 
     /**
@@ -78,28 +74,21 @@ class Migrator
             return;
         }
 
+        $this->dbh->exec('CREATE TABLE _migration_in_progress (dummy INTEGER)');
+
         // make sure we run through the migrations in order
-        // :ABC must be before <anything>:ABC XXX
-        \ksort($this->migrationList);
-        foreach ($this->migrationList as $fromTo => $queryList) {
+        \ksort($this->updateList);
+        foreach ($this->updateList as $fromTo => $queryList) {
             list($fromVersion, $toVersion) = \explode(':', $fromTo);
             if ($fromVersion === $currentVersion) {
                 try {
                     $this->dbh->beginTransaction();
-
-                    // XXX we really want to delete $fromVersion ONLY, bail if this doesn't work!
-                    if (1 !== $this->dbh->exec('DELETE FROM version')) {
-                        throw new RuntimeException('XXX');
-                    }
-
+                    $this->dbh->exec(\sprintf('DELETE FROM version WHERE current_version = "%s"', $fromVersion));
                     foreach ($queryList as $dbQuery) {
                         $this->dbh->exec($dbQuery);
                     }
+                    $this->dbh->exec(\sprintf('INSERT INTO version (current_version) VALUES("%s")', $toVersion));
                     $this->dbh->commit();
-                    $this->dbh->exec(
-                        \sprintf('INSERT INTO version (current_version) VALUES("%s")', $toVersion)
-                    );
-
                     $currentVersion = $toVersion;
                 } catch (PDOException $e) {
                     $this->dbh->rollback();
@@ -108,10 +97,12 @@ class Migrator
                 }
             }
         }
+
+        $this->dbh->exec('DROP TABLE _migration_in_progress');
     }
 
     /**
-     * @return string
+     * @return false|string
      */
     public function getCurrentVersion()
     {
@@ -119,17 +110,23 @@ class Migrator
             $sth = $this->dbh->query('SELECT current_version FROM version');
             $currentVersion = $sth->fetchColumn(0);
             $sth->closeCursor();
-            if (false === $currentVersion) {
-                throw new RuntimeException('no version set in the database, but version table exists');
-            }
 
             return $currentVersion;
         } catch (PDOException $e) {
-            // create table
-            $this->dbh->exec('CREATE TABLE IF NOT EXISTS version (current_version TEXT NOT NULL)');
-            $this->dbh->exec('INSERT INTO version (current_version) VALUES("0000000000")');
+            $this->createVersionTable(self::NO_VERSION);
 
-            return '0000000000';
+            return self::NO_VERSION;
         }
+    }
+
+    /**
+     * @param string $schemaVersion
+     *
+     * @return void
+     */
+    private function createVersionTable($schemaVersion)
+    {
+        $this->dbh->exec('CREATE TABLE IF NOT EXISTS version (current_version TEXT NOT NULL)');
+        $this->dbh->exec(\sprintf('INSERT INTO version (current_version) VALUES("%s")', $schemaVersion));
     }
 }

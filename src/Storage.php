@@ -996,8 +996,8 @@ SQL;
      */
     public function update()
     {
-        $this->migrator->addMigration(
-            '0000000000',
+        $this->migrator->addUpdate(
+            Migrator::NO_VERSION,
             '2018061501',
             [
                 'ALTER TABLE connection_log RENAME TO _connection_log',
