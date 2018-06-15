@@ -996,6 +996,10 @@ SQL;
      */
     public function update()
     {
+        if (!$this->migrator->isUpdateRequired()) {
+            return;
+        }
+
         $this->migrator->addUpdate(
             Migrator::NO_VERSION,
             '2018061501',

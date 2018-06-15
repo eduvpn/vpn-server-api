@@ -11,6 +11,7 @@ namespace SURFnet\VPN\Server;
 
 use PDO;
 use PDOException;
+use RangeException;
 
 class Migrator
 {
@@ -33,6 +34,9 @@ class Migrator
     {
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->dbh = $dbh;
+        if (1 !== \preg_match('/^[0-9]{10}$/', $schemaVersion)) {
+            throw new RangeException('schemaVersion must be 10 a digit string');
+        }
         $this->schemaVersion = $schemaVersion;
     }
 
@@ -50,6 +54,14 @@ class Migrator
     }
 
     /**
+     * @return bool
+     */
+    public function isUpdateRequired()
+    {
+        return $this->schemaVersion !== $this->getCurrentVersion();
+    }
+
+    /**
      * @param string        $fromVersion
      * @param string        $toVersion
      * @param array<string> $queryList
@@ -58,12 +70,14 @@ class Migrator
      */
     public function addUpdate($fromVersion, $toVersion, array $queryList)
     {
-        $this->updateList[\sprintf('%s:%s', $fromVersion, $toVersion)] = $queryList;
+        $fromToVersion = \sprintf('%s:%s', $fromVersion, $toVersion);
+        if (1 !== \preg_match('/^[0-9]{10}:[0-9]{10}$/', $fromToVersion)) {
+            throw new RangeException('fromVersion and toVersion must be 10 digit strings');
+        }
+        $this->updateList[$fromToVersion] = $queryList;
     }
 
     /**
-     * @param array<string,array<string>> $dbQueries
-     *
      * @return void
      */
     public function update()
@@ -83,11 +97,11 @@ class Migrator
             if ($fromVersion === $currentVersion) {
                 try {
                     $this->dbh->beginTransaction();
-                    $this->dbh->exec(\sprintf('DELETE FROM version WHERE current_version = "%s"', $fromVersion));
+                    $this->dbh->exec(\sprintf("DELETE FROM version WHERE current_version = '%s'", $fromVersion));
                     foreach ($queryList as $dbQuery) {
                         $this->dbh->exec($dbQuery);
                     }
-                    $this->dbh->exec(\sprintf('INSERT INTO version (current_version) VALUES("%s")', $toVersion));
+                    $this->dbh->exec(\sprintf("INSERT INTO version (current_version) VALUES('%s')", $toVersion));
                     $this->dbh->commit();
                     $currentVersion = $toVersion;
                 } catch (PDOException $e) {
@@ -127,6 +141,6 @@ class Migrator
     private function createVersionTable($schemaVersion)
     {
         $this->dbh->exec('CREATE TABLE IF NOT EXISTS version (current_version TEXT NOT NULL)');
-        $this->dbh->exec(\sprintf('INSERT INTO version (current_version) VALUES("%s")', $schemaVersion));
+        $this->dbh->exec(\sprintf("INSERT INTO version (current_version) VALUES('%s')", $schemaVersion));
     }
 }
