@@ -1053,12 +1053,16 @@ SQL;
      */
     private function getVersion()
     {
-        $stmt = $this->db->prepare('SELECT version FROM version');
-        $stmt->execute();
-        $schemaVersion = $stmt->fetchColumn();
-        $stmt->closeCursor();
+        try {
+            $stmt = $this->db->prepare('SELECT version FROM version');
+            $stmt->execute();
+            $schemaVersion = $stmt->fetchColumn();
+            $stmt->closeCursor();
 
-        return $schemaVersion;
+            return $schemaVersion;
+        } catch (PDOException $e) {
+            return null;
+        }
     }
 
     /**
