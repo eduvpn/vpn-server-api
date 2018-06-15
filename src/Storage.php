@@ -997,11 +997,6 @@ SQL;
     public function update()
     {
         $version = $this->getVersion();
-        if (null === $version) {
-            // create version table
-            $this->addVersionTable($version);
-        }
-
         switch ($version) {
             case '2018061401':
                 // do nothing, we are up to date
@@ -1012,44 +1007,26 @@ SQL;
     }
 
     /**
-     * @param array $queryList
-     *
-     * @return void
-     */
-    private function exec(array $queryList)
-    {
-        foreach ($queryList as $query) {
-            if ('sqlite' === $this->db->getAttribute(PDO::ATTR_DRIVER_NAME)) {
-                $query = str_replace('AUTO_INCREMENT', 'AUTOINCREMENT', $query);
-            }
-            $this->db->exec($query);
-        }
-    }
-
-    /**
-     * @param null|string $version
+     * @param string $version
      *
      * @return void
      */
     private function addVersionTable($version)
     {
-        $queryList = [];
-        $queryList[] =
+        $queryList = [
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS version (
         version VARCHAR(255) NOT NULL,
         update_in_progress BOOLEAN DEFAULT 0
     )
-SQL;
-        if (null !== $version) {
-            $queryList[] = sprintf('INSERT INTO version (version) VALUES("%s")', $version);
-        }
-
+SQL
+        ];
+        $queryList[] = sprintf('INSERT INTO version (version) VALUES("%s")', $version);
         $this->exec($queryList);
     }
 
     /**
-     * @return null|string
+     * @return string
      */
     private function getVersion()
     {
@@ -1061,7 +1038,11 @@ SQL;
 
             return $schemaVersion;
         } catch (PDOException $e) {
-            return null;
+            // no version table yet, add it
+            $initialVersion = '1970010101';
+            $this->addVersionTable($initialVersion);
+
+            return $initialVersion;
         }
     }
 
@@ -1119,6 +1100,21 @@ SQL
             $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
             $stmt->bindValue(':date_time', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
             $stmt->execute();
+        }
+    }
+
+    /**
+     * @param array $queryList
+     *
+     * @return void
+     */
+    private function exec(array $queryList)
+    {
+        foreach ($queryList as $query) {
+            if ('sqlite' === $this->db->getAttribute(PDO::ATTR_DRIVER_NAME)) {
+                $query = str_replace('AUTO_INCREMENT', 'AUTOINCREMENT', $query);
+            }
+            $this->db->exec($query);
         }
     }
 }
