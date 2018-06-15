@@ -14,15 +14,19 @@ use fkooman\OAuth\Client\AccessToken;
 use fkooman\OAuth\Client\TokenStorageInterface;
 use PDO;
 use PDOException;
-use RuntimeException;
 
 class Storage implements TokenStorageInterface
 {
+    const CURRENT_SCHEMA_VERSION = '2018061501';
+
     /** @var \PDO */
     private $db;
 
     /** @var \DateTime */
     private $dateTime;
+
+    /** @var Migrator */
+    private $migrator;
 
     public function __construct(PDO $db, DateTime $dateTime)
     {
@@ -30,8 +34,8 @@ class Storage implements TokenStorageInterface
         if ('sqlite' === $db->getAttribute(PDO::ATTR_DRIVER_NAME)) {
             $db->query('PRAGMA foreign_keys = ON');
         }
-
         $this->db = $db;
+        $this->migrator = new Migrator($db, self::CURRENT_SCHEMA_VERSION);
         $this->dateTime = $dateTime;
     }
 
@@ -911,9 +915,6 @@ SQL
         $this->deleteVootToken($userId);
     }
 
-    /**
-     * @return void
-     */
     public function init()
     {
         $queryList = [];
@@ -969,7 +970,7 @@ SQL;
         $queryList[] =
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS system_messages (
-        id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         type VARCHAR(255) NOT NULL DEFAULT "notification",
         message TINYTEXT NOT NULL,
         date_time DATETIME NOT NULL
@@ -979,7 +980,7 @@ SQL;
         $queryList[] =
 <<< 'SQL'
     CREATE TABLE IF NOT EXISTS user_messages (
-        id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         type VARCHAR(255) NOT NULL DEFAULT "notification",
         message TINYTEXT NOT NULL,
         date_time DATETIME NOT NULL,
@@ -987,8 +988,7 @@ SQL;
     )
 SQL;
 
-        $this->exec($queryList);
-        $this->addVersionTable('2018061401');
+        $this->migrator->init($queryList);
     }
 
     /**
@@ -996,75 +996,19 @@ SQL;
      */
     public function update()
     {
-        $version = $this->getVersion();
-        switch ($version) {
-            case '2018061401':
-                // do nothing, we are up to date
-                return;
-            default:
-                $this->to2018061401();
-        }
-    }
-
-    /**
-     * @param string $version
-     *
-     * @return void
-     */
-    private function addVersionTable($version)
-    {
-        $queryList = [
-<<< 'SQL'
-    CREATE TABLE IF NOT EXISTS version (
-        version VARCHAR(255) NOT NULL,
-        update_in_progress BOOLEAN DEFAULT 0
-    )
-SQL
-        ];
-        $queryList[] = sprintf('INSERT INTO version (version) VALUES("%s")', $version);
-        $this->exec($queryList);
-    }
-
-    /**
-     * @return string
-     */
-    private function getVersion()
-    {
-        try {
-            $stmt = $this->db->prepare('SELECT version FROM version');
-            $stmt->execute();
-            $schemaVersion = $stmt->fetchColumn();
-            $stmt->closeCursor();
-
-            return $schemaVersion;
-        } catch (PDOException $e) {
-            // no version table yet, add it
-            $initialVersion = '1970010101';
-            $this->addVersionTable($initialVersion);
-
-            return $initialVersion;
-        }
-    }
-
-    /**
-     * Add column client_lost to connection_log table.
-     *
-     * @return void
-     */
-    private function to2018061401()
-    {
-        if (1 !== $this->db->exec('UPDATE version SET update_in_progress = 1 WHERE update_in_progress = 0')) {
-            throw new RuntimeException('database schema update in progress');
-        }
-        $this->db->beginTransaction();
-        $this->db->exec('DELETE FROM version');
-        $this->db->exec('ALTER TABLE connection_log RENAME TO _connection_log_tmp');
-        $this->init();
-        $this->db->exec(
-            'INSERT INTO connection_log (user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred) SELECT user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred FROM _connection_log_tmp'
+        $this->migrator->addMigration(
+            '0000000000',
+            '2018061501',
+            [
+                'ALTER TABLE connection_log RENAME TO _connection_log',
+                'CREATE TABLE IF NOT EXISTS connection_log (user_id VARCHAR(255) NOT NULL, common_name VARCHAR(255) NOT NULL, profile_id VARCHAR(255) NOT NULL, ip4 VARCHAR(255) NOT NULL, ip6 VARCHAR(255) NOT NULL, connected_at DATETIME NOT NULL, disconnected_at DATETIME DEFAULT NULL, bytes_transferred INTEGER DEFAULT NULL, client_lost BOOLEAN DEFAULT 0
+)',
+                'INSERT INTO connection_log (user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred) SELECT user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred FROM _connection_log',
+                'DROP TABLE _connection_log',
+            ]
         );
-        $this->db->commit();
-        $this->db->exec('DROP TABLE _connection_log_tmp');
+
+        $this->migrator->update();
     }
 
     private function addUser($userId)
@@ -1100,21 +1044,6 @@ SQL
             $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
             $stmt->bindValue(':date_time', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
             $stmt->execute();
-        }
-    }
-
-    /**
-     * @param array $queryList
-     *
-     * @return void
-     */
-    private function exec(array $queryList)
-    {
-        foreach ($queryList as $query) {
-            if ('sqlite' === $this->db->getAttribute(PDO::ATTR_DRIVER_NAME)) {
-                $query = str_replace('AUTO_INCREMENT', 'AUTOINCREMENT', $query);
-            }
-            $this->db->exec($query);
         }
     }
 }
