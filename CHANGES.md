@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0 (...)
+- deal with "lost" clients, that disconnected, but didn't get added to the 
+  connection log (issue #70)
+
 ## 1.2.14 (2018-06-13)
 - fix unit test with bug fix release of `LC/openvpn-connection-manager`
 - update dependencies
