@@ -560,6 +560,35 @@ SQL
 
     public function clientConnect($profileId, $commonName, $ip4, $ip6, DateTime $connectedAt)
     {
+        // update "lost" client entries when a new client connects that gets
+        // the IP address of an existing entry that was not "closed" yet. This
+        // may occur when the OpenVPN process dies without writing the
+        // disconnect event to the log. We fix this when a new client
+        // wants to connect and gets this exact same IP address...
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+        UPDATE 
+            connection_log
+        SET
+            disconnected_at = :date_time,
+            client_lost = 1
+        WHERE
+            profile_id = :profile_id
+        AND
+            ip4 = :ip4 
+        AND
+            ip6 = :ip6 
+        AND
+            disconnected_at IS NULL
+SQL
+        );
+
+        $stmt->bindValue(':date_time', $connectedAt->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':profile_id', $profileId, PDO::PARAM_STR);
+        $stmt->bindValue(':ip4', $ip4, PDO::PARAM_STR);
+        $stmt->bindValue(':ip6', $ip6, PDO::PARAM_STR);
+        $stmt->execute();
+
         // this query is so complex, because we want to store the user_id in the
         // log as well, not just the common_name... the user may delete the
         // certificate, or the user account may be deleted...
@@ -651,7 +680,8 @@ SQL
         ip4, 
         ip6, 
         connected_at, 
-        disconnected_at
+        disconnected_at,
+        client_lost
     FROM
         connection_log
     WHERE
@@ -1005,8 +1035,7 @@ SQL;
             '2018061501',
             [
                 'ALTER TABLE connection_log RENAME TO _connection_log',
-                'CREATE TABLE IF NOT EXISTS connection_log (user_id VARCHAR(255) NOT NULL, common_name VARCHAR(255) NOT NULL, profile_id VARCHAR(255) NOT NULL, ip4 VARCHAR(255) NOT NULL, ip6 VARCHAR(255) NOT NULL, connected_at DATETIME NOT NULL, disconnected_at DATETIME DEFAULT NULL, bytes_transferred INTEGER DEFAULT NULL, client_lost BOOLEAN DEFAULT 0
-)',
+                'CREATE TABLE IF NOT EXISTS connection_log (user_id VARCHAR(255) NOT NULL, common_name VARCHAR(255) NOT NULL, profile_id VARCHAR(255) NOT NULL, ip4 VARCHAR(255) NOT NULL, ip6 VARCHAR(255) NOT NULL, connected_at DATETIME NOT NULL, disconnected_at DATETIME DEFAULT NULL, bytes_transferred INTEGER DEFAULT NULL, client_lost BOOLEAN DEFAULT 0)',
                 'INSERT INTO connection_log (user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred) SELECT user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred FROM _connection_log',
                 'DROP TABLE _connection_log',
             ]

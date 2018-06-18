@@ -12,6 +12,7 @@ namespace SURFnet\VPN\Server;
 use PDO;
 use PDOException;
 use RangeException;
+use RuntimeException;
 
 class Migrator
 {
@@ -32,12 +33,13 @@ class Migrator
      */
     public function __construct(PDO $dbh, $schemaVersion)
     {
+        if ('sqlite' !== $dbh->getAttribute(PDO::ATTR_DRIVER_NAME)) {
+            // we only support sqlite
+            throw new RuntimeException('only SQLite is supported');
+        }
         $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->dbh = $dbh;
-        if (1 !== \preg_match('/^[0-9]{10}$/', $schemaVersion)) {
-            throw new RangeException('schemaVersion must be 10 a digit string');
-        }
-        $this->schemaVersion = $schemaVersion;
+        $this->schemaVersion = self::validateSchemaVersion($schemaVersion);
     }
 
     /**
@@ -70,10 +72,12 @@ class Migrator
      */
     public function addUpdate($fromVersion, $toVersion, array $queryList)
     {
-        $fromToVersion = \sprintf('%s:%s', $fromVersion, $toVersion);
-        if (1 !== \preg_match('/^[0-9]{10}:[0-9]{10}$/', $fromToVersion)) {
-            throw new RangeException('fromVersion and toVersion must be 10 digit strings');
-        }
+        $fromToVersion = \sprintf(
+            '%s:%s',
+            self::validateSchemaVersion($fromVersion),
+            self::validateSchemaVersion($toVersion)
+        );
+
         $this->updateList[$fromToVersion] = $queryList;
     }
 
@@ -88,7 +92,16 @@ class Migrator
             return;
         }
 
+        // this creates a "lock" as only one process will succeed in this...
         $this->dbh->exec('CREATE TABLE _migration_in_progress (dummy INTEGER)');
+
+        // disable "foreign_keys" if they were on...
+        $sth = $this->dbh->query('PRAGMA foreign_keys');
+        $hasForeignKeys = '1' === $sth->fetchColumn(0);
+        $sth->closeCursor();
+        if ($hasForeignKeys) {
+            $this->dbh->exec('PRAGMA foreign_keys = OFF');
+        }
 
         // make sure we run through the migrations in order
         \ksort($this->updateList);
@@ -112,6 +125,12 @@ class Migrator
             }
         }
 
+        // enable "foreign_keys" if they were on...
+        if ($hasForeignKeys) {
+            $this->dbh->exec('PRAGMA foreign_keys = ON');
+        }
+
+        // release "lock"
         $this->dbh->exec('DROP TABLE _migration_in_progress');
     }
 
@@ -123,6 +142,8 @@ class Migrator
         try {
             $sth = $this->dbh->query('SELECT current_version FROM version');
             $currentVersion = $sth->fetchColumn(0);
+            // XXX this can return false, possibly when the table was already
+            // created but nothing was in it...
             $sth->closeCursor();
 
             return $currentVersion;
@@ -142,5 +163,19 @@ class Migrator
     {
         $this->dbh->exec('CREATE TABLE IF NOT EXISTS version (current_version TEXT NOT NULL)');
         $this->dbh->exec(\sprintf("INSERT INTO version (current_version) VALUES('%s')", $schemaVersion));
+    }
+
+    /**
+     * @param string $schemaVersion
+     *
+     * @return string
+     */
+    private static function validateSchemaVersion($schemaVersion)
+    {
+        if (1 !== \preg_match('/^[0-9]{10}$/', $schemaVersion)) {
+            throw new RangeException('schemaVersion must be 10 a digit string');
+        }
+
+        return $schemaVersion;
     }
 }
