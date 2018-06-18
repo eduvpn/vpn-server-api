@@ -71,6 +71,7 @@ try {
         ),
         new DateTime('now')
     );
+    $storage->update();
 
     $groupProviders = [];
     if ($config->hasSection('groupProviders')) {
