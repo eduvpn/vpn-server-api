@@ -39,7 +39,11 @@ try {
 
     $dataDir = sprintf('%s/data/%s', $baseDir, $instanceId);
     $db = new PDO(sprintf('sqlite://%s/db.sqlite', $dataDir));
-    $storage = new Storage($db, new DateTime('now'));
+    $storage = new Storage(
+        $db,
+        sprintf('%s/schema', $baseDir),
+        new DateTime('now')
+    );
 
     $outFile = sprintf('%s/stats.json', $dataDir);
 
