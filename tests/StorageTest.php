@@ -27,6 +27,7 @@ class StorageTest extends TestCase
                 $GLOBALS['DB_USER'],
                 $GLOBALS['DB_PASSWD']
             ),
+            'schema',
             new DateTime()
         );
         $this->storage->init();

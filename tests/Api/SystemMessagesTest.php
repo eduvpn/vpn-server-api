@@ -31,6 +31,7 @@ class SystemMessagesTest extends TestCase
                 $GLOBALS['DB_USER'],
                 $GLOBALS['DB_PASSWD']
             ),
+            'schema',
             new DateTime('2016-01-01 08:00:00')
         );
         $storage->init();

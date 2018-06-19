@@ -25,17 +25,22 @@ class Storage implements TokenStorageInterface
     /** @var \DateTime */
     private $dateTime;
 
-    /** @var Migrator */
-    private $migrator;
+    /** @var Migration */
+    private $migration;
 
-    public function __construct(PDO $db, DateTime $dateTime)
+    /**
+     * @param \PDO      $db
+     * @param string    $schemaDir
+     * @param \DateTime $dateTime
+     */
+    public function __construct(PDO $db, $schemaDir, DateTime $dateTime)
     {
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         if ('sqlite' === $db->getAttribute(PDO::ATTR_DRIVER_NAME)) {
-            $db->query('PRAGMA foreign_keys = ON');
+            $db->exec('PRAGMA foreign_keys = ON');
         }
         $this->db = $db;
-        $this->migrator = new Migrator($db, self::CURRENT_SCHEMA_VERSION);
+        $this->migration = new Migration($db, $schemaDir, self::CURRENT_SCHEMA_VERSION);
         $this->dateTime = $dateTime;
     }
 
@@ -947,78 +952,7 @@ SQL
 
     public function init()
     {
-        $queryList = [];
-        $queryList[] =
-<<< 'SQL'
-    CREATE TABLE IF NOT EXISTS users (
-        user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
-        voot_token TEXT DEFAULT NULL,
-        totp_secret VARCHAR(255) DEFAULT NULL,
-        yubi_key_id VARCHAR(255) DEFAULT NULL,
-        date_time DATETIME NOT NULL,
-        is_disabled BOOLEAN DEFAULT 0 NOT NULL
-    )
-SQL;
-
-        $queryList[] =
-<<< 'SQL'
-    CREATE TABLE IF NOT EXISTS certificates (
-        common_name VARCHAR(255) UNIQUE NOT NULL,
-        display_name VARCHAR(255) NOT NULL,
-        valid_from DATETIME NOT NULL,
-        valid_to DATETIME NOT NULL,
-        is_disabled BOOLEAN DEFAULT 0,
-        user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
-    )
-SQL;
-
-        $queryList[] =
-<<< 'SQL'
-    CREATE TABLE IF NOT EXISTS totp_log (
-        totp_key VARCHAR(255) NOT NULL,
-        date_time DATETIME NOT NULL,
-        user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-        UNIQUE (user_id, totp_key)
-    )
-SQL;
-
-        $queryList[] =
-<<< 'SQL'
-    CREATE TABLE IF NOT EXISTS connection_log (
-        user_id VARCHAR(255) NOT NULL,
-        common_name VARCHAR(255) NOT NULL,
-        profile_id VARCHAR(255) NOT NULL,
-        ip4 VARCHAR(255) NOT NULL,
-        ip6 VARCHAR(255) NOT NULL,
-        connected_at DATETIME NOT NULL,
-        disconnected_at DATETIME DEFAULT NULL,
-        bytes_transferred INTEGER DEFAULT NULL,
-        client_lost BOOLEAN DEFAULT 0
-    )
-SQL;
-
-        $queryList[] =
-<<< 'SQL'
-    CREATE TABLE IF NOT EXISTS system_messages (
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-        type VARCHAR(255) NOT NULL DEFAULT "notification",
-        message TINYTEXT NOT NULL,
-        date_time DATETIME NOT NULL
-    )
-SQL;
-
-        $queryList[] =
-<<< 'SQL'
-    CREATE TABLE IF NOT EXISTS user_messages (
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-        type VARCHAR(255) NOT NULL DEFAULT "notification",
-        message TINYTEXT NOT NULL,
-        date_time DATETIME NOT NULL,
-        user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
-    )
-SQL;
-
-        $this->migrator->init($queryList);
+        $this->migration->init();
     }
 
     /**
@@ -1026,22 +960,7 @@ SQL;
      */
     public function update()
     {
-        if (!$this->migrator->isUpdateRequired()) {
-            return;
-        }
-
-        $this->migrator->addUpdate(
-            Migrator::NO_VERSION,
-            '2018061501',
-            [
-                'ALTER TABLE connection_log RENAME TO _connection_log',
-                'CREATE TABLE IF NOT EXISTS connection_log (user_id VARCHAR(255) NOT NULL, common_name VARCHAR(255) NOT NULL, profile_id VARCHAR(255) NOT NULL, ip4 VARCHAR(255) NOT NULL, ip6 VARCHAR(255) NOT NULL, connected_at DATETIME NOT NULL, disconnected_at DATETIME DEFAULT NULL, bytes_transferred INTEGER DEFAULT NULL, client_lost BOOLEAN DEFAULT 0)',
-                'INSERT INTO connection_log (user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred) SELECT user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred FROM _connection_log',
-                'DROP TABLE _connection_log',
-            ]
-        );
-
-        $this->migrator->update();
+        $this->migration->run();
     }
 
     private function addUser($userId)

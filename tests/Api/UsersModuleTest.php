@@ -36,6 +36,7 @@ class UsersModuleTest extends TestCase
                 $GLOBALS['DB_USER'],
                 $GLOBALS['DB_PASSWD']
             ),
+            'schema',
             new DateTime()
         );
         $storage->init();
