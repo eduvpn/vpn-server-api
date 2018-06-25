@@ -36,7 +36,8 @@ class UsersModuleTest extends TestCase
                 $GLOBALS['DB_USER'],
                 $GLOBALS['DB_PASSWD']
             ),
-            new DateTime()
+            'schema',
+            new DateTime('2018-01-01 01:00:00')
         );
         $storage->init();
         $storage->addCertificate('foo', 'abcd1234', 'ABCD1234', new DateTime('@12345678'), new DateTime('@23456789'));
@@ -84,6 +85,7 @@ class UsersModuleTest extends TestCase
             [
                 'vpn-user-portal' => 'aabbcc',
                 'vpn-admin-portal' => 'bbccdd',
+                'vpn-server-node' => 'ccddee',
             ]
         );
 
@@ -99,18 +101,21 @@ class UsersModuleTest extends TestCase
                     'is_disabled' => false,
                     'has_yubi_key_id' => false,
                     'has_totp_secret' => false,
+                    'last_seen_web' => null,
                 ],
                 [
                     'user_id' => 'bar',
                     'is_disabled' => true,
                     'has_yubi_key_id' => false,
                     'has_totp_secret' => true,
+                    'last_seen_web' => null,
                 ],
                 [
                     'user_id' => 'baz',
                     'is_disabled' => false,
                     'has_yubi_key_id' => false,
                     'has_totp_secret' => true,
+                    'last_seen_web' => null,
                 ],
             ],
             $this->makeRequest(
@@ -351,6 +356,44 @@ class UsersModuleTest extends TestCase
                 ],
                 []
             )
+        );
+    }
+
+    public function testLastSeenWebConnectedVpn()
+    {
+        $this->assertNull(
+            $this->makeRequest(
+                ['vpn-admin-portal', 'bbccdd'],
+                'GET',
+                'user_list',
+                [],
+                []
+            )[0]['last_seen_web']
+        );
+        $this->assertTrue(
+            $this->makeRequest(
+                ['vpn-user-portal', 'aabbcc'],
+                'POST',
+                'last_seen_web_ping',
+                [],
+                ['user_id' => 'foo']
+            )
+        );
+        $this->assertSame(
+            [
+                'user_id' => 'foo',
+                'is_disabled' => false,
+                'has_yubi_key_id' => false,
+                'has_totp_secret' => false,
+                'last_seen_web' => '2018-01-01 01:00:00',
+            ],
+            $this->makeRequest(
+                ['vpn-admin-portal', 'bbccdd'],
+                'GET',
+                'user_list',
+                [],
+                []
+            )[0]
         );
     }
 

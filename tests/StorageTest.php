@@ -27,7 +27,8 @@ class StorageTest extends TestCase
                 $GLOBALS['DB_USER'],
                 $GLOBALS['DB_PASSWD']
             ),
-            new DateTime()
+            'schema',
+            new DateTime('2017-12-31 09:00:00')
         );
         $this->storage->init();
         $this->storage->addCertificate(
@@ -67,6 +68,17 @@ class StorageTest extends TestCase
                 'client_lost' => '0',
             ],
             $this->storage->getLogEntry(new DateTime('2018-02-02 10:00:00'), '10.0.0.1')
+        );
+
+        $this->assertSame(
+            [
+                'user_id' => 'user_id',
+                'is_disabled' => false,
+                'has_yubi_key_id' => false,
+                'has_totp_secret' => false,
+                'last_seen_web' => null,
+            ],
+            $this->storage->getUsers()[0]
         );
     }
 
