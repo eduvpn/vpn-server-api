@@ -102,7 +102,6 @@ class UsersModuleTest extends TestCase
                     'has_yubi_key_id' => false,
                     'has_totp_secret' => false,
                     'last_seen_web' => null,
-                    'last_connected_vpn' => null,
                 ],
                 [
                     'user_id' => 'bar',
@@ -110,7 +109,6 @@ class UsersModuleTest extends TestCase
                     'has_yubi_key_id' => false,
                     'has_totp_secret' => true,
                     'last_seen_web' => null,
-                    'last_connected_vpn' => null,
                 ],
                 [
                     'user_id' => 'baz',
@@ -118,7 +116,6 @@ class UsersModuleTest extends TestCase
                     'has_yubi_key_id' => false,
                     'has_totp_secret' => true,
                     'last_seen_web' => null,
-                    'last_connected_vpn' => null,
                 ],
             ],
             $this->makeRequest(
@@ -389,33 +386,6 @@ class UsersModuleTest extends TestCase
                 'has_yubi_key_id' => false,
                 'has_totp_secret' => false,
                 'last_seen_web' => '2018-01-01 01:00:00',
-                'last_connected_vpn' => null,
-            ],
-            $this->makeRequest(
-                ['vpn-admin-portal', 'bbccdd'],
-                'GET',
-                'user_list',
-                [],
-                []
-            )[0]
-        );
-        $this->assertTrue(
-            $this->makeRequest(
-                ['vpn-server-node', 'ccddee'],
-                'POST',
-                'last_connected_vpn_ping',
-                [],
-                ['user_id' => 'foo']
-            )
-        );
-        $this->assertSame(
-            [
-                'user_id' => 'foo',
-                'is_disabled' => false,
-                'has_yubi_key_id' => false,
-                'has_totp_secret' => false,
-                'last_seen_web' => '2018-01-01 01:00:00',
-                'last_connected_vpn' => '2018-01-01 01:00:00',
             ],
             $this->makeRequest(
                 ['vpn-admin-portal', 'bbccdd'],

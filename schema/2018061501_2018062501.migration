@@ -3,7 +3,6 @@ CREATE TABLE users(
   user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
   is_disabled BOOLEAN DEFAULT 0 NOT NULL,
   last_seen_web DATETIME DEFAULT NULL,
-  last_connected_vpn DATETIME DEFAULT NULL,
   voot_token TEXT DEFAULT NULL,
   totp_secret VARCHAR(255) DEFAULT NULL,
   yubi_key_id VARCHAR(255) DEFAULT NULL

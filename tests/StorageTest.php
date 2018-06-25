@@ -77,7 +77,6 @@ class StorageTest extends TestCase
                 'has_yubi_key_id' => false,
                 'has_totp_secret' => false,
                 'last_seen_web' => null,
-                'last_connected_vpn' => '2017-12-31 09:00:00',
             ],
             $this->storage->getUsers()[0]
         );

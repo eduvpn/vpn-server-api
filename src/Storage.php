@@ -56,7 +56,6 @@ class Storage implements TokenStorageInterface
         totp_secret,
         yubi_key_id,
         last_seen_web,
-        last_connected_vpn,
         is_disabled
     FROM 
         users
@@ -72,7 +71,6 @@ SQL
                 'has_yubi_key_id' => null !== $row['yubi_key_id'],
                 'has_totp_secret' => null !== $row['totp_secret'],
                 'last_seen_web' => $row['last_seen_web'],
-                'last_connected_vpn' => $row['last_connected_vpn'],
             ];
         }
 
@@ -396,25 +394,6 @@ SQL
         $stmt->execute();
     }
 
-    public function lastConnectedVpnPing($userId)
-    {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    UPDATE
-        users
-    SET
-        last_connected_vpn = :last_connected_vpn
-    WHERE
-        user_id = :user_id
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':last_connected_vpn', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
-
-        $stmt->execute();
-    }
-
     public function addCertificate($userId, $commonName, $displayName, DateTime $validFrom, DateTime $validTo)
     {
         $this->addUser($userId);
@@ -675,27 +654,6 @@ SQL
         $stmt->bindValue(':ip4', $ip4, PDO::PARAM_STR);
         $stmt->bindValue(':ip6', $ip6, PDO::PARAM_STR);
         $stmt->bindValue(':connected_at', $connectedAt->format('Y-m-d H:i:s'), PDO::PARAM_STR);
-        $stmt->execute();
-
-        // update the last_connected_vpn
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-        UPDATE 
-            users
-        SET
-            last_connected_vpn = :last_connected_vpn
-        WHERE
-            user_id = (
-                SELECT u.user_id
-                FROM users u, certificates c
-                WHERE u.user_id = c.user_id
-                AND c.common_name = :common_name
-            )
-SQL
-        );
-
-        $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
-        $stmt->bindValue(':last_connected_vpn', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->execute();
     }
 

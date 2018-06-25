@@ -348,17 +348,5 @@ class UsersModule implements ServiceModuleInterface
                 return new ApiResponse('last_seen_web_ping');
             }
         );
-
-        $service->post(
-            '/last_connected_vpn_ping',
-            function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-server-node']);
-
-                $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $this->storage->lastConnectedVpnPing($userId);
-
-                return new ApiResponse('last_connected_vpn_ping');
-            }
-        );
     }
 }
