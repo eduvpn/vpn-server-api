@@ -326,7 +326,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = $request->getQueryParameter('user_id');
+                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
 
                 $userGroups = [];
                 foreach ($this->groupProviders as $groupProvider) {
@@ -334,6 +334,30 @@ class UsersModule implements ServiceModuleInterface
                 }
 
                 return new ApiResponse('user_groups', $userGroups);
+            }
+        );
+
+        $service->post(
+            '/last_seen_web_ping',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+
+                $userId = InputValidation::userId($request->getPostParameter('user_id'));
+                $this->storage->lastSeenWebPing($userId);
+
+                return new ApiResponse('last_seen_web_ping');
+            }
+        );
+
+        $service->post(
+            '/last_connected_vpn_ping',
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-server-node']);
+
+                $userId = InputValidation::userId($request->getPostParameter('user_id'));
+                $this->storage->lastConnectedVpnPing($userId);
+
+                return new ApiResponse('last_connected_vpn_ping');
             }
         );
     }

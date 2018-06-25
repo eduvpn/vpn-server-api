@@ -17,7 +17,7 @@ use PDOException;
 
 class Storage implements TokenStorageInterface
 {
-    const CURRENT_SCHEMA_VERSION = '2018061501';
+    const CURRENT_SCHEMA_VERSION = '2018062501';
 
     /** @var \PDO */
     private $db;
@@ -53,9 +53,10 @@ class Storage implements TokenStorageInterface
 <<< 'SQL'
     SELECT
         user_id, 
-        date_time,
         totp_secret,
         yubi_key_id,
+        last_seen_web,
+        last_connected_vpn,
         is_disabled
     FROM 
         users
@@ -70,6 +71,8 @@ SQL
                 'is_disabled' => (bool) $row['is_disabled'],
                 'has_yubi_key_id' => null !== $row['yubi_key_id'],
                 'has_totp_secret' => null !== $row['totp_secret'],
+                'last_seen_web' => $row['last_seen_web'],
+                'last_connected_vpn' => $row['last_connected_vpn'],
             ];
         }
 
@@ -371,6 +374,44 @@ SQL
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+    }
+
+    public function lastSeenWebPing($userId)
+    {
+        $this->addUser($userId);
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    UPDATE
+        users
+    SET
+        last_seen_web = :last_seen_web
+    WHERE
+        user_id = :user_id
+SQL
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':last_seen_web', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+
+        $stmt->execute();
+    }
+
+    public function lastConnectedVpnPing($userId)
+    {
+        $this->addUser($userId);
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    UPDATE
+        users
+    SET
+        last_connected_vpn = :last_connected_vpn
+    WHERE
+        user_id = :user_id
+SQL
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':last_connected_vpn', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+
         $stmt->execute();
     }
 
@@ -984,17 +1025,14 @@ SQL
 <<< 'SQL'
     INSERT INTO 
         users (
-            user_id,
-            date_time
+            user_id
         )
     VALUES (
-        :user_id,
-        :date_time
+        :user_id
     )
 SQL
             );
             $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-            $stmt->bindValue(':date_time', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
             $stmt->execute();
         }
     }
