@@ -676,6 +676,27 @@ SQL
         $stmt->bindValue(':ip6', $ip6, PDO::PARAM_STR);
         $stmt->bindValue(':connected_at', $connectedAt->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->execute();
+
+        // update the last_connected_vpn
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+        UPDATE 
+            users
+        SET
+            last_connected_vpn = :last_connected_vpn
+        WHERE
+            user_id = (
+                SELECT u.user_id
+                FROM users u, certificates c
+                WHERE u.user_id = c.user_id
+                AND c.common_name = :common_name
+            )
+SQL
+        );
+
+        $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
+        $stmt->bindValue(':last_connected_vpn', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->execute();
     }
 
     public function clientDisconnect($profileId, $commonName, $ip4, $ip6, DateTime $connectedAt, DateTime $disconnectedAt, $bytesTransferred)
