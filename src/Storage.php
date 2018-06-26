@@ -17,7 +17,7 @@ use PDOException;
 
 class Storage implements TokenStorageInterface
 {
-    const CURRENT_SCHEMA_VERSION = '2018062501';
+    const CURRENT_SCHEMA_VERSION = '2018062601';
 
     /** @var \PDO */
     private $db;
@@ -90,7 +90,6 @@ SQL
         u.user_id AS user_id, 
         u.is_disabled AS user_is_disabled,
         c.display_name AS display_name,
-        c.is_disabled AS certificate_is_disabled,
         c.valid_from,
         c.valid_to
     FROM 
@@ -427,8 +426,7 @@ SQL
         common_name, 
         display_name, 
         valid_from, 
-        valid_to, 
-        is_disabled
+        valid_to
     FROM 
         certificates
     WHERE 
@@ -438,29 +436,7 @@ SQL
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
-        $certificateList = [];
-        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $row['is_disabled'] = (bool) $row['is_disabled'];
-            $certificateList[] = $row;
-        }
-
-        return $certificateList;
-    }
-
-    public function disableCertificate($commonName)
-    {
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    UPDATE 
-        certificates 
-    SET 
-        is_disabled = 1 
-    WHERE
-        common_name = :common_name
-SQL
-        );
-        $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
-        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function deleteCertificate($commonName)
@@ -469,22 +445,6 @@ SQL
 <<< 'SQL'
     DELETE FROM 
         certificates 
-    WHERE 
-        common_name = :common_name
-SQL
-        );
-        $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
-        $stmt->execute();
-    }
-
-    public function enableCertificate($commonName)
-    {
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    UPDATE 
-        certificates 
-    SET 
-        is_disabled = 0 
     WHERE 
         common_name = :common_name
 SQL

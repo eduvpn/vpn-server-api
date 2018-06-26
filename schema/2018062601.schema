@@ -1,0 +1,45 @@
+CREATE TABLE users(
+  user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
+  is_disabled BOOLEAN DEFAULT 0 NOT NULL,
+  last_seen_web DATETIME DEFAULT NULL,
+  voot_token TEXT DEFAULT NULL,
+  totp_secret VARCHAR(255) DEFAULT NULL,
+  yubi_key_id VARCHAR(255) DEFAULT NULL
+);
+CREATE TABLE certificates(
+  common_name VARCHAR(255) UNIQUE NOT NULL,
+  display_name VARCHAR(255) NOT NULL,
+  valid_from DATETIME NOT NULL,
+  valid_to DATETIME NOT NULL,
+  user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
+);
+CREATE TABLE totp_log(
+  totp_key VARCHAR(255) NOT NULL,
+  date_time DATETIME NOT NULL,
+  user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  UNIQUE(user_id, totp_key)
+);
+CREATE TABLE connection_log(
+  user_id VARCHAR(255) NOT NULL,
+  common_name VARCHAR(255) NOT NULL,
+  profile_id VARCHAR(255) NOT NULL,
+  ip4 VARCHAR(255) NOT NULL,
+  ip6 VARCHAR(255) NOT NULL,
+  connected_at DATETIME NOT NULL,
+  disconnected_at DATETIME DEFAULT NULL,
+  bytes_transferred INTEGER DEFAULT NULL,
+  client_lost BOOLEAN DEFAULT 0
+);
+CREATE TABLE system_messages(
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  type VARCHAR(255) NOT NULL DEFAULT "notification",
+  message TINYTEXT NOT NULL,
+  date_time DATETIME NOT NULL
+);
+CREATE TABLE user_messages(
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  type VARCHAR(255) NOT NULL DEFAULT "notification",
+  message TINYTEXT NOT NULL,
+  date_time DATETIME NOT NULL,
+  user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
+);

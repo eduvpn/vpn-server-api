@@ -166,13 +166,6 @@ class ConnectionsModule implements ServiceModuleInterface
             return new ApiErrorResponse('connect', $msg);
         }
 
-        if ($result['certificate_is_disabled']) {
-            $msg = sprintf('[VPN] unable to connect, certificate "%s" is disabled', $result['display_name']);
-            $this->storage->addUserMessage($result['user_id'], 'notification', $msg);
-
-            return new ApiErrorResponse('connect', $msg);
-        }
-
         return $this->verifyAcl($profileId, $result['user_id']);
     }
 

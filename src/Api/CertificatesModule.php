@@ -128,42 +128,6 @@ class CertificatesModule implements ServiceModuleInterface
             }
         );
 
-        $service->post(
-            '/disable_client_certificate',
-            function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
-
-                $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
-                $certInfo = $this->storage->getUserCertificateInfo($commonName);
-
-                $this->storage->addUserMessage(
-                    $certInfo['user_id'],
-                    'notification',
-                    sprintf('certificate "%s" disabled by an administrator', $certInfo['display_name'])
-                );
-
-                return new ApiResponse('disable_client_certificate', $this->storage->disableCertificate($commonName));
-            }
-        );
-
-        $service->post(
-            '/enable_client_certificate',
-            function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
-
-                $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
-                $certInfo = $this->storage->getUserCertificateInfo($commonName);
-
-                $this->storage->addUserMessage(
-                    $certInfo['user_id'],
-                    'notification',
-                    sprintf('certificate "%s" enabled by an administrator', $certInfo['display_name'])
-                );
-
-                return new ApiResponse('enable_client_certificate', $this->storage->enableCertificate($commonName));
-            }
-        );
-
         $service->get(
             '/client_certificate_list',
             function (Request $request, array $hookData) {

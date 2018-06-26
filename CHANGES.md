@@ -3,6 +3,10 @@
 ## 1.3.0 (...)
 - deal with "lost" clients, that disconnected, but didn't get added to the 
   connection log (issue #70)
+- `update-ip` script now assigns a /64 instead of /60 to IPv6 profile address
+- introduce `last_seen_web` to keep track of when the user was last seen at
+  the portal, or authorized an application
+- remove the ability to disable certificates, only users can be disabled now
 
 ## 1.2.14 (2018-06-13)
 - fix unit test with bug fix release of `LC/openvpn-connection-manager`

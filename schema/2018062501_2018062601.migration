@@ -1,0 +1,10 @@
+ALTER TABLE certificates RENAME TO _certificates;
+CREATE TABLE certificates(
+  common_name VARCHAR(255) UNIQUE NOT NULL,
+  display_name VARCHAR(255) NOT NULL,
+  valid_from DATETIME NOT NULL,
+  valid_to DATETIME NOT NULL,
+  user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
+);
+INSERT INTO certificates (common_name, display_name, valid_from, valid_to, user_id) SELECT common_name, display_name, valid_from, valid_to, user_id FROM _certificates;
+DROP TABLE _certificates;
