@@ -53,8 +53,19 @@ try {
         $secondByte = hexdec(bin2hex(random_bytes(1)));
     } while (42 === $secondByte);
 
-    $v4 = sprintf('10.%s.%s.0/24', $secondByte, hexdec(bin2hex(random_bytes(1))));
-    $v6 = sprintf('fd%s:%s:%s:%s::/60', bin2hex(random_bytes(1)), bin2hex(random_bytes(2)), bin2hex(random_bytes(2)), bin2hex(random_bytes(2) & hex2bin('fff0')));
+    $v4 = sprintf(
+        '10.%s.%s.0/24',
+        $secondByte,
+        hexdec(bin2hex(random_bytes(1)))
+    );
+
+    $v6 = sprintf(
+        'fd%s:%s:%s:%s::/64',
+        bin2hex(random_bytes(1)),
+        bin2hex(random_bytes(2)),
+        bin2hex(random_bytes(2)),
+        bin2hex(random_bytes(2))
+    );
 
     echo sprintf('IPv4 CIDR  : %s', $v4).PHP_EOL;
     echo sprintf('IPv6 prefix: %s', $v6).PHP_EOL;
