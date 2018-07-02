@@ -101,21 +101,21 @@ class UsersModuleTest extends TestCase
                     'is_disabled' => false,
                     'has_yubi_key_id' => false,
                     'has_totp_secret' => false,
-                    'last_seen_web' => null,
+                    'last_authenticated_at' => null,
                 ],
                 [
                     'user_id' => 'bar',
                     'is_disabled' => true,
                     'has_yubi_key_id' => false,
                     'has_totp_secret' => true,
-                    'last_seen_web' => null,
+                    'last_authenticated_at' => null,
                 ],
                 [
                     'user_id' => 'baz',
                     'is_disabled' => false,
                     'has_yubi_key_id' => false,
                     'has_totp_secret' => true,
-                    'last_seen_web' => null,
+                    'last_authenticated_at' => null,
                 ],
             ],
             $this->makeRequest(
@@ -359,7 +359,7 @@ class UsersModuleTest extends TestCase
         );
     }
 
-    public function testLastSeenWebConnectedVpn()
+    public function testLastAuthenticatedAtPing()
     {
         $this->assertNull(
             $this->makeRequest(
@@ -368,13 +368,13 @@ class UsersModuleTest extends TestCase
                 'user_list',
                 [],
                 []
-            )[0]['last_seen_web']
+            )[0]['last_authenticated_at']
         );
         $this->assertTrue(
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
                 'POST',
-                'last_seen_web_ping',
+                'last_authenticated_at_ping',
                 [],
                 ['user_id' => 'foo']
             )
@@ -385,7 +385,7 @@ class UsersModuleTest extends TestCase
                 'is_disabled' => false,
                 'has_yubi_key_id' => false,
                 'has_totp_secret' => false,
-                'last_seen_web' => '2018-01-01 01:00:00',
+                'last_authenticated_at' => '2018-01-01 01:00:00',
             ],
             $this->makeRequest(
                 ['vpn-admin-portal', 'bbccdd'],

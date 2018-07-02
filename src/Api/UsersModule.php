@@ -338,14 +338,14 @@ class UsersModule implements ServiceModuleInterface
         );
 
         $service->post(
-            '/last_seen_web_ping',
+            '/last_authenticated_at_ping',
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $this->storage->lastSeenWebPing($userId);
+                $this->storage->lastAuthenticatedAtPing($userId);
 
-                return new ApiResponse('last_seen_web_ping');
+                return new ApiResponse('last_authenticated_at_ping');
             }
         );
     }

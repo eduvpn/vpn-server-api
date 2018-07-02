@@ -76,7 +76,7 @@ class StorageTest extends TestCase
                 'is_disabled' => false,
                 'has_yubi_key_id' => false,
                 'has_totp_secret' => false,
-                'last_seen_web' => null,
+                'last_authenticated_at' => null,
             ],
             $this->storage->getUsers()[0]
         );

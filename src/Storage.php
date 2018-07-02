@@ -17,7 +17,7 @@ use PDOException;
 
 class Storage implements TokenStorageInterface
 {
-    const CURRENT_SCHEMA_VERSION = '2018062601';
+    const CURRENT_SCHEMA_VERSION = '2018070201';
 
     /** @var \PDO */
     private $db;
@@ -55,7 +55,7 @@ class Storage implements TokenStorageInterface
         user_id, 
         totp_secret,
         yubi_key_id,
-        last_seen_web,
+        last_authenticated_at,
         is_disabled
     FROM 
         users
@@ -70,7 +70,7 @@ SQL
                 'is_disabled' => (bool) $row['is_disabled'],
                 'has_yubi_key_id' => null !== $row['yubi_key_id'],
                 'has_totp_secret' => null !== $row['totp_secret'],
-                'last_seen_web' => $row['last_seen_web'],
+                'last_authenticated_at' => $row['last_authenticated_at'],
             ];
         }
 
@@ -374,7 +374,7 @@ SQL
         $stmt->execute();
     }
 
-    public function lastSeenWebPing($userId)
+    public function lastAuthenticatedAtPing($userId)
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
@@ -382,13 +382,13 @@ SQL
     UPDATE
         users
     SET
-        last_seen_web = :last_seen_web
+        last_authenticated_at = :last_authenticated_at
     WHERE
         user_id = :user_id
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':last_seen_web', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':last_authenticated_at', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
 
         $stmt->execute();
     }
