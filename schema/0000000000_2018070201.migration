@@ -1,3 +1,6 @@
+ALTER TABLE users RENAME TO _users;
+ALTER TABLE certificates RENAME TO _certificates;
+ALTER TABLE connection_log RENAME TO _connection_log;
 CREATE TABLE users(
   user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
   voot_token TEXT DEFAULT NULL,
@@ -13,12 +16,6 @@ CREATE TABLE certificates(
   valid_to DATETIME NOT NULL,
   user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
 );
-CREATE TABLE totp_log(
-  totp_key VARCHAR(255) NOT NULL,
-  date_time DATETIME NOT NULL,
-  user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-  UNIQUE(user_id, totp_key)
-);
 CREATE TABLE connection_log(
   user_id VARCHAR(255) NOT NULL,
   common_name VARCHAR(255) NOT NULL,
@@ -30,16 +27,9 @@ CREATE TABLE connection_log(
   bytes_transferred INTEGER DEFAULT NULL,
   client_lost BOOLEAN DEFAULT 0
 );
-CREATE TABLE system_messages(
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  type VARCHAR(255) NOT NULL DEFAULT "notification",
-  message TINYTEXT NOT NULL,
-  date_time DATETIME NOT NULL
-);
-CREATE TABLE user_messages(
-  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  type VARCHAR(255) NOT NULL DEFAULT "notification",
-  message TINYTEXT NOT NULL,
-  date_time DATETIME NOT NULL,
-  user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
-);
+INSERT INTO users (user_id, voot_token, totp_secret, yubi_key_id, is_disabled) SELECT user_id, voot_token, totp_secret, yubi_key_id, is_disabled FROM _users;
+INSERT INTO certificates (common_name, display_name, valid_from, valid_to, user_id) SELECT common_name, display_name, valid_from, valid_to, user_id FROM _certificates;
+INSERT INTO connection_log (user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred) SELECT user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred FROM _connection_log;
+DROP TABLE _users;
+DROP TABLE _certificates;
+DROP TABLE _connection_log;

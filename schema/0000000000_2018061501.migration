@@ -1,4 +1,0 @@
-ALTER TABLE connection_log RENAME TO _connection_log;
-CREATE TABLE IF NOT EXISTS connection_log (user_id VARCHAR(255) NOT NULL, common_name VARCHAR(255) NOT NULL, profile_id VARCHAR(255) NOT NULL, ip4 VARCHAR(255) NOT NULL, ip6 VARCHAR(255) NOT NULL, connected_at DATETIME NOT NULL, disconnected_at DATETIME DEFAULT NULL, bytes_transferred INTEGER DEFAULT NULL, client_lost BOOLEAN DEFAULT 0);
-INSERT INTO connection_log (user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred) SELECT user_id, common_name, profile_id, ip4, ip6, connected_at, disconnected_at, bytes_transferred FROM _connection_log;
-DROP TABLE _connection_log;
