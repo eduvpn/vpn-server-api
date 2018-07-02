@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.0 (...)
+## 1.3.0 (2018-07-02)
 - deal with "lost" clients, that disconnected, but didn't get added to the 
   connection log (issue #70)
 - `update-ip` script now assigns a /64 instead of /60 to IPv6 profile address
