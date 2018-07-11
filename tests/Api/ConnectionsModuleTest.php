@@ -10,8 +10,8 @@
 namespace SURFnet\VPN\Server\Tests\Api;
 
 use DateTime;
-use Otp\Otp;
-use ParagonIE\ConstantTime\Encoding;
+use fkooman\Otp\FrkOtp;
+use ParagonIE\ConstantTime\Base32;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use SURFnet\VPN\Common\Config;
@@ -40,7 +40,7 @@ class ConnectionsModuleTest extends TestCase
         );
         $storage->init();
         $storage->addCertificate('foo', '12345678901234567890123456789012', '12345678901234567890123456789012', new DateTime('@12345678'), new DateTime('@23456789'));
-        $storage->setTotpSecret('foo', 'CN2XAL23SIFTDFXZ');
+        $storage->setOtpSecret('foo', 'CN2XAL23SIFTDFXZ');
         $storage->clientConnect('internet', '12345678901234567890123456789012', '10.10.10.10', 'fd00:4242:4242:4242::', new DateTime('@12345678'));
 
         $config = Config::fromFile(sprintf('%s/data/config.php', __DIR__));
@@ -153,9 +153,8 @@ class ConnectionsModuleTest extends TestCase
 
     public function testVerifyOtp()
     {
-        $otp = new Otp();
         $totpSecret = 'CN2XAL23SIFTDFXZ';
-        $totpKey = $otp->totp(Encoding::base32DecodeUpper($totpSecret));
+        $totpKey = FrkOtp::totp(Base32::decodeUpper($totpSecret));
 
         $this->assertTrue(
             $this->makeRequest(

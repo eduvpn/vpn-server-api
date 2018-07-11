@@ -10,6 +10,9 @@
 namespace SURFnet\VPN\Server\Api;
 
 use fkooman\OAuth\Client\AccessToken;
+use fkooman\Otp\Exception\OtpException;
+use fkooman\Otp\FrkOtpVerifier;
+use fkooman\Otp\Totp;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\ApiErrorResponse;
 use SURFnet\VPN\Common\Http\ApiResponse;
@@ -18,10 +21,8 @@ use SURFnet\VPN\Common\Http\InputValidation;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
-use SURFnet\VPN\Server\Exception\TotpException;
 use SURFnet\VPN\Server\Exception\YubiKeyException;
 use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\Totp;
 use SURFnet\VPN\Server\YubiKey;
 
 class UsersModule implements ServiceModuleInterface
@@ -164,24 +165,22 @@ class UsersModule implements ServiceModuleInterface
                 $totpSecret = InputValidation::totpSecret($request->getPostParameter('totp_secret'));
 
                 // check if there is already a TOTP secret registered for this user
-                if ($this->storage->hasTotpSecret($userId)) {
+                if (false !== $this->storage->getOtpSecret($userId)) {
                     return new ApiErrorResponse('set_totp_secret', 'TOTP secret already set');
                 }
 
-                $totp = new Totp($this->storage);
+                $totp = new Totp($this->storage, new FrkOtpVerifier());
                 try {
-                    $totp->verify($userId, $totpKey, $totpSecret);
-                } catch (TotpException $e) {
-                    $msg = sprintf('TOTP verification failed: %s', $e->getMessage());
+                    $totp->register($userId, $totpSecret, $totpKey);
+                    $this->storage->addUserMessage($userId, 'notification', 'TOTP secret registered');
+
+                    return new ApiResponse('set_totp_secret');
+                } catch (OtpException $e) {
+                    $msg = sprintf('TOTP registration failed: %s', $e->getMessage());
                     $this->storage->addUserMessage($userId, 'notification', $msg);
 
                     return new ApiErrorResponse('set_totp_secret', $msg);
                 }
-
-                $this->storage->setTotpSecret($userId, $totpSecret);
-                $this->storage->addUserMessage($userId, 'notification', 'TOTP secret registered');
-
-                return new ApiResponse('set_totp_secret');
             }
         );
 
@@ -193,17 +192,22 @@ class UsersModule implements ServiceModuleInterface
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
                 $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
 
-                $totp = new Totp($this->storage);
+                $totp = new Totp($this->storage, new FrkOtpVerifier());
                 try {
-                    $totp->verify($userId, $totpKey);
-                } catch (TotpException $e) {
+                    if (false === $totp->verify($userId, $totpKey)) {
+                        $msg = 'TOTP validation failed: invalid TOTP key';
+                        $this->storage->addUserMessage($userId, 'notification', $msg);
+
+                        return new ApiErrorResponse('verify_totp_key', $msg);
+                    }
+
+                    return new ApiResponse('verify_totp_key');
+                } catch (OtpException $e) {
                     $msg = sprintf('TOTP validation failed: %s', $e->getMessage());
                     $this->storage->addUserMessage($userId, 'notification', $msg);
 
                     return new ApiErrorResponse('verify_totp_key', $msg);
                 }
-
-                return new ApiResponse('verify_totp_key');
             }
         );
 
@@ -214,7 +218,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getQueryParameter('user_id'));
 
-                return new ApiResponse('has_totp_secret', $this->storage->hasTotpSecret($userId));
+                return new ApiResponse('has_totp_secret', false !== $this->storage->getOtpSecret($userId));
             }
         );
 
@@ -225,7 +229,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
 
-                $this->storage->deleteTotpSecret($userId);
+                $this->storage->deleteOtpSecret($userId);
                 $this->storage->addUserMessage($userId, 'notification', 'TOTP secret deleted');
 
                 return new ApiResponse('delete_totp_secret');

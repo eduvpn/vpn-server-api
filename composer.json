@@ -28,11 +28,14 @@
         {
             "type": "vcs",
             "url": "https://git.tuxed.net/LC/php-openvpn-connection-manager"
+        },
+        {
+            "type": "vcs",
+            "url": "https://git.tuxed.net/fkooman/php-otp-verifier"
         }
     ],
     "require": {
         "LC/openvpn-connection-manager": "^1",
-        "christian-riesen/otp": "^2.0",
         "eduvpn/common": "^1",
         "ext-curl": "*",
         "ext-date": "*",
@@ -43,6 +46,7 @@
         "ext-pdo": "*",
         "ext-spl": "*",
         "fkooman/oauth2-client": "^7",
+        "fkooman/otp-verifier": "dev-master",
         "fkooman/yubitwee": "^1",
         "paragonie/constant_time_encoding": "^1|^2",
         "php": ">=5.4"

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a7f78731496bbacc06946db328b38087",
+    "content-hash": "5627f590671199efbd22ff2fb6d1d700",
     "packages": [
         {
             "name": "LC/openvpn-connection-manager",
@@ -43,64 +43,6 @@
             ],
             "description": "Manage client connections to OpenVPN processes",
             "time": "2018-06-13T13:14:06+00:00"
-        },
-        {
-            "name": "christian-riesen/otp",
-            "version": "2.6.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ChristianRiesen/otp.git",
-                "reference": "9b31f024114b3b5bc393a1fb4b0ad19cb7931e81"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ChristianRiesen/otp/zipball/9b31f024114b3b5bc393a1fb4b0ad19cb7931e81",
-                "reference": "9b31f024114b3b5bc393a1fb4b0ad19cb7931e81",
-                "shasum": ""
-            },
-            "require": {
-                "paragonie/constant_time_encoding": "^1|^2",
-                "paragonie/random_compat": "^1|^2",
-                "php": ">=5.4.0",
-                "symfony/polyfill-php56": "^1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8.35 || ^5.7.11 || ^6.0.5"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Otp\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christian Riesen",
-                    "email": "chris.riesen@gmail.com",
-                    "homepage": "http://christianriesen.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "One Time Passwords, hotp and totp according to RFC4226 and RFC6238",
-            "homepage": "https://github.com/ChristianRiesen/otp",
-            "keywords": [
-                "googleauthenticator",
-                "hotp",
-                "otp",
-                "rfc4226",
-                "rfc6238",
-                "totp"
-            ],
-            "time": "2018-05-04T09:41:44+00:00"
         },
         {
             "name": "eduvpn/common",
@@ -205,6 +147,54 @@
             ],
             "description": "Very simple OAuth 2.0 client",
             "time": "2018-06-02T00:36:19+00:00"
+        },
+        {
+            "name": "fkooman/otp-verifier",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://git.tuxed.net/fkooman/php-otp-verifier",
+                "reference": "fd7f40655af4cd30aa58eb23df7b2f05fe3605a2"
+            },
+            "require": {
+                "ext-date": "*",
+                "ext-hash": "*",
+                "ext-pdo": "*",
+                "ext-spl": "*",
+                "paragonie/constant_time_encoding": "^1|^2",
+                "paragonie/random_compat": ">=1",
+                "php": ">= 5.4",
+                "symfony/polyfill-php56": "^1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4|^5|^6|^7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "fkooman\\Otp\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "fkooman\\Otp\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "email": "fkooman@tuxed.net",
+                    "name": "François Kooman"
+                }
+            ],
+            "description": "OTP Validation Library",
+            "support": {
+                "email": "fkooman@tuxed.net",
+                "source": "https://git.tuxed.net/fkooman/php-otp-verifier"
+            },
+            "time": "2018-07-11T13:57:09+00:00"
         },
         {
             "name": "fkooman/secookie",
@@ -389,16 +379,16 @@
         },
         {
             "name": "paragonie/random_compat",
-            "version": "v2.0.15",
+            "version": "v2.0.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "10bcb46e8f3d365170f6de9d05245aa066b81f09"
+                "reference": "29af24f25bab834fcbb38ad2a69fa93b867e070d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/10bcb46e8f3d365170f6de9d05245aa066b81f09",
-                "reference": "10bcb46e8f3d365170f6de9d05245aa066b81f09",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/29af24f25bab834fcbb38ad2a69fa93b867e070d",
+                "reference": "29af24f25bab834fcbb38ad2a69fa93b867e070d",
                 "shasum": ""
             },
             "require": {
@@ -434,7 +424,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2018-06-08T15:26:40+00:00"
+            "time": "2018-07-04T16:31:37+00:00"
         },
         {
             "name": "psr/log",
@@ -2122,7 +2112,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "fkooman/otp-verifier": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
