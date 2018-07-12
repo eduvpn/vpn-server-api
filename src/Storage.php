@@ -782,6 +782,7 @@ SQL
      */
     public function getOtpSecret($userId)
     {
+        $this->addUser($userId);
         $stmt = $this->db->prepare('SELECT otp_secret FROM otp WHERE user_id = :user_id');
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
@@ -797,6 +798,7 @@ SQL
      */
     public function setOtpSecret($userId, $otpSecret)
     {
+        $this->addUser($userId);
         $stmt = $this->db->prepare('INSERT INTO otp (user_id, otp_secret) VALUES(:user_id, :otp_secret)');
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->bindValue(':otp_secret', $otpSecret, PDO::PARAM_STR);
@@ -810,6 +812,7 @@ SQL
      */
     public function deleteOtpSecret($userId)
     {
+        $this->addUser($userId);
         $stmt = $this->db->prepare('DELETE FROM otp WHERE user_id = :user_id');
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
@@ -822,6 +825,7 @@ SQL
      */
     public function getOtpAttemptCount($userId)
     {
+        $this->addUser($userId);
         $stmt = $this->db->prepare('SELECT COUNT(*) FROM otp_log WHERE user_id = :user_id');
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
@@ -838,6 +842,7 @@ SQL
      */
     public function recordOtpKey($userId, $otpKey, DateTime $dateTime)
     {
+        $this->addUser($userId);
         // check if this user used the key before
         $stmt = $this->db->prepare('SELECT COUNT(*) FROM otp_log WHERE user_id = :user_id AND otp_key = :otp_key');
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
