@@ -1,0 +1,25 @@
+CREATE TABLE otp(
+  user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
+  otp_secret VARCHAR(255) NOT NULL
+);
+INSERT INTO otp (user_id, otp_secret) SELECT user_id, totp_secret FROM users WHERE totp_secret IS NOT NULL;
+
+ALTER TABLE users RENAME TO _users;
+CREATE TABLE users(
+  user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
+  voot_token TEXT DEFAULT NULL,
+  yubi_key_id VARCHAR(255) DEFAULT NULL,
+  last_authenticated_at DATETIME DEFAULT NULL,
+  is_disabled BOOLEAN DEFAULT 0 NOT NULL
+);
+INSERT INTO users (user_id, voot_token, yubi_key_id, last_authenticated_at, is_disabled) SELECT user_id, voot_token, yubi_key_id, last_authenticated_at, is_disabled FROM _users;
+DROP TABLE _users;
+
+CREATE TABLE otp_log(
+  user_id VARCHAR(255) NOT NULL,
+  otp_key VARCHAR(255) NOT NULL,
+  date_time DATETIME NOT NULL,
+  UNIQUE(user_id, otp_key)
+);
+INSERT INTO otp_log (user_id, otp_key, date_time) SELECT user_id, totp_key, date_time FROM totp_log;
+DROP TABLE totp_log;
