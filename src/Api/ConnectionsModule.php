@@ -11,7 +11,6 @@ namespace SURFnet\VPN\Server\Api;
 
 use DateTime;
 use fkooman\Otp\Exception\OtpException;
-use fkooman\Otp\FrkOtpVerifier;
 use fkooman\Otp\Totp;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\ApiErrorResponse;
@@ -137,7 +136,7 @@ class ConnectionsModule implements ServiceModuleInterface
             case 'totp':
                 $totpKey = InputValidation::totpKey($request->getPostParameter('two_factor_value'));
                 try {
-                    $totp = new Totp($this->storage, new FrkOtpVerifier());
+                    $totp = new Totp($this->storage);
                     $totp->verify($userId, $totpKey);
                 } catch (OtpException $e) {
                     $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] TOTP validation failed: %s', $e->getMessage()));

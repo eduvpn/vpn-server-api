@@ -64,7 +64,11 @@ class UsersModuleTest extends TestCase
 
         // user "baz" has a secret, and already used a key for replay testing
         $storage->setOtpSecret('baz', 'SWIXJ4V7VYALWH6E');
-        $storage->recordOtpKey('baz', FrkOtp::totp(Base32::decodeUpper('SWIXJ4V7VYALWH6E')), new DateTime('2018-01-01 01:00:00'));
+        $frkOtp = new FrkOtp();
+        $dateTime = new DateTime();
+        $totpKey = $frkOtp->totp(Base32::decodeUpper('SWIXJ4V7VYALWH6E'), 'sha1', 6, $dateTime->getTimestamp(), 30);
+
+        $storage->recordOtpKey('baz', $totpKey, new DateTime('2018-01-01 08:00:00'));
 
         $config = Config::fromFile(sprintf('%s/data/user_groups_config.php', __DIR__));
         $groupProviders = [
@@ -132,7 +136,9 @@ class UsersModuleTest extends TestCase
     public function testSetOtpSecret()
     {
         $totpSecret = 'MM7TTLHPA7WZOJFB';
-        $totpKey = FrkOtp::totp(Base32::decodeUpper($totpSecret));
+        $frkOtp = new FrkOtp();
+        $dateTime = new DateTime();
+        $totpKey = $frkOtp->totp(Base32::decodeUpper($totpSecret), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
         $this->assertTrue(
             $this->makeRequest(
@@ -151,8 +157,9 @@ class UsersModuleTest extends TestCase
 
     public function testVerifyOtpKey()
     {
-        $totpSecret = 'CN2XAL23SIFTDFXZ';
-        $totpKey = FrkOtp::totp(Base32::decodeUpper($totpSecret));
+        $frkOtp = new FrkOtp();
+        $dateTime = new DateTime();
+        $totpKey = $frkOtp->totp(Base32::decodeUpper('CN2XAL23SIFTDFXZ'), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
         $this->assertTrue(
             $this->makeRequest(
@@ -192,7 +199,9 @@ class UsersModuleTest extends TestCase
 
     public function testVerifyOtpKeyReplay()
     {
-        $totpKey = FrkOtp::totp(Base32::decodeUpper('SWIXJ4V7VYALWH6E'));
+        $frkOtp = new FrkOtp();
+        $dateTime = new DateTime();
+        $totpKey = $frkOtp->totp(Base32::decodeUpper('SWIXJ4V7VYALWH6E'), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
         $this->assertSame(
             [

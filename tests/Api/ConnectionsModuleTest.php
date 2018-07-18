@@ -153,8 +153,9 @@ class ConnectionsModuleTest extends TestCase
 
     public function testVerifyOtp()
     {
-        $totpSecret = 'CN2XAL23SIFTDFXZ';
-        $totpKey = FrkOtp::totp(Base32::decodeUpper($totpSecret));
+        $frkOtp = new FrkOtp();
+        $dateTime = new DateTime();
+        $totpKey = $frkOtp->totp(Base32::decodeUpper('MM7TTLHPA7WZOJFB'), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
         $this->assertTrue(
             $this->makeRequest(

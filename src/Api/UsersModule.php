@@ -11,7 +11,6 @@ namespace SURFnet\VPN\Server\Api;
 
 use fkooman\OAuth\Client\AccessToken;
 use fkooman\Otp\Exception\OtpException;
-use fkooman\Otp\FrkOtpVerifier;
 use fkooman\Otp\Totp;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\ApiErrorResponse;
@@ -169,7 +168,7 @@ class UsersModule implements ServiceModuleInterface
                     return new ApiErrorResponse('set_totp_secret', 'TOTP secret already set');
                 }
 
-                $totp = new Totp($this->storage, new FrkOtpVerifier());
+                $totp = new Totp($this->storage);
                 try {
                     $totp->register($userId, $totpSecret, $totpKey);
                     $this->storage->addUserMessage($userId, 'notification', 'TOTP secret registered');
@@ -192,7 +191,7 @@ class UsersModule implements ServiceModuleInterface
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
                 $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
 
-                $totp = new Totp($this->storage, new FrkOtpVerifier());
+                $totp = new Totp($this->storage);
                 try {
                     if (false === $totp->verify($userId, $totpKey)) {
                         $msg = 'TOTP validation failed: invalid TOTP key';
