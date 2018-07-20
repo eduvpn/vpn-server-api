@@ -5,7 +5,7 @@ CREATE TABLE otp(
   otp_digits INTEGER NOT NULL,
   totp_period INTEGER NOT NULL
 );
-INSERT INTO otp (user_id, otp_secret, "sha1", 6, 30) SELECT user_id, totp_secret FROM users WHERE totp_secret IS NOT NULL;
+INSERT INTO otp (user_id, otp_secret, otp_algorithm, otp_digits, totp_period) SELECT user_id, totp_secret, 'sha1', '6', '30' FROM users WHERE totp_secret IS NOT NULL;
 
 ALTER TABLE users RENAME TO _users;
 CREATE TABLE users(
