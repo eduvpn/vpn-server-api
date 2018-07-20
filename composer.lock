@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5627f590671199efbd22ff2fb6d1d700",
+    "content-hash": "c34e993e4bec1dfab0d6f04d9dc89063",
     "packages": [
         {
             "name": "LC/openvpn-connection-manager",
@@ -150,11 +150,11 @@
         },
         {
             "name": "fkooman/otp-verifier",
-            "version": "dev-master",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://git.tuxed.net/fkooman/php-otp-verifier",
-                "reference": "c6a455a88ac86591c86b878bc7f62473480fb62d"
+                "reference": "2f5c4770a76cf1f4c913a35977108314b3af9ade"
             },
             "require": {
                 "ext-date": "*",
@@ -194,7 +194,7 @@
                 "email": "fkooman@tuxed.net",
                 "source": "https://git.tuxed.net/fkooman/php-otp-verifier"
             },
-            "time": "2018-07-20T10:06:17+00:00"
+            "time": "2018-07-20T10:50:27+00:00"
         },
         {
             "name": "fkooman/secookie",
@@ -2168,9 +2168,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "fkooman/otp-verifier": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
