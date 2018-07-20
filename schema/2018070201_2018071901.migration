@@ -1,11 +1,11 @@
 CREATE TABLE otp(
   user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
   otp_secret VARCHAR(255) NOT NULL,
-  otp_algorithm VARCHAR(255) NOT NULL,
+  otp_hash_algorithm VARCHAR(255) NOT NULL,
   otp_digits INTEGER NOT NULL,
   totp_period INTEGER NOT NULL
 );
-INSERT INTO otp (user_id, otp_secret, otp_algorithm, otp_digits, totp_period) SELECT user_id, totp_secret, 'sha1', '6', '30' FROM users WHERE totp_secret IS NOT NULL;
+INSERT INTO otp (user_id, otp_secret, otp_hash_algorithm, otp_digits, totp_period) SELECT user_id, totp_secret, 'sha1', '6', '30' FROM users WHERE totp_secret IS NOT NULL;
 
 ALTER TABLE users RENAME TO _users;
 CREATE TABLE users(

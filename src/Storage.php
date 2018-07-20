@@ -783,7 +783,7 @@ SQL
      */
     public function getOtpSecret($userId)
     {
-        $stmt = $this->db->prepare('SELECT otp_secret, otp_algorithm, otp_digits, totp_period FROM otp WHERE user_id = :user_id');
+        $stmt = $this->db->prepare('SELECT otp_secret, otp_hash_algorithm, otp_digits, totp_period FROM otp WHERE user_id = :user_id');
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
@@ -795,7 +795,7 @@ SQL
 
         return new OtpInfo(
             (string) $otpInfo['otp_secret'],
-            (string) $otpInfo['otp_algorithm'],
+            (string) $otpInfo['otp_hash_algorithm'],
             (int) $otpInfo['otp_digits'],
             (int) $otpInfo['totp_period']
         );
@@ -809,10 +809,10 @@ SQL
      */
     public function setOtpSecret($userId, OtpInfo $otpInfo)
     {
-        $stmt = $this->db->prepare('INSERT INTO otp (user_id, otp_secret, otp_algorithm, otp_digits, totp_period) VALUES(:user_id, :otp_secret, :otp_algorithm, :otp_digits, :totp_period)');
+        $stmt = $this->db->prepare('INSERT INTO otp (user_id, otp_secret, otp_hash_algorithm, otp_digits, totp_period) VALUES(:user_id, :otp_secret, :otp_hash_algorithm, :otp_digits, :totp_period)');
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->bindValue(':otp_secret', $otpInfo->getSecret(), PDO::PARAM_STR);
-        $stmt->bindValue(':otp_algorithm', $otpInfo->getAlgorithm(), PDO::PARAM_STR);
+        $stmt->bindValue(':otp_hash_algorithm', $otpInfo->getHashAlgorithm(), PDO::PARAM_STR);
         $stmt->bindValue(':otp_digits', $otpInfo->getDigits(), PDO::PARAM_INT);
         $stmt->bindValue(':totp_period', $otpInfo->getPeriod(), PDO::PARAM_INT);
 

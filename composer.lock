@@ -154,7 +154,7 @@
             "source": {
                 "type": "git",
                 "url": "https://git.tuxed.net/fkooman/php-otp-verifier",
-                "reference": "a9ca9dc4136f214b8537fbbb3b30c5cb92d6be99"
+                "reference": "c6a455a88ac86591c86b878bc7f62473480fb62d"
             },
             "require": {
                 "ext-date": "*",
@@ -194,7 +194,7 @@
                 "email": "fkooman@tuxed.net",
                 "source": "https://git.tuxed.net/fkooman/php-otp-verifier"
             },
-            "time": "2018-07-19T21:37:55+00:00"
+            "time": "2018-07-20T10:06:17+00:00"
         },
         {
             "name": "fkooman/secookie",
