@@ -349,6 +349,8 @@ SQL
         certificates
     WHERE 
         user_id = :user_id
+    ORDER BY
+        valid_from DESC
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
