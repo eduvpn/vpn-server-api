@@ -12,6 +12,7 @@ namespace SURFnet\VPN\Server\Tests\Api;
 use DateTime;
 use fkooman\OAuth\Client\AccessToken;
 use fkooman\Otp\FrkOtp;
+use fkooman\Otp\OtpInfo;
 use ParagonIE\ConstantTime\Base32;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -44,7 +45,7 @@ class UsersModuleTest extends TestCase
         $storage->disableUser('bar');
         $storage->disableUser('baz');
         $storage->enableUser('baz');
-        $storage->setOtpSecret('bar', 'CN2XAL23SIFTDFXZ');
+        $storage->setOtpSecret('bar', new OtpInfo('CN2XAL23SIFTDFXZ', 'sha1', 6, 30));
 
 //        $vootToken = new AccessToken('12345', 'bearer', 'groups', null, new DateTime('2016-01-01'));
         $vootToken = AccessToken::fromJson(
@@ -63,7 +64,7 @@ class UsersModuleTest extends TestCase
         $storage->setVootToken('bar', $vootToken);
 
         // user "baz" has a secret, and already used a key for replay testing
-        $storage->setOtpSecret('baz', 'SWIXJ4V7VYALWH6E');
+        $storage->setOtpSecret('baz', new OtpInfo('SWIXJ4V7VYALWH6E', 'sha1', 6, 30));
         $frkOtp = new FrkOtp();
         $dateTime = new DateTime();
         $totpKey = $frkOtp->totp(Base32::decodeUpper('SWIXJ4V7VYALWH6E'), 'sha1', 6, $dateTime->getTimestamp(), 30);

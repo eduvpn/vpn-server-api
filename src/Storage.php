@@ -12,13 +12,14 @@ namespace SURFnet\VPN\Server;
 use DateTime;
 use fkooman\OAuth\Client\AccessToken;
 use fkooman\OAuth\Client\TokenStorageInterface;
+use fkooman\Otp\OtpInfo;
 use fkooman\Otp\OtpStorageInterface;
 use PDO;
 use PDOException;
 
 class Storage implements TokenStorageInterface, OtpStorageInterface
 {
-    const CURRENT_SCHEMA_VERSION = '2018071101';
+    const CURRENT_SCHEMA_VERSION = '2018071901';
 
     /** @var \PDO */
     private $db;
@@ -778,30 +779,43 @@ SQL
     /**
      * @param string $userId
      *
-     * @return false|string
+     * @return false|OtpInfo
      */
     public function getOtpSecret($userId)
     {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare('SELECT otp_secret FROM otp WHERE user_id = :user_id');
+        $stmt = $this->db->prepare('SELECT otp_secret, otp_algorithm, otp_digits, totp_period FROM otp WHERE user_id = :user_id');
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
-        return $stmt->fetchColumn();
+        /** @var false|array<string, string|int> */
+        $otpInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (false === $otpInfo) {
+            return false;
+        }
+
+        return new OtpInfo(
+            (string) $otpInfo['otp_secret'],
+            (string) $otpInfo['otp_algorithm'],
+            (int) $otpInfo['otp_digits'],
+            (int) $otpInfo['totp_period']
+        );
     }
 
     /**
-     * @param string $userId
-     * @param string $otpSecret
+     * @param string  $userId
+     * @param OtpInfo $otpInfo
      *
      * @return void
      */
-    public function setOtpSecret($userId, $otpSecret)
+    public function setOtpSecret($userId, OtpInfo $otpInfo)
     {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare('INSERT INTO otp (user_id, otp_secret) VALUES(:user_id, :otp_secret)');
+        $stmt = $this->db->prepare('INSERT INTO otp (user_id, otp_secret, otp_algorithm, otp_digits, totp_period) VALUES(:user_id, :otp_secret, :otp_algorithm, :otp_digits, :totp_period)');
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':otp_secret', $otpSecret, PDO::PARAM_STR);
+        $stmt->bindValue(':otp_secret', $otpInfo->getSecret(), PDO::PARAM_STR);
+        $stmt->bindValue(':otp_algorithm', $otpInfo->getAlgorithm(), PDO::PARAM_STR);
+        $stmt->bindValue(':otp_digits', $otpInfo->getDigits(), PDO::PARAM_INT);
+        $stmt->bindValue(':totp_period', $otpInfo->getPeriod(), PDO::PARAM_INT);
+
         $stmt->execute();
     }
 

@@ -38,7 +38,10 @@ CREATE TABLE user_messages(
 );
 CREATE TABLE otp(
   user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
-  otp_secret VARCHAR(255) NOT NULL
+  otp_secret VARCHAR(255) NOT NULL,
+  otp_algorithm VARCHAR(255) NOT NULL,
+  otp_digits INTEGER NOT NULL,
+  totp_period INTEGER NOT NULL
 );
 CREATE TABLE otp_log(
   user_id VARCHAR(255) NOT NULL,
