@@ -10,6 +10,8 @@
 namespace SURFnet\VPN\Server\Api;
 
 use DateTime;
+use fkooman\Otp\Exception\OtpException;
+use fkooman\Otp\Totp;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\ApiErrorResponse;
 use SURFnet\VPN\Common\Http\ApiResponse;
@@ -19,10 +21,8 @@ use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\ProfileConfig;
-use SURFnet\VPN\Server\Exception\TotpException;
 use SURFnet\VPN\Server\Exception\YubiKeyException;
 use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\Totp;
 use SURFnet\VPN\Server\YubiKey;
 
 class ConnectionsModule implements ServiceModuleInterface
@@ -138,7 +138,7 @@ class ConnectionsModule implements ServiceModuleInterface
                 try {
                     $totp = new Totp($this->storage);
                     $totp->verify($userId, $totpKey);
-                } catch (TotpException $e) {
+                } catch (OtpException $e) {
                     $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] TOTP validation failed: %s', $e->getMessage()));
 
                     return new ApiErrorResponse('verify_two_factor', $e->getMessage());

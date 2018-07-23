@@ -11,8 +11,9 @@ namespace SURFnet\VPN\Server\Tests\Api;
 
 use DateTime;
 use fkooman\OAuth\Client\AccessToken;
-use Otp\Otp;
-use ParagonIE\ConstantTime\Encoding;
+use fkooman\Otp\FrkOtp;
+use fkooman\Otp\OtpInfo;
+use ParagonIE\ConstantTime\Base32;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use SURFnet\VPN\Common\Config;
@@ -42,7 +43,9 @@ class UsersModuleTest extends TestCase
         $storage->init();
         $storage->addCertificate('foo', 'abcd1234', 'ABCD1234', new DateTime('@12345678'), new DateTime('@23456789'));
         $storage->disableUser('bar');
-        $storage->setTotpSecret('bar', 'CN2XAL23SIFTDFXZ');
+        $storage->disableUser('baz');
+        $storage->enableUser('baz');
+        $storage->setOtpSecret('bar', new OtpInfo('CN2XAL23SIFTDFXZ', 'sha1', 6, 30));
 
 //        $vootToken = new AccessToken('12345', 'bearer', 'groups', null, new DateTime('2016-01-01'));
         $vootToken = AccessToken::fromJson(
@@ -61,9 +64,12 @@ class UsersModuleTest extends TestCase
         $storage->setVootToken('bar', $vootToken);
 
         // user "baz" has a secret, and already used a key for replay testing
-        $storage->setTotpSecret('baz', 'SWIXJ4V7VYALWH6E');
-        $otp = new Otp();
-        $storage->recordTotpKey('baz', $otp->totp(Encoding::base32DecodeUpper('SWIXJ4V7VYALWH6E')));
+        $storage->setOtpSecret('baz', new OtpInfo('SWIXJ4V7VYALWH6E', 'sha1', 6, 30));
+        $frkOtp = new FrkOtp();
+        $dateTime = new DateTime();
+        $totpKey = $frkOtp->totp(Base32::decodeUpper('SWIXJ4V7VYALWH6E'), 'sha1', 6, $dateTime->getTimestamp(), 30);
+
+        $storage->recordOtpKey('baz', $totpKey, new DateTime('2018-01-01 08:00:00'));
 
         $config = Config::fromFile(sprintf('%s/data/user_groups_config.php', __DIR__));
         $groupProviders = [
@@ -128,11 +134,12 @@ class UsersModuleTest extends TestCase
         );
     }
 
-    public function testSetTotpSecret()
+    public function testSetOtpSecret()
     {
-        $otp = new Otp();
         $totpSecret = 'MM7TTLHPA7WZOJFB';
-        $totpKey = $otp->totp(Encoding::base32DecodeUpper($totpSecret));
+        $frkOtp = new FrkOtp();
+        $dateTime = new DateTime();
+        $totpKey = $frkOtp->totp(Base32::decodeUpper($totpSecret), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
         $this->assertTrue(
             $this->makeRequest(
@@ -151,9 +158,9 @@ class UsersModuleTest extends TestCase
 
     public function testVerifyOtpKey()
     {
-        $otp = new Otp();
-        $totpSecret = 'CN2XAL23SIFTDFXZ';
-        $totpKey = $otp->totp(Encoding::base32DecodeUpper($totpSecret));
+        $frkOtp = new FrkOtp();
+        $dateTime = new DateTime();
+        $totpKey = $frkOtp->totp(Base32::decodeUpper('CN2XAL23SIFTDFXZ'), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
         $this->assertTrue(
             $this->makeRequest(
@@ -185,7 +192,7 @@ class UsersModuleTest extends TestCase
                 [],
                 [
                     'user_id' => 'bar',
-                    'totp_key' => '123456',
+                    'totp_key' => '001122',
                 ]
             )
         );
@@ -193,13 +200,14 @@ class UsersModuleTest extends TestCase
 
     public function testVerifyOtpKeyReplay()
     {
-        $otp = new Otp();
-        $totpKey = $otp->totp(Encoding::base32DecodeUpper('SWIXJ4V7VYALWH6E'));
+        $frkOtp = new FrkOtp();
+        $dateTime = new DateTime();
+        $totpKey = $frkOtp->totp(Base32::decodeUpper('SWIXJ4V7VYALWH6E'), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
         $this->assertSame(
             [
                 'ok' => false,
-                'error' => 'TOTP validation failed: TOTP key replay',
+                'error' => 'TOTP validation failed: replay of OTP code',
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],

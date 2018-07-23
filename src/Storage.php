@@ -12,12 +12,14 @@ namespace SURFnet\VPN\Server;
 use DateTime;
 use fkooman\OAuth\Client\AccessToken;
 use fkooman\OAuth\Client\TokenStorageInterface;
+use fkooman\Otp\OtpInfo;
+use fkooman\Otp\OtpStorageInterface;
 use PDO;
 use PDOException;
 
-class Storage implements TokenStorageInterface
+class Storage implements TokenStorageInterface, OtpStorageInterface
 {
-    const CURRENT_SCHEMA_VERSION = '2018070201';
+    const CURRENT_SCHEMA_VERSION = '2018071901';
 
     /** @var \PDO */
     private $db;
@@ -52,8 +54,8 @@ class Storage implements TokenStorageInterface
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
-        user_id, 
-        totp_secret,
+        user_id,
+        (SELECT otp_secret FROM otp WHERE user_id = users.user_id) AS otp_secret,
         yubi_key_id,
         last_authenticated_at,
         is_disabled
@@ -69,7 +71,7 @@ SQL
                 'user_id' => $row['user_id'],
                 'is_disabled' => (bool) $row['is_disabled'],
                 'has_yubi_key_id' => null !== $row['yubi_key_id'],
-                'has_totp_secret' => null !== $row['totp_secret'],
+                'has_totp_secret' => null !== $row['otp_secret'],
                 'last_authenticated_at' => $row['last_authenticated_at'],
             ];
         }
@@ -188,90 +190,6 @@ SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
 
-        $stmt->execute();
-    }
-
-    /**
-     * @param string $userId
-     *
-     * @return bool
-     */
-    public function hasTotpSecret($userId)
-    {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    SELECT
-        totp_secret
-    FROM 
-        users
-    WHERE 
-        user_id = :user_id
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->execute();
-
-        return null !== $stmt->fetchColumn();
-    }
-
-    /**
-     * @param string $userId
-     *
-     * @return string|null
-     */
-    public function getTotpSecret($userId)
-    {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    SELECT
-        totp_secret
-    FROM 
-        users
-    WHERE 
-        user_id = :user_id
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->execute();
-
-        return $stmt->fetchColumn();
-    }
-
-    public function setTotpSecret($userId, $totpSecret)
-    {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    UPDATE
-        users
-    SET
-        totp_secret = :totp_secret
-    WHERE
-        user_id = :user_id
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':totp_secret', $totpSecret, PDO::PARAM_STR);
-
-        $stmt->execute();
-    }
-
-    public function deleteTotpSecret($userId)
-    {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    UPDATE
-        users
-    SET
-        totp_secret = NULL
-    WHERE 
-        user_id = :user_id
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
     }
 
@@ -688,62 +606,6 @@ SQL
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * @param string $userId
-     *
-     * @return int
-     */
-    public function getTotpAttemptCount($userId)
-    {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-        SELECT
-            COUNT(*)
-        FROM 
-            totp_log
-        WHERE user_id = :user_id
-SQL
-        );
-
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->execute();
-
-        return (int) $stmt->fetchColumn();
-    }
-
-    /**
-     * @param string $userId
-     * @param string $totpKey
-     *
-     * @return bool true if recording succeeds, false if it cannot due to replay
-     */
-    public function recordTotpKey($userId, $totpKey)
-    {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    INSERT INTO totp_log 
-        (user_id, totp_key, date_time)
-    VALUES
-        (:user_id, :totp_key, :date_time)
-SQL
-        );
-
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':totp_key', $totpKey, PDO::PARAM_STR);
-        $stmt->bindValue(':date_time', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
-
-        try {
-            $stmt->execute();
-        } catch (PDOException $e) {
-            // unable to record the TOTP, most likely replay
-            return false;
-        }
-
-        return true;
-    }
-
     public function cleanConnectionLog(DateTime $dateTime)
     {
         $stmt = $this->db->prepare(
@@ -769,22 +631,6 @@ SQL
     DELETE FROM
         user_messages
     WHERE
-        date_time < :date_time
-SQL
-        );
-
-        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
-
-        return $stmt->execute();
-    }
-
-    public function cleanTotpLog(DateTime $dateTime)
-    {
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    DELETE FROM 
-        totp_log
-    WHERE 
         date_time < :date_time
 SQL
         );
@@ -930,6 +776,122 @@ SQL
     public function deleteAccessToken($userId, AccessToken $accessToken)
     {
         $this->deleteVootToken($userId);
+    }
+
+    /**
+     * @param string $userId
+     *
+     * @return false|OtpInfo
+     */
+    public function getOtpSecret($userId)
+    {
+        $stmt = $this->db->prepare('SELECT otp_secret, otp_hash_algorithm, otp_digits, totp_period FROM otp WHERE user_id = :user_id');
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        /** @var false|array<string, string|int> */
+        $otpInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (false === $otpInfo) {
+            return false;
+        }
+
+        return new OtpInfo(
+            (string) $otpInfo['otp_secret'],
+            (string) $otpInfo['otp_hash_algorithm'],
+            (int) $otpInfo['otp_digits'],
+            (int) $otpInfo['totp_period']
+        );
+    }
+
+    /**
+     * @param string  $userId
+     * @param OtpInfo $otpInfo
+     *
+     * @return void
+     */
+    public function setOtpSecret($userId, OtpInfo $otpInfo)
+    {
+        $stmt = $this->db->prepare('INSERT INTO otp (user_id, otp_secret, otp_hash_algorithm, otp_digits, totp_period) VALUES(:user_id, :otp_secret, :otp_hash_algorithm, :otp_digits, :totp_period)');
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':otp_secret', $otpInfo->getSecret(), PDO::PARAM_STR);
+        $stmt->bindValue(':otp_hash_algorithm', $otpInfo->getHashAlgorithm(), PDO::PARAM_STR);
+        $stmt->bindValue(':otp_digits', $otpInfo->getDigits(), PDO::PARAM_INT);
+        $stmt->bindValue(':totp_period', $otpInfo->getPeriod(), PDO::PARAM_INT);
+
+        $stmt->execute();
+    }
+
+    /**
+     * @param string $userId
+     *
+     * @return void
+     */
+    public function deleteOtpSecret($userId)
+    {
+        $this->addUser($userId);
+        $stmt = $this->db->prepare('DELETE FROM otp WHERE user_id = :user_id');
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+    }
+
+    /**
+     * @param string $userId
+     *
+     * @return int
+     */
+    public function getOtpAttemptCount($userId)
+    {
+        $this->addUser($userId);
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM otp_log WHERE user_id = :user_id');
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * @param string    $userId
+     * @param string    $otpKey
+     * @param \DateTime $dateTime
+     *
+     * @return bool
+     */
+    public function recordOtpKey($userId, $otpKey, DateTime $dateTime)
+    {
+        $this->addUser($userId);
+        // check if this user used the key before
+        $stmt = $this->db->prepare('SELECT COUNT(*) FROM otp_log WHERE user_id = :user_id AND otp_key = :otp_key');
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':otp_key', $otpKey, PDO::PARAM_STR);
+        $stmt->execute();
+        if (0 !== (int) $stmt->fetchColumn()) {
+            return false;
+        }
+
+        // because the insert MUST succeed we avoid race condition where
+        // potentially two times the same key for the same user are accepted,
+        // we'd just get a PDOException because the UNIQUE(user_id, otp_key)
+        // constrained is violated
+        $stmt = $this->db->prepare('INSERT INTO otp_log (user_id, otp_key, date_time) VALUES (:user_id, :otp_key, :date_time)');
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':otp_key', $otpKey, PDO::PARAM_STR);
+        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->execute();
+
+        return true;
+    }
+
+    /**
+     * @param \DateTime $dateTime
+     *
+     * @return void
+     */
+    public function cleanOtpLog(DateTime $dateTime)
+    {
+        $stmt = $this->db->prepare('DELETE FROM otp_log WHERE date_time < :date_time');
+        $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+
+        $stmt->execute();
     }
 
     public function init()
