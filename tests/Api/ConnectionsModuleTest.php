@@ -156,7 +156,7 @@ class ConnectionsModuleTest extends TestCase
     {
         $frkOtp = new FrkOtp();
         $dateTime = new DateTime();
-        $totpKey = $frkOtp->totp(Base32::decodeUpper('MM7TTLHPA7WZOJFB'), 'sha1', 6, $dateTime->getTimestamp(), 30);
+        $totpKey = $frkOtp->totp(Base32::decodeUpper('CN2XAL23SIFTDFXZ'), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
         $this->assertTrue(
             $this->makeRequest(

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.1 (2018-07-23)
+- fix OTP validation at VPN connect time
+
 ## 1.4.0 (2018-07-23)
 - switch from `christian-riesen/otp` to `fkooman/otp-verifier`
 - certificates are now sorted in reverse order (from newer to older)

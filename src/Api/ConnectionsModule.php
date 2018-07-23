@@ -137,7 +137,11 @@ class ConnectionsModule implements ServiceModuleInterface
                 $totpKey = InputValidation::totpKey($request->getPostParameter('two_factor_value'));
                 try {
                     $totp = new Totp($this->storage);
-                    $totp->verify($userId, $totpKey);
+                    if (false === $totp->verify($userId, $totpKey)) {
+                        $this->storage->addUserMessage($userId, 'notification', '[VPN] TOTP validation failed: invalid OTP');
+
+                        return new ApiErrorResponse('verify_two_factor', '[VPN] TOTP validation failed: invalid OTP');
+                    }
                 } catch (OtpException $e) {
                     $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] TOTP validation failed: %s', $e->getMessage()));
 
