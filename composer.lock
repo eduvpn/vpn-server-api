@@ -45,67 +45,6 @@
             "time": "2018-06-13T13:14:06+00:00"
         },
         {
-<<<<<<< HEAD
-            "name": "christian-riesen/otp",
-            "version": "2.6.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ChristianRiesen/otp.git",
-                "reference": "f38926c9c48d0d51953aca1a49d740775d755d5c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ChristianRiesen/otp/zipball/f38926c9c48d0d51953aca1a49d740775d755d5c",
-                "reference": "f38926c9c48d0d51953aca1a49d740775d755d5c",
-                "shasum": ""
-            },
-            "require": {
-                "paragonie/constant_time_encoding": "^1|^2",
-                "paragonie/random_compat": "^1|^2",
-                "php": ">=5.4.0",
-                "symfony/polyfill-php56": "^1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8.35 || ^5.7.11 || ^6.0.5"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Otp\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christian Riesen",
-                    "email": "chris.riesen@gmail.com",
-                    "homepage": "http://christianriesen.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "One Time Passwords, hotp and totp according to RFC4226 and RFC6238",
-            "homepage": "https://github.com/ChristianRiesen/otp",
-            "keywords": [
-                "googleauthenticator",
-                "hotp",
-                "otp",
-                "rfc4226",
-                "rfc6238",
-                "totp"
-            ],
-            "time": "2018-07-10T11:15:05+00:00"
-        },
-        {
-=======
->>>>>>> otp
             "name": "eduvpn/common",
             "version": "1.1.16",
             "source": {
