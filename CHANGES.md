@@ -2,6 +2,7 @@
 
 ## 1.4.0 (2018-07-23)
 - switch from `christian-riesen/otp` to `fkooman/otp-verifier`
+- certificates are now sorted in reverse order (from newer to older)
 
 ## 1.3.0 (2018-07-02)
 - deal with "lost" clients, that disconnected, but didn't get added to the 
