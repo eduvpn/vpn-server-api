@@ -32,6 +32,10 @@
         {
             "type": "vcs",
             "url": "https://git.tuxed.net/fkooman/php-otp-verifier"
+        },
+        {
+            "type": "vcs",
+            "url": "https://git.tuxed.net/fkooman/php-sqlite-migrate"
         }
     ],
     "require": {
@@ -47,6 +51,7 @@
         "ext-spl": "*",
         "fkooman/oauth2-client": "^7",
         "fkooman/otp-verifier": "^0.2",
+        "fkooman/sqlite-migrate": "^0",
         "fkooman/yubitwee": "^1",
         "paragonie/constant_time_encoding": "^1|^2",
         "php": ">=5.4"

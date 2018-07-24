@@ -6,9 +6,12 @@
     xsi:schemaLocation="https://getpsalm.org/schema/config file:///home/fkooman/.config/composer/vendor/vimeo/psalm/config.xsd"
 >
     <projectFiles>
-        <directory name="bin" />
         <directory name="src" />
         <directory name="web" />
+        <directory name="bin" />
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
     </projectFiles>
 
     <issueHandlers>

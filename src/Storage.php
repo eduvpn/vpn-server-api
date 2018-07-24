@@ -14,6 +14,7 @@ use fkooman\OAuth\Client\AccessToken;
 use fkooman\OAuth\Client\TokenStorageInterface;
 use fkooman\Otp\OtpInfo;
 use fkooman\Otp\OtpStorageInterface;
+use fkooman\SqliteMigrate\Migration;
 use PDO;
 use PDOException;
 
@@ -27,7 +28,7 @@ class Storage implements TokenStorageInterface, OtpStorageInterface
     /** @var \DateTime */
     private $dateTime;
 
-    /** @var Migration */
+    /** @var \fkooman\SqliteMigrate\Migration */
     private $migration;
 
     /**
