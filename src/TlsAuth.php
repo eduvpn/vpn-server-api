@@ -17,11 +17,17 @@ class TlsAuth
     /** @var string */
     private $dataDir;
 
+    /**
+     * @param string $dataDir
+     */
     public function __construct($dataDir)
     {
         $this->dataDir = $dataDir;
     }
 
+    /**
+     * @return void
+     */
     public function init()
     {
         $taFile = sprintf('%s/ta.key', $this->dataDir);
@@ -32,6 +38,9 @@ class TlsAuth
         }
     }
 
+    /**
+     * @return string
+     */
     public function get()
     {
         $taFile = sprintf('%s/ta.key', $this->dataDir);
@@ -39,6 +48,11 @@ class TlsAuth
         return FileIO::readFile($taFile);
     }
 
+    /**
+     * @param array<int, string> $argv
+     *
+     * @return void
+     */
     private function execOpenVpn(array $argv)
     {
         $command = sprintf(

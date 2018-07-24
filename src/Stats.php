@@ -25,6 +25,9 @@ class Stats
         $this->dateTime = $dateTime;
     }
 
+    /**
+     * @return array
+     */
     public function get(array $profileIdList)
     {
         $allStatsData = [
