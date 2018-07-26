@@ -112,7 +112,7 @@ SQL
     /**
      * @param string $userId
      *
-     * @return string|null
+     * @return null|string
      */
     public function getVootToken($userId)
     {
@@ -130,6 +130,8 @@ SQL
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
+        // NULL when no voot token is set, never returns false as we always
+        // make sure the user exists...
         return $stmt->fetchColumn();
     }
 
@@ -159,21 +161,7 @@ SQL
      */
     public function hasVootToken($userId)
     {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    SELECT
-        voot_token
-    FROM 
-        users
-    WHERE 
-        user_id = :user_id
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->execute();
-
-        return null !== $stmt->fetchColumn();
+        return null !== $this->getVootToken($userId);
     }
 
     public function deleteVootToken($userId)
@@ -220,27 +208,13 @@ SQL
      */
     public function hasYubiKeyId($userId)
     {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    SELECT
-        yubi_key_id
-    FROM 
-        users
-    WHERE 
-        user_id = :user_id
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->execute();
-
-        return null !== $stmt->fetchColumn();
+        return null !== $this->getYubiKeyId($userId);
     }
 
     /**
      * @param string $userId
      *
-     * @return string|null
+     * @return null|string
      */
     public function getYubiKeyId($userId)
     {
@@ -258,6 +232,8 @@ SQL
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
+        // NULL when no yubikey id is set, never returns false as we always
+        // make sure the user exists...
         return $stmt->fetchColumn();
     }
 
@@ -429,6 +405,9 @@ SQL
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
+        // because the user always exists, this will always return something,
+        // this is why we don't need to distinguish between a successful fetch
+        // or not, a bit ugly!
         return (bool) $stmt->fetchColumn();
     }
 
