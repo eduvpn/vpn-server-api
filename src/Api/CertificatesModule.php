@@ -10,6 +10,7 @@
 namespace SURFnet\VPN\Server\Api;
 
 use DateTime;
+use SURFnet\VPN\Common\Http\ApiErrorResponse;
 use SURFnet\VPN\Common\Http\ApiResponse;
 use SURFnet\VPN\Common\Http\AuthUtils;
 use SURFnet\VPN\Common\Http\InputValidation;
@@ -116,7 +117,9 @@ class CertificatesModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
-                $certInfo = $this->storage->getUserCertificateInfo($commonName);
+                if (false === $certInfo = $this->storage->getUserCertificateInfo($commonName)) {
+                    return new ApiErrorResponse('delete_client_certificate', 'certificate does not exist');
+                }
 
                 $this->storage->addUserMessage(
                     $certInfo['user_id'],

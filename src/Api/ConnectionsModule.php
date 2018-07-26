@@ -111,7 +111,9 @@ class ConnectionsModule implements ServiceModuleInterface
         $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
         $twoFactorType = InputValidation::twoFactorType($request->getPostParameter('two_factor_type'));
 
-        $certInfo = $this->storage->getUserCertificateInfo($commonName);
+        if (false === $certInfo = $this->storage->getUserCertificateInfo($commonName)) {
+            return new ApiErrorResponse('verify_two_factor', '[VPN] certificate does not exist');
+        }
         $userId = $certInfo['user_id'];
 
         switch ($twoFactorType) {

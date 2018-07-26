@@ -69,7 +69,12 @@ class LdapProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Get the groups a user is a member of.
+     *
+     * @param string $userId the userID of the user to request the groups of
+     *
+     * @return array the groups as an array containing the keys "id" and
+     *               "displayName", empty array if no groups are available for this user
      */
     public function getGroups($userId)
     {
@@ -121,7 +126,7 @@ class LdapProvider implements ProviderInterface
         );
         if (1 !== $ldapEntries['count']) {
             // we did not find the user's DN, or too many
-            return [];
+            return '';
         }
         $userDn = $ldapEntries[0]['dn'];
 

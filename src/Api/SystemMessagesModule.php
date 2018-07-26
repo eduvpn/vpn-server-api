@@ -53,7 +53,9 @@ class SystemMessagesModule implements ServiceModuleInterface
                 // and the apps MUST interprete it as "text/plain".
                 $message = $request->getPostParameter('message_body');
 
-                return new ApiResponse('add_system_message', $this->storage->addSystemMessage($type, $message));
+                $this->storage->addSystemMessage($type, $message);
+
+                return new ApiResponse('add_system_message', true);
             }
         );
 
@@ -64,7 +66,9 @@ class SystemMessagesModule implements ServiceModuleInterface
 
                 $messageId = InputValidation::messageId($request->getPostParameter('message_id'));
 
-                return new ApiResponse('delete_system_message', $this->storage->deleteSystemMessage($messageId));
+                $this->storage->deleteSystemMessage($messageId);
+
+                return new ApiResponse('delete_system_message', true);
             }
         );
     }

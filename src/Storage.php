@@ -83,7 +83,7 @@ SQL
     /**
      * @param string $commonName
      *
-     * @return array|false
+     * @return false|array
      */
     public function getUserCertificateInfo($commonName)
     {
@@ -135,6 +135,12 @@ SQL
         return $stmt->fetchColumn();
     }
 
+    /**
+     * @param string                            $userId
+     * @param \fkooman\OAuth\Client\AccessToken $vootToken
+     *
+     * @return void
+     */
     public function setVootToken($userId, AccessToken $vootToken)
     {
         $this->addUser($userId);
@@ -164,6 +170,11 @@ SQL
         return null !== $this->getVootToken($userId);
     }
 
+    /**
+     * @param string $userId
+     *
+     * @return void
+     */
     public function deleteVootToken($userId)
     {
         $this->addUser($userId);
@@ -182,6 +193,12 @@ SQL
         $stmt->execute();
     }
 
+    /**
+     * @param string $userId
+     * @param string $yubiKeyId
+     *
+     * @return void
+     */
     public function setYubiKeyId($userId, $yubiKeyId)
     {
         $this->addUser($userId);
@@ -237,6 +254,11 @@ SQL
         return $stmt->fetchColumn();
     }
 
+    /**
+     * @param string $userId
+     *
+     * @return void
+     */
     public function deleteYubiKeyId($userId)
     {
         $this->addUser($userId);
@@ -254,6 +276,11 @@ SQL
         $stmt->execute();
     }
 
+    /**
+     * @param string $userId
+     *
+     * @return void
+     */
     public function deleteUser($userId)
     {
         $this->addUser($userId);
@@ -269,6 +296,11 @@ SQL
         $stmt->execute();
     }
 
+    /**
+     * @param string $userId
+     *
+     * @return void
+     */
     public function lastAuthenticatedAtPing($userId)
     {
         $this->addUser($userId);
@@ -288,6 +320,15 @@ SQL
         $stmt->execute();
     }
 
+    /**
+     * @param string    $userId
+     * @param string    $commonName
+     * @param string    $displayName
+     * @param \DateTime $validFrom
+     * @param \Datetime $validTo
+     *
+     * @return void
+     */
     public function addCertificate($userId, $commonName, $displayName, DateTime $validFrom, DateTime $validTo)
     {
         $this->addUser($userId);
@@ -336,6 +377,11 @@ SQL
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @param string $commonName
+     *
+     * @return void
+     */
     public function deleteCertificate($commonName)
     {
         $stmt = $this->db->prepare(
@@ -350,6 +396,11 @@ SQL
         $stmt->execute();
     }
 
+    /**
+     * @param string $userId
+     *
+     * @return void
+     */
     public function disableUser($userId)
     {
         $this->addUser($userId);
@@ -367,6 +418,11 @@ SQL
         $stmt->execute();
     }
 
+    /**
+     * @param string $userId
+     *
+     * @return void
+     */
     public function enableUser($userId)
     {
         $this->addUser($userId);
@@ -443,6 +499,15 @@ SQL
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @param string    $profileId
+     * @param string    $commonName
+     * @param string    $ip4
+     * @param string    $ip6
+     * @param \DateTime $connectedAt
+     *
+     * @return void
+     */
     public function clientConnect($profileId, $commonName, $ip4, $ip6, DateTime $connectedAt)
     {
         // update "lost" client entries when a new client connects that gets
@@ -517,6 +582,17 @@ SQL
         $stmt->execute();
     }
 
+    /**
+     * @param string    $profileId
+     * @param string    $commonName
+     * @param string    $ip4
+     * @param string    $ip6
+     * @param \DateTime $connectedAt
+     * @param \DateTime $disconnectedAt
+     * @param int       $bytesTransferred
+     *
+     * @return void
+     */
     public function clientDisconnect($profileId, $commonName, $ip4, $ip6, DateTime $connectedAt, DateTime $disconnectedAt, $bytesTransferred)
     {
         $stmt = $this->db->prepare(
@@ -552,7 +628,7 @@ SQL
     /**
      * @param string $ipAddress
      *
-     * @return array|false
+     * @return false|array
      */
     public function getLogEntry(DateTime $dateTime, $ipAddress)
     {
@@ -586,6 +662,11 @@ SQL
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @param \DateTime $dateTime
+     *
+     * @return void
+     */
     public function cleanConnectionLog(DateTime $dateTime)
     {
         $stmt = $this->db->prepare(
@@ -601,9 +682,14 @@ SQL
 
         $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
 
-        return $stmt->execute();
+        $stmt->execute();
     }
 
+    /**
+     * @param \DateTime $dateTime
+     *
+     * @return void
+     */
     public function cleanUserMessages(DateTime $dateTime)
     {
         $stmt = $this->db->prepare(
@@ -617,7 +703,7 @@ SQL
 
         $stmt->bindValue(':date_time', $dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
 
-        return $stmt->execute();
+        $stmt->execute();
     }
 
     /**
@@ -644,6 +730,12 @@ SQL
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @param string $type
+     * @param string $message
+     *
+     * @return void
+     */
     public function addSystemMessage($type, $message)
     {
         $stmt = $this->db->prepare(
@@ -661,6 +753,11 @@ SQL
         $stmt->execute();
     }
 
+    /**
+     * @param int $messageId
+     *
+     * @return void
+     */
     public function deleteSystemMessage($messageId)
     {
         $stmt = $this->db->prepare(
@@ -702,6 +799,13 @@ SQL
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @param string $userId
+     * @param string $type
+     * @param string $message
+     *
+     * @return void
+     */
     public function addUserMessage($userId, $type, $message)
     {
         $this->addUser($userId);
@@ -726,7 +830,7 @@ SQL
     /**
      * @param string $userId
      *
-     * @return array
+     * @return array<\fkooman\OAuth\Client\AccessToken>
      */
     public function getAccessTokenList($userId)
     {
@@ -741,8 +845,10 @@ SQL
     }
 
     /**
-     * @param string      $userId
-     * @param AccessToken $accessToken
+     * @param string                            $userId
+     * @param \fkooman\OAuth\Client\AccessToken $accessToken
+     *
+     * @return void
      */
     public function storeAccessToken($userId, AccessToken $accessToken)
     {
@@ -750,8 +856,10 @@ SQL
     }
 
     /**
-     * @param string      $userId
-     * @param AccessToken $accessToken
+     * @param string                            $userId
+     * @param \fkooman\OAuth\Client\AccessToken $accessToken
+     *
+     * @return void
      */
     public function deleteAccessToken($userId, AccessToken $accessToken)
     {
@@ -761,7 +869,7 @@ SQL
     /**
      * @param string $userId
      *
-     * @return false|OtpInfo
+     * @return false|\fkooman\Otp\OtpInfo
      */
     public function getOtpSecret($userId)
     {
@@ -784,8 +892,8 @@ SQL
     }
 
     /**
-     * @param string  $userId
-     * @param OtpInfo $otpInfo
+     * @param string               $userId
+     * @param \fkooman\Otp\OtpInfo $otpInfo
      *
      * @return void
      */
@@ -874,6 +982,9 @@ SQL
         $stmt->execute();
     }
 
+    /**
+     * @return void
+     */
     public function init()
     {
         $this->migration->init();
@@ -887,6 +998,11 @@ SQL
         $this->migration->run();
     }
 
+    /**
+     * @param string $userId
+     *
+     * @return void
+     */
     private function addUser($userId)
     {
         $stmt = $this->db->prepare(
