@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "602964c21fc98c6e0f73384b2c380c51",
+    "content-hash": "19b54e09e9f1a3009457b518e91ccecf",
     "packages": [
         {
             "name": "LC/openvpn-connection-manager",

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.2 (2018-07-26)
+- use `fkooman/sqlite-migrate`
+- small docblock updates
+- various small code fixes
+
 ## 1.4.1 (2018-07-23)
 - fix OTP validation at VPN connect time
 
