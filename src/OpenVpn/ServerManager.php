@@ -100,6 +100,13 @@ class ServerManager
         return 0;
     }
 
+    /**
+     * @param int $instanceNumber
+     * @param int $profileNumber
+     * @param int $processNumber
+     *
+     * @return int
+     */
     private function toPort($instanceNumber, $profileNumber, $processNumber)
     {
         // convert an instanceNumber, $profileNumber and $processNumber to a management port

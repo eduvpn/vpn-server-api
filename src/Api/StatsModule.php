@@ -22,11 +22,17 @@ class StatsModule implements ServiceModuleInterface
     /** @var string */
     private $dataDir;
 
+    /**
+     * @param string $dataDir
+     */
     public function __construct($dataDir)
     {
         $this->dataDir = $dataDir;
     }
 
+    /**
+     * @return void
+     */
     public function init(Service $service)
     {
         $service->get(

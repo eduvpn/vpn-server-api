@@ -157,6 +157,12 @@ class ConnectionsModule implements ServiceModuleInterface
         return new ApiResponse('verify_two_factor');
     }
 
+    /**
+     * @param string $profileId
+     * @param string $commonName
+     *
+     * @return \SURFnet\VPN\Common\Http\ApiErrorResponse
+     */
     private function verifyConnection($profileId, $commonName)
     {
         // verify status of certificate/user
@@ -175,6 +181,12 @@ class ConnectionsModule implements ServiceModuleInterface
         return $this->verifyAcl($profileId, $result['user_id']);
     }
 
+    /**
+     * @param string $profileId
+     * @param string $externalUserId
+     *
+     * @return true|\SURFnet\VPN\Common\Http\ApiErrorResponse
+     */
     private function verifyAcl($profileId, $externalUserId)
     {
         // verify ACL

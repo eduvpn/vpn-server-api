@@ -25,6 +25,9 @@ class VootProvider implements ProviderInterface
     /** @var string */
     private $vootUri;
 
+    /**
+     * @param string $vootUri
+     */
     public function __construct(OAuthClient $client, Provider $provider, $vootUri)
     {
         $this->client = $client;
@@ -43,6 +46,11 @@ class VootProvider implements ProviderInterface
         );
     }
 
+    /**
+     * @param string $userId
+     *
+     * @return array
+     */
     private function fetchGroups($userId)
     {
         try {

@@ -131,6 +131,9 @@ class EasyRsaCa implements CaInterface
         return $this->certInfo($commonName);
     }
 
+    /**
+     * @param string $commonName
+     */
     private function certInfo($commonName)
     {
         $certData = $this->readCertificate(sprintf('%s/pki/issued/%s.crt', $this->easyRsaDataDir, $commonName));
@@ -146,6 +149,9 @@ class EasyRsaCa implements CaInterface
         ];
     }
 
+    /**
+     * @param string $certFile
+     */
     private function readCertificate($certFile)
     {
         // strip junk before and after actual certificate
@@ -157,6 +163,9 @@ class EasyRsaCa implements CaInterface
         return $matches[1];
     }
 
+    /**
+     * @param string $keyFile
+     */
     private function readKey($keyFile)
     {
         // strip whitespace before and after actual key
@@ -165,6 +174,9 @@ class EasyRsaCa implements CaInterface
         );
     }
 
+    /**
+     * @param string $commonName
+     */
     private function hasCert($commonName)
     {
         return @file_exists(
