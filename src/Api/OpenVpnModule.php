@@ -32,10 +32,16 @@ class OpenVpnModule implements ServiceModuleInterface
         $this->storage = $storage;
     }
 
+    /**
+     * @return void
+     */
     public function init(Service $service)
     {
         $service->get(
             '/client_connections',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
@@ -58,6 +64,9 @@ class OpenVpnModule implements ServiceModuleInterface
 
         $service->post(
             '/kill_client',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
 

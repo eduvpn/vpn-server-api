@@ -27,10 +27,16 @@ class SystemMessagesModule implements ServiceModuleInterface
         $this->storage = $storage;
     }
 
+    /**
+     * @return void
+     */
     public function init(Service $service)
     {
         $service->get(
             '/system_messages',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
 
@@ -42,6 +48,9 @@ class SystemMessagesModule implements ServiceModuleInterface
 
         $service->post(
             '/add_system_message',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
@@ -61,6 +70,9 @@ class SystemMessagesModule implements ServiceModuleInterface
 
         $service->post(
             '/delete_system_message',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 

@@ -37,7 +37,7 @@ class ServerManager
     }
 
     /**
-     * Get the connection information about connected clients.
+     * @return array
      */
     public function connections()
     {

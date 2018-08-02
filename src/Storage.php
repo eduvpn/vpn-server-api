@@ -325,7 +325,7 @@ SQL
      * @param string    $commonName
      * @param string    $displayName
      * @param \DateTime $validFrom
-     * @param \Datetime $validTo
+     * @param \DateTime $validTo
      *
      * @return void
      */

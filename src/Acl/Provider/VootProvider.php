@@ -78,6 +78,9 @@ class VootProvider implements ProviderInterface
         return $response->json();
     }
 
+    /**
+     * @return array
+     */
     private static function extractMembership(array $responseData)
     {
         $memberOf = [];
@@ -102,6 +105,9 @@ class VootProvider implements ProviderInterface
         return $memberOf;
     }
 
+    /**
+     * @return string
+     */
     private static function getDisplayName(array $groupEntry)
     {
         if (!array_key_exists('displayName', $groupEntry)) {

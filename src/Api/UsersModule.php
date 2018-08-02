@@ -42,10 +42,16 @@ class UsersModule implements ServiceModuleInterface
         $this->groupProviders = $groupProviders;
     }
 
+    /**
+     * @return void
+     */
     public function init(Service $service)
     {
         $service->get(
             '/user_list',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
@@ -55,6 +61,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/set_yubi_key_id',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
@@ -84,6 +93,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/verify_yubi_key_otp',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
@@ -114,6 +126,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->get(
             '/has_yubi_key_id',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
@@ -125,6 +140,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->get(
             '/yubi_key_id',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
@@ -141,6 +159,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/delete_yubi_key_id',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
@@ -156,6 +177,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/set_totp_secret',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
@@ -185,6 +209,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/verify_totp_key',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
@@ -212,6 +239,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->get(
             '/has_totp_secret',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
@@ -223,6 +253,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/delete_totp_secret',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
@@ -237,6 +270,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/set_voot_token',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
@@ -252,6 +288,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/delete_voot_token',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
@@ -264,6 +303,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->get(
             '/has_voot_token',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
@@ -275,6 +317,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->get(
             '/is_disabled_user',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
 
@@ -286,6 +331,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/disable_user',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
@@ -300,6 +348,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/enable_user',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
@@ -314,6 +365,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/delete_user',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
@@ -326,6 +380,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->get(
             '/user_groups',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
@@ -342,6 +399,9 @@ class UsersModule implements ServiceModuleInterface
 
         $service->post(
             '/last_authenticated_at_ping',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 

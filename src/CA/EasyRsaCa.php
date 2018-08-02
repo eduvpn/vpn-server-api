@@ -38,6 +38,9 @@ class EasyRsaCa implements CaInterface
         $this->init();
     }
 
+    /**
+     * @return void
+     */
     public function init()
     {
         FileIO::createDir($this->easyRsaDataDir, 0700);
@@ -133,6 +136,8 @@ class EasyRsaCa implements CaInterface
 
     /**
      * @param string $commonName
+     *
+     * @return array<string,string>
      */
     private function certInfo($commonName)
     {
@@ -151,6 +156,8 @@ class EasyRsaCa implements CaInterface
 
     /**
      * @param string $certFile
+     *
+     * @return string
      */
     private function readCertificate($certFile)
     {
@@ -165,6 +172,8 @@ class EasyRsaCa implements CaInterface
 
     /**
      * @param string $keyFile
+     *
+     * @return string
      */
     private function readKey($keyFile)
     {
@@ -176,6 +185,8 @@ class EasyRsaCa implements CaInterface
 
     /**
      * @param string $commonName
+     *
+     * @return bool
      */
     private function hasCert($commonName)
     {
@@ -188,6 +199,9 @@ class EasyRsaCa implements CaInterface
         );
     }
 
+    /**
+     * @return void
+     */
     private function execEasyRsa(array $argv)
     {
         $command = sprintf(

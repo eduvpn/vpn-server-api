@@ -27,11 +27,17 @@ class InfoModule implements ServiceModuleInterface
         $this->config = $config;
     }
 
+    /**
+     * @return void
+     */
     public function init(Service $service)
     {
         /* INFO */
         $service->get(
             '/instance_number',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
@@ -41,6 +47,9 @@ class InfoModule implements ServiceModuleInterface
 
         $service->get(
             '/profile_list',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
 

@@ -27,10 +27,16 @@ class LogModule implements ServiceModuleInterface
         $this->storage = $storage;
     }
 
+    /**
+     * @return void
+     */
     public function init(Service $service)
     {
         $service->get(
             '/log',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 

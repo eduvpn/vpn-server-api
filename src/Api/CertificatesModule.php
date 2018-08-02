@@ -44,11 +44,17 @@ class CertificatesModule implements ServiceModuleInterface
         $this->random = $random;
     }
 
+    /**
+     * @return void
+     */
     public function init(Service $service)
     {
         /* CERTIFICATES */
         $service->post(
             '/add_client_certificate',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
@@ -83,6 +89,9 @@ class CertificatesModule implements ServiceModuleInterface
          */
         $service->get(
             '/server_info',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
@@ -97,6 +106,9 @@ class CertificatesModule implements ServiceModuleInterface
 
         $service->post(
             '/add_server_certificate',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
@@ -113,6 +125,9 @@ class CertificatesModule implements ServiceModuleInterface
 
         $service->post(
             '/delete_client_certificate',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
@@ -133,6 +148,9 @@ class CertificatesModule implements ServiceModuleInterface
 
         $service->get(
             '/client_certificate_list',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
@@ -144,6 +162,9 @@ class CertificatesModule implements ServiceModuleInterface
 
         $service->get(
             '/client_certificate_info',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 

@@ -117,6 +117,10 @@ class LdapProvider implements ProviderInterface
             return str_replace('{{UID}}', LdapClient::escapeFilter($userId), $this->memberFilterTemplate);
         }
 
+        if (null === $this->userIdFilterTemplate) {
+            return '';
+        }
+
         // we first have to determine the user DN as we can't directly use
         // the userId in the memberFilter
         $userIdFilter = str_replace('{{UID}}', LdapClient::escapeFilter($userId), $this->userIdFilterTemplate);

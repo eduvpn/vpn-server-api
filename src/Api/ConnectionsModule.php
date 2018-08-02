@@ -43,10 +43,16 @@ class ConnectionsModule implements ServiceModuleInterface
         $this->groupProviders = $groupProviders;
     }
 
+    /**
+     * @return void
+     */
     public function init(Service $service)
     {
         $service->post(
             '/connect',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
@@ -56,6 +62,9 @@ class ConnectionsModule implements ServiceModuleInterface
 
         $service->post(
             '/disconnect',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
@@ -65,6 +74,9 @@ class ConnectionsModule implements ServiceModuleInterface
 
         $service->post(
             '/verify_two_factor',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
@@ -73,6 +85,9 @@ class ConnectionsModule implements ServiceModuleInterface
         );
     }
 
+    /**
+     * @return \SURFnet\VPN\Common\Http\Response
+     */
     public function connect(Request $request)
     {
         $profileId = InputValidation::profileId($request->getPostParameter('profile_id'));
@@ -81,7 +96,7 @@ class ConnectionsModule implements ServiceModuleInterface
         $ip6 = InputValidation::ip6($request->getPostParameter('ip6'));
         $connectedAt = InputValidation::connectedAt($request->getPostParameter('connected_at'));
 
-        if (true !== $response = $this->verifyConnection($profileId, $commonName)) {
+        if (null !== $response = $this->verifyConnection($profileId, $commonName)) {
             return $response;
         }
 
@@ -90,6 +105,9 @@ class ConnectionsModule implements ServiceModuleInterface
         return new ApiResponse('connect');
     }
 
+    /**
+     * @return \SURFnet\VPN\Common\Http\Response
+     */
     public function disconnect(Request $request)
     {
         $profileId = InputValidation::profileId($request->getPostParameter('profile_id'));
@@ -106,6 +124,9 @@ class ConnectionsModule implements ServiceModuleInterface
         return new ApiResponse('disconnect');
     }
 
+    /**
+     * @return \SURFnet\VPN\Common\Http\Response
+     */
     public function verifyTwoFactor(Request $request)
     {
         $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
@@ -161,7 +182,7 @@ class ConnectionsModule implements ServiceModuleInterface
      * @param string $profileId
      * @param string $commonName
      *
-     * @return \SURFnet\VPN\Common\Http\ApiErrorResponse
+     * @return null|\SURFnet\VPN\Common\Http\ApiErrorResponse
      */
     private function verifyConnection($profileId, $commonName)
     {
@@ -185,7 +206,7 @@ class ConnectionsModule implements ServiceModuleInterface
      * @param string $profileId
      * @param string $externalUserId
      *
-     * @return true|\SURFnet\VPN\Common\Http\ApiErrorResponse
+     * @return null|\SURFnet\VPN\Common\Http\ApiErrorResponse
      */
     private function verifyAcl($profileId, $externalUserId)
     {
@@ -206,9 +227,12 @@ class ConnectionsModule implements ServiceModuleInterface
             }
         }
 
-        return true;
+        return null;
     }
 
+    /**
+     * @return bool
+     */
     private static function isMember(array $memberOf, array $aclGroupList)
     {
         //        var_dump($aclGroupList);
