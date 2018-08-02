@@ -16,7 +16,6 @@ use fkooman\Otp\OtpInfo;
 use fkooman\Otp\OtpStorageInterface;
 use fkooman\SqliteMigrate\Migration;
 use PDO;
-use PDOException;
 
 class Storage implements TokenStorageInterface, OtpStorageInterface
 {

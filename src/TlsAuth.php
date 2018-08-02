@@ -68,7 +68,7 @@ class TlsAuth
 
         if (0 !== $returnValue) {
             throw new RuntimeException(
-                sprintf('command "%s" did not complete successfully: "%s"', $command, $commandOutput)
+                sprintf('command "%s" did not complete successfully: "%s"', $command, implode(PHP_EOL, $commandOutput))
             );
         }
     }
