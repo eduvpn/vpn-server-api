@@ -142,7 +142,9 @@ class CertificatesModule implements ServiceModuleInterface
                     sprintf('certificate "%s" deleted by user', $certInfo['display_name'])
                 );
 
-                return new ApiResponse('delete_client_certificate', $this->storage->deleteCertificate($commonName));
+                $this->storage->deleteCertificate($commonName);
+
+                return new ApiResponse('delete_client_certificate');
             }
         );
 
