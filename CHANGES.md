@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.3 (2018-08-05)
+- many `vimeo/psalm` fixes
+- add `psr/log` dependency
+
 ## 1.4.2 (2018-07-26)
 - use `fkooman/sqlite-migrate`
 - small docblock updates
