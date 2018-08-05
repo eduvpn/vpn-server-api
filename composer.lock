@@ -46,16 +46,16 @@
         },
         {
             "name": "eduvpn/common",
-            "version": "1.1.16",
+            "version": "1.1.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "21bf30aa87b535cb1f79d2927a928e8c699beef5"
+                "reference": "6e282a7bf20a4a72241cf2575978b27bc9226fac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/21bf30aa87b535cb1f79d2927a928e8c699beef5",
-                "reference": "21bf30aa87b535cb1f79d2927a928e8c699beef5",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/6e282a7bf20a4a72241cf2575978b27bc9226fac",
+                "reference": "6e282a7bf20a4a72241cf2575978b27bc9226fac",
                 "shasum": ""
             },
             "require": {
@@ -92,7 +92,7 @@
                 }
             },
             "license": [
-                "AGPL-3.0"
+                "AGPL-3.0-or-later"
             ],
             "authors": [
                 {
@@ -101,7 +101,11 @@
                 }
             ],
             "description": "Common VPN library",
-            "time": "2018-06-06T09:53:57+00:00"
+            "support": {
+                "email": "eduvpn@surfnet.nl",
+                "source": "https://github.com/eduvpn/vpn-lib-common"
+            },
+            "time": "2018-08-05T10:49:36+00:00"
         },
         {
             "name": "fkooman/oauth2-client",
@@ -1473,16 +1477,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.2.7",
+            "version": "7.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "8e878aff7917ef66e702e03d1359b16eee254e2c"
+                "reference": "0b6b29faf95c03fd7867e866438b78d5692b6f03"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/8e878aff7917ef66e702e03d1359b16eee254e2c",
-                "reference": "8e878aff7917ef66e702e03d1359b16eee254e2c",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/0b6b29faf95c03fd7867e866438b78d5692b6f03",
+                "reference": "0b6b29faf95c03fd7867e866438b78d5692b6f03",
                 "shasum": ""
             },
             "require": {
@@ -1527,7 +1531,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "7.2-dev"
+                    "dev-master": "7.3-dev"
                 }
             },
             "autoload": {
@@ -1553,7 +1557,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-07-15T05:20:50+00:00"
+            "time": "2018-08-03T06:02:45+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
