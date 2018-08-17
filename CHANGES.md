@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.4 (...)
+- update for new vpn-lib-common API
+- cleanup autoloader so Psalm will be able to verify the scripts in web and bin
+  folder
+
 ## 1.4.3 (2018-08-05)
 - many `vimeo/psalm` fixes
 - add `psr/log` dependency

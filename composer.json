@@ -40,7 +40,7 @@
     ],
     "require": {
         "LC/openvpn-connection-manager": "^1",
-        "eduvpn/common": "^1",
+        "eduvpn/common": "dev-master",
         "ext-curl": "*",
         "ext-date": "*",
         "ext-json": "*",
