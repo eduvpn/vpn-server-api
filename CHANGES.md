@@ -4,6 +4,9 @@
 - update for new vpn-lib-common API
 - cleanup autoloader so Psalm will be able to verify the scripts in web and bin
   folder
+- bind issued certificates/keys to OAuth client ID when requested through API
+- use foreign key on `otp` and `otp_log` tables that removes OTP information
+  when the user is deleted (issue #71)
 
 ## 1.4.3 (2018-08-05)
 - many `vimeo/psalm` fixes

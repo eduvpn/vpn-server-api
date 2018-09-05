@@ -36,14 +36,16 @@ class StorageTest extends TestCase
             'common_name',
             'display_name',
             new DateTime('2018-01-01 00:00:00'),
-            new DateTime('2018-06-06 00:00:00')
+            new DateTime('2018-06-06 00:00:00'),
+            null
         );
         $this->storage->addCertificate(
             'other_user_id',
             'other_common_name',
             'other_display_name',
             new DateTime('2018-01-01 00:00:00'),
-            new DateTime('2018-06-06 00:00:00')
+            new DateTime('2018-06-06 00:00:00'),
+            null
         );
     }
 

@@ -1,0 +1,30 @@
+ALTER TABLE otp RENAME TO _otp;
+CREATE TABLE otp(
+  user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  otp_secret VARCHAR(255) NOT NULL,
+  otp_hash_algorithm VARCHAR(255) NOT NULL,
+  otp_digits INTEGER NOT NULL,
+  totp_period INTEGER NOT NULL
+);
+INSERT INTO otp (user_id, otp_secret, otp_hash_algorithm, otp_digits, totp_period) SELECT user_id, otp_secret, otp_hash_algorithm, otp_digits, totp_period FROM _otp;
+DROP TABLE _otp;
+ALTER TABLE otp_log RENAME TO _otp_log;
+CREATE TABLE otp_log(
+  user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  otp_key VARCHAR(255) NOT NULL,
+  date_time DATETIME NOT NULL,
+  UNIQUE(user_id, otp_key)
+);
+INSERT INTO otp_log (user_id, otp_key, date_time) SELECT user_id, otp_key, date_time FROM _otp_log;
+DROP TABLE _otp_log;
+ALTER TABLE certificates RENAME TO _certificates;
+CREATE TABLE certificates(
+  common_name VARCHAR(255) UNIQUE NOT NULL,
+  display_name VARCHAR(255) NOT NULL,
+  valid_from DATETIME NOT NULL,
+  valid_to DATETIME NOT NULL,
+  client_id VARCHAR(255) DEFAULT NULL,
+  user_id VARCHAR(255) NOT NULL REFERENCES users(user_id) ON DELETE CASCADE
+);
+INSERT INTO certificates (common_name, display_name, valid_from, valid_to, client_id, user_id) SELECT common_name, display_name, valid_from, valid_to, NULL, user_id FROM _certificates;
+DROP TABLE _certificates;

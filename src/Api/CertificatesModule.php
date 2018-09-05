@@ -60,6 +60,10 @@ class CertificatesModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
                 $displayName = InputValidation::displayName($request->getPostParameter('display_name'));
+                $clientId = $request->getPostParameter('client_id', false);
+                if (null !== $clientId) {
+                    $clientId = InputValidation::clientId($clientId);
+                }
 
                 // generate a random string as the certificate's CN
                 $commonName = $this->random->get(16);
@@ -70,7 +74,8 @@ class CertificatesModule implements ServiceModuleInterface
                     $commonName,
                     $displayName,
                     new DateTime(sprintf('@%d', $certInfo['valid_from'])),
-                    new DateTime(sprintf('@%d', $certInfo['valid_to']))
+                    new DateTime(sprintf('@%d', $certInfo['valid_to'])),
+                    $clientId
                 );
 
                 $this->storage->addUserMessage(
@@ -145,6 +150,29 @@ class CertificatesModule implements ServiceModuleInterface
                 $this->storage->deleteCertificate($commonName);
 
                 return new ApiResponse('delete_client_certificate');
+            }
+        );
+
+        $service->post(
+            '/delete_client_certificates_of_client_id',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+
+                $userId = InputValidation::userId($request->getPostParameter('user_id'));
+                $clientId = InputValidation::clientId($request->getPostParameter('client_id'));
+
+                $this->storage->addUserMessage(
+                    $userId,
+                    'notification',
+                    sprintf('certificates for OAuth client "%s" deleted', $clientId)
+                );
+
+                $this->storage->deleteCertificatesOfClientId($userId, $clientId);
+
+                return new ApiResponse('delete_client_certificates_of_client_id');
             }
         );
 

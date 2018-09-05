@@ -19,7 +19,7 @@ use PDO;
 
 class Storage implements TokenStorageInterface, OtpStorageInterface
 {
-    const CURRENT_SCHEMA_VERSION = '2018071901';
+    const CURRENT_SCHEMA_VERSION = '2018090501';
 
     /** @var \PDO */
     private $db;
@@ -320,23 +320,24 @@ SQL
     }
 
     /**
-     * @param string    $userId
-     * @param string    $commonName
-     * @param string    $displayName
-     * @param \DateTime $validFrom
-     * @param \DateTime $validTo
+     * @param string      $userId
+     * @param string      $commonName
+     * @param string      $displayName
+     * @param \DateTime   $validFrom
+     * @param \DateTime   $validTo
+     * @param null|string $clientId
      *
      * @return void
      */
-    public function addCertificate($userId, $commonName, $displayName, DateTime $validFrom, DateTime $validTo)
+    public function addCertificate($userId, $commonName, $displayName, DateTime $validFrom, DateTime $validTo, $clientId)
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     INSERT INTO certificates 
-        (common_name, user_id, display_name, valid_from, valid_to)
+        (common_name, user_id, display_name, valid_from, valid_to, client_id)
     VALUES
-        (:common_name, :user_id, :display_name, :valid_from, :valid_to)
+        (:common_name, :user_id, :display_name, :valid_from, :valid_to, :client_id)
 SQL
         );
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
@@ -344,6 +345,7 @@ SQL
         $stmt->bindValue(':display_name', $displayName, PDO::PARAM_STR);
         $stmt->bindValue(':valid_from', $validFrom->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->bindValue(':valid_to', $validTo->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':client_id', $clientId, PDO::PARAM_STR | PDO::PARAM_NULL);
         $stmt->execute();
     }
 
@@ -392,6 +394,29 @@ SQL
 SQL
         );
         $stmt->bindValue(':common_name', $commonName, PDO::PARAM_STR);
+        $stmt->execute();
+    }
+
+    /**
+     * @param string $userId
+     * @param string $clientId
+     *
+     * @return void
+     */
+    public function deleteCertificatesOfClientId($userId, $clientId)
+    {
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    DELETE FROM 
+        certificates 
+    WHERE 
+        user_id = :user_id 
+    AND 
+        client_id = :client_id
+SQL
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->bindValue(':client_id', $clientId, PDO::PARAM_STR);
         $stmt->execute();
     }
 
