@@ -93,7 +93,8 @@ SQL
         u.is_disabled AS user_is_disabled,
         c.display_name AS display_name,
         c.valid_from,
-        c.valid_to
+        c.valid_to,
+        c.client_id
     FROM 
         users u, certificates c 
     WHERE 

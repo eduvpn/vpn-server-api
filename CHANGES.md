@@ -8,6 +8,7 @@
 - use foreign key on `otp` and `otp_log` tables that removes OTP information
   when the user is deleted (issue #71)
 - add `useLocalDns` configuration option to the configuration template
+- add filtering for `/client_connections` by `user_id` and `client_id`
 
 ## 1.4.3 (2018-08-05)
 - many `vimeo/psalm` fixes

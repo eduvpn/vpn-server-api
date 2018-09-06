@@ -85,6 +85,7 @@ class OpenVpnModuleTest extends TestCase
                             'display_name' => 'Display Name',
                             'valid_from' => '1970-05-23 21:21:18',
                             'valid_to' => '1970-09-29 11:46:29',
+                            'client_id' => null,
                         ],
                         [
                             'common_name' => '78f4a3c26062a434b01892e2b23126d1',
@@ -97,6 +98,7 @@ class OpenVpnModuleTest extends TestCase
                             'display_name' => 'Display Name 2',
                             'valid_from' => '1970-05-23 21:21:18',
                             'valid_to' => '1970-09-29 11:46:29',
+                            'client_id' => null,
                         ],
                     ],
                 ],

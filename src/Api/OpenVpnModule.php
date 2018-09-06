@@ -45,6 +45,13 @@ class OpenVpnModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
+                if (null !== $userId = $request->getQueryParameter('user_id', false)) {
+                    $userId = InputValidation::userId($userId);
+                }
+                if (null !== $clientId = $request->getQueryParameter('client_id', false)) {
+                    $clientId = InputValidation::clientId($clientId);
+                }
+
                 $clientConnections = $this->serverManager->connections();
                 // add user information to connection information
                 foreach ($clientConnections as $k => $v) {
@@ -54,6 +61,21 @@ class OpenVpnModule implements ServiceModuleInterface
                             unset($clientConnections[$k]['connections'][$k1]);
                             continue;
                         }
+                        if (null !== $userId) {
+                            // filter by userId
+                            if ($userId !== $certInfo['user_id']) {
+                                unset($clientConnections[$k]['connections'][$k1]);
+                                continue;
+                            }
+                        }
+                        if (null !== $clientId) {
+                            // filter by clientId
+                            if ($clientId !== $certInfo['client_id']) {
+                                unset($clientConnections[$k]['connections'][$k1]);
+                                continue;
+                            }
+                        }
+
                         $clientConnections[$k]['connections'][$k1] = array_merge($v2, $certInfo);
                     }
                 }
