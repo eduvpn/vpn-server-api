@@ -91,6 +91,10 @@ return [
             // Quad9 (https://www.quad9.net)
             'dns' => ['9.9.9.9', '2620:fe::fe'],
 
+            // Push the IPv4 and IPv6 gateway as DNS servers to the client, only
+            // when defaultGateway is true, overrides "dns" configuration option
+            'useLocalDns' => false,
+
             // Whether or not to enable two-factor authentication
             // DEFAULT = false
             'twoFactor' => false,
