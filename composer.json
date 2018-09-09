@@ -41,10 +41,8 @@
     "require": {
         "LC/openvpn-connection-manager": "^1",
         "eduvpn/common": "dev-master",
-        "ext-curl": "*",
         "ext-date": "*",
         "ext-json": "*",
-        "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-pcre": "*",
         "ext-pdo": "*",

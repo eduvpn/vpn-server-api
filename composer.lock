@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9550d37a2961bd2129b797f89ec76c39",
+    "content-hash": "6652445b916d16082e2337a5fbfe63a7",
     "packages": [
         {
             "name": "LC/openvpn-connection-manager",
@@ -1480,16 +1480,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.3.4",
+            "version": "7.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "0356331bf62896dc56e3a15030b23b73f38b2935"
+                "reference": "7b331efabbb628c518c408fdfcaf571156775de2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/0356331bf62896dc56e3a15030b23b73f38b2935",
-                "reference": "0356331bf62896dc56e3a15030b23b73f38b2935",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/7b331efabbb628c518c408fdfcaf571156775de2",
+                "reference": "7b331efabbb628c518c408fdfcaf571156775de2",
                 "shasum": ""
             },
             "require": {
@@ -1560,7 +1560,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-09-05T09:58:53+00:00"
+            "time": "2018-09-08T15:14:29+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -2224,10 +2224,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "ext-curl": "*",
         "ext-date": "*",
         "ext-json": "*",
-        "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-pcre": "*",
         "ext-pdo": "*",
