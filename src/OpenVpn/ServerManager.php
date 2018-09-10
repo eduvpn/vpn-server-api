@@ -52,7 +52,7 @@ class ServerManager
 
             $profileConnections = [];
             $socketAddressList = [];
-            for ($i = 0; $i < count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
+            for ($i = 0; $i < \count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
                 $socketAddressList[] = sprintf(
                     'tcp://%s:%d',
                     $managementIp,
@@ -84,7 +84,7 @@ class ServerManager
             $profileNumber = $profileConfig->getItem('profileNumber');
 
             $socketAddressList = [];
-            for ($i = 0; $i < count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
+            for ($i = 0; $i < \count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
                 $socketAddressList[] = sprintf(
                     'tcp://%s:%d',
                     $managementIp,

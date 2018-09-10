@@ -34,7 +34,7 @@ class StaticProvider implements ProviderInterface
         $groupIdList = array_keys($this->config->toArray());
         foreach ($groupIdList as $groupId) {
             $memberList = $this->config->getSection($groupId)->getSection('members')->toArray();
-            if (!in_array($userId, $memberList, true)) {
+            if (!\in_array($userId, $memberList, true)) {
                 continue;
             }
 

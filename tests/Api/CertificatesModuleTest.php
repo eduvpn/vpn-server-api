@@ -45,7 +45,7 @@ class CertificatesModuleTest extends TestCase
             new CertificatesModule(
                 new TestCa(),
                 $storage,
-                new TlsAuth(sprintf('%s/data', dirname(__DIR__))),
+                new TlsAuth(sprintf('%s/data', \dirname(__DIR__))),
                 $random
             )
         );

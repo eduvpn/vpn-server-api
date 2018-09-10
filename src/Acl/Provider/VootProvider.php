@@ -85,13 +85,13 @@ class VootProvider implements ProviderInterface
     {
         $memberOf = [];
         foreach ($responseData as $groupEntry) {
-            if (!is_array($groupEntry)) {
+            if (!\is_array($groupEntry)) {
                 continue;
             }
             if (!array_key_exists('id', $groupEntry)) {
                 continue;
             }
-            if (!is_string($groupEntry['id'])) {
+            if (!\is_string($groupEntry['id'])) {
                 continue;
             }
             $displayName = self::getDisplayName($groupEntry);
@@ -114,11 +114,11 @@ class VootProvider implements ProviderInterface
             return $groupEntry['id'];
         }
 
-        if (is_string($groupEntry['displayName'])) {
+        if (\is_string($groupEntry['displayName'])) {
             return $groupEntry['displayName'];
         }
 
-        if (is_array($groupEntry['displayName'])) {
+        if (\is_array($groupEntry['displayName'])) {
             if (array_key_exists('en', $groupEntry['displayName'])) {
                 return $groupEntry['displayName']['en'];
             }

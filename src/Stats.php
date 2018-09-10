@@ -75,12 +75,12 @@ class Stats
                 }
 
                 // unique user list per day
-                if (!in_array($userId, $statsData[$dateOfConnection]['unique_user_list'], true)) {
+                if (!\in_array($userId, $statsData[$dateOfConnection]['unique_user_list'], true)) {
                     $statsData[$dateOfConnection]['unique_user_list'][] = $userId;
                 }
 
                 // unique user list for the whole logging period
-                if (!in_array($userId, $uniqueUsers, true)) {
+                if (!\in_array($userId, $uniqueUsers, true)) {
                     $uniqueUsers[] = $userId;
                 }
             }
@@ -108,7 +108,7 @@ class Stats
             // key and determine total amount of traffic
             foreach ($statsData as $date => $entry) {
                 $statsData[$date]['date'] = $date;
-                $statsData[$date]['unique_user_count'] = count($entry['unique_user_list']);
+                $statsData[$date]['unique_user_count'] = \count($entry['unique_user_list']);
                 unset($statsData[$date]['unique_user_list']);
                 $totalTraffic += $entry['bytes_transferred'];
             }
@@ -118,7 +118,7 @@ class Stats
                 'total_traffic' => $totalTraffic,
                 'max_concurrent_connections' => $maxConcurrentConnections,
                 'max_concurrent_connections_time' => $maxConcurrentConnectionsTime,
-                'unique_user_count' => count($uniqueUsers),
+                'unique_user_count' => \count($uniqueUsers),
             ];
         }
 
