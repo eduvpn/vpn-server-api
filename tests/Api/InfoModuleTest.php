@@ -74,7 +74,6 @@ class InfoModuleTest extends TestCase
                       ],
                       'tlsProtection' => 'tls-auth',
                       'twoFactor' => false,
-                      'useLocalDns' => false,
                       'vpnProtoPorts' => [
                         0 => 'udp/1194',
                         1 => 'tcp/1194',

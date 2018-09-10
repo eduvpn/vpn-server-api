@@ -83,17 +83,15 @@ return [
             // DEFAULT = []
             'routes' => [],
 
-            // IPv4 and IPv6 address of DNS server(s) to push to the client, only
-            // used when defaultGateway is true
+            // IPv4 and IPv6 address of DNS server(s) to push to the client.
+            // if you leave it empty, i.e. [], it will be automatically filled
+            // with the IPv4 and IPv6 gateway address
+            // NOTE: only used when defaultGateway is true!
             // DEFAULT  = []
             // Google Public DNS (https://developers.google.com/speed/public-dns/)
             //'dns' => ['8.8.8.8', '8.8.4.4', '2001:4860:4860::8888', '2001:4860:4860::8844'],
             // Quad9 (https://www.quad9.net)
             'dns' => ['9.9.9.9', '2620:fe::fe'],
-
-            // Push the IPv4 and IPv6 gateway as DNS servers to the client, only
-            // when defaultGateway is true, overrides "dns" configuration option
-            'useLocalDns' => false,
 
             // Whether or not to enable two-factor authentication
             // DEFAULT = false
