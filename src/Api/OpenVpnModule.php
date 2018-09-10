@@ -43,7 +43,7 @@ class OpenVpnModule implements ServiceModuleInterface
              * @return \SURFnet\VPN\Common\Http\Response
              */
             function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
 
                 if (null !== $userId = $request->getQueryParameter('user_id', false)) {
                     $userId = InputValidation::userId($userId);
