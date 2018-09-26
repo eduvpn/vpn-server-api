@@ -79,6 +79,7 @@ class StorageTest extends TestCase
                 'has_yubi_key_id' => false,
                 'has_totp_secret' => false,
                 'last_authenticated_at' => null,
+                'entitlement_list' => [],
             ],
             $this->storage->getUsers()[0]
         );

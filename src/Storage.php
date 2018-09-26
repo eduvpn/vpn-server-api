@@ -19,7 +19,7 @@ use PDO;
 
 class Storage implements TokenStorageInterface, OtpStorageInterface
 {
-    const CURRENT_SCHEMA_VERSION = '2018090501';
+    const CURRENT_SCHEMA_VERSION = '2018092601';
 
     /** @var \PDO */
     private $db;
@@ -58,6 +58,7 @@ class Storage implements TokenStorageInterface, OtpStorageInterface
         (SELECT otp_secret FROM otp WHERE user_id = users.user_id) AS otp_secret,
         yubi_key_id,
         last_authenticated_at,
+        entitlement_list, 
         is_disabled
     FROM 
         users
@@ -73,6 +74,7 @@ SQL
                 'has_yubi_key_id' => null !== $row['yubi_key_id'],
                 'has_totp_secret' => null !== $row['otp_secret'],
                 'last_authenticated_at' => $row['last_authenticated_at'],
+                'entitlement_list' => json_decode($row['entitlement_list'], true),
             ];
         }
 
@@ -297,11 +299,12 @@ SQL
     }
 
     /**
-     * @param string $userId
+     * @param string        $userId
+     * @param array<string> $entitlementList
      *
      * @return void
      */
-    public function lastAuthenticatedAtPing($userId)
+    public function lastAuthenticatedAtPing($userId, array $entitlementList)
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
@@ -309,13 +312,15 @@ SQL
     UPDATE
         users
     SET
-        last_authenticated_at = :last_authenticated_at
+        last_authenticated_at = :last_authenticated_at,
+        entitlement_list = :entitlement_list
     WHERE
         user_id = :user_id
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->bindValue(':last_authenticated_at', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':entitlement_list', json_encode($entitlementList), PDO::PARAM_STR);
 
         $stmt->execute();
     }

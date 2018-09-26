@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.5 (..)
+- also cache the entitlements of a particular user together with the last
+  time the user authenticated
+
 ## 1.4.4 (2018-09-10)
 - update for new vpn-lib-common API
 - cleanup autoloader so Psalm will be able to verify the scripts in web and bin

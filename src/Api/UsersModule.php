@@ -406,7 +406,8 @@ class UsersModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $this->storage->lastAuthenticatedAtPing($userId);
+                $entitlementList = InputValidation::entitlementList($request->getPostParameter('entitlement_list'));
+                $this->storage->lastAuthenticatedAtPing($userId, $entitlementList);
 
                 return new ApiResponse('last_authenticated_at_ping');
             }

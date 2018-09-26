@@ -108,6 +108,7 @@ class UsersModuleTest extends TestCase
                     'has_yubi_key_id' => false,
                     'has_totp_secret' => false,
                     'last_authenticated_at' => null,
+                    'entitlement_list' => [],
                 ],
                 [
                     'user_id' => 'bar',
@@ -115,6 +116,7 @@ class UsersModuleTest extends TestCase
                     'has_yubi_key_id' => false,
                     'has_totp_secret' => true,
                     'last_authenticated_at' => null,
+                    'entitlement_list' => [],
                 ],
                 [
                     'user_id' => 'baz',
@@ -122,6 +124,7 @@ class UsersModuleTest extends TestCase
                     'has_yubi_key_id' => false,
                     'has_totp_secret' => true,
                     'last_authenticated_at' => null,
+                    'entitlement_list' => [],
                 ],
             ],
             $this->makeRequest(
@@ -384,7 +387,7 @@ class UsersModuleTest extends TestCase
                 'POST',
                 'last_authenticated_at_ping',
                 [],
-                ['user_id' => 'foo']
+                ['user_id' => 'foo', 'entitlement_list' => '[]']
             )
         );
         $this->assertSame(
@@ -394,6 +397,7 @@ class UsersModuleTest extends TestCase
                 'has_yubi_key_id' => false,
                 'has_totp_secret' => false,
                 'last_authenticated_at' => '2018-01-01 01:00:00',
+                'entitlement_list' => [],
             ],
             $this->makeRequest(
                 ['vpn-admin-portal', 'bbccdd'],
