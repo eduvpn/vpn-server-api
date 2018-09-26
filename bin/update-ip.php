@@ -19,11 +19,11 @@ use SURFnet\VPN\Common\ProfileConfig;
  * Update the IP address configuration of vpn-server-api.
  *
  * IPv4:
- * Random value for the second and third octet, e.g: 10.53.129.0/24
+ * Random value for the second and third octet, e.g: 10.53.129.0/25
  *
  * IPv6:
  * The IPv6 address is generated according to RFC 4193 (Global ID), it results
- * in a /60 network.
+ * in a /64 network.
  */
 
 try {
@@ -44,17 +44,9 @@ try {
     }
 
     $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
-
-    $secondByte = 0;
-    // make sure the second part of the IP address is never 42, because we use
-    // that for communication between the nodes in a multi node setup
-    do {
-        $secondByte = hexdec(bin2hex(random_bytes(1)));
-    } while (42 === $secondByte);
-
     $v4 = sprintf(
-        '10.%s.%s.0/24',
-        $secondByte,
+        '10.%s.%s.0/25',
+        hexdec(bin2hex(random_bytes(1))),
         hexdec(bin2hex(random_bytes(1)))
     );
 
