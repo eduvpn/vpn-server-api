@@ -82,6 +82,29 @@ SQL
     }
 
     /**
+     * @param string $userId
+     *
+     * @return array<string>
+     */
+    public function getEntitlementList($userId)
+    {
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    SELECT
+        entitlement_list
+    FROM 
+        users
+    WHERE
+        user_id = :user_id
+SQL
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return json_decode($stmt->fetchColumn(), true);
+    }
+
+    /**
      * @param string $commonName
      *
      * @return false|array

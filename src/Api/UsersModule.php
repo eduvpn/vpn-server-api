@@ -397,6 +397,19 @@ class UsersModule implements ServiceModuleInterface
             }
         );
 
+        $service->get(
+            '/user_entitlement_list',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
+
+                return new ApiResponse('user_entitlement_list', $this->storage->getEntitlementList($userId));
+            }
+        );
+
         $service->post(
             '/last_authenticated_at_ping',
             /**
