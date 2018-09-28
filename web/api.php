@@ -19,6 +19,7 @@ use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Response;
 use SURFnet\VPN\Common\Http\Service;
+use SURFnet\VPN\Common\Json;
 use SURFnet\VPN\Common\LdapClient;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Common\Random;
@@ -198,6 +199,6 @@ try {
 } catch (Exception $e) {
     $logger->error($e->getMessage());
     $response = new Response(500, 'application/json');
-    $response->setBody(json_encode(['error' => $e->getMessage()]));
+    $response->setBody(Json::encode(['error' => $e->getMessage()]));
     $response->send();
 }

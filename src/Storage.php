@@ -16,6 +16,7 @@ use fkooman\Otp\OtpInfo;
 use fkooman\Otp\OtpStorageInterface;
 use fkooman\SqliteMigrate\Migration;
 use PDO;
+use SURFnet\VPN\Common\Json;
 
 class Storage implements TokenStorageInterface, OtpStorageInterface
 {
@@ -74,7 +75,7 @@ SQL
                 'has_yubi_key_id' => null !== $row['yubi_key_id'],
                 'has_totp_secret' => null !== $row['otp_secret'],
                 'last_authenticated_at' => $row['last_authenticated_at'],
-                'entitlement_list' => json_decode($row['entitlement_list'], true),
+                'entitlement_list' => Json::decode($row['entitlement_list']),
             ];
         }
 
@@ -101,7 +102,7 @@ SQL
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
-        return json_decode($stmt->fetchColumn(), true);
+        return Json::decode($stmt->fetchColumn());
     }
 
     /**
@@ -343,7 +344,7 @@ SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->bindValue(':last_authenticated_at', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
-        $stmt->bindValue(':entitlement_list', json_encode($entitlementList), PDO::PARAM_STR);
+        $stmt->bindValue(':entitlement_list', Json::encode($entitlementList), PDO::PARAM_STR);
 
         $stmt->execute();
     }
