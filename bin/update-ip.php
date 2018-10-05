@@ -58,8 +58,35 @@ try {
         bin2hex(random_bytes(2))
     );
 
+    // figure out DNS based on `/etc/resolv.conf`
+    $nameServerList = [];
+    if (false !== $resolvConf = @file_get_contents('/etc/resolv.conf')) {
+        $resolvConfData = explode(PHP_EOL, $resolvConf);
+        foreach ($resolvConfData as $revolvConfLine) {
+            if (0 === strpos(trim($revolvConfLine), 'nameserver ')) {
+                // found a nameserver
+                $nameServerIp = trim(substr($revolvConfLine, 11));
+                // ignore "local" addresses
+                if (0 === strpos($nameServerIp, '127.')) {
+                    continue;
+                }
+                if (0 === strpos($nameServerIp, '::1')) {
+                    continue;
+                }
+                $nameServerList[] = trim(substr($revolvConfLine, 11));
+            }
+        }
+    }
+    if (0 === count($nameServerList)) {
+        $nameServerList = [
+            '9.9.9.9',
+            '2620:fe::fe',
+        ];
+    }
+
     echo sprintf('IPv4 CIDR  : %s', $v4).PHP_EOL;
     echo sprintf('IPv6 prefix: %s', $v6).PHP_EOL;
+    echo sprintf('DNS        : %s', implode(', ', $nameServerList)).PHP_EOL;
 
     $configFile = sprintf('%s/config/%s/config.php', $baseDir, $instanceId);
     $config = Config::fromFile($configFile);
@@ -70,6 +97,7 @@ try {
 
     $profileConfigData['range'] = $v4;
     $profileConfigData['range6'] = $v6;
+    $profileConfigData['dns'] = $nameServerList;
     $profileConfigData['hostName'] = $opt->getItem('host');
     $profileConfigData['extIf'] = $opt->getItem('ext');
     $configData['vpnProfiles'][$opt->getItem('profile')] = $profileConfigData;
