@@ -1,10 +1,14 @@
 # Changelog
 
-## 1.4.5 (..)
+## 1.4.5 (2018-10-10)
 - also cache the entitlements of a particular user together with the last
   time the user authenticated
 - by default take nameservers from `/etc/resolv.conf` when using the 
   `bin/update-ip.php` script (on new deploys)
+- update configuration template
+- use `Json` helper class introduced in vpn-lib-common
+- generate a `/25` by default as we only have 2 OpenVPN processes by default
+- no longer avoid using `.42` as second octet in generated IP address
 
 ## 1.4.4 (2018-09-10)
 - update for new vpn-lib-common API
