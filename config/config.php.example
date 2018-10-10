@@ -23,8 +23,8 @@ return [
     // List of VPN profiles
     'vpnProfiles' => [
         'internet' => [
-            // The number of this profile, every profile per instance has a unique
-            // number
+            // The number of this profile, every profile per instance has a 
+            // unique number
             // REQUIRED
             'profileNumber' => 1,
 
@@ -65,12 +65,13 @@ return [
             // DEFAULT = true
             'enableNat6' => true,
 
-            // Do not forward IPv4 traffic, useful for creating an IPv6 only VPN
+            // Do not forward IPv4 traffic, useful for creating an IPv6 only 
+            // VPN
             // DEFAULT = false
             'reject4' => false,
 
-            // Do not forward IPv6 traffic, useful when the VPN server does not have
-            // IPv6 connectivity
+            // Do not forward IPv6 traffic, useful when the VPN server does not 
+            // have IPv6 connectivity
             // DEFAULT = false
             'reject6' => false,
 
@@ -83,13 +84,8 @@ return [
             // DEFAULT = []
             'routes' => [],
 
-            // IPv4 and IPv6 address of DNS server(s) to push to the client.
-            // if you leave it empty, i.e. [], it will be automatically filled
-            // with the IPv4 and IPv6 gateway address
-            // NOTE: only used when defaultGateway is true!
+            // IPv4 and IPv6 address of DNS server(s) to push to the client
             // DEFAULT  = []
-            // Google Public DNS (https://developers.google.com/speed/public-dns/)
-            //'dns' => ['8.8.8.8', '8.8.4.4', '2001:4860:4860::8888', '2001:4860:4860::8844'],
             // Quad9 (https://www.quad9.net)
             'dns' => ['9.9.9.9', '2620:fe::fe'],
 
@@ -109,7 +105,8 @@ return [
             // DEFAULT = false
             'enableAcl' => false,
 
-            // The list of groups to allow access, requires enableAcl to be true
+            // The list of groups to allow access, requires enableAcl to be 
+            // true
             // DEFAULT  = []
             'aclGroupList' => [],
 
@@ -117,8 +114,8 @@ return [
             // DEFAULT = false
             'blockSmb' => false,
 
-            // The protocols and ports the OpenVPN processes should use, MUST be
-            // either 1, 2, 4 or 8 proto/port combinations
+            // The protocols and ports the OpenVPN processes should use, MUST 
+            // be either 1, 2, 4 or 8 proto/port combinations
             // DEFAULT = ['udp/1194', 'tcp/1194']
             'vpnProtoPorts' => [
                 'udp/1194',
@@ -134,8 +131,8 @@ return [
                 // 'tcp/443'
             ],
 
-            // Hide the profile from the user portal, i.e. do not allow the user to
-            // choose it
+            // Hide the profile from the user portal, i.e. do not allow the 
+            // user to choose it
             // DEFAULT = false
             'hideProfile' => false,
 
