@@ -110,10 +110,6 @@ return [
             // DEFAULT  = []
             'aclGroupList' => [],
 
-            // Whether or not to block Samba/CIFS traffic to the Internet
-            // DEFAULT = false
-            'blockSmb' => false,
-
             // The protocols and ports the OpenVPN processes should use, MUST 
             // be either 1, 2, 4 or 8 proto/port combinations
             // DEFAULT = ['udp/1194', 'tcp/1194']
