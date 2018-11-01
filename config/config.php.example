@@ -82,7 +82,10 @@ return [
             // IPv4 and IPv6 routes to push to the client, only used when
             // defaultGateway is false
             // DEFAULT = []
-            'routes' => [],
+            'routes' => [
+                //'192.168.1.0/24',
+                //'fd01:1:1:1::/64',
+            ],
 
             // IPv4 and IPv6 address of DNS server(s) to push to the client
             // DEFAULT  = []
