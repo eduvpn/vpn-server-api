@@ -31,10 +31,11 @@ interface CaInterface
     /**
      * Generate a certificate for a VPN client.
      *
-     * @param string $commonName
+     * @param string   $commonName
+     * @param null|int $certExpireDays
      *
      * @return array the certificate and key in array with keys 'cert', 'key',
      *               'valid_from' and 'valid_to'
      */
-    public function clientCert($commonName);
+    public function clientCert($commonName, $certExpireDays);
 }

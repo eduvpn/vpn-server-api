@@ -108,22 +108,30 @@ class EasyRsaCa implements CaInterface
     /**
      * Generate a certificate for a VPN client.
      *
-     * @param string $commonName
+     * @param string   $commonName
+     * @param null|int $certExpireDays
      *
      * @return array the certificate and key in array with keys 'cert', 'key',
      *               'valid_from' and 'valid_to'
      */
-    public function clientCert($commonName)
+    public function clientCert($commonName, $certExpireDays)
     {
         if ($this->hasCert($commonName)) {
             throw new CaException(sprintf('certificate with commonName "%s" already exists', $commonName));
+        }
+
+        $configCertExpireDays = $this->config->getSection('CA')->getItem('cert_expire');
+        // only allow reducing the validity of a cert, never allow it to be
+        // longer valid than the value from the configuration!
+        if (null === $certExpireDays || 0 >= $certExpireDays || $configCertExpireDays > $certExpireDays) {
+            $certExpireDays = $configCertExpireDays;
         }
 
         $this->execEasyRsa(
             [
                 sprintf(
                     '--days=%d',
-                    $this->config->getSection('CA')->getItem('cert_expire')
+                    $certExpireDays
                 ),
                 'build-client-full',
                 $commonName,

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.6 (...)
+- show examples for routes config
+- remove `blockSmb` from config template (it still works if it is set)
+- extend API to allow restricting the validity (valid to) of issued client
+  certificates
+
 ## 1.4.5 (2018-10-10)
 - also cache the entitlements of a particular user together with the last
   time the user authenticated

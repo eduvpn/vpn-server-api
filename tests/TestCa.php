@@ -35,18 +35,19 @@ class TestCa implements CaInterface
     /**
      * Generate a certificate for a VPN client.
      *
-     * @param string $commonName
+     * @param string   $commonName
+     * @param null|int $certExpireDays
      *
      * @return array the certificate and key in array with keys 'cert', 'key',
      *               'valid_from' and 'valid_to'
      */
-    public function clientCert($commonName)
+    public function clientCert($commonName, $certExpireDays = null)
     {
         return [
             'certificate' => sprintf('ClientCert for %s', $commonName),
             'private_key' => sprintf('ClientKey for %s', $commonName),
             'valid_from' => 1234567890,
-            'valid_to' => 2345678901,
+            'valid_to' => null === $certExpireDays ? 2345678901 : 2345678901 + $certExpireDays,
         ];
     }
 

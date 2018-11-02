@@ -80,6 +80,25 @@ class CertificatesModuleTest extends TestCase
         );
     }
 
+    public function testGenerateCertExpiresDays()
+    {
+        $this->assertSame(
+            [
+                'certificate' => 'ClientCert for random_1',
+                'private_key' => 'ClientKey for random_1',
+                'valid_from' => 1234567890,
+                'valid_to' => 2345678906,
+            ],
+            $this->makeRequest(
+                ['vpn-user-portal', 'abcdef'],
+                'POST',
+                'add_client_certificate',
+                [],
+                ['user_id' => 'foo', 'display_name' => 'bar', 'cert_expires_days' => 5]
+            )
+        );
+    }
+
     public function testServerInfo()
     {
         $this->assertSame(
