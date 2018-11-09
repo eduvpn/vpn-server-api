@@ -48,6 +48,7 @@ class InfoModuleTest extends TestCase
                 'internet' => [
                       'aclGroupList' => [
                       ],
+                      'blockLan' => false,
                       'clientToClient' => false,
                       'defaultGateway' => false,
                       'displayName' => 'Internet Access',

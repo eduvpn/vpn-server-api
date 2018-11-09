@@ -79,6 +79,10 @@ return [
             // DEFAULT = false
             'defaultGateway' => true,
 
+            // Block access to local LAN when VPN is active
+            // DEFAULT = false
+            'blockLan' => true,
+
             // IPv4 and IPv6 routes to push to the client, only used when
             // defaultGateway is false
             // DEFAULT = []
