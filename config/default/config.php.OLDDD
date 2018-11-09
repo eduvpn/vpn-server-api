@@ -1,0 +1,67 @@
+<?php
+
+/*
+ * eduVPN - End-user friendly VPN.
+ *
+ * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * SPDX-License-Identifier: AGPL-3.0+
+ */
+
+return [
+  'apiConsumers' => [
+    'vpn-user-portal' => 'c3539aea83e244411eae27fbe7451ca6',
+    'vpn-admin-portal' => '0a93b7b86d118440b79d376aae9bb35a',
+    'vpn-server-node' => '953f8acb6491990c5e1dea691d8859fe',
+  ],
+  'CA' => [
+    'key_size' => 4096,
+    'ca_expire' => 1826,
+    'server_cert_expire' => 365,
+    'cert_expire' => 180,
+    'ca_cn' => 'VPN CA',
+  ],
+  'instanceNumber' => 1,
+  'vpnProfiles' => [
+    'internet' => [
+      'defaultGateway' => true,
+      'routes' => [
+      ],
+      'dns' => [
+        0 => '9.9.9.9',
+        1 => '2620:fe::fe',
+      ],
+      'enableNat4' => true,
+      'enableNat6' => true,
+      'twoFactor' => false,
+      'clientToClient' => false,
+      'listen' => '::',
+      'enableLog' => false,
+      'enableAcl' => false,
+      'aclGroupList' => [
+      ],
+      'managementIp' => '127.0.0.1',
+      'blockSmb' => false,
+      'reject4' => false,
+      'reject6' => false,
+      'vpnProtoPorts' => [
+        0 => 'udp/1194',
+        1 => 'tcp/1194',
+      ],
+      'exposedVpnProtoPorts' => [
+      ],
+      'hideProfile' => false,
+      'tlsProtection' => 'tls-crypt',
+      'enableCompression' => false,
+      'profileNumber' => 1,
+      'displayName' => 'Internet Access',
+      'extIf' => 'eth0',
+      'range' => '10.162.144.0/25',
+      'range6' => 'fd17:385f:00b7:e8a0::/64',
+      'hostName' => 'foo.example',
+      'requireScope' => true,
+      'scopeExpiry' => 'PT8H',
+    ],
+  ],
+  'groupProviders' => [
+  ],
+];

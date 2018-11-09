@@ -87,6 +87,10 @@ return [
                 //'fd01:1:1:1::/64',
             ],
 
+            // Block access to local LAN when VPN is active
+            // DEFAULT = false
+            'blockLan' => true,
+
             // IPv4 and IPv6 address of DNS server(s) to push to the client
             // DEFAULT  = []
             // Quad9 (https://www.quad9.net)
