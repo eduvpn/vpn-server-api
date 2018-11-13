@@ -398,6 +398,19 @@ class UsersModule implements ServiceModuleInterface
         );
 
         $service->get(
+            '/user_last_authenticated_at',
+            /**
+             * @return \SURFnet\VPN\Common\Http\Response
+             */
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
+
+                return new ApiResponse('user_last_authenticated_at', $this->storage->getLastAuthenticatedAt($userId));
+            }
+        );
+
+        $service->get(
             '/user_entitlement_list',
             /**
              * @return \SURFnet\VPN\Common\Http\Response

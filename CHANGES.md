@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.7 (...)
+- create API call for `last_authenticated_at`
+
 ## 1.4.6 (2018-11-09)
 - show examples for routes config
 - remove `blockSmb` from config template (it still works if it is set)

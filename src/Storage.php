@@ -85,6 +85,32 @@ SQL
     /**
      * @param string $userId
      *
+     * @return null|string
+     */
+    public function getLastAuthenticatedAt($userId)
+    {
+        $this->addUser($userId);
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    SELECT
+        last_authenticated_at
+    FROM 
+        users
+    WHERE 
+        user_id = :user_id
+SQL
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        // NULL when no last_authenticated_at is set, never returns false as we
+        // always make sure the user exists...
+        return $stmt->fetchColumn();
+    }
+
+    /**
+     * @param string $userId
+     *
      * @return array<string>
      */
     public function getEntitlementList($userId)
