@@ -2,6 +2,8 @@
 
 ## 1.4.7 (...)
 - create API call for `last_authenticated_at`
+- client certificates / refresh tokens will expire after 90 days (new default)
+- also mention 16 ports for OpenVPN processes are supported
 
 ## 1.4.6 (2018-11-09)
 - show examples for routes config
