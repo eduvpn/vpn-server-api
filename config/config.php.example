@@ -118,7 +118,7 @@ return [
             'aclGroupList' => [],
 
             // The protocols and ports the OpenVPN processes should use, MUST 
-            // be either 1, 2, 4 or 8 proto/port combinations
+            // be either 1, 2, 4, 8 or 16 proto/port combinations
             // DEFAULT = ['udp/1194', 'tcp/1194']
             'vpnProtoPorts' => [
                 'udp/1194',
