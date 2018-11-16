@@ -9,6 +9,8 @@
 
 namespace SURFnet\VPN\Server\CA;
 
+use DateTime;
+
 interface CaInterface
 {
     /**
@@ -31,11 +33,11 @@ interface CaInterface
     /**
      * Generate a certificate for a VPN client.
      *
-     * @param string   $commonName
-     * @param null|int $certExpireDays
+     * @param string    $commonName
+     * @param \DateTime $expiresAt
      *
      * @return array the certificate and key in array with keys 'cert', 'key',
      *               'valid_from' and 'valid_to'
      */
-    public function clientCert($commonName, $certExpireDays);
+    public function clientCert($commonName, DateTime $expiresAt);
 }

@@ -65,11 +65,11 @@ class CertificatesModule implements ServiceModuleInterface
                     $clientId = InputValidation::clientId($clientId);
                 }
 
-                $certExpireDays = InputValidation::certExpiresDays($request->getPostParameter('cert_expires_days', false));
+                $expiresAt = InputValidation::expiresAt($request->getPostParameter('expires_at'));
 
                 // generate a random string as the certificate's CN
                 $commonName = $this->random->get(16);
-                $certInfo = $this->ca->clientCert($commonName, $certExpireDays);
+                $certInfo = $this->ca->clientCert($commonName, $expiresAt);
 
                 $this->storage->addCertificate(
                     $userId,

@@ -9,6 +9,7 @@
 
 namespace SURFnet\VPN\Server\Tests;
 
+use DateTime;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\CA\CaInterface;
 
@@ -35,19 +36,19 @@ class TestCa implements CaInterface
     /**
      * Generate a certificate for a VPN client.
      *
-     * @param string   $commonName
-     * @param null|int $certExpireDays
+     * @param string    $commonName
+     * @param \DateTime $expiresAt
      *
      * @return array the certificate and key in array with keys 'cert', 'key',
      *               'valid_from' and 'valid_to'
      */
-    public function clientCert($commonName, $certExpireDays = null)
+    public function clientCert($commonName, DateTime $expiresAt)
     {
         return [
             'certificate' => sprintf('ClientCert for %s', $commonName),
             'private_key' => sprintf('ClientKey for %s', $commonName),
             'valid_from' => 1234567890,
-            'valid_to' => null === $certExpireDays ? 2345678901 : 2345678901 + $certExpireDays,
+            'valid_to' => $expiresAt->getTimestamp(),
         ];
     }
 

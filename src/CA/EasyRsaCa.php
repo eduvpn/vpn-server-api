@@ -9,6 +9,7 @@
 
 namespace SURFnet\VPN\Server\CA;
 
+use DateTime;
 use RuntimeException;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\FileIO;
@@ -108,30 +109,23 @@ class EasyRsaCa implements CaInterface
     /**
      * Generate a certificate for a VPN client.
      *
-     * @param string   $commonName
-     * @param null|int $certExpireDays
+     * @param string    $commonName
+     * @param \DateTime $expiresAt
      *
      * @return array the certificate and key in array with keys 'cert', 'key',
      *               'valid_from' and 'valid_to'
      */
-    public function clientCert($commonName, $certExpireDays)
+    public function clientCert($commonName, DateTime $expiresAt)
     {
         if ($this->hasCert($commonName)) {
             throw new CaException(sprintf('certificate with commonName "%s" already exists', $commonName));
         }
 
-        $configCertExpireDays = (int) $this->config->getSection('CA')->getItem('cert_expire');
-        // only allow reducing the validity of a cert, never allow it to be
-        // longer valid than the value from the configuration!
-        if (null === $certExpireDays || 0 >= $certExpireDays || $certExpireDays > $configCertExpireDays) {
-            $certExpireDays = $configCertExpireDays;
-        }
-
         $this->execEasyRsa(
             [
                 sprintf(
-                    '--days=%d',
-                    $certExpireDays
+                    '--enddate=%s',
+                    $expiresAt->format('YmdHis\Z')
                 ),
                 'build-client-full',
                 $commonName,

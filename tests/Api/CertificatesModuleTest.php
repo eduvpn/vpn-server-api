@@ -63,6 +63,7 @@ class CertificatesModuleTest extends TestCase
 
     public function testGenerateCert()
     {
+        $expiresAt = new DateTime('@2345678901');
         $this->assertSame(
             [
                 'certificate' => 'ClientCert for random_1',
@@ -75,26 +76,7 @@ class CertificatesModuleTest extends TestCase
                 'POST',
                 'add_client_certificate',
                 [],
-                ['user_id' => 'foo', 'display_name' => 'bar']
-            )
-        );
-    }
-
-    public function testGenerateCertExpiresDays()
-    {
-        $this->assertSame(
-            [
-                'certificate' => 'ClientCert for random_1',
-                'private_key' => 'ClientKey for random_1',
-                'valid_from' => 1234567890,
-                'valid_to' => 2345678906,
-            ],
-            $this->makeRequest(
-                ['vpn-user-portal', 'abcdef'],
-                'POST',
-                'add_client_certificate',
-                [],
-                ['user_id' => 'foo', 'display_name' => 'bar', 'cert_expires_days' => 5]
+                ['user_id' => 'foo', 'display_name' => 'bar', 'expires_at' => $expiresAt->format(DateTime::ATOM)]
             )
         );
     }
