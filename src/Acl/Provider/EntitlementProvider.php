@@ -38,6 +38,6 @@ class EntitlementProvider implements ProviderInterface
             ];
         }
 
-        return $entitlementList;
+        return $memberOf;
     }
 }
