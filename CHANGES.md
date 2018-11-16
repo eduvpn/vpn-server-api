@@ -5,6 +5,7 @@
 - also mention 16 ports for OpenVPN processes are supported
 - `/add_client_certificate` requires the `expires_at` parameter now indicating
   when the certificate will expire
+- add ACL module for "entitlements", enabled by default
 
 ## 1.4.6 (2018-11-09)
 - show examples for routes config

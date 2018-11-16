@@ -23,6 +23,7 @@ use SURFnet\VPN\Common\Json;
 use SURFnet\VPN\Common\LdapClient;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Common\Random;
+use SURFnet\VPN\Server\Acl\Provider\EntitlementProvider;
 use SURFnet\VPN\Server\Acl\Provider\LdapProvider;
 use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
 use SURFnet\VPN\Server\Acl\Provider\VootProvider;
@@ -74,7 +75,10 @@ try {
     );
     $storage->update();
 
-    $groupProviders = [];
+    $groupProviders = [
+        new EntitlementProvider($storage),
+    ];
+
     if ($config->hasSection('groupProviders')) {
         $enabledProviders = array_keys($config->getSection('groupProviders')->toArray());
         // StaticProvider
