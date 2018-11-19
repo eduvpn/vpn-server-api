@@ -121,6 +121,12 @@ class EasyRsaCa implements CaInterface
             throw new CaException(sprintf('certificate with commonName "%s" already exists', $commonName));
         }
 
+        // prevent expiresAt to be in the past
+        $dateTime = new DateTime();
+        if ($dateTime >= $expiresAt) {
+            throw new CaException('can not issue certificates that expire in the past');
+        }
+
         // the date format MUST be y (2 digit year), with Y (4 digit year) PHP
         // on CentOS 7 freaks out when parsing the certificate using
         // openssl_x509_parse...
