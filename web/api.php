@@ -79,6 +79,7 @@ try {
         new EntitlementProvider($storage),
     ];
 
+    // the is all LEGACY! **DEPRECATED**
     if ($config->hasSection('groupProviders')) {
         $enabledProviders = array_keys($config->getSection('groupProviders')->toArray());
         // StaticProvider
