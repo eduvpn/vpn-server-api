@@ -155,15 +155,12 @@ return [
     'groupProviders' => [
 //        'StaticProvider' => [
 //            'all' => [
-//                'displayName' => 'All',
 //                'members' => ['foo', 'bar'],
 //            ],
 //            'students' => [
-//                'displayName' => 'Students',
 //                'members' => ['foo'],
 //            ],
 //            'employees' => [
-//                'displayName' => 'Employees',
 //                'members' => ['bar'],
 //            ],
 //        ],
