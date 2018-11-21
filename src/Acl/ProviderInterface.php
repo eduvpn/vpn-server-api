@@ -14,7 +14,7 @@ interface ProviderInterface
     /**
      * @param string $userId
      *
-     * @return array
+     * @return array<string>
      */
     public function getGroups($userId);
 }

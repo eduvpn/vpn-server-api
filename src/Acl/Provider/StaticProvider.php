@@ -25,12 +25,11 @@ class StaticProvider implements ProviderInterface
     /**
      * @param string $userId
      *
-     * @return array
+     * @return array<string>
      */
     public function getGroups($userId)
     {
         $memberOf = [];
-
         $groupIdList = array_keys($this->config->toArray());
         foreach ($groupIdList as $groupId) {
             $memberList = $this->config->getSection($groupId)->getSection('members')->toArray();
@@ -38,10 +37,7 @@ class StaticProvider implements ProviderInterface
                 continue;
             }
 
-            $memberOf[] = [
-                'id' => $groupId,
-                'displayName' => $this->config->getSection($groupId)->getItem('displayName'),
-            ];
+            $memberOf[] = $groupId;
         }
 
         return $memberOf;

@@ -81,22 +81,10 @@ class VootProviderTest extends TestCase
     {
         $this->assertSame(
             [
-                [
-                    'id' => 'urn:collab:group:surfteams.nl:nl:surfnet:diensten:eduvpn',
-                    'displayName' => 'EduVPN',
-                ],
-                [
-                    'id' => 'urn:collab:group:surfteams.nl:nl:surfnet:diensten:eduvpn-test',
-                    'displayName' => 'eduVPN-test',
-                ],
-                [
-                    'id' => 'urn:collab:group:surfteams.nl:nl:surfnet:diensten:enabling_dynamic_services_2015',
-                    'displayName' => 'Enabling Dynamic Services 2015',
-                ],
-                [
-                    'id' => 'urn:collab:group:surfteams.nl:nl:surfnet:diensten:surfcloud_utrecht_users',
-                    'displayName' => 'SURFcloud Utrecht users',
-                ],
+                'urn:collab:group:surfteams.nl:nl:surfnet:diensten:eduvpn',
+                'urn:collab:group:surfteams.nl:nl:surfnet:diensten:eduvpn-test',
+                'urn:collab:group:surfteams.nl:nl:surfnet:diensten:enabling_dynamic_services_2015',
+                'urn:collab:group:surfteams.nl:nl:surfnet:diensten:surfcloud_utrecht_users',
             ],
             $this->vootProvider->getGroups('foo')
         );

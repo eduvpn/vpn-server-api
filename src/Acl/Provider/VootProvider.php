@@ -36,7 +36,9 @@ class VootProvider implements ProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $userId
+     *
+     * @return array<string>
      */
     public function getGroups($userId)
     {
@@ -79,7 +81,7 @@ class VootProvider implements ProviderInterface
     }
 
     /**
-     * @return array
+     * @return array<string>
      */
     private static function extractMembership(array $responseData)
     {
@@ -94,38 +96,9 @@ class VootProvider implements ProviderInterface
             if (!\is_string($groupEntry['id'])) {
                 continue;
             }
-            $displayName = self::getDisplayName($groupEntry);
-
-            $memberOf[] = [
-                'id' => $groupEntry['id'],
-                'displayName' => $displayName,
-            ];
+            $memberOf[] = $groupEntry['id'];
         }
 
         return $memberOf;
-    }
-
-    /**
-     * @return string
-     */
-    private static function getDisplayName(array $groupEntry)
-    {
-        if (!array_key_exists('displayName', $groupEntry)) {
-            return $groupEntry['id'];
-        }
-
-        if (\is_string($groupEntry['displayName'])) {
-            return $groupEntry['displayName'];
-        }
-
-        if (\is_array($groupEntry['displayName'])) {
-            if (array_key_exists('en', $groupEntry['displayName'])) {
-                return $groupEntry['displayName']['en'];
-            }
-
-            return array_values($groupEntry['displayName'])[0];
-        }
-
-        return $groupEntry['id'];
     }
 }

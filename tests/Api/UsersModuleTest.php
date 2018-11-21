@@ -348,16 +348,7 @@ class UsersModuleTest extends TestCase
     public function testUserGroups()
     {
         $this->assertSame(
-            [
-                [
-                    'id' => 'all',
-                    'displayName' => 'All',
-                ],
-                [
-                    'id' => 'employees',
-                    'displayName' => 'Employees',
-                ],
-            ],
+            ['all', 'employees'],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
                 'GET',

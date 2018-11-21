@@ -73,8 +73,7 @@ class LdapProvider implements ProviderInterface
      *
      * @param string $userId the userID of the user to request the groups of
      *
-     * @return array the groups as an array containing the keys "id" and
-     *               "displayName", empty array if no groups are available for this user
+     * @return array<string>
      */
     public function getGroups($userId)
     {
@@ -85,15 +84,12 @@ class LdapProvider implements ProviderInterface
             $ldapEntries = $this->ldapClient->search(
                 $this->groupBaseDn,
                 $memberFilter,
-                ['cn']
+                []
             );
 
             $memberOf = [];
             for ($i = 0; $i < $ldapEntries['count']; ++$i) {
-                $memberOf[] = [
-                    'id' => $ldapEntries[$i]['dn'],
-                    'displayName' => $ldapEntries[$i]['cn'][0],
-                ];
+                $memberOf[] = $ldapEntries[$i]['dn'];
             }
 
             return $memberOf;

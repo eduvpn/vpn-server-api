@@ -25,19 +25,10 @@ class EntitlementProvider implements ProviderInterface
     /**
      * @param string $userId
      *
-     * @return array
+     * @return array<string>
      */
     public function getGroups($userId)
     {
-        $memberOf = [];
-        $entitlementList = $this->storage->getEntitlementList($userId);
-        foreach ($entitlementList as $entitlementValue) {
-            $memberOf[] = [
-                'id' => $entitlementValue,
-                'displayName' => $entitlementValue,
-            ];
-        }
-
-        return $memberOf;
+        return $this->storage->getEntitlementList($userId);
     }
 }
