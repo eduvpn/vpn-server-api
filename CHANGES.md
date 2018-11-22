@@ -1,11 +1,14 @@
 # Changelog
 
-## 1.4.7 (...)
-- create API call for `last_authenticated_at`
+## 1.4.7 (2018-11-22)
+- create API call for `user_last_authenticated_at`
+- create API call for `get_voot_token`
 - also mention 16 ports for OpenVPN processes are supported
 - `/add_client_certificate` requires the `expires_at` parameter now indicating
-  when the certificate will expire
+  when the certificate will expire exactly
 - add ACL module for "entitlements", enabled by default
+- no longer support "display_name" for groups
+- deprecate all "backend" ACL / group information retrieval methods
 
 ## 1.4.6 (2018-11-09)
 - show examples for routes config
