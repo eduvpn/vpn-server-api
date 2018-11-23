@@ -45,20 +45,6 @@ class UsersModuleTest extends TestCase
         $storage->disableUser('baz');
         $storage->enableUser('baz');
         $storage->setOtpSecret('bar', new OtpInfo('CN2XAL23SIFTDFXZ', 'sha1', 6, 30));
-        $vootToken = json_encode(
-            [
-                'provider_id' => 'foo|bar',
-                'user_id' => 'foo',
-                'access_token' => '12345',
-                'token_type' => 'bearer',
-                'scope' => 'groups',
-                'refresh_token' => null,
-                'expires_in' => 3600,
-                'issued_at' => '2016-01-01 00:00:00',
-            ]
-        );
-
-        $storage->setVootToken('bar', $vootToken);
 
         // user "baz" has a secret, and already used a key for replay testing
         $storage->setOtpSecret('baz', new OtpInfo('SWIXJ4V7VYALWH6E', 'sha1', 6, 30));
@@ -244,50 +230,6 @@ class UsersModuleTest extends TestCase
                 ['vpn-admin-portal', 'bbccdd'],
                 'POST',
                 'delete_totp_secret',
-                [],
-                [
-                    'user_id' => 'bar',
-                ]
-            )
-        );
-    }
-
-    public function testSetVootToken()
-    {
-        $vootToken = json_encode(
-            [
-                'provider_id' => 'foo|bar',
-                'user_id' => 'foo',
-                'access_token' => 'AT',
-                'token_type' => 'bearer',
-                'scope' => 'groups',
-                'refresh_token' => 'RT',
-                'expires_in' => 3600,
-                'issued_at' => '2016-01-02 00:00:00',
-            ]
-        );
-
-        $this->assertTrue(
-            $this->makeRequest(
-                ['vpn-user-portal', 'aabbcc'],
-                'POST',
-                'set_voot_token',
-                [],
-                [
-                    'user_id' => 'foo',
-                    'voot_token' => $vootToken,
-                ]
-            )
-        );
-    }
-
-    public function testDeleteVootToken()
-    {
-        $this->assertTrue(
-            $this->makeRequest(
-                ['vpn-admin-portal', 'bbccdd'],
-                'POST',
-                'delete_voot_token',
                 [],
                 [
                     'user_id' => 'bar',
