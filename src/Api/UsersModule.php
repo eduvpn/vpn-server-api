@@ -9,7 +9,6 @@
 
 namespace SURFnet\VPN\Server\Api;
 
-use fkooman\OAuth\Client\AccessToken;
 use fkooman\Otp\Exception\OtpException;
 use fkooman\Otp\Totp;
 use SURFnet\VPN\Common\Config;
@@ -277,9 +276,8 @@ class UsersModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
-
-                // load the POSTed AccessToken from JSON
-                $vootToken = AccessToken::fromJson($request->getPostParameter('voot_token'));
+                // XXX validate voot_token
+                $vootToken = $request->getPostParameter('voot_token');
                 $this->storage->setVootToken($userId, $vootToken);
 
                 return new ApiResponse('set_voot_token');

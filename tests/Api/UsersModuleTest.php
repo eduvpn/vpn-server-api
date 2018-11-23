@@ -10,7 +10,6 @@
 namespace SURFnet\VPN\Server\Tests\Api;
 
 use DateTime;
-use fkooman\OAuth\Client\AccessToken;
 use fkooman\Otp\FrkOtp;
 use fkooman\Otp\OtpInfo;
 use ParagonIE\ConstantTime\Base32;
@@ -46,10 +45,8 @@ class UsersModuleTest extends TestCase
         $storage->disableUser('baz');
         $storage->enableUser('baz');
         $storage->setOtpSecret('bar', new OtpInfo('CN2XAL23SIFTDFXZ', 'sha1', 6, 30));
-
-//        $vootToken = new AccessToken('12345', 'bearer', 'groups', null, new DateTime('2016-01-01'));
-        $vootToken = AccessToken::fromJson(
-            json_encode([
+        $vootToken = json_encode(
+            [
                 'provider_id' => 'foo|bar',
                 'user_id' => 'foo',
                 'access_token' => '12345',
@@ -58,7 +55,7 @@ class UsersModuleTest extends TestCase
                 'refresh_token' => null,
                 'expires_in' => 3600,
                 'issued_at' => '2016-01-01 00:00:00',
-            ])
+            ]
         );
 
         $storage->setVootToken('bar', $vootToken);
@@ -257,9 +254,8 @@ class UsersModuleTest extends TestCase
 
     public function testSetVootToken()
     {
-        //        $vootToken = new AccessToken('AT', 'bearer', 'groups', 'RT', new DateTime('2016-01-02'));
-        $vootToken = AccessToken::fromJson(
-            json_encode([
+        $vootToken = json_encode(
+            [
                 'provider_id' => 'foo|bar',
                 'user_id' => 'foo',
                 'access_token' => 'AT',
@@ -268,7 +264,7 @@ class UsersModuleTest extends TestCase
                 'refresh_token' => 'RT',
                 'expires_in' => 3600,
                 'issued_at' => '2016-01-02 00:00:00',
-            ])
+            ]
         );
 
         $this->assertTrue(
@@ -279,7 +275,7 @@ class UsersModuleTest extends TestCase
                 [],
                 [
                     'user_id' => 'foo',
-                    'voot_token' => $vootToken->toJson(),
+                    'voot_token' => $vootToken,
                 ]
             )
         );

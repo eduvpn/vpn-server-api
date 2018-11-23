@@ -10,15 +10,13 @@
 namespace SURFnet\VPN\Server;
 
 use DateTime;
-use fkooman\OAuth\Client\AccessToken;
-use fkooman\OAuth\Client\TokenStorageInterface;
 use fkooman\Otp\OtpInfo;
 use fkooman\Otp\OtpStorageInterface;
 use fkooman\SqliteMigrate\Migration;
 use PDO;
 use SURFnet\VPN\Common\Json;
 
-class Storage implements TokenStorageInterface, OtpStorageInterface
+class Storage implements OtpStorageInterface
 {
     const CURRENT_SCHEMA_VERSION = '2018092601';
 
@@ -188,12 +186,12 @@ SQL
     }
 
     /**
-     * @param string                            $userId
-     * @param \fkooman\OAuth\Client\AccessToken $vootToken
+     * @param string $userId
+     * @param string $vootToken
      *
      * @return void
      */
-    public function setVootToken($userId, AccessToken $vootToken)
+    public function setVootToken($userId, $vootToken)
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
@@ -207,7 +205,7 @@ SQL
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':voot_token', $vootToken->toJson(), PDO::PARAM_STR);
+        $stmt->bindValue(':voot_token', $vootToken, PDO::PARAM_STR);
 
         $stmt->execute();
     }
@@ -903,47 +901,6 @@ SQL
         $stmt->bindValue(':message', $message, PDO::PARAM_STR);
         $stmt->bindValue(':date_time', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->execute();
-    }
-
-    // TokenStorageInterface
-
-    /**
-     * @param string $userId
-     *
-     * @return array<\fkooman\OAuth\Client\AccessToken>
-     */
-    public function getAccessTokenList($userId)
-    {
-        $vootToken = $this->getVootToken($userId);
-        if (null === $vootToken) {
-            return [];
-        }
-
-        return [
-            AccessToken::fromJson($vootToken),
-        ];
-    }
-
-    /**
-     * @param string                            $userId
-     * @param \fkooman\OAuth\Client\AccessToken $accessToken
-     *
-     * @return void
-     */
-    public function storeAccessToken($userId, AccessToken $accessToken)
-    {
-        $this->setVootToken($userId, $accessToken);
-    }
-
-    /**
-     * @param string                            $userId
-     * @param \fkooman\OAuth\Client\AccessToken $accessToken
-     *
-     * @return void
-     */
-    public function deleteAccessToken($userId, AccessToken $accessToken)
-    {
-        $this->deleteVootToken($userId);
     }
 
     /**

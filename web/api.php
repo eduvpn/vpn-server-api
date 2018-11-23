@@ -10,9 +10,6 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
-use fkooman\OAuth\Client\Http\CurlHttpClient;
-use fkooman\OAuth\Client\OAuthClient;
-use fkooman\OAuth\Client\Provider;
 use LC\OpenVpn\ManagementSocket;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
@@ -26,7 +23,6 @@ use SURFnet\VPN\Common\Random;
 use SURFnet\VPN\Server\Acl\Provider\EntitlementProvider;
 use SURFnet\VPN\Server\Acl\Provider\LdapProvider;
 use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
-use SURFnet\VPN\Server\Acl\Provider\VootProvider;
 use SURFnet\VPN\Server\Api\CertificatesModule;
 use SURFnet\VPN\Server\Api\ConnectionsModule;
 use SURFnet\VPN\Server\Api\InfoModule;
@@ -37,7 +33,6 @@ use SURFnet\VPN\Server\Api\SystemMessagesModule;
 use SURFnet\VPN\Server\Api\UserMessagesModule;
 use SURFnet\VPN\Server\Api\UsersModule;
 use SURFnet\VPN\Server\CA\EasyRsaCa;
-use SURFnet\VPN\Server\NullSession;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
 use SURFnet\VPN\Server\Storage;
 use SURFnet\VPN\Server\TlsAuth;
@@ -88,25 +83,7 @@ try {
                 $config->getSection('groupProviders')->getSection('StaticProvider')
             );
         }
-        // VootProvider
-        if (in_array('VootProvider', $enabledProviders, true)) {
-            $provider = new Provider(
-                $config->getSection('groupProviders')->getSection('VootProvider')->getItem('clientId'),
-                $config->getSection('groupProviders')->getSection('VootProvider')->getItem('clientSecret'),
-                $config->getSection('groupProviders')->getSection('VootProvider')->getItem('authorizationEndpoint'),
-                $config->getSection('groupProviders')->getSection('VootProvider')->getItem('tokenEndpoint')
-            );
-            $oauthClient = new OAuthClient(
-                $storage,
-                new CurlHttpClient([], $logger)
-            );
-            $oauthClient->setSession(new NullSession());
-            $groupProviders[] = new VootProvider(
-                $oauthClient,
-                $provider,
-                $config->getSection('groupProviders')->getSection('VootProvider')->getItem('apiUrl')
-            );
-        }
+        // LdapProvider
         if (in_array('LdapProvider', $enabledProviders, true)) {
             $ldapConfig = $config->getSection('groupProviders')->getSection('LdapProvider');
             $ldapClient = new LdapClient($ldapConfig->getItem('ldapUri'));
