@@ -115,6 +115,7 @@ SQL
      */
     public function getEntitlementList($userId)
     {
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
