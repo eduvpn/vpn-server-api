@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.8 (2018-11-26)
+- make sure user exists before checking for "entitlements"
+
 ## 1.4.7 (2018-11-22)
 - create API call for `user_last_authenticated_at`
 - create API call for `get_voot_token`
