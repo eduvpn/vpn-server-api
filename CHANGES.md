@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.9 (...)
+- fix bug where disabling a user would only disconnect the user from the first
+  profile
+
 ## 1.4.8 (2018-11-26)
 - make sure user exists before checking for "entitlements"
 
