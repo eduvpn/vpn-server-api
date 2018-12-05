@@ -1,8 +1,9 @@
 # Changelog
 
-## 1.4.9 (...)
+## 1.4.9 (2018-12-05)
 - fix bug where disabling a user would only disconnect the user from the first
   profile
+- remove PHP error suppression
 
 ## 1.4.8 (2018-11-26)
 - make sure user exists before checking for "entitlements"
