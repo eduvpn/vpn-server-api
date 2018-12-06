@@ -60,7 +60,7 @@ try {
 
     // figure out DNS based on `/etc/resolv.conf`
     $nameServerList = [];
-    if (false !== $resolvConf = @file_get_contents('/etc/resolv.conf')) {
+    if (false !== $resolvConf = file_get_contents('/etc/resolv.conf')) {
         $resolvConfData = explode(PHP_EOL, $resolvConf);
         foreach ($resolvConfData as $revolvConfLine) {
             if (0 === strpos(trim($revolvConfLine), 'nameserver ')) {

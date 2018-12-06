@@ -18,7 +18,7 @@ use SURFnet\VPN\Common\Json;
 
 class Storage implements OtpStorageInterface
 {
-    const CURRENT_SCHEMA_VERSION = '2018092601';
+    const CURRENT_SCHEMA_VERSION = '2018120601';
 
     /** @var \PDO */
     private $db;
@@ -55,7 +55,6 @@ class Storage implements OtpStorageInterface
     SELECT
         user_id,
         (SELECT otp_secret FROM otp WHERE user_id = users.user_id) AS otp_secret,
-        yubi_key_id,
         last_authenticated_at,
         entitlement_list, 
         is_disabled
@@ -70,7 +69,6 @@ SQL
             $userList[] = [
                 'user_id' => $row['user_id'],
                 'is_disabled' => (bool) $row['is_disabled'],
-                'has_yubi_key_id' => null !== $row['yubi_key_id'],
                 'has_totp_secret' => null !== $row['otp_secret'],
                 'last_authenticated_at' => $row['last_authenticated_at'],
                 'entitlement_list' => Json::decode($row['entitlement_list']),
@@ -113,6 +111,7 @@ SQL
      */
     public function getEntitlementList($userId)
     {
+        $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
@@ -157,89 +156,6 @@ SQL
         $stmt->execute();
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * @param string $userId
-     * @param string $yubiKeyId
-     *
-     * @return void
-     */
-    public function setYubiKeyId($userId, $yubiKeyId)
-    {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    UPDATE
-        users
-    SET
-        yubi_key_id = :yubi_key_id
-    WHERE
-        user_id = :user_id
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':yubi_key_id', $yubiKeyId, PDO::PARAM_STR);
-
-        $stmt->execute();
-    }
-
-    /**
-     * @param string $userId
-     *
-     * @return bool
-     */
-    public function hasYubiKeyId($userId)
-    {
-        return null !== $this->getYubiKeyId($userId);
-    }
-
-    /**
-     * @param string $userId
-     *
-     * @return null|string
-     */
-    public function getYubiKeyId($userId)
-    {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    SELECT
-        yubi_key_id
-    FROM 
-        users
-    WHERE 
-        user_id = :user_id
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->execute();
-
-        // NULL when no yubikey id is set, never returns false as we always
-        // make sure the user exists...
-        return $stmt->fetchColumn();
-    }
-
-    /**
-     * @param string $userId
-     *
-     * @return void
-     */
-    public function deleteYubiKeyId($userId)
-    {
-        $this->addUser($userId);
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    UPDATE
-        users
-    SET
-        yubi_key_id = NULL
-    WHERE 
-        user_id = :user_id
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->execute();
     }
 
     /**
@@ -333,7 +249,8 @@ SQL
         common_name, 
         display_name, 
         valid_from, 
-        valid_to
+        valid_to,
+        client_id
     FROM 
         certificates
     WHERE 

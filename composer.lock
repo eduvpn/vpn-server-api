@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1b4e11e7f8d701906f50d4fa4fab974f",
+    "content-hash": "370a5099a4f3125e1294b472a91988ff",
     "packages": [
         {
             "name": "LC/openvpn-connection-manager",
@@ -46,16 +46,16 @@
         },
         {
             "name": "eduvpn/common",
-            "version": "1.3.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "0f502dfe87009bd5c5f140d6a823e08bca27931a"
+                "reference": "6cfac34ae5799c23973e317497955f3bdbf6ea0b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/0f502dfe87009bd5c5f140d6a823e08bca27931a",
-                "reference": "0f502dfe87009bd5c5f140d6a823e08bca27931a",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/6cfac34ae5799c23973e317497955f3bdbf6ea0b",
+                "reference": "6cfac34ae5799c23973e317497955f3bdbf6ea0b",
                 "shasum": ""
             },
             "require": {
@@ -105,7 +105,7 @@
                 "email": "eduvpn@surfnet.nl",
                 "source": "https://github.com/eduvpn/vpn-lib-common"
             },
-            "time": "2018-11-22T20:33:07+00:00"
+            "time": "2018-12-06T22:22:03+00:00"
         },
         {
             "name": "fkooman/otp-verifier",
@@ -233,48 +233,6 @@
                 "source": "https://git.tuxed.net/fkooman/php-sqlite-migrate"
             },
             "time": "2018-06-26T07:47:46+00:00"
-        },
-        {
-            "name": "fkooman/yubitwee",
-            "version": "1.1.4",
-            "source": {
-                "type": "git",
-                "url": "https://git.tuxed.net/fkooman/php-yubitwee",
-                "reference": "af5b10dd4834993bc92b296da348e6c763f9df6e"
-            },
-            "require": {
-                "ext-curl": "*",
-                "ext-date": "*",
-                "ext-hash": "*",
-                "ext-pcre": "*",
-                "ext-spl": "*",
-                "paragonie/constant_time_encoding": "^1|^2",
-                "paragonie/random_compat": ">=1",
-                "php": ">=5.4",
-                "symfony/polyfill-php56": "^1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8.35|^5|^6|^7"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "fkooman\\YubiTwee\\": "src/",
-                    "fkooman\\YubiTwee\\Tests\\": "tests/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "François Kooman",
-                    "email": "fkooman@tuxed.net"
-                }
-            ],
-            "description": "YubiKey OTP Validator library",
-            "time": "2018-06-08T08:44:01+00:00"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -644,16 +602,16 @@
         },
         {
             "name": "twig/extensions",
-            "version": "v1.5.3",
+            "version": "v1.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig-extensions.git",
-                "reference": "e187386bea539a2cc2726689d6b4d468672a8ab4"
+                "reference": "57873c8b0c1be51caa47df2cdb824490beb16202"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig-extensions/zipball/e187386bea539a2cc2726689d6b4d468672a8ab4",
-                "reference": "e187386bea539a2cc2726689d6b4d468672a8ab4",
+                "url": "https://api.github.com/repos/twigphp/Twig-extensions/zipball/57873c8b0c1be51caa47df2cdb824490beb16202",
+                "reference": "57873c8b0c1be51caa47df2cdb824490beb16202",
                 "shasum": ""
             },
             "require": {
@@ -695,7 +653,7 @@
                 "i18n",
                 "text"
             ],
-            "time": "2018-11-16T03:34:09+00:00"
+            "time": "2018-12-05T18:34:18+00:00"
         },
         {
             "name": "twig/twig",
@@ -1438,16 +1396,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "7.4.4",
+            "version": "7.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "b1be2c8530c4c29c3519a052c9fb6cee55053bbd"
+                "reference": "61d34e8dd6eb3555900f0f2a2fa9e7e570730102"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b1be2c8530c4c29c3519a052c9fb6cee55053bbd",
-                "reference": "b1be2c8530c4c29c3519a052c9fb6cee55053bbd",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/61d34e8dd6eb3555900f0f2a2fa9e7e570730102",
+                "reference": "61d34e8dd6eb3555900f0f2a2fa9e7e570730102",
                 "shasum": ""
             },
             "require": {
@@ -1468,7 +1426,7 @@
                 "phpunit/php-timer": "^2.0",
                 "sebastian/comparator": "^3.0",
                 "sebastian/diff": "^3.0",
-                "sebastian/environment": "^3.1 || ^4.0",
+                "sebastian/environment": "^4.0",
                 "sebastian/exporter": "^3.1",
                 "sebastian/global-state": "^2.0",
                 "sebastian/object-enumerator": "^3.0.3",
@@ -1518,7 +1476,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2018-11-14T16:52:02+00:00"
+            "time": "2018-12-03T05:01:24+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -1687,28 +1645,28 @@
         },
         {
             "name": "sebastian/environment",
-            "version": "3.1.0",
+            "version": "4.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "cd0871b3975fb7fc44d11314fd1ee20925fce4f5"
+                "reference": "febd209a219cea7b56ad799b30ebbea34b71eb8f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/cd0871b3975fb7fc44d11314fd1ee20925fce4f5",
-                "reference": "cd0871b3975fb7fc44d11314fd1ee20925fce4f5",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/febd209a219cea7b56ad799b30ebbea34b71eb8f",
+                "reference": "febd209a219cea7b56ad799b30ebbea34b71eb8f",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.0"
+                "php": "^7.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.1"
+                "phpunit/phpunit": "^7.4"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1.x-dev"
+                    "dev-master": "4.0-dev"
                 }
             },
             "autoload": {
@@ -1733,7 +1691,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2017-07-01T08:51:00+00:00"
+            "time": "2018-11-25T09:31:21+00:00"
         },
         {
             "name": "sebastian/exporter",
@@ -2176,7 +2134,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "eduvpn/common": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

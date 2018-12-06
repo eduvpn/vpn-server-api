@@ -76,6 +76,7 @@ class ServerManager
     public function kill($commonName)
     {
         $instanceNumber = $this->config->getItem('instanceNumber');
+        $socketAddressList = [];
 
         // loop over all profiles
         foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
@@ -83,7 +84,6 @@ class ServerManager
             $managementIp = $profileConfig->getItem('managementIp');
             $profileNumber = $profileConfig->getItem('profileNumber');
 
-            $socketAddressList = [];
             for ($i = 0; $i < \count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
                 $socketAddressList[] = sprintf(
                     'tcp://%s:%d',
@@ -91,13 +91,11 @@ class ServerManager
                     11940 + $this->toPort($instanceNumber, $profileNumber, $i)
                 );
             }
-
-            $connectionManager = new ConnectionManager($socketAddressList, $this->logger, $this->managementSocket);
-
-            return $connectionManager->disconnect([$commonName]);
         }
 
-        return 0;
+        $connectionManager = new ConnectionManager($socketAddressList, $this->logger, $this->managementSocket);
+
+        return $connectionManager->disconnect([$commonName]);
     }
 
     /**

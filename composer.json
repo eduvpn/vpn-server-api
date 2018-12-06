@@ -40,7 +40,7 @@
     ],
     "require": {
         "LC/openvpn-connection-manager": "^1",
-        "eduvpn/common": "^1",
+        "eduvpn/common": "dev-master",
         "ext-date": "*",
         "ext-json": "*",
         "ext-openssl": "*",
@@ -49,7 +49,6 @@
         "ext-spl": "*",
         "fkooman/otp-verifier": "^0",
         "fkooman/sqlite-migrate": "^0",
-        "fkooman/yubitwee": "^1",
         "php": ">=5.4",
         "psr/log": "^1"
     },

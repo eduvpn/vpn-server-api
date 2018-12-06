@@ -76,7 +76,6 @@ class StorageTest extends TestCase
             [
                 'user_id' => 'user_id',
                 'is_disabled' => false,
-                'has_yubi_key_id' => false,
                 'has_totp_secret' => false,
                 'last_authenticated_at' => null,
                 'entitlement_list' => [],

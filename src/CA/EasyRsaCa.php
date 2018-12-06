@@ -47,7 +47,7 @@ class EasyRsaCa implements CaInterface
         FileIO::createDir($this->easyRsaDataDir, 0700);
 
         // only initialize when unitialized, prevent destroying existing CA
-        if (!@file_exists(sprintf('%s/vars', $this->easyRsaDataDir))) {
+        if (!file_exists(sprintf('%s/vars', $this->easyRsaDataDir))) {
             $configData = [
                 sprintf('set_var EASYRSA "%s"', $this->easyRsaDir),
                 sprintf('set_var EASYRSA_PKI "%s/pki"', $this->easyRsaDataDir),
@@ -201,7 +201,7 @@ class EasyRsaCa implements CaInterface
      */
     private function hasCert($commonName)
     {
-        return @file_exists(
+        return file_exists(
             sprintf(
                 '%s/pki/issued/%s.crt',
                 $this->easyRsaDataDir,

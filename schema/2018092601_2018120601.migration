@@ -1,0 +1,10 @@
+ALTER TABLE users RENAME TO _users;
+CREATE TABLE users(
+  user_id VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
+  voot_token TEXT DEFAULT NULL,
+  last_authenticated_at DATETIME DEFAULT NULL,
+  entitlement_list TEXT DEFAULT "[]",
+  is_disabled BOOLEAN DEFAULT 0 NOT NULL
+);
+INSERT INTO users (user_id, voot_token, last_authenticated_at, entitlement_list, is_disabled) SELECT user_id, voot_token, last_authenticated_at, entitlement_list, is_disabled FROM _users;
+DROP TABLE _users;
