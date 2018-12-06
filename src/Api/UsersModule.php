@@ -20,9 +20,7 @@ use SURFnet\VPN\Common\Http\InputValidation;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
-use SURFnet\VPN\Server\Exception\YubiKeyException;
 use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\YubiKey;
 
 class UsersModule implements ServiceModuleInterface
 {
@@ -56,122 +54,6 @@ class UsersModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
 
                 return new ApiResponse('user_list', $this->storage->getUsers());
-            }
-        );
-
-        $service->post(
-            '/set_yubi_key_id',
-            /**
-             * @return \SURFnet\VPN\Common\Http\Response
-             */
-            function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
-
-                $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $yubiKeyOtp = InputValidation::yubiKeyOtp($request->getPostParameter('yubi_key_otp'));
-
-                // check if there is already a YubiKey ID registered for this user
-                if ($this->storage->hasYubiKeyId($userId)) {
-                    return new ApiErrorResponse('set_yubi_key_id', 'YubiKey ID already set');
-                }
-
-                $yubiKey = new YubiKey();
-                try {
-                    $yubiKeyId = $yubiKey->getVerifiedId($yubiKeyOtp);
-                    $this->storage->setYubiKeyId($userId, $yubiKeyId);
-                    $this->storage->addUserMessage($userId, 'notification', sprintf('YubiKey ID "%s" registered', $yubiKeyId));
-
-                    return new ApiResponse('set_yubi_key_id');
-                } catch (YubiKeyException $e) {
-                    $msg = sprintf('YubiKey OTP verification failed: %s', $e->getMessage());
-                    $this->storage->addUserMessage($userId, 'notification', $msg);
-
-                    return new ApiErrorResponse('set_yubi_key_id', $msg);
-                }
-            }
-        );
-
-        $service->post(
-            '/verify_yubi_key_otp',
-            /**
-             * @return \SURFnet\VPN\Common\Http\Response
-             */
-            function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
-
-                $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $yubiKeyOtp = InputValidation::yubiKeyOtp($request->getPostParameter('yubi_key_otp'));
-
-                $expectedYubiKeyId = $this->storage->getYubiKeyId($userId);
-                if (null === $expectedYubiKeyId) {
-                    $msg = 'YubiKey: user not enrolled';
-                    $this->storage->addUserMessage($userId, 'notification', $msg);
-
-                    return new ApiErrorResponse('verify_yubi_key_otp', $msg);
-                }
-
-                $yubiKey = new YubiKey();
-                try {
-                    $yubiKey->verifyOtpForId($yubiKeyOtp, $expectedYubiKeyId);
-
-                    return new ApiResponse('verify_yubi_key_otp');
-                } catch (YubiKeyException $e) {
-                    $msg = sprintf('YubiKey: %s', $e->getMessage());
-                    $this->storage->addUserMessage($userId, 'notification', $msg);
-
-                    return new ApiErrorResponse('verify_yubi_key_otp', $msg);
-                }
-            }
-        );
-
-        $service->get(
-            '/has_yubi_key_id',
-            /**
-             * @return \SURFnet\VPN\Common\Http\Response
-             */
-            function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
-
-                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
-
-                return new ApiResponse('has_yubi_key_id', $this->storage->hasYubiKeyId($userId));
-            }
-        );
-
-        $service->get(
-            '/yubi_key_id',
-            /**
-             * @return \SURFnet\VPN\Common\Http\Response
-             */
-            function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-admin-portal']);
-
-                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
-
-                $yubiKeyId = $this->storage->getYubiKeyId($userId);
-                if (null === $yubiKeyId) {
-                    return new ApiResponse('yubi_key_id', false);
-                }
-
-                return new ApiResponse('yubi_key_id', $yubiKeyId);
-            }
-        );
-
-        $service->post(
-            '/delete_yubi_key_id',
-            /**
-             * @return \SURFnet\VPN\Common\Http\Response
-             */
-            function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
-
-                $userId = InputValidation::userId($request->getPostParameter('user_id'));
-
-                $yubiKeyId = $this->storage->getYubiKeyId($userId);
-                $this->storage->deleteYubiKeyId($userId);
-                $this->storage->addUserMessage($userId, 'notification', sprintf('YubiKey ID "%s" deleted', $yubiKeyId));
-
-                return new ApiResponse('delete_yubi_key_id');
             }
         );
 

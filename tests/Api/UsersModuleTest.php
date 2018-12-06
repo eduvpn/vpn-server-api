@@ -105,7 +105,6 @@ class UsersModuleTest extends TestCase
                 [
                     'user_id' => 'foo',
                     'is_disabled' => false,
-                    'has_yubi_key_id' => false,
                     'has_totp_secret' => false,
                     'last_authenticated_at' => null,
                     'entitlement_list' => [],
@@ -113,7 +112,6 @@ class UsersModuleTest extends TestCase
                 [
                     'user_id' => 'bar',
                     'is_disabled' => true,
-                    'has_yubi_key_id' => false,
                     'has_totp_secret' => true,
                     'last_authenticated_at' => null,
                     'entitlement_list' => [],
@@ -121,7 +119,6 @@ class UsersModuleTest extends TestCase
                 [
                     'user_id' => 'baz',
                     'is_disabled' => false,
-                    'has_yubi_key_id' => false,
                     'has_totp_secret' => true,
                     'last_authenticated_at' => null,
                     'entitlement_list' => [],
@@ -385,7 +382,6 @@ class UsersModuleTest extends TestCase
             [
                 'user_id' => 'foo',
                 'is_disabled' => false,
-                'has_yubi_key_id' => false,
                 'has_totp_secret' => false,
                 'last_authenticated_at' => '2018-01-01 01:00:00',
                 'entitlement_list' => [],

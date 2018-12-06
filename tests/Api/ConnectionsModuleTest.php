@@ -173,27 +173,6 @@ class ConnectionsModuleTest extends TestCase
         );
     }
 
-    public function testVerifyYubiNotEnrolled()
-    {
-        $this->assertSame(
-            [
-                'ok' => false,
-                'error' => '[VPN] YubiKey: user not enrolled',
-            ],
-            $this->makeRequest(
-                ['vpn-server-node', 'aabbcc'],
-                'POST',
-                'verify_two_factor',
-                [],
-                [
-                    'common_name' => '12345678901234567890123456789012',
-                    'two_factor_type' => 'yubi',
-                    'two_factor_value' => 'ccccccetgjtltdlnkkcjgtkvdbdritctdhvittdkngkt',
-                ]
-            )
-        );
-    }
-
     private function makeRequest(array $basicAuth, $requestMethod, $pathInfo, array $getData = [], array $postData = [])
     {
         $response = $this->service->run(

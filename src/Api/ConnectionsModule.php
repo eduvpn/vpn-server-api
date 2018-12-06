@@ -21,9 +21,7 @@ use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 use SURFnet\VPN\Common\ProfileConfig;
-use SURFnet\VPN\Server\Exception\YubiKeyException;
 use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\YubiKey;
 
 class ConnectionsModule implements ServiceModuleInterface
 {
@@ -138,24 +136,6 @@ class ConnectionsModule implements ServiceModuleInterface
         $userId = $certInfo['user_id'];
 
         switch ($twoFactorType) {
-            case 'yubi':
-                $yubiKeyOtp = InputValidation::yubiKeyOtp($request->getPostParameter('two_factor_value'));
-                $expectedYubiKeyId = $this->storage->getYubiKeyId($userId);
-                if (null === $expectedYubiKeyId) {
-                    $msg = '[VPN] YubiKey: user not enrolled';
-                    $this->storage->addUserMessage($userId, 'notification', $msg);
-
-                    return new ApiErrorResponse('verify_two_factor', $msg);
-                }
-                try {
-                    $yubiKey = new YubiKey();
-                    $yubiKey->verifyOtpForId($yubiKeyOtp, $expectedYubiKeyId);
-                } catch (YubiKeyException $e) {
-                    $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] YubiKey OTP validation failed: %s', $e->getMessage()));
-
-                    return new ApiErrorResponse('verify_two_factor', $e->getMessage());
-                }
-                break;
             case 'totp':
                 $totpKey = InputValidation::totpKey($request->getPostParameter('two_factor_value'));
                 try {
