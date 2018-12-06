@@ -18,7 +18,7 @@ use SURFnet\VPN\Common\Json;
 
 class Storage implements OtpStorageInterface
 {
-    const CURRENT_SCHEMA_VERSION = '2018120601';
+    const CURRENT_SCHEMA_VERSION = '2018120602';
 
     /** @var \PDO */
     private $db;
