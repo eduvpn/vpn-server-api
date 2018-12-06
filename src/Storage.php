@@ -335,7 +335,8 @@ SQL
         common_name, 
         display_name, 
         valid_from, 
-        valid_to
+        valid_to,
+        client_id
     FROM 
         certificates
     WHERE 
