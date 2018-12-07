@@ -10,8 +10,6 @@
 namespace SURFnet\VPN\Server\Api;
 
 use DateTime;
-use fkooman\Otp\Exception\OtpException;
-use fkooman\Otp\Totp;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\ApiErrorResponse;
 use SURFnet\VPN\Common\Http\ApiResponse;
@@ -69,18 +67,6 @@ class ConnectionsModule implements ServiceModuleInterface
                 return $this->disconnect($request);
             }
         );
-
-        $service->post(
-            '/verify_two_factor',
-            /**
-             * @return \SURFnet\VPN\Common\Http\Response
-             */
-            function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-server-node']);
-
-                return $this->verifyTwoFactor($request);
-            }
-        );
     }
 
     /**
@@ -120,42 +106,6 @@ class ConnectionsModule implements ServiceModuleInterface
         $this->storage->clientDisconnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)), new DateTime(sprintf('@%d', $disconnectedAt)), $bytesTransferred);
 
         return new ApiResponse('disconnect');
-    }
-
-    /**
-     * @return \SURFnet\VPN\Common\Http\Response
-     */
-    public function verifyTwoFactor(Request $request)
-    {
-        $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
-        $twoFactorType = InputValidation::twoFactorType($request->getPostParameter('two_factor_type'));
-
-        if (false === $certInfo = $this->storage->getUserCertificateInfo($commonName)) {
-            return new ApiErrorResponse('verify_two_factor', '[VPN] certificate does not exist');
-        }
-        $userId = $certInfo['user_id'];
-
-        switch ($twoFactorType) {
-            case 'totp':
-                $totpKey = InputValidation::totpKey($request->getPostParameter('two_factor_value'));
-                try {
-                    $totp = new Totp($this->storage);
-                    if (false === $totp->verify($userId, $totpKey)) {
-                        $this->storage->addUserMessage($userId, 'notification', '[VPN] TOTP validation failed: invalid OTP');
-
-                        return new ApiErrorResponse('verify_two_factor', '[VPN] TOTP validation failed: invalid OTP');
-                    }
-                } catch (OtpException $e) {
-                    $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] TOTP validation failed: %s', $e->getMessage()));
-
-                    return new ApiErrorResponse('verify_two_factor', $e->getMessage());
-                }
-                break;
-            default:
-                return new ApiErrorResponse('verify_two_factor', 'invalid two factor type');
-        }
-
-        return new ApiResponse('verify_two_factor');
     }
 
     /**

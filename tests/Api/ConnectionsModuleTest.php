@@ -10,9 +10,7 @@
 namespace SURFnet\VPN\Server\Tests\Api;
 
 use DateTime;
-use fkooman\Otp\FrkOtp;
 use fkooman\Otp\OtpInfo;
-use ParagonIE\ConstantTime\Base32;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use SURFnet\VPN\Common\Config;
@@ -147,27 +145,6 @@ class ConnectionsModuleTest extends TestCase
                     'connected_at' => 12345678,
                     'disconnected_at' => 23456789,
                     'bytes_transferred' => 2222222,
-                ]
-            )
-        );
-    }
-
-    public function testVerifyOtp()
-    {
-        $frkOtp = new FrkOtp();
-        $dateTime = new DateTime();
-        $totpKey = $frkOtp->totp(Base32::decodeUpper('CN2XAL23SIFTDFXZ'), 'sha1', 6, $dateTime->getTimestamp(), 30);
-
-        $this->assertTrue(
-            $this->makeRequest(
-                ['vpn-server-node', 'aabbcc'],
-                'POST',
-                'verify_two_factor',
-                [],
-                [
-                    'common_name' => '12345678901234567890123456789012',
-                    'two_factor_type' => 'totp',
-                    'two_factor_value' => $totpKey,
                 ]
             )
         );

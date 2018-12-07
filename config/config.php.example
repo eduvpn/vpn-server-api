@@ -95,10 +95,6 @@ return [
             // Quad9 (https://www.quad9.net)
             'dns' => ['9.9.9.9', '2620:fe::fe'],
 
-            // Whether or not to enable two-factor authentication
-            // DEFAULT = false
-            'twoFactor' => false,
-
             // Whether or not to allow client-to-client traffic
             // DEFAULT = false
             'clientToClient' => false,
