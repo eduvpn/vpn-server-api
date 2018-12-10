@@ -13,6 +13,7 @@ $baseDir = dirname(__DIR__);
 
 use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\Config;
+use SURFnet\VPN\Common\FileIO;
 
 $credentials = [
     'vpn-user-portal' => bin2hex(random_bytes(16)),
@@ -58,7 +59,7 @@ try {
     ];
 
     foreach ($consumerConfigFiles as $configId => $configFile) {
-        if (file_exists($configFile)) {
+        if (FileIO::hasFile($configFile)) {
             $config = Config::fromFile($configFile);
             $configData = $config->toArray();
             $configData['apiPass'] = $credentials[$configId];

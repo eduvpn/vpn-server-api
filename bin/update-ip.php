@@ -13,6 +13,7 @@ $baseDir = dirname(__DIR__);
 
 use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\Config;
+use SURFnet\VPN\Common\FileIO;
 use SURFnet\VPN\Common\ProfileConfig;
 
 /*
@@ -60,7 +61,8 @@ try {
 
     // figure out DNS based on `/etc/resolv.conf`
     $nameServerList = [];
-    if (false !== $resolvConf = file_get_contents('/etc/resolv.conf')) {
+    if (FileIO::hasFile('/etc/resolv.conf')) {
+        $resolvConf = FileIO::readFile('/etc/resolv.conf');
         $resolvConfData = explode(PHP_EOL, $resolvConf);
         foreach ($resolvConfData as $revolvConfLine) {
             if (0 === strpos(trim($revolvConfLine), 'nameserver ')) {
