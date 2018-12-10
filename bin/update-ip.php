@@ -61,7 +61,7 @@ try {
 
     // figure out DNS based on `/etc/resolv.conf`
     $nameServerList = [];
-    if (FileIO::hasFile('/etc/resolv.conf')) {
+    if (FileIO::exists('/etc/resolv.conf')) {
         $resolvConf = FileIO::readFile('/etc/resolv.conf');
         $resolvConfData = explode(PHP_EOL, $resolvConf);
         foreach ($resolvConfData as $revolvConfLine) {

@@ -59,7 +59,7 @@ try {
     ];
 
     foreach ($consumerConfigFiles as $configId => $configFile) {
-        if (FileIO::hasFile($configFile)) {
+        if (FileIO::exists($configFile)) {
             $config = Config::fromFile($configFile);
             $configData = $config->toArray();
             $configData['apiPass'] = $credentials[$configId];

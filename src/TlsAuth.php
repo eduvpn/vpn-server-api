@@ -33,7 +33,7 @@ class TlsAuth
         $taFile = sprintf('%s/ta.key', $this->dataDir);
 
         // generate the TA file if it does not exist
-        if (false === FileIO::hasFile($taFile)) {
+        if (false === FileIO::exists($taFile)) {
             $this->execOpenVpn(['--genkey', '--secret', $taFile]);
         }
     }
