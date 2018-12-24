@@ -19,7 +19,6 @@ use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Json;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Common\Random;
-use SURFnet\VPN\Server\Acl\Provider\EntitlementProvider;
 use SURFnet\VPN\Server\Api\CertificatesModule;
 use SURFnet\VPN\Server\Api\ConnectionsModule;
 use SURFnet\VPN\Server\Api\InfoModule;
@@ -67,15 +66,10 @@ try {
     );
     $storage->update();
 
-    $groupProviders = [
-        new EntitlementProvider($storage),
-    ];
-
     $service->addModule(
         new ConnectionsModule(
             $config,
-            $storage,
-            $groupProviders
+            $storage
         )
     );
 
@@ -88,8 +82,7 @@ try {
     $service->addModule(
         new UsersModule(
             $config,
-            $storage,
-            $groupProviders
+            $storage
         )
     );
 

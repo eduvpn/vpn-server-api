@@ -19,7 +19,6 @@ use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Server\Acl\Provider\EntitlementProvider;
 use SURFnet\VPN\Server\Api\UsersModule;
 use SURFnet\VPN\Server\Storage;
 
@@ -57,16 +56,11 @@ class UsersModuleTest extends TestCase
         $storage->lastAuthenticatedAtPing('bar', ['all', 'employees']);
 
         $config = Config::fromFile(sprintf('%s/data/user_groups_config.php', __DIR__));
-        $groupProviders = [
-            new EntitlementProvider($storage),
-        ];
-
         $this->service = new Service();
         $this->service->addModule(
             new UsersModule(
                 $config,
-                $storage,
-                $groupProviders
+                $storage
             )
         );
 
@@ -276,22 +270,6 @@ class UsersModuleTest extends TestCase
                 [
                     'user_id' => 'foo',
                 ]
-            )
-        );
-    }
-
-    public function testUserGroups()
-    {
-        $this->assertSame(
-            ['all', 'employees'],
-            $this->makeRequest(
-                ['vpn-user-portal', 'aabbcc'],
-                'GET',
-                'user_groups',
-                [
-                    'user_id' => 'bar',
-                ],
-                []
             )
         );
     }

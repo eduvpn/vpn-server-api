@@ -17,7 +17,6 @@ use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Server\Acl\Provider\EntitlementProvider;
 use SURFnet\VPN\Server\Api\ConnectionsModule;
 use SURFnet\VPN\Server\Storage;
 
@@ -44,17 +43,11 @@ class ConnectionsModuleTest extends TestCase
         $storage->clientConnect('internet', '12345678901234567890123456789012', '10.10.10.10', 'fd00:4242:4242:4242::', new DateTime('@12345678'));
 
         $config = Config::fromFile(sprintf('%s/data/config.php', __DIR__));
-
-        $groupProviders = [
-            new EntitlementProvider($storage),
-        ];
-
         $this->service = new Service();
         $this->service->addModule(
             new ConnectionsModule(
                 $config,
-                $storage,
-                $groupProviders
+                $storage
             )
         );
 

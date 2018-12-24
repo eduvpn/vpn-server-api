@@ -29,14 +29,10 @@ class UsersModule implements ServiceModuleInterface
     /** @var \SURFnet\VPN\Server\Storage */
     private $storage;
 
-    /** @var array */
-    private $groupProviders;
-
-    public function __construct(Config $config, Storage $storage, array $groupProviders)
+    public function __construct(Config $config, Storage $storage)
     {
         $this->config = $config;
         $this->storage = $storage;
-        $this->groupProviders = $groupProviders;
     }
 
     /**
@@ -209,25 +205,6 @@ class UsersModule implements ServiceModuleInterface
                 $this->storage->deleteUser($userId);
 
                 return new ApiResponse('delete_user');
-            }
-        );
-
-        $service->get(
-            '/user_groups',
-            /**
-             * @return \SURFnet\VPN\Common\Http\Response
-             */
-            function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
-
-                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
-
-                $userGroups = [];
-                foreach ($this->groupProviders as $groupProvider) {
-                    $userGroups = array_merge($userGroups, $groupProvider->getGroups($userId));
-                }
-
-                return new ApiResponse('user_groups', $userGroups);
             }
         );
 

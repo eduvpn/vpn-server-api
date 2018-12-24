@@ -29,14 +29,10 @@ class ConnectionsModule implements ServiceModuleInterface
     /** @var \SURFnet\VPN\Server\Storage */
     private $storage;
 
-    /** @var array */
-    private $groupProviders;
-
-    public function __construct(Config $config, Storage $storage, array $groupProviders)
+    public function __construct(Config $config, Storage $storage)
     {
         $this->config = $config;
         $this->storage = $storage;
-        $this->groupProviders = $groupProviders;
     }
 
     /**
@@ -144,11 +140,7 @@ class ConnectionsModule implements ServiceModuleInterface
         $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
         if ($profileConfig->getItem('enableAcl')) {
             // ACL enabled
-            $userGroups = [];
-            foreach ($this->groupProviders as $groupProvider) {
-                $userGroups = array_merge($userGroups, $groupProvider->getGroups($externalUserId));
-            }
-
+            $userGroups = $this->storage->getEntitlementList($externalUserId);
             if (false === self::isMember($userGroups, $profileConfig->getSection('aclGroupList')->toArray())) {
                 $msg = '[VPN] unable to connect, account not a member of required group';
                 $this->storage->addUserMessage($externalUserId, 'notification', $msg);
