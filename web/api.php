@@ -17,12 +17,9 @@ use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Response;
 use SURFnet\VPN\Common\Http\Service;
 use SURFnet\VPN\Common\Json;
-use SURFnet\VPN\Common\LdapClient;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Common\Random;
 use SURFnet\VPN\Server\Acl\Provider\EntitlementProvider;
-use SURFnet\VPN\Server\Acl\Provider\LdapProvider;
-use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
 use SURFnet\VPN\Server\Api\CertificatesModule;
 use SURFnet\VPN\Server\Api\ConnectionsModule;
 use SURFnet\VPN\Server\Api\InfoModule;
@@ -73,37 +70,6 @@ try {
     $groupProviders = [
         new EntitlementProvider($storage),
     ];
-
-    // the is all LEGACY! **DEPRECATED**
-    if ($config->hasSection('groupProviders')) {
-        $enabledProviders = array_keys($config->getSection('groupProviders')->toArray());
-        // StaticProvider
-        if (in_array('StaticProvider', $enabledProviders, true)) {
-            $groupProviders[] = new StaticProvider(
-                $config->getSection('groupProviders')->getSection('StaticProvider')
-            );
-        }
-        // LdapProvider
-        if (in_array('LdapProvider', $enabledProviders, true)) {
-            $ldapConfig = $config->getSection('groupProviders')->getSection('LdapProvider');
-            $ldapClient = new LdapClient($ldapConfig->getItem('ldapUri'));
-
-            // backwards compatible support for old "groupDn" and "filterTemplate". remove in 2.0
-            $groupBaseDn = $ldapConfig->hasItem('groupDn') ? $ldapConfig->getItem('groupDn') : $ldapConfig->getItem('groupBaseDn');
-            $memberFilterTemplate = $ldapConfig->hasItem('filterTemplate') ? $ldapConfig->getItem('filterTemplate') : $ldapConfig->getItem('memberFilterTemplate');
-
-            $groupProviders[] = new LdapProvider(
-                $logger,
-                $ldapClient,
-                $groupBaseDn,
-                $memberFilterTemplate,
-                $ldapConfig->hasItem('userBaseDn') ? $ldapConfig->getItem('userBaseDn') : null,
-                $ldapConfig->hasItem('userIdFilterTemplate') ? $ldapConfig->getItem('userIdFilterTemplate') : null,
-                $ldapConfig->hasItem('bindDn') ? $ldapConfig->getItem('bindDn') : null,
-                $ldapConfig->hasItem('bindPass') ? $ldapConfig->getItem('bindPass') : null
-            );
-        }
-    }
 
     $service->addModule(
         new ConnectionsModule(

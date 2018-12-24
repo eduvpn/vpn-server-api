@@ -19,7 +19,7 @@ use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
+use SURFnet\VPN\Server\Acl\Provider\EntitlementProvider;
 use SURFnet\VPN\Server\Api\UsersModule;
 use SURFnet\VPN\Server\Storage;
 
@@ -54,11 +54,11 @@ class UsersModuleTest extends TestCase
 
         $storage->recordOtpKey('baz', $totpKey, new DateTime('2018-01-01 08:00:00'));
 
+        $storage->lastAuthenticatedAtPing('bar', ['all', 'employees']);
+
         $config = Config::fromFile(sprintf('%s/data/user_groups_config.php', __DIR__));
         $groupProviders = [
-            new StaticProvider(
-                $config->getSection('groupProviders')->getSection('StaticProvider')
-            ),
+            new EntitlementProvider($storage),
         ];
 
         $this->service = new Service();
@@ -96,8 +96,8 @@ class UsersModuleTest extends TestCase
                     'user_id' => 'bar',
                     'is_disabled' => true,
                     'has_totp_secret' => true,
-                    'last_authenticated_at' => null,
-                    'entitlement_list' => [],
+                    'last_authenticated_at' => '2018-01-01 01:00:00',
+                    'entitlement_list' => ['all', 'employees'],
                 ],
                 [
                     'user_id' => 'baz',

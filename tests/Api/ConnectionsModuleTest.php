@@ -17,7 +17,7 @@ use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
 use SURFnet\VPN\Common\Http\Request;
 use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Server\Acl\Provider\StaticProvider;
+use SURFnet\VPN\Server\Acl\Provider\EntitlementProvider;
 use SURFnet\VPN\Server\Api\ConnectionsModule;
 use SURFnet\VPN\Server\Storage;
 
@@ -38,6 +38,7 @@ class ConnectionsModuleTest extends TestCase
             new DateTime()
         );
         $storage->init();
+        $storage->lastAuthenticatedAtPing('foo', ['students']);
         $storage->addCertificate('foo', '12345678901234567890123456789012', '12345678901234567890123456789012', new DateTime('@12345678'), new DateTime('@23456789'), null);
         $storage->setOtpSecret('foo', new OtpInfo('CN2XAL23SIFTDFXZ', 'sha1', 6, 30));
         $storage->clientConnect('internet', '12345678901234567890123456789012', '10.10.10.10', 'fd00:4242:4242:4242::', new DateTime('@12345678'));
@@ -45,9 +46,7 @@ class ConnectionsModuleTest extends TestCase
         $config = Config::fromFile(sprintf('%s/data/config.php', __DIR__));
 
         $groupProviders = [
-            new StaticProvider(
-                $config->getSection('groupProviders')->getSection('StaticProvider')
-            ),
+            new EntitlementProvider($storage),
         ];
 
         $this->service = new Service();
