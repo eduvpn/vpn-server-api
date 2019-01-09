@@ -38,7 +38,7 @@ class UserMessagesModule implements ServiceModuleInterface
              * @return \SURFnet\VPN\Common\Http\Response
              */
             function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $userId = InputValidation::userId($request->getQueryParameter('user_id'));
 

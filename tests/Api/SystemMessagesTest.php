@@ -46,7 +46,7 @@ class SystemMessagesTest extends TestCase
 
         $bearerAuthentication = new BasicAuthenticationHook(
             [
-                'vpn-admin-portal' => 'aabbcc',
+                'vpn-user-portal' => 'aabbcc',
             ]
         );
 
@@ -64,7 +64,7 @@ class SystemMessagesTest extends TestCase
                 ],
             ],
             $this->makeRequest(
-                ['vpn-admin-portal', 'aabbcc'],
+                ['vpn-user-portal', 'aabbcc'],
                 'GET',
                 'system_messages',
                 ['message_type' => 'motd'],
@@ -77,7 +77,7 @@ class SystemMessagesTest extends TestCase
     {
         $this->assertTrue(
             $this->makeRequest(
-                ['vpn-admin-portal', 'aabbcc'],
+                ['vpn-user-portal', 'aabbcc'],
                 'POST',
                 'add_system_message',
                 [],
@@ -98,7 +98,7 @@ class SystemMessagesTest extends TestCase
                 ],
             ],
             $this->makeRequest(
-                ['vpn-admin-portal', 'aabbcc'],
+                ['vpn-user-portal', 'aabbcc'],
                 'GET',
                 'system_messages',
                 ['message_type' => 'motd'],
@@ -111,7 +111,7 @@ class SystemMessagesTest extends TestCase
     {
         $this->assertTrue(
             $this->makeRequest(
-                ['vpn-admin-portal', 'aabbcc'],
+                ['vpn-user-portal', 'aabbcc'],
                 'POST',
                 'delete_system_message',
                 [],

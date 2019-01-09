@@ -38,7 +38,7 @@ class SystemMessagesModule implements ServiceModuleInterface
              * @return \SURFnet\VPN\Common\Http\Response
              */
             function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $type = InputValidation::messageType($request->getQueryParameter('message_type'));
 
@@ -52,7 +52,7 @@ class SystemMessagesModule implements ServiceModuleInterface
              * @return \SURFnet\VPN\Common\Http\Response
              */
             function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $type = InputValidation::messageType($request->getPostParameter('message_type'));
 
@@ -74,7 +74,7 @@ class SystemMessagesModule implements ServiceModuleInterface
              * @return \SURFnet\VPN\Common\Http\Response
              */
             function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $messageId = InputValidation::messageId($request->getPostParameter('message_id'));
 

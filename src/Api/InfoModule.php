@@ -51,7 +51,7 @@ class InfoModule implements ServiceModuleInterface
              * @return \SURFnet\VPN\Common\Http\Response
              */
             function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-admin-portal', 'vpn-user-portal', 'vpn-server-node']);
+                AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-server-node']);
 
                 $profileList = [];
                 foreach ($this->config->getSection('vpnProfiles')->toArray() as $profileId => $profileData) {

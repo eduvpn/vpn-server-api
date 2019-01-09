@@ -4,7 +4,6 @@ return [
     // API consumers & credentials
     'apiConsumers' => [
         'vpn-user-portal' => 'XXX-vpn-user-portal/vpn-server-api-XXX',
-        'vpn-admin-portal' => 'XXX-vpn-admin-portal/vpn-server-api-XXX',
         'vpn-server-node' => 'XXX-vpn-server-node/vpn-server-api-XXX',
     ],
 

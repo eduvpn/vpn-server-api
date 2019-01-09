@@ -60,7 +60,7 @@ class OpenVpnModuleTest extends TestCase
 
         $bearerAuthentication = new BasicAuthenticationHook(
             [
-                'vpn-admin-portal' => 'bbccdd',
+                'vpn-user-portal' => 'aabbcc',
             ]
         );
 
@@ -104,7 +104,7 @@ class OpenVpnModuleTest extends TestCase
                 ],
             ],
             $this->makeRequest(
-                ['vpn-admin-portal', 'bbccdd'],
+                ['vpn-user-portal', 'aabbcc'],
                 'GET',
                 'client_connections',
                 [],

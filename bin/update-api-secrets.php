@@ -17,7 +17,6 @@ use SURFnet\VPN\Common\FileIO;
 
 $credentials = [
     'vpn-user-portal' => bin2hex(random_bytes(16)),
-    'vpn-admin-portal' => bin2hex(random_bytes(16)),
     'vpn-server-node' => bin2hex(random_bytes(16)),
 ];
 
@@ -47,14 +46,12 @@ try {
     $config = Config::fromFile($configFile);
     $configData = $config->toArray();
     $configData['apiConsumers']['vpn-user-portal'] = $credentials['vpn-user-portal'];
-    $configData['apiConsumers']['vpn-admin-portal'] = $credentials['vpn-admin-portal'];
     $configData['apiConsumers']['vpn-server-node'] = $credentials['vpn-server-node'];
     Config::toFile($configFile, $configData, 0644);
 
     // consumers
     $consumerConfigFiles = [
         'vpn-user-portal' => sprintf('%s/vpn-user-portal/config/%s/config.php', $prefix, $instanceId),
-        'vpn-admin-portal' => sprintf('%s/vpn-admin-portal/config/%s/config.php', $prefix, $instanceId),
         'vpn-server-node' => sprintf('%s/vpn-server-node/config/%s/config.php', $prefix, $instanceId),
     ];
 

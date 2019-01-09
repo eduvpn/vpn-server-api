@@ -38,7 +38,7 @@ class LogModule implements ServiceModuleInterface
              * @return \SURFnet\VPN\Common\Http\Response
              */
             function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $dateTime = InputValidation::dateTime($request->getQueryParameter('date_time'));
                 $ipAddress = InputValidation::ipAddress($request->getQueryParameter('ip_address'));

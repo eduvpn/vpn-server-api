@@ -67,7 +67,6 @@ class UsersModuleTest extends TestCase
         $bearerAuthentication = new BasicAuthenticationHook(
             [
                 'vpn-user-portal' => 'aabbcc',
-                'vpn-admin-portal' => 'bbccdd',
                 'vpn-server-node' => 'ccddee',
             ]
         );
@@ -102,7 +101,7 @@ class UsersModuleTest extends TestCase
                 ],
             ],
             $this->makeRequest(
-                ['vpn-admin-portal', 'bbccdd'],
+                ['vpn-user-portal', 'aabbcc'],
                 'GET',
                 'user_list',
                 ['profile_id' => 'internet'],
@@ -218,7 +217,7 @@ class UsersModuleTest extends TestCase
     {
         $this->assertTrue(
             $this->makeRequest(
-                ['vpn-admin-portal', 'bbccdd'],
+                ['vpn-user-portal', 'aabbcc'],
                 'POST',
                 'delete_totp_secret',
                 [],
@@ -233,7 +232,7 @@ class UsersModuleTest extends TestCase
     {
         $this->assertTrue(
             $this->makeRequest(
-                ['vpn-admin-portal', 'bbccdd'],
+                ['vpn-user-portal', 'aabbcc'],
                 'POST',
                 'disable_user',
                 [],
@@ -248,7 +247,7 @@ class UsersModuleTest extends TestCase
     {
         $this->assertTrue(
             $this->makeRequest(
-                ['vpn-admin-portal', 'bbccdd'],
+                ['vpn-user-portal', 'aabbcc'],
                 'POST',
                 'enable_user',
                 [],
@@ -263,7 +262,7 @@ class UsersModuleTest extends TestCase
     {
         $this->assertTrue(
             $this->makeRequest(
-                ['vpn-admin-portal', 'bbccdd'],
+                ['vpn-user-portal', 'aabbcc'],
                 'POST',
                 'delete_user',
                 [],
@@ -278,7 +277,7 @@ class UsersModuleTest extends TestCase
     {
         $this->assertNull(
             $this->makeRequest(
-                ['vpn-admin-portal', 'bbccdd'],
+                ['vpn-user-portal', 'aabbcc'],
                 'GET',
                 'user_list',
                 [],
@@ -303,7 +302,7 @@ class UsersModuleTest extends TestCase
                 'entitlement_list' => [],
             ],
             $this->makeRequest(
-                ['vpn-admin-portal', 'bbccdd'],
+                ['vpn-user-portal', 'aabbcc'],
                 'GET',
                 'user_list',
                 [],

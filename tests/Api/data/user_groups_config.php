@@ -10,7 +10,6 @@
 return  [
   'apiConsumers' => [
     'vpn-user-portal' => 'abcdef',
-    'vpn-admin-portal' => 'fedcba',
     'vpn-server-node' => 'aabbcc',
   ],
   'CA' => [

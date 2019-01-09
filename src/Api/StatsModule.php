@@ -41,7 +41,7 @@ class StatsModule implements ServiceModuleInterface
              * @return \SURFnet\VPN\Common\Http\Response
              */
             function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-admin-portal']);
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
                 $statsFile = sprintf('%s/stats.json', $this->dataDir);
 
                 try {

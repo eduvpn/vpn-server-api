@@ -53,7 +53,6 @@ class CertificatesModuleTest extends TestCase
         $bearerAuthentication = new BasicAuthenticationHook(
             [
                 'vpn-user-portal' => 'abcdef',
-                'vpn-admin-portal' => 'ffeedd',
                 'vpn-server-node' => 'aabbcc',
             ]
         );
