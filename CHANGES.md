@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.10 (...)
+## 2.0.0 (...)
 - remove YubiKey support
 - remove VOOT support
 
