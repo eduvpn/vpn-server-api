@@ -134,16 +134,9 @@ return [
             'hideProfile' => false,
 
             // Protect to TLS control channel with PSK
-            // DEFAULT = tls-auth
+            // DEFAULT = tls-crypt
             'tlsProtection' => 'tls-crypt',
-            //'tlsProtection' => 'tls-auth',
             //'tlsProtection' => false,
-
-            // Enable data channel compression framing (--comp-lzo)
-            // it will NEVER enable compression, as that would NOT be secure, 
-            // see e.g. "VORACLE" attack
-            // DEFAULT = true
-            'enableCompression' => false,
         ],
     ],
 ];

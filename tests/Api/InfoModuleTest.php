@@ -55,7 +55,6 @@ class InfoModuleTest extends TestCase
                       'dns' => [
                       ],
                       'enableAcl' => false,
-                      'enableCompression' => true,
                       'enableLog' => false,
                       'enableNat4' => false,
                       'enableNat6' => false,
@@ -72,7 +71,7 @@ class InfoModuleTest extends TestCase
                       'reject6' => false,
                       'routes' => [
                       ],
-                      'tlsProtection' => 'tls-auth',
+                      'tlsProtection' => 'tls-crypt',
                       'vpnProtoPorts' => [
                         0 => 'udp/1194',
                         1 => 'tcp/1194',

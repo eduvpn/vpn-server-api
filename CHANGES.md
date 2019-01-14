@@ -3,6 +3,8 @@
 ## 2.0.0 (...)
 - remove YubiKey support
 - remove VOOT support
+- remove compression framing support 
+- remove tls-auth support
 
 ## 1.4.9 (2018-12-05)
 - fix bug where disabling a user would only disconnect the user from the first
