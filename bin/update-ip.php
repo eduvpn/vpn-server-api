@@ -44,7 +44,6 @@ try {
         exit(0);
     }
 
-    $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
     $v4 = sprintf(
         '10.%s.%s.0/25',
         hexdec(bin2hex(random_bytes(1))),
@@ -90,7 +89,7 @@ try {
     echo sprintf('IPv6 prefix: %s', $v6).PHP_EOL;
     echo sprintf('DNS        : %s', implode(', ', $nameServerList)).PHP_EOL;
 
-    $configFile = sprintf('%s/config/%s/config.php', $baseDir, $instanceId);
+    $configFile = sprintf('%s/config/config.php', $baseDir);
     $config = Config::fromFile($configFile);
     $profileConfig = new ProfileConfig($config->getSection('vpnProfiles')->getSection($opt->getItem('profile'))->toArray());
 

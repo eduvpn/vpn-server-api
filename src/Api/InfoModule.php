@@ -34,18 +34,6 @@ class InfoModule implements ServiceModuleInterface
     {
         /* INFO */
         $service->get(
-            '/instance_number',
-            /**
-             * @return \SURFnet\VPN\Common\Http\Response
-             */
-            function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-server-node']);
-
-                return new ApiResponse('instance_number', $this->config->getItem('instanceNumber'));
-            }
-        );
-
-        $service->get(
             '/profile_list',
             /**
              * @return \SURFnet\VPN\Common\Http\Response

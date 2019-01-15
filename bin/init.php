@@ -11,37 +11,21 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
-use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Server\CA\EasyRsaCa;
 use SURFnet\VPN\Server\Storage;
 use SURFnet\VPN\Server\TlsAuth;
 
 try {
-    $p = new CliParser(
-        'Initialize the CA',
-        [
-            'instance' => ['the VPN instance', true, false],
-        ]
-    );
-
-    $opt = $p->parse($argv);
-    if ($opt->hasItem('help')) {
-        echo $p->help();
-        exit(0);
-    }
-
-    $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
-
-    $configFile = sprintf('%s/config/%s/config.php', $baseDir, $instanceId);
+    $configFile = sprintf('%s/config/config.php', $baseDir);
     $config = Config::fromFile($configFile);
 
     $easyRsaDir = sprintf('%s/easy-rsa', $baseDir);
-    $easyRsaDataDir = sprintf('%s/data/%s/easy-rsa', $baseDir, $instanceId);
+    $easyRsaDataDir = sprintf('%s/data/easy-rsa', $baseDir);
 
     $ca = new EasyRsaCa($config, $easyRsaDir, $easyRsaDataDir);
 
-    $dataDir = sprintf('%s/data/%s', $baseDir, $instanceId);
+    $dataDir = sprintf('%s/data', $baseDir);
     $storage = new Storage(
         new PDO(
             sprintf('sqlite://%s/db.sqlite', $dataDir)

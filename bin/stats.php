@@ -11,32 +11,16 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
-use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\FileIO;
 use SURFnet\VPN\Server\Stats;
 use SURFnet\VPN\Server\Storage;
 
 try {
-    $p = new CliParser(
-        'Generate statistics for an instance',
-        [
-            'instance' => ['the VPN instance', true, false],
-        ]
-    );
-
-    $opt = $p->parse($argv);
-    if ($opt->hasItem('help')) {
-        echo $p->help();
-        exit(0);
-    }
-
-    $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
-
-    $configFile = sprintf('%s/config/%s/config.php', $baseDir, $instanceId);
+    $configFile = sprintf('%s/config/config.php', $baseDir);
     $config = Config::fromFile($configFile);
 
-    $dataDir = sprintf('%s/data/%s', $baseDir, $instanceId);
+    $dataDir = sprintf('%s/data', $baseDir);
     $db = new PDO(sprintf('sqlite://%s/db.sqlite', $dataDir));
     $storage = new Storage(
         $db,

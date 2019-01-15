@@ -12,28 +12,12 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
 use LC\OpenVpn\ManagementSocket;
-use SURFnet\VPN\Common\CliParser;
 use SURFnet\VPN\Common\Config;
 use SURFnet\VPN\Common\Logger;
 use SURFnet\VPN\Server\OpenVpn\ServerManager;
 
 try {
-    $p = new CliParser(
-        'Get the connection status of an instance',
-        [
-            'instance' => ['the VPN instance', true, false],
-        ]
-    );
-
-    $opt = $p->parse($argv);
-    if ($opt->hasItem('help')) {
-        echo $p->help();
-        exit(0);
-    }
-
-    $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
-
-    $configFile = sprintf('%s/config/%s/config.php', $baseDir, $instanceId);
+    $configFile = sprintf('%s/config/config.php', $baseDir);
     $config = Config::fromFile($configFile);
 
     $serverManager = new ServerManager(
@@ -42,10 +26,7 @@ try {
         new ManagementSocket()
     );
 
-    $output = [
-        sprintf('*** %s ***', $instanceId),
-    ];
-
+    $output = [];
     foreach ($serverManager->connections() as $profile) {
         $output[] = $profile['id'];
 

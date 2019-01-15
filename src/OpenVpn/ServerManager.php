@@ -42,7 +42,6 @@ class ServerManager
     public function connections()
     {
         $clientConnections = [];
-        $instanceNumber = $this->config->getItem('instanceNumber');
 
         // loop over all profiles
         foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
@@ -56,7 +55,7 @@ class ServerManager
                 $socketAddressList[] = sprintf(
                     'tcp://%s:%d',
                     $managementIp,
-                    11940 + $this->toPort($instanceNumber, $profileNumber, $i)
+                    11940 + $this->toPort($profileNumber, $i)
                 );
             }
 
@@ -75,7 +74,6 @@ class ServerManager
      */
     public function kill($commonName)
     {
-        $instanceNumber = $this->config->getItem('instanceNumber');
         $socketAddressList = [];
 
         // loop over all profiles
@@ -88,7 +86,7 @@ class ServerManager
                 $socketAddressList[] = sprintf(
                     'tcp://%s:%d',
                     $managementIp,
-                    11940 + $this->toPort($instanceNumber, $profileNumber, $i)
+                    11940 + $this->toPort($profileNumber, $i)
                 );
             }
         }
@@ -99,19 +97,17 @@ class ServerManager
     }
 
     /**
-     * @param int $instanceNumber
      * @param int $profileNumber
      * @param int $processNumber
      *
      * @return int
      */
-    private function toPort($instanceNumber, $profileNumber, $processNumber)
+    private function toPort($profileNumber, $processNumber)
     {
-        // convert an instanceNumber, $profileNumber and $processNumber to a management port
-
-        // instanceId = 6 bits (max 64)
-        // profileNumber = 4 bits (max 16)
-        // processNumber = 4 bits  (max 16)
-        return ($instanceNumber - 1 << 8) | ($profileNumber - 1 << 4) | ($processNumber);
+        // we have 2^16 - 11940 ports available for management ports, so let's
+        // say we have 2^14 ports available to distribute over profiles and
+        // processes, let's take 12 bits, so we have 64 profiles with each 64
+        // processes...
+        return ($profileNumber - 1 << 6) | $processNumber;
     }
 }

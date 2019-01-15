@@ -18,7 +18,6 @@ return  [
     'cert_expire' => 365,
     'ca_cn' => 'VPN CA',
   ],
-  'instanceNumber' => 1,
   'vpnProfiles' => [
     'internet' => [
       'profileNumber' => 1,

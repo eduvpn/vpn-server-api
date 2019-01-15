@@ -39,12 +39,8 @@ try {
     // this is provided by Apache, using CanonicalName
     $request = new Request($_SERVER, $_GET, $_POST);
 
-    if (false === $instanceId = getenv('VPN_INSTANCE_ID')) {
-        $instanceId = $request->getServerName();
-    }
-
-    $dataDir = sprintf('%s/data/%s', $baseDir, $instanceId);
-    $configDir = sprintf('%s/config/%s', $baseDir, $instanceId);
+    $dataDir = sprintf('%s/data', $baseDir);
+    $configDir = sprintf('%s/config', $baseDir);
 
     $config = Config::fromFile(
         sprintf('%s/config.php', $configDir)

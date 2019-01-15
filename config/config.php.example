@@ -15,9 +15,6 @@ return [
         'ca_cn' => 'VPN CA',
     ],
 
-    // The number of this instance, every instance has a unique number
-    'instanceNumber' => 1,
-
     // List of VPN profiles
     'vpnProfiles' => [
         'internet' => [

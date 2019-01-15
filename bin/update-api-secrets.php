@@ -24,7 +24,6 @@ try {
     $p = new CliParser(
         'Update the API secrets used by the various components',
         [
-            'instance' => ['the VPN instance', true, false],
             'prefix' => ['the prefix of the installed modules (DEFAULT: /usr/share)', true, false],
         ]
     );
@@ -39,10 +38,8 @@ try {
         $prefix = $opt->getItem('prefix');
     }
 
-    $instanceId = $opt->hasItem('instance') ? $opt->getItem('instance') : 'default';
-
     // api provider
-    $configFile = sprintf('%s/vpn-server-api/config/%s/config.php', $prefix, $instanceId);
+    $configFile = sprintf('%s/vpn-server-api/config/config.php', $prefix);
     $config = Config::fromFile($configFile);
     $configData = $config->toArray();
     $configData['apiConsumers']['vpn-user-portal'] = $credentials['vpn-user-portal'];
@@ -51,8 +48,8 @@ try {
 
     // consumers
     $consumerConfigFiles = [
-        'vpn-user-portal' => sprintf('%s/vpn-user-portal/config/%s/config.php', $prefix, $instanceId),
-        'vpn-server-node' => sprintf('%s/vpn-server-node/config/%s/config.php', $prefix, $instanceId),
+        'vpn-user-portal' => sprintf('%s/vpn-user-portal/config/config.php', $prefix),
+        'vpn-server-node' => sprintf('%s/vpn-server-node/config/config.php', $prefix),
     ];
 
     foreach ($consumerConfigFiles as $configId => $configFile) {
