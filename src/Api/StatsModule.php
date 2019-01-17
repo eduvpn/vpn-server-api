@@ -3,19 +3,19 @@
 /*
  * eduVPN - End-user friendly VPN.
  *
- * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * Copyright: 2016-2019, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace SURFnet\VPN\Server\Api;
+namespace LetsConnect\Server\Api;
 
+use LetsConnect\Common\FileIO;
+use LetsConnect\Common\Http\ApiResponse;
+use LetsConnect\Common\Http\AuthUtils;
+use LetsConnect\Common\Http\Request;
+use LetsConnect\Common\Http\Service;
+use LetsConnect\Common\Http\ServiceModuleInterface;
 use RuntimeException;
-use SURFnet\VPN\Common\FileIO;
-use SURFnet\VPN\Common\Http\ApiResponse;
-use SURFnet\VPN\Common\Http\AuthUtils;
-use SURFnet\VPN\Common\Http\Request;
-use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Common\Http\ServiceModuleInterface;
 
 class StatsModule implements ServiceModuleInterface
 {
@@ -38,7 +38,7 @@ class StatsModule implements ServiceModuleInterface
         $service->get(
             '/stats',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);

@@ -3,21 +3,21 @@
 /*
  * eduVPN - End-user friendly VPN.
  *
- * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * Copyright: 2016-2019, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace SURFnet\VPN\Server\CA;
+namespace LetsConnect\Server\CA;
 
 use DateTime;
+use LetsConnect\Common\Config;
+use LetsConnect\Common\FileIO;
+use LetsConnect\Server\CA\Exception\CaException;
 use RuntimeException;
-use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Common\FileIO;
-use SURFnet\VPN\Server\CA\Exception\CaException;
 
 class EasyRsaCa implements CaInterface
 {
-    /** @var \SURFnet\VPN\Common\Config */
+    /** @var \LetsConnect\Common\Config */
     private $config;
 
     /** @var string */
@@ -27,7 +27,7 @@ class EasyRsaCa implements CaInterface
     private $easyRsaDataDir;
 
     /**
-     * @param \SURFnet\VPN\Common\Config $config
+     * @param \LetsConnect\Common\Config $config
      * @param string                     $easyRsaDir
      * @param string                     $easyRsaDataDir
      */

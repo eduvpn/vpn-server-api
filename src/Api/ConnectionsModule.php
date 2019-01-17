@@ -3,30 +3,30 @@
 /*
  * eduVPN - End-user friendly VPN.
  *
- * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * Copyright: 2016-2019, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace SURFnet\VPN\Server\Api;
+namespace LetsConnect\Server\Api;
 
 use DateTime;
-use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Common\Http\ApiErrorResponse;
-use SURFnet\VPN\Common\Http\ApiResponse;
-use SURFnet\VPN\Common\Http\AuthUtils;
-use SURFnet\VPN\Common\Http\InputValidation;
-use SURFnet\VPN\Common\Http\Request;
-use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Common\Http\ServiceModuleInterface;
-use SURFnet\VPN\Common\ProfileConfig;
-use SURFnet\VPN\Server\Storage;
+use LetsConnect\Common\Config;
+use LetsConnect\Common\Http\ApiErrorResponse;
+use LetsConnect\Common\Http\ApiResponse;
+use LetsConnect\Common\Http\AuthUtils;
+use LetsConnect\Common\Http\InputValidation;
+use LetsConnect\Common\Http\Request;
+use LetsConnect\Common\Http\Service;
+use LetsConnect\Common\Http\ServiceModuleInterface;
+use LetsConnect\Common\ProfileConfig;
+use LetsConnect\Server\Storage;
 
 class ConnectionsModule implements ServiceModuleInterface
 {
-    /** @var \SURFnet\VPN\Common\Config */
+    /** @var \LetsConnect\Common\Config */
     private $config;
 
-    /** @var \SURFnet\VPN\Server\Storage */
+    /** @var \LetsConnect\Server\Storage */
     private $storage;
 
     public function __construct(Config $config, Storage $storage)
@@ -43,7 +43,7 @@ class ConnectionsModule implements ServiceModuleInterface
         $service->post(
             '/connect',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
@@ -55,7 +55,7 @@ class ConnectionsModule implements ServiceModuleInterface
         $service->post(
             '/disconnect',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
@@ -66,7 +66,7 @@ class ConnectionsModule implements ServiceModuleInterface
     }
 
     /**
-     * @return \SURFnet\VPN\Common\Http\Response
+     * @return \LetsConnect\Common\Http\Response
      */
     public function connect(Request $request)
     {
@@ -86,7 +86,7 @@ class ConnectionsModule implements ServiceModuleInterface
     }
 
     /**
-     * @return \SURFnet\VPN\Common\Http\Response
+     * @return \LetsConnect\Common\Http\Response
      */
     public function disconnect(Request $request)
     {
@@ -108,7 +108,7 @@ class ConnectionsModule implements ServiceModuleInterface
      * @param string $profileId
      * @param string $commonName
      *
-     * @return null|\SURFnet\VPN\Common\Http\ApiErrorResponse
+     * @return \LetsConnect\Common\Http\ApiErrorResponse|null
      */
     private function verifyConnection($profileId, $commonName)
     {
@@ -132,7 +132,7 @@ class ConnectionsModule implements ServiceModuleInterface
      * @param string $profileId
      * @param string $externalUserId
      *
-     * @return null|\SURFnet\VPN\Common\Http\ApiErrorResponse
+     * @return \LetsConnect\Common\Http\ApiErrorResponse|null
      */
     private function verifyAcl($profileId, $externalUserId)
     {

@@ -8,12 +8,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "SURFnet\\VPN\\Server\\": "src/"
+            "LetsConnect\\Server\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SURFnet\\VPN\\Server\\Tests\\": "tests/"
+            "LetsConnect\\Server\\Tests\\": "tests/"
         }
     },
     "description": "VPN Server API",

@@ -3,37 +3,37 @@
 /*
  * eduVPN - End-user friendly VPN.
  *
- * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * Copyright: 2016-2019, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace SURFnet\VPN\Server\Api;
+namespace LetsConnect\Server\Api;
 
 use DateTime;
-use SURFnet\VPN\Common\Http\ApiErrorResponse;
-use SURFnet\VPN\Common\Http\ApiResponse;
-use SURFnet\VPN\Common\Http\AuthUtils;
-use SURFnet\VPN\Common\Http\InputValidation;
-use SURFnet\VPN\Common\Http\Request;
-use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Common\Http\ServiceModuleInterface;
-use SURFnet\VPN\Common\RandomInterface;
-use SURFnet\VPN\Server\CA\CaInterface;
-use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\TlsAuth;
+use LetsConnect\Common\Http\ApiErrorResponse;
+use LetsConnect\Common\Http\ApiResponse;
+use LetsConnect\Common\Http\AuthUtils;
+use LetsConnect\Common\Http\InputValidation;
+use LetsConnect\Common\Http\Request;
+use LetsConnect\Common\Http\Service;
+use LetsConnect\Common\Http\ServiceModuleInterface;
+use LetsConnect\Common\RandomInterface;
+use LetsConnect\Server\CA\CaInterface;
+use LetsConnect\Server\Storage;
+use LetsConnect\Server\TlsAuth;
 
 class CertificatesModule implements ServiceModuleInterface
 {
-    /** @var \SURFnet\VPN\Server\CA\CaInterface */
+    /** @var \LetsConnect\Server\CA\CaInterface */
     private $ca;
 
-    /** @var \SURFnet\VPN\Server\Storage */
+    /** @var \LetsConnect\Server\Storage */
     private $storage;
 
-    /** @var \SURFnet\VPN\Server\TlsAuth */
+    /** @var \LetsConnect\Server\TlsAuth */
     private $tlsAuth;
 
-    /** @var \SURFnet\VPN\Common\RandomInterface */
+    /** @var \LetsConnect\Common\RandomInterface */
     private $random;
 
     public function __construct(CaInterface $ca, Storage $storage, TlsAuth $tlsAuth, RandomInterface $random)
@@ -53,7 +53,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->post(
             '/add_client_certificate',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -97,7 +97,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->get(
             '/server_info',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -114,7 +114,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->post(
             '/add_server_certificate',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
@@ -133,7 +133,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->post(
             '/delete_client_certificate',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -158,7 +158,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->post(
             '/delete_client_certificates_of_client_id',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -181,7 +181,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->get(
             '/client_certificate_list',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -195,7 +195,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->get(
             '/client_certificate_info',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);

@@ -3,23 +3,23 @@
 /*
  * eduVPN - End-user friendly VPN.
  *
- * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * Copyright: 2016-2019, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace SURFnet\VPN\Server\Api;
+namespace LetsConnect\Server\Api;
 
-use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Common\Http\ApiResponse;
-use SURFnet\VPN\Common\Http\AuthUtils;
-use SURFnet\VPN\Common\Http\Request;
-use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Common\Http\ServiceModuleInterface;
-use SURFnet\VPN\Common\ProfileConfig;
+use LetsConnect\Common\Config;
+use LetsConnect\Common\Http\ApiResponse;
+use LetsConnect\Common\Http\AuthUtils;
+use LetsConnect\Common\Http\Request;
+use LetsConnect\Common\Http\Service;
+use LetsConnect\Common\Http\ServiceModuleInterface;
+use LetsConnect\Common\ProfileConfig;
 
 class InfoModule implements ServiceModuleInterface
 {
-    /** @var \SURFnet\VPN\Common\Config */
+    /** @var \LetsConnect\Common\Config */
     private $config;
 
     public function __construct(Config $config)
@@ -36,7 +36,7 @@ class InfoModule implements ServiceModuleInterface
         $service->get(
             '/profile_list',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-server-node']);

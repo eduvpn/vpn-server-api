@@ -3,30 +3,30 @@
 /*
  * eduVPN - End-user friendly VPN.
  *
- * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * Copyright: 2016-2019, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace SURFnet\VPN\Server\Api;
+namespace LetsConnect\Server\Api;
 
 use fkooman\Otp\Exception\OtpException;
 use fkooman\Otp\Totp;
-use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Common\Http\ApiErrorResponse;
-use SURFnet\VPN\Common\Http\ApiResponse;
-use SURFnet\VPN\Common\Http\AuthUtils;
-use SURFnet\VPN\Common\Http\InputValidation;
-use SURFnet\VPN\Common\Http\Request;
-use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Common\Http\ServiceModuleInterface;
-use SURFnet\VPN\Server\Storage;
+use LetsConnect\Common\Config;
+use LetsConnect\Common\Http\ApiErrorResponse;
+use LetsConnect\Common\Http\ApiResponse;
+use LetsConnect\Common\Http\AuthUtils;
+use LetsConnect\Common\Http\InputValidation;
+use LetsConnect\Common\Http\Request;
+use LetsConnect\Common\Http\Service;
+use LetsConnect\Common\Http\ServiceModuleInterface;
+use LetsConnect\Server\Storage;
 
 class UsersModule implements ServiceModuleInterface
 {
-    /** @var \SURFnet\VPN\Common\Config */
+    /** @var \LetsConnect\Common\Config */
     private $config;
 
-    /** @var \SURFnet\VPN\Server\Storage */
+    /** @var \LetsConnect\Server\Storage */
     private $storage;
 
     public function __construct(Config $config, Storage $storage)
@@ -43,7 +43,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/user_list',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -55,7 +55,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/set_totp_secret',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -87,7 +87,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/verify_totp_key',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -117,7 +117,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/has_totp_secret',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -131,7 +131,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/delete_totp_secret',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -148,7 +148,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/is_disabled_user',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -162,7 +162,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/disable_user',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -179,7 +179,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/enable_user',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -196,7 +196,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/delete_user',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -211,7 +211,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/user_last_authenticated_at',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -224,7 +224,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/user_entitlement_list',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -237,7 +237,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/last_authenticated_at_ping',
             /**
-             * @return \SURFnet\VPN\Common\Http\Response
+             * @return \LetsConnect\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);

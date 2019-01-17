@@ -4,16 +4,16 @@
 /*
  * eduVPN - End-user friendly VPN.
  *
- * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * Copyright: 2016-2019, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
-use SURFnet\VPN\Common\CliParser;
-use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Common\FileIO;
+use LetsConnect\Common\CliParser;
+use LetsConnect\Common\Config;
+use LetsConnect\Common\FileIO;
 
 $credentials = [
     'vpn-user-portal' => bin2hex(random_bytes(16)),

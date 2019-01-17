@@ -4,17 +4,17 @@
 /*
  * eduVPN - End-user friendly VPN.
  *
- * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * Copyright: 2016-2019, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
-use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Server\CA\EasyRsaCa;
-use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\TlsAuth;
+use LetsConnect\Common\Config;
+use LetsConnect\Server\CA\EasyRsaCa;
+use LetsConnect\Server\Storage;
+use LetsConnect\Server\TlsAuth;
 
 try {
     $configFile = sprintf('%s/config/config.php', $baseDir);

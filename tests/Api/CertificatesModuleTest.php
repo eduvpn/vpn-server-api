@@ -3,31 +3,31 @@
 /*
  * eduVPN - End-user friendly VPN.
  *
- * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * Copyright: 2016-2019, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace SURFnet\VPN\Server\Tests\Api;
+namespace LetsConnect\Server\Tests\Api;
 
 use DateTime;
+use LetsConnect\Common\Http\BasicAuthenticationHook;
+use LetsConnect\Common\Http\Request;
+use LetsConnect\Common\Http\Service;
+use LetsConnect\Server\Api\CertificatesModule;
+use LetsConnect\Server\Storage;
+use LetsConnect\Server\Tests\TestCa;
+use LetsConnect\Server\TlsAuth;
 use PDO;
 use PHPUnit\Framework\TestCase;
-use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
-use SURFnet\VPN\Common\Http\Request;
-use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Server\Api\CertificatesModule;
-use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\Tests\TestCa;
-use SURFnet\VPN\Server\TlsAuth;
 
 class CertificatesModuleTest extends TestCase
 {
-    /** @var \SURFnet\VPN\Common\Http\Service */
+    /** @var \LetsConnect\Common\Http\Service */
     private $service;
 
     public function setUp()
     {
-        $random = $this->getMockBuilder('SURFnet\VPN\Common\RandomInterface')->getMock();
+        $random = $this->getMockBuilder('LetsConnect\Common\RandomInterface')->getMock();
         $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
 
         $storage = new Storage(

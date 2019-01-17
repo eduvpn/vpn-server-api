@@ -3,18 +3,18 @@
 /*
  * eduVPN - End-user friendly VPN.
  *
- * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * Copyright: 2016-2019, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace SURFnet\VPN\Server;
+namespace LetsConnect\Server;
 
 use DateTime;
 use fkooman\Otp\OtpInfo;
 use fkooman\Otp\OtpStorageInterface;
 use fkooman\SqliteMigrate\Migration;
+use LetsConnect\Common\Json;
 use PDO;
-use SURFnet\VPN\Common\Json;
 
 class Storage implements OtpStorageInterface
 {
@@ -81,7 +81,7 @@ SQL
     /**
      * @param string $userId
      *
-     * @return null|string
+     * @return string|null
      */
     public function getLastAuthenticatedAt($userId)
     {
@@ -211,7 +211,7 @@ SQL
      * @param string      $displayName
      * @param \DateTime   $validFrom
      * @param \DateTime   $validTo
-     * @param null|string $clientId
+     * @param string|null $clientId
      *
      * @return void
      */

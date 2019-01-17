@@ -3,7 +3,7 @@
 /*
  * eduVPN - End-user friendly VPN.
  *
- * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * Copyright: 2016-2019, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
@@ -11,27 +11,27 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
 use LC\OpenVpn\ManagementSocket;
-use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Common\Http\BasicAuthenticationHook;
-use SURFnet\VPN\Common\Http\Request;
-use SURFnet\VPN\Common\Http\Response;
-use SURFnet\VPN\Common\Http\Service;
-use SURFnet\VPN\Common\Json;
-use SURFnet\VPN\Common\Logger;
-use SURFnet\VPN\Common\Random;
-use SURFnet\VPN\Server\Api\CertificatesModule;
-use SURFnet\VPN\Server\Api\ConnectionsModule;
-use SURFnet\VPN\Server\Api\InfoModule;
-use SURFnet\VPN\Server\Api\LogModule;
-use SURFnet\VPN\Server\Api\OpenVpnModule;
-use SURFnet\VPN\Server\Api\StatsModule;
-use SURFnet\VPN\Server\Api\SystemMessagesModule;
-use SURFnet\VPN\Server\Api\UserMessagesModule;
-use SURFnet\VPN\Server\Api\UsersModule;
-use SURFnet\VPN\Server\CA\EasyRsaCa;
-use SURFnet\VPN\Server\OpenVpn\ServerManager;
-use SURFnet\VPN\Server\Storage;
-use SURFnet\VPN\Server\TlsAuth;
+use LetsConnect\Common\Config;
+use LetsConnect\Common\Http\BasicAuthenticationHook;
+use LetsConnect\Common\Http\Request;
+use LetsConnect\Common\Http\Response;
+use LetsConnect\Common\Http\Service;
+use LetsConnect\Common\Json;
+use LetsConnect\Common\Logger;
+use LetsConnect\Common\Random;
+use LetsConnect\Server\Api\CertificatesModule;
+use LetsConnect\Server\Api\ConnectionsModule;
+use LetsConnect\Server\Api\InfoModule;
+use LetsConnect\Server\Api\LogModule;
+use LetsConnect\Server\Api\OpenVpnModule;
+use LetsConnect\Server\Api\StatsModule;
+use LetsConnect\Server\Api\SystemMessagesModule;
+use LetsConnect\Server\Api\UserMessagesModule;
+use LetsConnect\Server\Api\UsersModule;
+use LetsConnect\Server\CA\EasyRsaCa;
+use LetsConnect\Server\OpenVpn\ServerManager;
+use LetsConnect\Server\Storage;
+use LetsConnect\Server\TlsAuth;
 
 $logger = new Logger('vpn-server-api');
 

@@ -3,24 +3,24 @@
 /*
  * eduVPN - End-user friendly VPN.
  *
- * Copyright: 2016-2018, The Commons Conservancy eduVPN Programme
+ * Copyright: 2016-2019, The Commons Conservancy eduVPN Programme
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace SURFnet\VPN\Server\OpenVpn;
+namespace LetsConnect\Server\OpenVpn;
 
 use LC\OpenVpn\ConnectionManager;
 use LC\OpenVpn\ManagementSocketInterface;
+use LetsConnect\Common\Config;
+use LetsConnect\Common\ProfileConfig;
 use Psr\Log\LoggerInterface;
-use SURFnet\VPN\Common\Config;
-use SURFnet\VPN\Common\ProfileConfig;
 
 /**
  * Manage all OpenVPN processes controlled by this service.
  */
 class ServerManager
 {
-    /** @var \SURFnet\VPN\Common\Config */
+    /** @var \LetsConnect\Common\Config */
     private $config;
 
     /** @var \Psr\Log\LoggerInterface */
