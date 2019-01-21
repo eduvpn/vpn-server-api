@@ -117,7 +117,6 @@ try {
     $easyRsaDataDir = sprintf('%s/easy-rsa', $dataDir);
 
     $easyRsaCa = new EasyRsaCa(
-        $config,
         $easyRsaDir,
         $easyRsaDataDir
     );

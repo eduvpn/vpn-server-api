@@ -10,19 +10,15 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
-use LetsConnect\Common\Config;
 use LetsConnect\Server\CA\EasyRsaCa;
 use LetsConnect\Server\Storage;
 use LetsConnect\Server\TlsAuth;
 
 try {
-    $configFile = sprintf('%s/config/config.php', $baseDir);
-    $config = Config::fromFile($configFile);
-
     $easyRsaDir = sprintf('%s/easy-rsa', $baseDir);
     $easyRsaDataDir = sprintf('%s/data/easy-rsa', $baseDir);
 
-    $ca = new EasyRsaCa($config, $easyRsaDir, $easyRsaDataDir);
+    $ca = new EasyRsaCa($easyRsaDir, $easyRsaDataDir);
 
     $dataDir = sprintf('%s/data', $baseDir);
     $storage = new Storage(
