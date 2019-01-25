@@ -22,11 +22,7 @@ class StorageTest extends TestCase
     public function setUp()
     {
         $this->storage = new Storage(
-            new PDO(
-                $GLOBALS['DB_DSN'],
-                $GLOBALS['DB_USER'],
-                $GLOBALS['DB_PASSWD']
-            ),
+            new PDO('sqlite::memory:'),
             'schema',
             new DateTime('2017-12-31 09:00:00')
         );
@@ -78,7 +74,7 @@ class StorageTest extends TestCase
                 'is_disabled' => false,
                 'has_totp_secret' => false,
                 'last_authenticated_at' => null,
-                'entitlement_list' => [],
+                'permission_list' => [],
             ],
             $this->storage->getUsers()[0]
         );

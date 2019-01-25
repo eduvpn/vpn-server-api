@@ -140,9 +140,9 @@ class ConnectionsModule implements ServiceModuleInterface
         $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
         if ($profileConfig->getItem('enableAcl')) {
             // ACL enabled
-            $userGroups = $this->storage->getEntitlementList($externalUserId);
-            if (false === self::isMember($userGroups, $profileConfig->getSection('aclGroupList')->toArray())) {
-                $msg = '[VPN] unable to connect, account not a member of required group';
+            $userPermissionList = $this->storage->getPermissionList($externalUserId);
+            if (false === self::hasPermission($userPermissionList, $profileConfig->getSection('aclPermissionList')->toArray())) {
+                $msg = '[VPN] unable to connect, user does not have required permissions';
                 $this->storage->addUserMessage($externalUserId, 'notification', $msg);
 
                 return new ApiErrorResponse('connect', $msg);
@@ -155,12 +155,11 @@ class ConnectionsModule implements ServiceModuleInterface
     /**
      * @return bool
      */
-    private static function isMember(array $memberOf, array $aclGroupList)
+    private static function hasPermission(array $userPermissionList, array $aclPermissionList)
     {
-        //        var_dump($aclGroupList);
-        // one of the groups must be listed in the profile ACL list
-        foreach ($memberOf as $memberGroup) {
-            if (\in_array($memberGroup, $aclGroupList, true)) {
+        // one of the permissions must be listed in the profile ACL list
+        foreach ($userPermissionList as $userPermission) {
+            if (\in_array($userPermission, $aclPermissionList, true)) {
                 return true;
             }
         }

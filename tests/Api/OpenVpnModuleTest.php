@@ -31,11 +31,7 @@ class OpenVpnModuleTest extends TestCase
     {
         $config = Config::fromFile(sprintf('%s/data/openvpn_module_config.php', __DIR__));
         $storage = new Storage(
-            new PDO(
-                $GLOBALS['DB_DSN'],
-                $GLOBALS['DB_USER'],
-                $GLOBALS['DB_PASSWD']
-            ),
+            new PDO('sqlite::memory:'),
             'schema',
             new DateTime()
         );

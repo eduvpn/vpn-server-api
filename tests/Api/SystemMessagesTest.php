@@ -26,11 +26,7 @@ class SystemMessagesTest extends TestCase
     public function setUp()
     {
         $storage = new Storage(
-            new PDO(
-                $GLOBALS['DB_DSN'],
-                $GLOBALS['DB_USER'],
-                $GLOBALS['DB_PASSWD']
-            ),
+            new PDO('sqlite::memory:'),
             'schema',
             new DateTime('2016-01-01 08:00:00')
         );

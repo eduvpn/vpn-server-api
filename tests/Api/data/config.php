@@ -12,12 +12,6 @@ return  [
     'vpn-user-portal' => 'abcdef',
     'vpn-server-node' => 'aabbcc',
   ],
-  'CA' => [
-    'key_size' => 4096,
-    'ca_expire' => 1826,
-    'cert_expire' => 365,
-    'ca_cn' => 'VPN CA',
-  ],
   'vpnProfiles' => [
     'internet' => [
       'profileNumber' => 1,
@@ -35,7 +29,7 @@ return  [
       'range6' => 'fd00:4242:4242::/48',
       'hostName' => 'vpn.example',
       'enableAcl' => true,
-      'aclGroupList' => [
+      'aclPermissionList' => [
         'students',
       ],
     ],
@@ -47,31 +41,8 @@ return  [
       'range6' => 'fd00:4242:4242::/48',
       'hostName' => 'vpn.example',
       'enableAcl' => true,
-      'aclGroupList' => [
+      'aclPermissionList' => [
         'employees',
-      ],
-    ],
-  ],
-  'groupProviders' => [
-    'StaticProvider' => [
-      'all' => [
-        'displayName' => 'All',
-        'members' => [
-          'foo',
-          'bar',
-        ],
-      ],
-      'students' => [
-        'displayName' => 'Students',
-        'members' => [
-          'foo',
-        ],
-      ],
-      'employees' => [
-        'displayName' => 'Employees',
-        'members' => [
-          'bar',
-        ],
       ],
     ],
   ],

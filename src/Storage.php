@@ -18,7 +18,7 @@ use PDO;
 
 class Storage implements OtpStorageInterface
 {
-    const CURRENT_SCHEMA_VERSION = '2018120602';
+    const CURRENT_SCHEMA_VERSION = '2019012501';
 
     /** @var \PDO */
     private $db;
@@ -56,7 +56,7 @@ class Storage implements OtpStorageInterface
         user_id,
         (SELECT otp_secret FROM otp WHERE user_id = users.user_id) AS otp_secret,
         last_authenticated_at,
-        entitlement_list, 
+        permission_list, 
         is_disabled
     FROM 
         users
@@ -71,7 +71,7 @@ SQL
                 'is_disabled' => (bool) $row['is_disabled'],
                 'has_totp_secret' => null !== $row['otp_secret'],
                 'last_authenticated_at' => $row['last_authenticated_at'],
-                'entitlement_list' => Json::decode($row['entitlement_list']),
+                'permission_list' => Json::decode($row['permission_list']),
             ];
         }
 
@@ -109,13 +109,13 @@ SQL
      *
      * @return array<string>
      */
-    public function getEntitlementList($userId)
+    public function getPermissionList($userId)
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
-        entitlement_list
+        permission_list
     FROM 
         users
     WHERE
@@ -180,11 +180,11 @@ SQL
 
     /**
      * @param string        $userId
-     * @param array<string> $entitlementList
+     * @param array<string> $permissionList
      *
      * @return void
      */
-    public function lastAuthenticatedAtPing($userId, array $entitlementList)
+    public function lastAuthenticatedAtPing($userId, array $permissionList)
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
@@ -193,14 +193,14 @@ SQL
         users
     SET
         last_authenticated_at = :last_authenticated_at,
-        entitlement_list = :entitlement_list
+        permission_list = :permission_list
     WHERE
         user_id = :user_id
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->bindValue(':last_authenticated_at', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
-        $stmt->bindValue(':entitlement_list', Json::encode($entitlementList), PDO::PARAM_STR);
+        $stmt->bindValue(':permission_list', Json::encode($permissionList), PDO::PARAM_STR);
 
         $stmt->execute();
     }

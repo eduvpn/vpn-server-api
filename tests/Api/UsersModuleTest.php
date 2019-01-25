@@ -30,11 +30,7 @@ class UsersModuleTest extends TestCase
     public function setUp()
     {
         $storage = new Storage(
-            new PDO(
-                $GLOBALS['DB_DSN'],
-                $GLOBALS['DB_USER'],
-                $GLOBALS['DB_PASSWD']
-            ),
+            new PDO('sqlite::memory:'),
             'schema',
             new DateTime('2018-01-01 01:00:00')
         );
@@ -55,7 +51,7 @@ class UsersModuleTest extends TestCase
 
         $storage->lastAuthenticatedAtPing('bar', ['all', 'employees']);
 
-        $config = Config::fromFile(sprintf('%s/data/user_groups_config.php', __DIR__));
+        $config = Config::fromFile(sprintf('%s/data/user_permissions_config.php', __DIR__));
         $this->service = new Service();
         $this->service->addModule(
             new UsersModule(
@@ -83,21 +79,21 @@ class UsersModuleTest extends TestCase
                     'is_disabled' => false,
                     'has_totp_secret' => false,
                     'last_authenticated_at' => null,
-                    'entitlement_list' => [],
+                    'permission_list' => [],
                 ],
                 [
                     'user_id' => 'bar',
                     'is_disabled' => true,
                     'has_totp_secret' => true,
                     'last_authenticated_at' => '2018-01-01 01:00:00',
-                    'entitlement_list' => ['all', 'employees'],
+                    'permission_list' => ['all', 'employees'],
                 ],
                 [
                     'user_id' => 'baz',
                     'is_disabled' => false,
                     'has_totp_secret' => true,
                     'last_authenticated_at' => null,
-                    'entitlement_list' => [],
+                    'permission_list' => [],
                 ],
             ],
             $this->makeRequest(
@@ -290,7 +286,7 @@ class UsersModuleTest extends TestCase
                 'POST',
                 'last_authenticated_at_ping',
                 [],
-                ['user_id' => 'foo', 'entitlement_list' => '[]']
+                ['user_id' => 'foo', 'permission_list' => '[]']
             )
         );
         $this->assertSame(
@@ -299,7 +295,7 @@ class UsersModuleTest extends TestCase
                 'is_disabled' => false,
                 'has_totp_secret' => false,
                 'last_authenticated_at' => '2018-01-01 01:00:00',
-                'entitlement_list' => [],
+                'permission_list' => [],
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],

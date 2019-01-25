@@ -222,7 +222,7 @@ class UsersModule implements ServiceModuleInterface
         );
 
         $service->get(
-            '/user_entitlement_list',
+            '/user_permission_list',
             /**
              * @return \LetsConnect\Common\Http\Response
              */
@@ -230,7 +230,7 @@ class UsersModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
                 $userId = InputValidation::userId($request->getQueryParameter('user_id'));
 
-                return new ApiResponse('user_entitlement_list', $this->storage->getEntitlementList($userId));
+                return new ApiResponse('user_permission_list', $this->storage->getPermissionList($userId));
             }
         );
 
@@ -243,8 +243,8 @@ class UsersModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $entitlementList = InputValidation::entitlementList($request->getPostParameter('entitlement_list'));
-                $this->storage->lastAuthenticatedAtPing($userId, $entitlementList);
+                $permissionList = InputValidation::permissionList($request->getPostParameter('permission_list'));
+                $this->storage->lastAuthenticatedAtPing($userId, $permissionList);
 
                 return new ApiResponse('last_authenticated_at_ping');
             }

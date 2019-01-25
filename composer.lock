@@ -50,12 +50,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "1fdb9447cbfc41eeaad6abb5d7cac4bb1471e238"
+                "reference": "9a54328f3a7fb8c4662e17dadb0eba8858503686"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/1fdb9447cbfc41eeaad6abb5d7cac4bb1471e238",
-                "reference": "1fdb9447cbfc41eeaad6abb5d7cac4bb1471e238",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/9a54328f3a7fb8c4662e17dadb0eba8858503686",
+                "reference": "9a54328f3a7fb8c4662e17dadb0eba8858503686",
                 "shasum": ""
             },
             "require": {
@@ -102,7 +102,7 @@
                 "email": "eduvpn@surfnet.nl",
                 "source": "https://github.com/eduvpn/vpn-lib-common"
             },
-            "time": "2019-01-17T12:28:35+00:00"
+            "time": "2019-01-25T10:33:39+00:00"
         },
         {
             "name": "fkooman/otp-verifier",

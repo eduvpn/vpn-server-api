@@ -31,11 +31,7 @@ class CertificatesModuleTest extends TestCase
         $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
 
         $storage = new Storage(
-            new PDO(
-                $GLOBALS['DB_DSN'],
-                $GLOBALS['DB_USER'],
-                $GLOBALS['DB_PASSWD']
-            ),
+            new PDO('sqlite::memory:'),
             'schema',
             new DateTime()
         );

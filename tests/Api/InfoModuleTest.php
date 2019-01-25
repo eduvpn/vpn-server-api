@@ -46,7 +46,7 @@ class InfoModuleTest extends TestCase
         $this->assertSame(
             [
                 'internet' => [
-                      'aclGroupList' => [
+                      'aclPermissionList' => [
                       ],
                       'blockLan' => false,
                       'clientToClient' => false,

@@ -89,10 +89,10 @@ return [
             // DEFAULT = false
             'enableAcl' => false,
 
-            // The list of groups to allow access, requires enableAcl to be 
-            // true
+            // The list of permissions to allow access, requires enableAcl to 
+            // be true
             // DEFAULT  = []
-            'aclGroupList' => [],
+            'aclPermissionList' => [],
 
             // The protocols and ports the OpenVPN processes should use, MUST 
             // be either 1, 2, 4, 8 or 16 proto/port combinations

@@ -10,7 +10,6 @@
 namespace LetsConnect\Server\Tests\Api;
 
 use DateTime;
-use fkooman\Otp\OtpInfo;
 use LetsConnect\Common\Config;
 use LetsConnect\Common\Http\BasicAuthenticationHook;
 use LetsConnect\Common\Http\Request;
@@ -28,18 +27,13 @@ class ConnectionsModuleTest extends TestCase
     public function setUp()
     {
         $storage = new Storage(
-            new PDO(
-                $GLOBALS['DB_DSN'],
-                $GLOBALS['DB_USER'],
-                $GLOBALS['DB_PASSWD']
-            ),
+            new PDO('sqlite::memory:'),
             'schema',
             new DateTime()
         );
         $storage->init();
         $storage->lastAuthenticatedAtPing('foo', ['students']);
         $storage->addCertificate('foo', '12345678901234567890123456789012', '12345678901234567890123456789012', new DateTime('@12345678'), new DateTime('@23456789'), null);
-        $storage->setOtpSecret('foo', new OtpInfo('CN2XAL23SIFTDFXZ', 'sha1', 6, 30));
         $storage->clientConnect('internet', '12345678901234567890123456789012', '10.10.10.10', 'fd00:4242:4242:4242::', new DateTime('@12345678'));
 
         $config = Config::fromFile(sprintf('%s/data/config.php', __DIR__));
@@ -103,7 +97,7 @@ class ConnectionsModuleTest extends TestCase
         $this->assertSame(
             [
                 'ok' => false,
-                'error' => '[VPN] unable to connect, account not a member of required group',
+                'error' => '[VPN] unable to connect, user does not have required permissions',
             ],
             $this->makeRequest(
                 ['vpn-server-node', 'aabbcc'],
