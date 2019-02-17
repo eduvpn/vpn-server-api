@@ -56,8 +56,6 @@ class InfoModuleTest extends TestCase
                       ],
                       'enableAcl' => false,
                       'enableLog' => false,
-                      'enableNat4' => false,
-                      'enableNat6' => false,
                       'exposedVpnProtoPorts' => [],
                       'extIf' => 'eth0',
                       'hideProfile' => false,
@@ -67,8 +65,6 @@ class InfoModuleTest extends TestCase
                       'profileNumber' => 1,
                       'range' => '10.0.0.0/24',
                       'range6' => 'fd00:4242:4242::/48',
-                      'reject4' => false,
-                      'reject6' => false,
                       'routes' => [
                       ],
                       'tlsProtection' => 'tls-crypt',

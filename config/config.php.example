@@ -13,11 +13,6 @@ return [
             // REQUIRED
             'displayName' => 'Internet Access',
 
-            // The external interface which connects to the Internet or to the
-            // network you want to reach through the VPN
-            // REQUIRED
-            'extIf' => 'eth0',
-
             // The IPv4 range of the network that will be assigned to clients
             // REQUIRED
             'range' => '10.0.0.0/25',
@@ -37,24 +32,6 @@ return [
             // The IP address to use for connecting to OpenVPN processes
             // DEFAULT = '127.0.0.1'
             'managementIp' => '127.0.0.1',
-
-            // Whether or not to NAT the range network to the extIf
-            // DEFAULT = false
-            'enableNat4' => true,
-
-            // Whether or not to NAT the range6 network to the extIf
-            // DEFAULT = true
-            'enableNat6' => true,
-
-            // Do not forward IPv4 traffic, useful for creating an IPv6 only 
-            // VPN
-            // DEFAULT = false
-            'reject4' => false,
-
-            // Do not forward IPv6 traffic, useful when the VPN server does not 
-            // have IPv6 connectivity
-            // DEFAULT = false
-            'reject6' => false,
 
             // Whether or not to route all traffic from the client over the VPN
             // DEFAULT = false
