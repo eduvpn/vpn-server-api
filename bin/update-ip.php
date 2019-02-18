@@ -30,10 +30,8 @@ try {
     $p = new CliParser(
         'Automatically generate an IP address and basic config for a profile',
         [
-            'instance' => ['the VPN instance', true, false],
             'profile' => ['the profile to target, e.g. internet', true, true],
             'host' => ['the hostname clients connect to', true, true],
-            'ext' => ['the external interface, e.g. eth0', true, true],
         ]
     );
 
@@ -99,7 +97,6 @@ try {
     $profileConfigData['range6'] = $v6;
     $profileConfigData['dns'] = $nameServerList;
     $profileConfigData['hostName'] = $opt->getItem('host');
-    $profileConfigData['extIf'] = $opt->getItem('ext');
     $configData['vpnProfiles'][$opt->getItem('profile')] = $profileConfigData;
 
     Config::toFile($configFile, $configData, 0644);
