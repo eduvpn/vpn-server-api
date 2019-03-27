@@ -49,7 +49,7 @@ class Stats
                 $connectedAtDateTime = new DateTime($entry['connected_at']);
                 $dateOfConnection = $connectedAtDateTime->format('Y-m-d');
 
-                if (!array_key_exists($dateOfConnection, $statsData)) {
+                if (!\array_key_exists($dateOfConnection, $statsData)) {
                     $statsData[$dateOfConnection] = [
                         'number_of_connections' => 0,
                         'bytes_transferred' => 0,
@@ -62,13 +62,13 @@ class Stats
 
                 // add it to table to be able to determine max concurrent connection
                 // count
-                if (!array_key_exists($connectedAt, $timeConnection)) {
+                if (!\array_key_exists($connectedAt, $timeConnection)) {
                     $timeConnection[$connectedAt] = [];
                 }
                 $timeConnection[$connectedAt][] = 'C';
 
                 if (null !== $disconnectedAt) {
-                    if (!array_key_exists($disconnectedAt, $timeConnection)) {
+                    if (!\array_key_exists($disconnectedAt, $timeConnection)) {
                         $timeConnection[$disconnectedAt] = [];
                     }
                     $timeConnection[$disconnectedAt][] = 'D';

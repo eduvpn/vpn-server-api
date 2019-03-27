@@ -48,8 +48,7 @@ class UsersModuleTest extends TestCase
         $totpKey = $frkOtp->totp(Base32::decodeUpper('SWIXJ4V7VYALWH6E'), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
         $storage->recordOtpKey('baz', $totpKey, new DateTime('2018-01-01 08:00:00'));
-
-        $storage->lastAuthenticatedAtPing('bar', ['all', 'employees']);
+        $storage->updateSessionInfo('bar', new DateTime('2018-01-01 02:00:00'), ['all', 'employees']);
 
         $config = Config::fromFile(sprintf('%s/data/user_permissions_config.php', __DIR__));
         $this->service = new Service();
@@ -78,21 +77,21 @@ class UsersModuleTest extends TestCase
                     'user_id' => 'foo',
                     'is_disabled' => false,
                     'has_totp_secret' => false,
-                    'last_authenticated_at' => null,
+                    'session_expires_at' => '2018-01-01T01:00:00+00:00',
                     'permission_list' => [],
                 ],
                 [
                     'user_id' => 'bar',
                     'is_disabled' => true,
                     'has_totp_secret' => true,
-                    'last_authenticated_at' => '2018-01-01 01:00:00',
+                    'session_expires_at' => '2018-01-01T02:00:00+00:00',
                     'permission_list' => ['all', 'employees'],
                 ],
                 [
                     'user_id' => 'baz',
                     'is_disabled' => false,
                     'has_totp_secret' => true,
-                    'last_authenticated_at' => null,
+                    'session_expires_at' => '2018-01-01T01:00:00+00:00',
                     'permission_list' => [],
                 ],
             ],
@@ -269,44 +268,6 @@ class UsersModuleTest extends TestCase
         );
     }
 
-    public function testLastAuthenticatedAtPing()
-    {
-        $this->assertNull(
-            $this->makeRequest(
-                ['vpn-user-portal', 'aabbcc'],
-                'GET',
-                'user_list',
-                [],
-                []
-            )[0]['last_authenticated_at']
-        );
-        $this->assertTrue(
-            $this->makeRequest(
-                ['vpn-user-portal', 'aabbcc'],
-                'POST',
-                'last_authenticated_at_ping',
-                [],
-                ['user_id' => 'foo', 'permission_list' => '[]']
-            )
-        );
-        $this->assertSame(
-            [
-                'user_id' => 'foo',
-                'is_disabled' => false,
-                'has_totp_secret' => false,
-                'last_authenticated_at' => '2018-01-01 01:00:00',
-                'permission_list' => [],
-            ],
-            $this->makeRequest(
-                ['vpn-user-portal', 'aabbcc'],
-                'GET',
-                'user_list',
-                [],
-                []
-            )[0]
-        );
-    }
-
     private function makeRequest(array $basicAuth, $requestMethod, $pathInfo, array $getData = [], array $postData = [])
     {
         $response = $this->service->run(
@@ -327,7 +288,7 @@ class UsersModuleTest extends TestCase
 
         $responseArray = json_decode($response->getBody(), true)[$pathInfo];
         if ($responseArray['ok']) {
-            if (array_key_exists('data', $responseArray)) {
+            if (\array_key_exists('data', $responseArray)) {
                 return $responseArray['data'];
             }
 

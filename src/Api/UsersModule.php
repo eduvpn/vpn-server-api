@@ -9,6 +9,7 @@
 
 namespace LetsConnect\Server\Api;
 
+use DateTime;
 use fkooman\Otp\Exception\OtpException;
 use fkooman\Otp\Totp;
 use LetsConnect\Common\Config;
@@ -209,7 +210,7 @@ class UsersModule implements ServiceModuleInterface
         );
 
         $service->get(
-            '/user_last_authenticated_at',
+            '/user_session_expires_at',
             /**
              * @return \LetsConnect\Common\Http\Response
              */
@@ -217,7 +218,7 @@ class UsersModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
                 $userId = InputValidation::userId($request->getQueryParameter('user_id'));
 
-                return new ApiResponse('user_last_authenticated_at', $this->storage->getLastAuthenticatedAt($userId));
+                return new ApiResponse('user_session_expires_at', $this->storage->getSessionExpiresAt($userId));
             }
         );
 
@@ -235,7 +236,7 @@ class UsersModule implements ServiceModuleInterface
         );
 
         $service->post(
-            '/last_authenticated_at_ping',
+            '/user_update_session_info',
             /**
              * @return \LetsConnect\Common\Http\Response
              */
@@ -244,9 +245,11 @@ class UsersModule implements ServiceModuleInterface
 
                 $userId = InputValidation::userId($request->getPostParameter('user_id'));
                 $permissionList = InputValidation::permissionList($request->getPostParameter('permission_list'));
-                $this->storage->lastAuthenticatedAtPing($userId, $permissionList);
+                $sessionExpiresAt = new DateTime($request->getPostParameter('session_expires_at'));
+                // XXX make sure it is in the future!
+                $this->storage->updateSessionInfo($userId, $sessionExpiresAt, $permissionList);
 
-                return new ApiResponse('last_authenticated_at_ping');
+                return new ApiResponse('user_update_session_info');
             }
         );
     }

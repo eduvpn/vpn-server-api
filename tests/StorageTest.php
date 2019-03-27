@@ -73,7 +73,7 @@ class StorageTest extends TestCase
                 'user_id' => 'user_id',
                 'is_disabled' => false,
                 'has_totp_secret' => false,
-                'last_authenticated_at' => null,
+                'session_expires_at' => '2017-12-31T09:00:00+00:00',
                 'permission_list' => [],
             ],
             $this->storage->getUsers()[0]

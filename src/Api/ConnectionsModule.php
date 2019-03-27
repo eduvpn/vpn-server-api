@@ -118,6 +118,8 @@ class ConnectionsModule implements ServiceModuleInterface
             return new ApiErrorResponse('connect', 'user or certificate does not exist');
         }
 
+        // XXX should we check whether or not session is expired yet?!
+
         if ($result['user_is_disabled']) {
             $msg = '[VPN] unable to connect, account is disabled';
             $this->storage->addUserMessage($result['user_id'], 'notification', $msg);

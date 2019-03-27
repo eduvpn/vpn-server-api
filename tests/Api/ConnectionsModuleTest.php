@@ -32,7 +32,8 @@ class ConnectionsModuleTest extends TestCase
             new DateTime()
         );
         $storage->init();
-        $storage->lastAuthenticatedAtPing('foo', ['students']);
+        $storage->updateSessionInfo('foo', new DateTime('2018-01-01 00:00:00'), ['students']);
+
         $storage->addCertificate('foo', '12345678901234567890123456789012', '12345678901234567890123456789012', new DateTime('@12345678'), new DateTime('@23456789'), null);
         $storage->clientConnect('internet', '12345678901234567890123456789012', '10.10.10.10', 'fd00:4242:4242:4242::', new DateTime('@12345678'));
 
@@ -156,7 +157,7 @@ class ConnectionsModuleTest extends TestCase
 
         $responseArray = json_decode($response->getBody(), true)[$pathInfo];
         if ($responseArray['ok']) {
-            if (array_key_exists('data', $responseArray)) {
+            if (\array_key_exists('data', $responseArray)) {
                 return $responseArray['data'];
             }
 

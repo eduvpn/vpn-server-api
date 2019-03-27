@@ -104,7 +104,7 @@ class InfoModuleTest extends TestCase
 
         $responseArray = json_decode($response->getBody(), true)[$pathInfo];
         if ($responseArray['ok']) {
-            if (array_key_exists('data', $responseArray)) {
+            if (\array_key_exists('data', $responseArray)) {
                 return $responseArray['data'];
             }
 

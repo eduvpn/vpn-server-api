@@ -18,7 +18,7 @@ use PDO;
 
 class Storage implements OtpStorageInterface
 {
-    const CURRENT_SCHEMA_VERSION = '2019012501';
+    const CURRENT_SCHEMA_VERSION = '2019032701';
 
     /** @var \PDO */
     private $db;
@@ -55,7 +55,7 @@ class Storage implements OtpStorageInterface
     SELECT
         user_id,
         (SELECT otp_secret FROM otp WHERE user_id = users.user_id) AS otp_secret,
-        last_authenticated_at,
+        session_expires_at,
         permission_list, 
         is_disabled
     FROM 
@@ -70,7 +70,7 @@ SQL
                 'user_id' => $row['user_id'],
                 'is_disabled' => (bool) $row['is_disabled'],
                 'has_totp_secret' => null !== $row['otp_secret'],
-                'last_authenticated_at' => $row['last_authenticated_at'],
+                'session_expires_at' => $row['session_expires_at'],
                 'permission_list' => Json::decode($row['permission_list']),
             ];
         }
@@ -83,13 +83,13 @@ SQL
      *
      * @return string|null
      */
-    public function getLastAuthenticatedAt($userId)
+    public function getSessionExpiresAt($userId)
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
-        last_authenticated_at
+        session_expires_at
     FROM 
         users
     WHERE 
@@ -99,8 +99,6 @@ SQL
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
         $stmt->execute();
 
-        // NULL when no last_authenticated_at is set, never returns false as we
-        // always make sure the user exists...
         return $stmt->fetchColumn();
     }
 
@@ -180,11 +178,12 @@ SQL
 
     /**
      * @param string        $userId
+     * @param \DateTime     $sessionExpiresAt
      * @param array<string> $permissionList
      *
      * @return void
      */
-    public function lastAuthenticatedAtPing($userId, array $permissionList)
+    public function updateSessionInfo($userId, DateTime $sessionExpiresAt, array $permissionList)
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
@@ -192,14 +191,14 @@ SQL
     UPDATE
         users
     SET
-        last_authenticated_at = :last_authenticated_at,
+        session_expires_at = :session_expires_at,
         permission_list = :permission_list
     WHERE
         user_id = :user_id
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':last_authenticated_at', $this->dateTime->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindValue(':session_expires_at', $sessionExpiresAt->format(DateTime::ATOM), PDO::PARAM_STR);
         $stmt->bindValue(':permission_list', Json::encode($permissionList), PDO::PARAM_STR);
 
         $stmt->execute();
@@ -894,14 +893,23 @@ SQL
 <<< 'SQL'
     INSERT INTO 
         users (
-            user_id
+            user_id,
+            session_expires_at,
+            permission_list,
+            is_disabled
         )
     VALUES (
-        :user_id
+        :user_id,
+        :session_expires_at,
+        :permission_list,
+        :is_disabled
     )
 SQL
             );
             $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+            $stmt->bindValue(':session_expires_at', $this->dateTime->format(DateTime::ATOM), PDO::PARAM_STR);
+            $stmt->bindValue(':permission_list', '[]', PDO::PARAM_STR);
+            $stmt->bindValue(':is_disabled', false, PDO::PARAM_BOOL);
             $stmt->execute();
         }
     }
