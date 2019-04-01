@@ -14,19 +14,10 @@ use LC\Common\Config;
 use LC\Common\Logger;
 use LC\OpenVpn\ManagementSocket;
 use LC\Server\OpenVpn\ServerManager;
-use LC\Server\Storage;
 
 try {
     $configFile = sprintf('%s/config/config.php', $baseDir);
     $config = Config::fromFile($configFile);
-
-    $dataDir = sprintf('%s/data', $baseDir);
-    $storage = new Storage(
-        new PDO(
-            sprintf('sqlite://%s/db.sqlite', $dataDir)
-        ),
-        sprintf('%s/schema', $baseDir)
-    );
 
     $serverManager = new ServerManager(
         $config,
@@ -39,13 +30,7 @@ try {
         $output[] = $profile['id'];
 
         foreach ($profile['connections'] as $connection) {
-            // get information about the certificate based on commonName
-            $commonName = $connection['common_name'];
-            if (false === $userCertificateInfo = $storage->getUserCertificateInfo($commonName)) {
-                // XXX hmm?!
-                continue;
-            }
-            $output[] = sprintf("\t%s\t%s [%s]", $commonName, implode(', ', $connection['virtual_address']), $userCertificateInfo['valid_to']);
+            $output[] = sprintf("\t%s\t%s", $connection['common_name'], implode(', ', $connection['virtual_address']));
         }
     }
 
