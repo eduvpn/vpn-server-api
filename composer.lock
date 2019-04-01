@@ -241,11 +241,11 @@
         },
         {
             "name": "lc/openvpn-connection-manager",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://git.tuxed.net/LC/php-openvpn-connection-manager",
-                "reference": "03af3fbe32c0e9255c1d5bc6cee3ee79f4a57abd"
+                "reference": "9712e920bdeefba455f7191f5ce7d1a61d81b708"
             },
             "require": {
                 "php": ">=5.4",
@@ -275,7 +275,11 @@
                 }
             ],
             "description": "Manage client connections to OpenVPN processes",
-            "time": "2018-06-13T13:14:06+00:00"
+            "support": {
+                "email": "fkooman@tuxed.net",
+                "source": "https://git.tuxed.net/LC/php-openvpn-connection-manager"
+            },
+            "time": "2019-04-01T10:09:14+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
