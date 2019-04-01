@@ -23,9 +23,9 @@ class StorageTest extends TestCase
     {
         $this->storage = new Storage(
             new PDO('sqlite::memory:'),
-            'schema',
-            new DateTime('2017-12-31 09:00:00')
+            'schema'
         );
+        $this->storage->setDateTime(new DateTime('2017-12-31 09:00:00'));
         $this->storage->init();
         $this->storage->addCertificate(
             'user_id',

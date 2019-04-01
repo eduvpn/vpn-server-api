@@ -25,8 +25,7 @@ try {
         new PDO(
             sprintf('sqlite://%s/db.sqlite', $dataDir)
         ),
-        sprintf('%s/schema', $baseDir),
-        new DateTime('now')
+        sprintf('%s/schema', $baseDir)
     );
     $storage->init();
 

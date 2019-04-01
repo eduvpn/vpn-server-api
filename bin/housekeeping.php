@@ -17,8 +17,7 @@ try {
     $db = new PDO(sprintf('sqlite://%s/db.sqlite', $dataDir));
     $storage = new Storage(
         $db,
-        sprintf('%s/schema', $baseDir),
-        new DateTime('now')
+        sprintf('%s/schema', $baseDir)
     );
 
     $storage->cleanConnectionLog(new DateTime('now -32 days'));

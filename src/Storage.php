@@ -23,18 +23,17 @@ class Storage implements OtpStorageInterface
     /** @var \PDO */
     private $db;
 
-    /** @var \DateTime */
-    private $dateTime;
-
     /** @var \fkooman\SqliteMigrate\Migration */
     private $migration;
 
+    /** @var \DateTime */
+    private $dateTime;
+
     /**
-     * @param \PDO      $db
-     * @param string    $schemaDir
-     * @param \DateTime $dateTime
+     * @param \PDO   $db
+     * @param string $schemaDir
      */
-    public function __construct(PDO $db, $schemaDir, DateTime $dateTime)
+    public function __construct(PDO $db, $schemaDir)
     {
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         if ('sqlite' === $db->getAttribute(PDO::ATTR_DRIVER_NAME)) {
@@ -42,6 +41,16 @@ class Storage implements OtpStorageInterface
         }
         $this->db = $db;
         $this->migration = new Migration($db, $schemaDir, self::CURRENT_SCHEMA_VERSION);
+        $this->dateTime = new DateTime();
+    }
+
+    /**
+     * @param \DateTime $dateTime
+     *
+     * @return void
+     */
+    public function setDateTime(DateTime $dateTime)
+    {
         $this->dateTime = $dateTime;
     }
 
