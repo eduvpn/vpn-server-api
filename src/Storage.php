@@ -852,6 +852,19 @@ SQL
      *
      * @return void
      */
+    public function cleanExpiredCertificates(DateTime $dateTime)
+    {
+        $stmt = $this->db->prepare('DELETE FROM certificates WHERE valid_to < :date_time');
+        $stmt->bindValue(':date_time', $dateTime->format(DateTime::ATOM), PDO::PARAM_STR);
+
+        $stmt->execute();
+    }
+
+    /**
+     * @param \DateTime $dateTime
+     *
+     * @return void
+     */
     public function cleanOtpLog(DateTime $dateTime)
     {
         $stmt = $this->db->prepare('DELETE FROM otp_log WHERE date_time < :date_time');
