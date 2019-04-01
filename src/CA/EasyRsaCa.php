@@ -7,11 +7,11 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\CA;
+namespace LC\Server\CA;
 
 use DateTime;
-use LetsConnect\Common\FileIO;
-use LetsConnect\Server\CA\Exception\CaException;
+use LC\Common\FileIO;
+use LC\Server\CA\Exception\CaException;
 use RuntimeException;
 
 class EasyRsaCa implements CaInterface

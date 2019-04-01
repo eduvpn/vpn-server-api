@@ -10,9 +10,9 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
-use LetsConnect\Server\CA\EasyRsaCa;
-use LetsConnect\Server\Storage;
-use LetsConnect\Server\TlsAuth;
+use LC\Server\CA\EasyRsaCa;
+use LC\Server\Storage;
+use LC\Server\TlsAuth;
 
 try {
     $easyRsaDir = sprintf('%s/easy-rsa', $baseDir);

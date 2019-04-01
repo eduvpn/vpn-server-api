@@ -7,12 +7,12 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\OpenVpn;
+namespace LC\Server\OpenVpn;
 
+use LC\Common\Config;
+use LC\Common\ProfileConfig;
 use LC\OpenVpn\ConnectionManager;
 use LC\OpenVpn\ManagementSocketInterface;
-use LetsConnect\Common\Config;
-use LetsConnect\Common\ProfileConfig;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
  */
 class ServerManager
 {
-    /** @var \LetsConnect\Common\Config */
+    /** @var \LC\Common\Config */
     private $config;
 
     /** @var \Psr\Log\LoggerInterface */

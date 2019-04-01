@@ -7,33 +7,33 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Api;
+namespace LC\Server\Api;
 
 use DateTime;
-use LetsConnect\Common\Http\ApiErrorResponse;
-use LetsConnect\Common\Http\ApiResponse;
-use LetsConnect\Common\Http\AuthUtils;
-use LetsConnect\Common\Http\InputValidation;
-use LetsConnect\Common\Http\Request;
-use LetsConnect\Common\Http\Service;
-use LetsConnect\Common\Http\ServiceModuleInterface;
-use LetsConnect\Common\RandomInterface;
-use LetsConnect\Server\CA\CaInterface;
-use LetsConnect\Server\Storage;
-use LetsConnect\Server\TlsAuth;
+use LC\Common\Http\ApiErrorResponse;
+use LC\Common\Http\ApiResponse;
+use LC\Common\Http\AuthUtils;
+use LC\Common\Http\InputValidation;
+use LC\Common\Http\Request;
+use LC\Common\Http\Service;
+use LC\Common\Http\ServiceModuleInterface;
+use LC\Common\RandomInterface;
+use LC\Server\CA\CaInterface;
+use LC\Server\Storage;
+use LC\Server\TlsAuth;
 
 class CertificatesModule implements ServiceModuleInterface
 {
-    /** @var \LetsConnect\Server\CA\CaInterface */
+    /** @var \LC\Server\CA\CaInterface */
     private $ca;
 
-    /** @var \LetsConnect\Server\Storage */
+    /** @var \LC\Server\Storage */
     private $storage;
 
-    /** @var \LetsConnect\Server\TlsAuth */
+    /** @var \LC\Server\TlsAuth */
     private $tlsAuth;
 
-    /** @var \LetsConnect\Common\RandomInterface */
+    /** @var \LC\Common\RandomInterface */
     private $random;
 
     public function __construct(CaInterface $ca, Storage $storage, TlsAuth $tlsAuth, RandomInterface $random)
@@ -53,7 +53,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->post(
             '/add_client_certificate',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -97,7 +97,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->get(
             '/server_info',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -114,7 +114,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->post(
             '/add_server_certificate',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
@@ -133,7 +133,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->post(
             '/delete_client_certificate',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -158,7 +158,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->post(
             '/delete_client_certificates_of_client_id',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -181,7 +181,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->get(
             '/client_certificate_list',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -195,7 +195,7 @@ class CertificatesModule implements ServiceModuleInterface
         $service->get(
             '/client_certificate_info',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);

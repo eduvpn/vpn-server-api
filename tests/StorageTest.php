@@ -7,16 +7,16 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Tests;
+namespace LC\Server\Tests;
 
 use DateTime;
-use LetsConnect\Server\Storage;
+use LC\Server\Storage;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class StorageTest extends TestCase
 {
-    /** @var \LetsConnect\Server\Storage */
+    /** @var \LC\Server\Storage */
     private $storage;
 
     public function setUp()

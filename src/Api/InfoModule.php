@@ -7,19 +7,19 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Api;
+namespace LC\Server\Api;
 
-use LetsConnect\Common\Config;
-use LetsConnect\Common\Http\ApiResponse;
-use LetsConnect\Common\Http\AuthUtils;
-use LetsConnect\Common\Http\Request;
-use LetsConnect\Common\Http\Service;
-use LetsConnect\Common\Http\ServiceModuleInterface;
-use LetsConnect\Common\ProfileConfig;
+use LC\Common\Config;
+use LC\Common\Http\ApiResponse;
+use LC\Common\Http\AuthUtils;
+use LC\Common\Http\Request;
+use LC\Common\Http\Service;
+use LC\Common\Http\ServiceModuleInterface;
+use LC\Common\ProfileConfig;
 
 class InfoModule implements ServiceModuleInterface
 {
-    /** @var \LetsConnect\Common\Config */
+    /** @var \LC\Common\Config */
     private $config;
 
     public function __construct(Config $config)
@@ -36,7 +36,7 @@ class InfoModule implements ServiceModuleInterface
         $service->get(
             '/profile_list',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-server-node']);

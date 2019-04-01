@@ -10,10 +10,10 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
-use LetsConnect\Common\CliParser;
-use LetsConnect\Common\Config;
-use LetsConnect\Common\FileIO;
-use LetsConnect\Common\ProfileConfig;
+use LC\Common\CliParser;
+use LC\Common\Config;
+use LC\Common\FileIO;
+use LC\Common\ProfileConfig;
 
 /*
  * Update the IP address configuration of vpn-server-api.

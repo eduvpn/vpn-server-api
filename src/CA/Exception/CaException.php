@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\CA\Exception;
+namespace LC\Server\CA\Exception;
 
 use Exception;
 

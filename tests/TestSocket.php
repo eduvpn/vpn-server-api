@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Tests;
+namespace LC\Server\Tests;
 
 use LC\OpenVpn\ManagementSocketInterface;
 

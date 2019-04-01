@@ -7,19 +7,19 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Api;
+namespace LC\Server\Api;
 
-use LetsConnect\Common\Http\ApiResponse;
-use LetsConnect\Common\Http\AuthUtils;
-use LetsConnect\Common\Http\InputValidation;
-use LetsConnect\Common\Http\Request;
-use LetsConnect\Common\Http\Service;
-use LetsConnect\Common\Http\ServiceModuleInterface;
-use LetsConnect\Server\Storage;
+use LC\Common\Http\ApiResponse;
+use LC\Common\Http\AuthUtils;
+use LC\Common\Http\InputValidation;
+use LC\Common\Http\Request;
+use LC\Common\Http\Service;
+use LC\Common\Http\ServiceModuleInterface;
+use LC\Server\Storage;
 
 class UserMessagesModule implements ServiceModuleInterface
 {
-    /** @var \LetsConnect\Server\Storage */
+    /** @var \LC\Server\Storage */
     private $storage;
 
     public function __construct(Storage $storage)
@@ -35,7 +35,7 @@ class UserMessagesModule implements ServiceModuleInterface
         $service->get(
             '/user_messages',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);

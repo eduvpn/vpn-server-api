@@ -8,17 +8,17 @@
     ],
     "autoload": {
         "psr-4": {
-            "LetsConnect\\Server\\": "src/"
+            "LC\\Server\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "LetsConnect\\Server\\Tests\\": "tests/"
+            "LC\\Server\\Tests\\": "tests/"
         }
     },
     "description": "VPN Server API",
     "license": "AGPL-3.0-or-later",
-    "name": "eduvpn/vpn-server-api",
+    "name": "lc/vpn-server-api",
     "repositories": [
         {
             "no-api": true,
@@ -39,8 +39,6 @@
         }
     ],
     "require": {
-        "lc/openvpn-connection-manager": "^1",
-        "eduvpn/common": "dev-master",
         "ext-date": "*",
         "ext-json": "*",
         "ext-openssl": "*",
@@ -49,6 +47,8 @@
         "ext-spl": "*",
         "fkooman/otp-verifier": "^0",
         "fkooman/sqlite-migrate": "^0",
+        "lc/common": "dev-master",
+        "lc/openvpn-connection-manager": "^1",
         "php": ">=5.4",
         "psr/log": "^1"
     },

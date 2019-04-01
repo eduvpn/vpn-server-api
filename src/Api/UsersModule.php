@@ -7,27 +7,27 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Api;
+namespace LC\Server\Api;
 
 use DateTime;
 use fkooman\Otp\Exception\OtpException;
 use fkooman\Otp\Totp;
-use LetsConnect\Common\Config;
-use LetsConnect\Common\Http\ApiErrorResponse;
-use LetsConnect\Common\Http\ApiResponse;
-use LetsConnect\Common\Http\AuthUtils;
-use LetsConnect\Common\Http\InputValidation;
-use LetsConnect\Common\Http\Request;
-use LetsConnect\Common\Http\Service;
-use LetsConnect\Common\Http\ServiceModuleInterface;
-use LetsConnect\Server\Storage;
+use LC\Common\Config;
+use LC\Common\Http\ApiErrorResponse;
+use LC\Common\Http\ApiResponse;
+use LC\Common\Http\AuthUtils;
+use LC\Common\Http\InputValidation;
+use LC\Common\Http\Request;
+use LC\Common\Http\Service;
+use LC\Common\Http\ServiceModuleInterface;
+use LC\Server\Storage;
 
 class UsersModule implements ServiceModuleInterface
 {
-    /** @var \LetsConnect\Common\Config */
+    /** @var \LC\Common\Config */
     private $config;
 
-    /** @var \LetsConnect\Server\Storage */
+    /** @var \LC\Server\Storage */
     private $storage;
 
     public function __construct(Config $config, Storage $storage)
@@ -44,7 +44,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/user_list',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -56,7 +56,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/set_totp_secret',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -88,7 +88,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/verify_totp_key',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -118,7 +118,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/has_totp_secret',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -132,7 +132,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/delete_totp_secret',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -149,7 +149,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/is_disabled_user',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -163,7 +163,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/disable_user',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -180,7 +180,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/enable_user',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -197,7 +197,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/delete_user',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -212,7 +212,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/user_session_expires_at',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -225,7 +225,7 @@ class UsersModule implements ServiceModuleInterface
         $service->get(
             '/user_permission_list',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -238,7 +238,7 @@ class UsersModule implements ServiceModuleInterface
         $service->post(
             '/user_update_session_info',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);

@@ -7,11 +7,11 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Tests;
+namespace LC\Server\Tests;
 
 use DateTime;
-use LetsConnect\Common\Config;
-use LetsConnect\Server\CA\CaInterface;
+use LC\Common\Config;
+use LC\Server\CA\CaInterface;
 
 class TestCa implements CaInterface
 {

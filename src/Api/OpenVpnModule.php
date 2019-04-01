@@ -7,23 +7,23 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Api;
+namespace LC\Server\Api;
 
-use LetsConnect\Common\Http\ApiResponse;
-use LetsConnect\Common\Http\AuthUtils;
-use LetsConnect\Common\Http\InputValidation;
-use LetsConnect\Common\Http\Request;
-use LetsConnect\Common\Http\Service;
-use LetsConnect\Common\Http\ServiceModuleInterface;
-use LetsConnect\Server\OpenVpn\ServerManager;
-use LetsConnect\Server\Storage;
+use LC\Common\Http\ApiResponse;
+use LC\Common\Http\AuthUtils;
+use LC\Common\Http\InputValidation;
+use LC\Common\Http\Request;
+use LC\Common\Http\Service;
+use LC\Common\Http\ServiceModuleInterface;
+use LC\Server\OpenVpn\ServerManager;
+use LC\Server\Storage;
 
 class OpenVpnModule implements ServiceModuleInterface
 {
-    /** @var \LetsConnect\Server\OpenVpn\ServerManager */
+    /** @var \LC\Server\OpenVpn\ServerManager */
     private $serverManager;
 
-    /** @var \LetsConnect\Server\Storage */
+    /** @var \LC\Server\Storage */
     private $storage;
 
     public function __construct(ServerManager $serverManager, Storage $storage)
@@ -40,7 +40,7 @@ class OpenVpnModule implements ServiceModuleInterface
         $service->get(
             '/client_connections',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
@@ -87,7 +87,7 @@ class OpenVpnModule implements ServiceModuleInterface
         $service->post(
             '/kill_client',
             /**
-             * @return \LetsConnect\Common\Http\Response
+             * @return \LC\Common\Http\Response
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);

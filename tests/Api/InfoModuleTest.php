@@ -7,18 +7,18 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Tests\Api;
+namespace LC\Server\Tests\Api;
 
-use LetsConnect\Common\Config;
-use LetsConnect\Common\Http\BasicAuthenticationHook;
-use LetsConnect\Common\Http\Request;
-use LetsConnect\Common\Http\Service;
-use LetsConnect\Server\Api\InfoModule;
+use LC\Common\Config;
+use LC\Common\Http\BasicAuthenticationHook;
+use LC\Common\Http\Request;
+use LC\Common\Http\Service;
+use LC\Server\Api\InfoModule;
 use PHPUnit\Framework\TestCase;
 
 class InfoModuleTest extends TestCase
 {
-    /** @var \LetsConnect\Common\Http\Service */
+    /** @var \LC\Common\Http\Service */
     private $service;
 
     public function setUp()

@@ -7,27 +7,27 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Tests\Api;
+namespace LC\Server\Tests\Api;
 
 use DateTime;
-use LetsConnect\Common\Http\BasicAuthenticationHook;
-use LetsConnect\Common\Http\Request;
-use LetsConnect\Common\Http\Service;
-use LetsConnect\Server\Api\CertificatesModule;
-use LetsConnect\Server\Storage;
-use LetsConnect\Server\Tests\TestCa;
-use LetsConnect\Server\TlsAuth;
+use LC\Common\Http\BasicAuthenticationHook;
+use LC\Common\Http\Request;
+use LC\Common\Http\Service;
+use LC\Server\Api\CertificatesModule;
+use LC\Server\Storage;
+use LC\Server\Tests\TestCa;
+use LC\Server\TlsAuth;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class CertificatesModuleTest extends TestCase
 {
-    /** @var \LetsConnect\Common\Http\Service */
+    /** @var \LC\Common\Http\Service */
     private $service;
 
     public function setUp()
     {
-        $random = $this->getMockBuilder('LetsConnect\Common\RandomInterface')->getMock();
+        $random = $this->getMockBuilder('LC\Common\RandomInterface')->getMock();
         $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
 
         $storage = new Storage(

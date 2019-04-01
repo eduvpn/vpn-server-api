@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\CA;
+namespace LC\Server\CA;
 
 use DateTime;
 

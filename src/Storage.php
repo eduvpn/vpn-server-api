@@ -7,13 +7,13 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server;
+namespace LC\Server;
 
 use DateTime;
 use fkooman\Otp\OtpInfo;
 use fkooman\Otp\OtpStorageInterface;
 use fkooman\SqliteMigrate\Migration;
-use LetsConnect\Common\Json;
+use LC\Common\Json;
 use PDO;
 
 class Storage implements OtpStorageInterface

@@ -10,7 +10,7 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
-use LetsConnect\Server\Storage;
+use LC\Server\Storage;
 
 try {
     $dataDir = sprintf('%s/data', $baseDir);

@@ -10,10 +10,10 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
-use LetsConnect\Common\Config;
-use LetsConnect\Common\FileIO;
-use LetsConnect\Server\Stats;
-use LetsConnect\Server\Storage;
+use LC\Common\Config;
+use LC\Common\FileIO;
+use LC\Server\Stats;
+use LC\Server\Storage;
 
 try {
     $configFile = sprintf('%s/config/config.php', $baseDir);

@@ -4,106 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f6700ad4e95ade3229cbea284dd2fbef",
+    "content-hash": "004471da1f8d9011d650e865606c79bf",
     "packages": [
-        {
-            "name": "LC/openvpn-connection-manager",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://git.tuxed.net/LC/php-openvpn-connection-manager",
-                "reference": "03af3fbe32c0e9255c1d5bc6cee3ee79f4a57abd"
-            },
-            "require": {
-                "php": ">=5.4",
-                "psr/log": "^1.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4|^5|^6|^7"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "LC\\OpenVpn\\": "src/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "LC\\OpenVpn\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "AGPL-3.0"
-            ],
-            "authors": [
-                {
-                    "email": "fkooman@tuxed.net",
-                    "name": "François Kooman"
-                }
-            ],
-            "description": "Manage client connections to OpenVPN processes",
-            "time": "2018-06-13T13:14:06+00:00"
-        },
-        {
-            "name": "eduvpn/common",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/eduvpn/vpn-lib-common",
-                "reference": "cc96643dd2576add6690849e21e2221d850b2dea"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/cc96643dd2576add6690849e21e2221d850b2dea",
-                "reference": "cc96643dd2576add6690849e21e2221d850b2dea",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "ext-date": "*",
-                "ext-filter": "*",
-                "ext-hash": "*",
-                "ext-json": "*",
-                "ext-ldap": "*",
-                "ext-mbstring": "*",
-                "ext-pcre": "*",
-                "ext-pdo": "*",
-                "ext-radius": "*",
-                "ext-spl": "*",
-                "fkooman/secookie": "^2",
-                "ircmaxell/password-compat": "^1",
-                "paragonie/constant_time_encoding": "^1|^2",
-                "paragonie/random_compat": "^1|^2",
-                "php": ">= 5.4",
-                "psr/log": "^1.0",
-                "symfony/polyfill-php56": "^1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8.35|^5|^6|^7"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "LetsConnect\\Common\\": "src/",
-                    "LetsConnect\\Common\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "AGPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "email": "fkooman@tuxed.net",
-                    "name": "François Kooman"
-                }
-            ],
-            "description": "Common VPN library",
-            "support": {
-                "email": "eduvpn@surfnet.nl",
-                "source": "https://github.com/eduvpn/vpn-lib-common"
-            },
-            "time": "2019-03-26T14:33:07+00:00"
-        },
         {
             "name": "fkooman/otp-verifier",
             "version": "0.2.1",
@@ -274,6 +176,108 @@
             "time": "2014-11-20T16:49:30+00:00"
         },
         {
+            "name": "lc/common",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eduvpn/vpn-lib-common",
+                "reference": "d27c63c639e4cf1cbd09d2257032e86ba94ddcb0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eduvpn/vpn-lib-common/zipball/d27c63c639e4cf1cbd09d2257032e86ba94ddcb0",
+                "reference": "d27c63c639e4cf1cbd09d2257032e86ba94ddcb0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-date": "*",
+                "ext-filter": "*",
+                "ext-hash": "*",
+                "ext-json": "*",
+                "ext-ldap": "*",
+                "ext-mbstring": "*",
+                "ext-pcre": "*",
+                "ext-pdo": "*",
+                "ext-radius": "*",
+                "ext-spl": "*",
+                "fkooman/secookie": "^2",
+                "ircmaxell/password-compat": "^1",
+                "paragonie/constant_time_encoding": "^1|^2",
+                "paragonie/random_compat": ">=1",
+                "php": ">= 5.4",
+                "psr/log": "^1.0",
+                "symfony/polyfill-php56": "^1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35|^5|^6|^7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "LC\\Common\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LC\\Common\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "AGPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "email": "fkooman@tuxed.net",
+                    "name": "François Kooman"
+                }
+            ],
+            "description": "Common VPN library",
+            "support": {
+                "email": "eduvpn@surfnet.nl",
+                "source": "https://github.com/eduvpn/vpn-lib-common"
+            },
+            "time": "2019-04-01T09:42:19+00:00"
+        },
+        {
+            "name": "lc/openvpn-connection-manager",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://git.tuxed.net/LC/php-openvpn-connection-manager",
+                "reference": "03af3fbe32c0e9255c1d5bc6cee3ee79f4a57abd"
+            },
+            "require": {
+                "php": ">=5.4",
+                "psr/log": "^1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4|^5|^6|^7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "LC\\OpenVpn\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "LC\\OpenVpn\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "AGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "email": "fkooman@tuxed.net",
+                    "name": "François Kooman"
+                }
+            ],
+            "description": "Manage client connections to OpenVPN processes",
+            "time": "2018-06-13T13:14:06+00:00"
+        },
+        {
             "name": "paragonie/constant_time_encoding",
             "version": "v2.2.3",
             "source": {
@@ -337,33 +341,29 @@
         },
         {
             "name": "paragonie/random_compat",
-            "version": "v2.0.18",
+            "version": "v9.99.99",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "0a58ef6e3146256cc3dc7cc393927bcc7d1b72db"
+                "reference": "84b4dfb120c6f9b4ff7b3685f9b8f1aa365a0c95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/0a58ef6e3146256cc3dc7cc393927bcc7d1b72db",
-                "reference": "0a58ef6e3146256cc3dc7cc393927bcc7d1b72db",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/84b4dfb120c6f9b4ff7b3685f9b8f1aa365a0c95",
+                "reference": "84b4dfb120c6f9b4ff7b3685f9b8f1aa365a0c95",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2.0"
+                "php": "^7"
             },
             "require-dev": {
-                "phpunit/phpunit": "4.*|5.*"
+                "phpunit/phpunit": "4.*|5.*",
+                "vimeo/psalm": "^1"
             },
             "suggest": {
                 "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
             },
             "type": "library",
-            "autoload": {
-                "files": [
-                    "lib/random.php"
-                ]
-            },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
@@ -382,7 +382,7 @@
                 "pseudorandom",
                 "random"
             ],
-            "time": "2019-01-03T20:59:08+00:00"
+            "time": "2018-07-02T15:55:56+00:00"
         },
         {
             "name": "psr/log",
@@ -2017,7 +2017,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "eduvpn/common": 20
+        "lc/common": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

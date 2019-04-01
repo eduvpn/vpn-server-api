@@ -7,20 +7,20 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Tests\Api;
+namespace LC\Server\Tests\Api;
 
 use DateTime;
-use LetsConnect\Common\Http\BasicAuthenticationHook;
-use LetsConnect\Common\Http\Request;
-use LetsConnect\Common\Http\Service;
-use LetsConnect\Server\Api\SystemMessagesModule;
-use LetsConnect\Server\Storage;
+use LC\Common\Http\BasicAuthenticationHook;
+use LC\Common\Http\Request;
+use LC\Common\Http\Service;
+use LC\Server\Api\SystemMessagesModule;
+use LC\Server\Storage;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class SystemMessagesTest extends TestCase
 {
-    /** @var \LetsConnect\Common\Http\Service */
+    /** @var \LC\Common\Http\Service */
     private $service;
 
     public function setUp()

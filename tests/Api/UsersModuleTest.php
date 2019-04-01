@@ -7,24 +7,24 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Tests\Api;
+namespace LC\Server\Tests\Api;
 
 use DateTime;
 use fkooman\Otp\FrkOtp;
 use fkooman\Otp\OtpInfo;
-use LetsConnect\Common\Config;
-use LetsConnect\Common\Http\BasicAuthenticationHook;
-use LetsConnect\Common\Http\Request;
-use LetsConnect\Common\Http\Service;
-use LetsConnect\Server\Api\UsersModule;
-use LetsConnect\Server\Storage;
+use LC\Common\Config;
+use LC\Common\Http\BasicAuthenticationHook;
+use LC\Common\Http\Request;
+use LC\Common\Http\Service;
+use LC\Server\Api\UsersModule;
+use LC\Server\Storage;
 use ParagonIE\ConstantTime\Base32;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 class UsersModuleTest extends TestCase
 {
-    /** @var \LetsConnect\Common\Http\Service */
+    /** @var \LC\Common\Http\Service */
     private $service;
 
     public function setUp()
@@ -39,13 +39,13 @@ class UsersModuleTest extends TestCase
         $storage->disableUser('bar');
         $storage->disableUser('baz');
         $storage->enableUser('baz');
-        $storage->setOtpSecret('bar', new OtpInfo('CN2XAL23SIFTDFXZ', 'sha1', 6, 30));
+        $storage->setOtpSecret('bar', new OtpInfo('XO66UFFKDOWLG5LJP5TU2SCD7D4HKEM3', 'sha1', 6, 30));
 
         // user "baz" has a secret, and already used a key for replay testing
-        $storage->setOtpSecret('baz', new OtpInfo('SWIXJ4V7VYALWH6E', 'sha1', 6, 30));
+        $storage->setOtpSecret('baz', new OtpInfo('NTEVDXNSX5EXJQHOWDJBRB47EYGR5EED', 'sha1', 6, 30));
         $frkOtp = new FrkOtp();
         $dateTime = new DateTime();
-        $totpKey = $frkOtp->totp(Base32::decodeUpper('SWIXJ4V7VYALWH6E'), 'sha1', 6, $dateTime->getTimestamp(), 30);
+        $totpKey = $frkOtp->totp(Base32::decodeUpper('NTEVDXNSX5EXJQHOWDJBRB47EYGR5EED'), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
         $storage->recordOtpKey('baz', $totpKey, new DateTime('2018-01-01 08:00:00'));
         $storage->updateSessionInfo('bar', new DateTime('2018-01-01 02:00:00'), ['all', 'employees']);
@@ -107,7 +107,7 @@ class UsersModuleTest extends TestCase
 
     public function testSetOtpSecret()
     {
-        $totpSecret = 'MM7TTLHPA7WZOJFB';
+        $totpSecret = 'QFRMM4K7LOFDECURTGIL7MBJGKWLVQMC';
         $frkOtp = new FrkOtp();
         $dateTime = new DateTime();
         $totpKey = $frkOtp->totp(Base32::decodeUpper($totpSecret), 'sha1', 6, $dateTime->getTimestamp(), 30);
@@ -131,7 +131,7 @@ class UsersModuleTest extends TestCase
     {
         $frkOtp = new FrkOtp();
         $dateTime = new DateTime();
-        $totpKey = $frkOtp->totp(Base32::decodeUpper('CN2XAL23SIFTDFXZ'), 'sha1', 6, $dateTime->getTimestamp(), 30);
+        $totpKey = $frkOtp->totp(Base32::decodeUpper('XO66UFFKDOWLG5LJP5TU2SCD7D4HKEM3'), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
         $this->assertTrue(
             $this->makeRequest(
@@ -173,7 +173,7 @@ class UsersModuleTest extends TestCase
     {
         $frkOtp = new FrkOtp();
         $dateTime = new DateTime();
-        $totpKey = $frkOtp->totp(Base32::decodeUpper('SWIXJ4V7VYALWH6E'), 'sha1', 6, $dateTime->getTimestamp(), 30);
+        $totpKey = $frkOtp->totp(Base32::decodeUpper('NTEVDXNSX5EXJQHOWDJBRB47EYGR5EED'), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
         $this->assertSame(
             [

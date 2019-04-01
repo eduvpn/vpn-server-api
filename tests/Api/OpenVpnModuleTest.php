@@ -7,24 +7,24 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-namespace LetsConnect\Server\Tests\Api;
+namespace LC\Server\Tests\Api;
 
 use DateTime;
-use LetsConnect\Common\Config;
-use LetsConnect\Common\Http\BasicAuthenticationHook;
-use LetsConnect\Common\Http\Request;
-use LetsConnect\Common\Http\Service;
-use LetsConnect\Server\Api\OpenVpnModule;
-use LetsConnect\Server\OpenVpn\ServerManager;
-use LetsConnect\Server\Storage;
-use LetsConnect\Server\Tests\TestSocket;
+use LC\Common\Config;
+use LC\Common\Http\BasicAuthenticationHook;
+use LC\Common\Http\Request;
+use LC\Common\Http\Service;
+use LC\Server\Api\OpenVpnModule;
+use LC\Server\OpenVpn\ServerManager;
+use LC\Server\Storage;
+use LC\Server\Tests\TestSocket;
 use PDO;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 class OpenVpnModuleTest extends TestCase
 {
-    /** @var \LetsConnect\Common\Http\Service */
+    /** @var \LC\Common\Http\Service */
     private $service;
 
     public function setUp()
