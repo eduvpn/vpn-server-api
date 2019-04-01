@@ -31,7 +31,7 @@ class Stats
     public function get(array $profileIdList)
     {
         $allStatsData = [
-            'generated_at' => $this->dateTime->format('Y-m-d H:i:s'),
+            'generated_at' => $this->dateTime->format(DateTime::ATOM),
             'profiles' => [],
         ];
 

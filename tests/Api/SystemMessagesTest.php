@@ -56,7 +56,7 @@ class SystemMessagesTest extends TestCase
                 [
                     'id' => '1',
                     'message' => 'Hello World!',
-                    'date_time' => '2016-01-01 08:00:00',
+                    'date_time' => '2016-01-01T08:00:00+00:00',
                 ],
             ],
             $this->makeRequest(
@@ -85,12 +85,12 @@ class SystemMessagesTest extends TestCase
                 [
                     'id' => '1',
                     'message' => 'Hello World!',
-                    'date_time' => '2016-01-01 08:00:00',
+                    'date_time' => '2016-01-01T08:00:00+00:00',
                 ],
                 [
                     'id' => '2',
                     'message' => 'foo',
-                    'date_time' => '2016-01-01 08:00:00',
+                    'date_time' => '2016-01-01T08:00:00+00:00',
                 ],
             ],
             $this->makeRequest(
