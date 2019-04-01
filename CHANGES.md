@@ -1,12 +1,16 @@
 # Changelog
 
-## 2.0.0 (...)
+## 2.0.0 (2019-04-01)
 - remove YubiKey support
 - remove VOOT support
 - remove compression framing support 
 - remove tls-auth support
 - remove "multi instance" support
 - rename "entitlement" to "permission"
+- add script to disconnect clients with expired certificates
+- store all dates in `DateTime::ATOM` format
+- store user's session expiry in database
+- rework firewall configuration
 
 ## 1.4.9 (2018-12-05)
 - fix bug where disabling a user would only disconnect the user from the first
