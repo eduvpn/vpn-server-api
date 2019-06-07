@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.1 (2019-06-07)
+- fix unit tests
+
 ## 2.0.0 (2019-04-01)
 - remove YubiKey support
 - remove VOOT support

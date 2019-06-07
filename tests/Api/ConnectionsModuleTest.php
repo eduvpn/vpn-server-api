@@ -68,7 +68,7 @@ class ConnectionsModuleTest extends TestCase
                     'common_name' => '12345678901234567890123456789012',
                     'ip4' => '10.10.10.10',
                     'ip6' => 'fd00:4242:4242:4242::',
-                    'connected_at' => 12345678,
+                    'connected_at' => '12345678',
                 ]
             )
         );
@@ -87,7 +87,7 @@ class ConnectionsModuleTest extends TestCase
                     'common_name' => '12345678901234567890123456789012',
                     'ip4' => '10.10.10.10',
                     'ip6' => 'fd00:4242:4242:4242::',
-                    'connected_at' => 12345678,
+                    'connected_at' => '12345678',
                 ]
             )
         );
@@ -110,7 +110,7 @@ class ConnectionsModuleTest extends TestCase
                     'common_name' => '12345678901234567890123456789012',
                     'ip4' => '10.10.10.10',
                     'ip6' => 'fd00:4242:4242:4242::',
-                    'connected_at' => 12345678,
+                    'connected_at' => '12345678',
                 ]
             )
         );
@@ -129,9 +129,9 @@ class ConnectionsModuleTest extends TestCase
                     'common_name' => '12345678901234567890123456789012',
                     'ip4' => '10.10.10.10',
                     'ip6' => 'fd00:4242:4242:4242::',
-                    'connected_at' => 12345678,
-                    'disconnected_at' => 23456789,
-                    'bytes_transferred' => 2222222,
+                    'connected_at' => '12345678',
+                    'disconnected_at' => '23456789',
+                    'bytes_transferred' => '2222222',
                 ]
             )
         );

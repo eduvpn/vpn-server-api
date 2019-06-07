@@ -111,7 +111,7 @@ class SystemMessagesTest extends TestCase
                 'POST',
                 'delete_system_message',
                 [],
-                ['message_id' => 1]
+                ['message_id' => '1']
             )
         );
     }
