@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.2 (...)
+- update to `fkooman/otp-verifier` `^0.3`
+
 ## 2.0.1 (2019-06-07)
 - fix unit tests
 

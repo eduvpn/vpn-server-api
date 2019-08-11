@@ -44,7 +44,7 @@
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-spl": "*",
-        "fkooman/otp-verifier": "^0.2",
+        "fkooman/otp-verifier": "^0.3",
         "fkooman/sqlite-migrate": "^0",
         "lc/common": "v2.x-dev",
         "lc/openvpn-connection-manager": "^1",

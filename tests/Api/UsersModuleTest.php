@@ -154,7 +154,7 @@ class UsersModuleTest extends TestCase
         $this->assertSame(
             [
                 'ok' => false,
-                'error' => 'TOTP validation failed: invalid TOTP key',
+                'error' => 'TOTP validation failed: invalid OTP code',
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],

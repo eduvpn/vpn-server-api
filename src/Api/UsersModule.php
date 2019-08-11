@@ -98,12 +98,7 @@ class UsersModule implements ServiceModuleInterface
 
                 $totp = new Totp($this->storage);
                 try {
-                    if (false === $totp->verify($userId, $totpKey)) {
-                        $msg = 'TOTP validation failed: invalid TOTP key';
-                        $this->storage->addUserMessage($userId, 'notification', $msg);
-
-                        return new ApiErrorResponse('verify_totp_key', $msg);
-                    }
+                    $totp->verify($userId, $totpKey);
 
                     return new ApiResponse('verify_totp_key');
                 } catch (OtpException $e) {
