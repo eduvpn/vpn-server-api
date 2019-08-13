@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.2 (...)
+## 2.0.2 (2019-08-13)
 - update to `fkooman/otp-verifier` `^0.3`
 - support `dnsSuffix` configuration option
 - add [CONFIG_CHANGES](CONFIG_CHANGES.md) to indicate the changed configuration
