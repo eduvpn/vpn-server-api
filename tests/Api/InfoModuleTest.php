@@ -54,6 +54,7 @@ class InfoModuleTest extends TestCase
                       'displayName' => 'Internet Access',
                       'dns' => [
                       ],
+                      'dnsSuffix' => [],
                       'enableAcl' => false,
                       'enableLog' => false,
                       'exposedVpnProtoPorts' => [],

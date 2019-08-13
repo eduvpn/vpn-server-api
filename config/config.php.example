@@ -54,6 +54,12 @@ return [
             // Quad9 (https://www.quad9.net)
             'dns' => ['9.9.9.9', '2620:fe::fe'],
 
+            // Set the DNS (search) suffix(es) the client will use
+            // DEFAULT = []
+            'dnsSuffix' => [
+                //'example.org',
+            ],
+
             // Whether or not to allow client-to-client traffic
             // DEFAULT = false
             'clientToClient' => false,
