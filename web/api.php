@@ -31,7 +31,7 @@ use LC\Server\Api\UsersModule;
 use LC\Server\CA\EasyRsaCa;
 use LC\Server\OpenVpn\ServerManager;
 use LC\Server\Storage;
-use LC\Server\TlsAuth;
+use LC\Server\TlsCrypt;
 
 $logger = new Logger('vpn-server-api');
 
@@ -119,13 +119,12 @@ try {
         $easyRsaDir,
         $easyRsaDataDir
     );
-    $tlsAuth = new TlsAuth($dataDir);
 
     $service->addModule(
         new CertificatesModule(
             $easyRsaCa,
             $storage,
-            $tlsAuth,
+            TlsCrypt::fromFile(sprintf('%s/ta.key', $dataDir)),
             new Random()
         )
     );

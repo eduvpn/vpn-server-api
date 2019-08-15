@@ -16,7 +16,7 @@ use LC\Common\Http\Service;
 use LC\Server\Api\CertificatesModule;
 use LC\Server\Storage;
 use LC\Server\Tests\TestCa;
-use LC\Server\TlsAuth;
+use LC\Server\TlsCrypt;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
@@ -41,7 +41,7 @@ class CertificatesModuleTest extends TestCase
             new CertificatesModule(
                 new TestCa(),
                 $storage,
-                new TlsAuth(sprintf('%s/data', \dirname(__DIR__))),
+                TlsCrypt::fromFile(sprintf('%s/data/ta.key', \dirname(__DIR__))),
                 $random
             )
         );
@@ -78,9 +78,19 @@ class CertificatesModuleTest extends TestCase
 
     public function testServerInfo()
     {
+        $testKey = <<< 'EOF'
+#
+# 2048 bit OpenVPN static key
+#
+-----BEGIN OpenVPN Static key V1-----
+TEST
+-----END OpenVPN Static key V1-----
+
+EOF;
+
         $this->assertSame(
             [
-                'ta' => 'Test_Ta_Key',
+                'ta' => $testKey,
                 'ca' => 'Ca',
             ],
             $this->makeRequest(
@@ -95,13 +105,23 @@ class CertificatesModuleTest extends TestCase
 
     public function testGenerateServerCert()
     {
+        $testKey = <<< 'EOF'
+#
+# 2048 bit OpenVPN static key
+#
+-----BEGIN OpenVPN Static key V1-----
+TEST
+-----END OpenVPN Static key V1-----
+
+EOF;
+
         $this->assertSame(
             [
                 'certificate' => 'ServerCert for vpn.example',
                 'private_key' => 'ServerCert for vpn.example',
                 'valid_from' => 1234567890,
                 'valid_to' => 2345678901,
-                'ta' => 'Test_Ta_Key',
+                'ta' => $testKey,
                 'ca' => 'Ca',
             ],
             $this->makeRequest(

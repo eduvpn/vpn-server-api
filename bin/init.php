@@ -10,9 +10,10 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
+use LC\Common\FileIO;
 use LC\Server\CA\EasyRsaCa;
 use LC\Server\Storage;
-use LC\Server\TlsAuth;
+use LC\Server\TlsCrypt;
 
 try {
     $easyRsaDir = sprintf('%s/easy-rsa', $baseDir);
@@ -29,8 +30,8 @@ try {
     );
     $storage->init();
 
-    $tlsAuth = new TlsAuth($dataDir);
-    $tlsAuth->init();
+    $tlsCrypt = TlsCrypt::generate();
+    FileIO::writeFile(sprintf('%s/ta.key', $dataDir), $tlsCrypt->raw());
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);

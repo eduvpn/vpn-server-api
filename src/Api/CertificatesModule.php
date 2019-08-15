@@ -20,7 +20,7 @@ use LC\Common\Http\ServiceModuleInterface;
 use LC\Common\RandomInterface;
 use LC\Server\CA\CaInterface;
 use LC\Server\Storage;
-use LC\Server\TlsAuth;
+use LC\Server\TlsCrypt;
 
 class CertificatesModule implements ServiceModuleInterface
 {
@@ -30,17 +30,17 @@ class CertificatesModule implements ServiceModuleInterface
     /** @var \LC\Server\Storage */
     private $storage;
 
-    /** @var \LC\Server\TlsAuth */
-    private $tlsAuth;
+    /** @var \LC\Server\TlsCrypt */
+    private $tlsCrypt;
 
     /** @var \LC\Common\RandomInterface */
     private $random;
 
-    public function __construct(CaInterface $ca, Storage $storage, TlsAuth $tlsAuth, RandomInterface $random)
+    public function __construct(CaInterface $ca, Storage $storage, TlsCrypt $tlsCrypt, RandomInterface $random)
     {
         $this->ca = $ca;
         $this->storage = $storage;
-        $this->tlsAuth = $tlsAuth;
+        $this->tlsCrypt = $tlsCrypt;
         $this->random = $random;
     }
 
@@ -103,7 +103,7 @@ class CertificatesModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $serverInfo = [
-                    'ta' => $this->tlsAuth->get(),
+                    'ta' => $this->tlsCrypt->raw(),
                     'ca' => $this->ca->caCert(),
                 ];
 
@@ -123,7 +123,7 @@ class CertificatesModule implements ServiceModuleInterface
 
                 $certInfo = $this->ca->serverCert($commonName);
                 // add TLS Auth
-                $certInfo['ta'] = $this->tlsAuth->get();
+                $certInfo['ta'] = $this->tlsCrypt->raw();
                 $certInfo['ca'] = $this->ca->caCert();
 
                 return new ApiResponse('add_server_certificate', $certInfo, 201);
