@@ -29,6 +29,7 @@ use LC\Server\Api\SystemMessagesModule;
 use LC\Server\Api\UserMessagesModule;
 use LC\Server\Api\UsersModule;
 use LC\Server\CA\EasyRsaCa;
+use LC\Server\CA\VpnCa;
 use LC\Server\OpenVpn\ServerManager;
 use LC\Server\Storage;
 use LC\Server\TlsCrypt;
@@ -114,15 +115,20 @@ try {
 
     $easyRsaDir = sprintf('%s/easy-rsa', $baseDir);
     $easyRsaDataDir = sprintf('%s/easy-rsa', $dataDir);
+    $vpnCaDir = sprintf('%s/ca', $dataDir);
 
-    $easyRsaCa = new EasyRsaCa(
-        $easyRsaDir,
-        $easyRsaDataDir
-    );
+    if (null === $vpnCaPath = $config->optionalItem('vpnCaPath')) {
+        // we want to use (legacy) EasyRsaCa
+        $ca = new EasyRsaCa($easyRsaDir, $easyRsaDataDir);
+    } else {
+        // we want to use VpnCA
+        // VpnCa gets the easyRsaDataDir in case a migration is needed...
+        $ca = new VpnCa($vpnCaDir, $vpnCaPath, $easyRsaDataDir);
+    }
 
     $service->addModule(
         new CertificatesModule(
-            $easyRsaCa,
+            $ca,
             $storage,
             TlsCrypt::fromFile(sprintf('%s/ta.key', $dataDir)),
             new Random()
