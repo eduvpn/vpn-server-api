@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.3 (2019-08-29)
+- no longer require OpenVPN to generate `tls-crypt` key
+- add experimental [vpn-ca](https://github.com/fkooman/vpn-ca) support
+
 ## 2.0.2 (2019-08-13)
 - update to `fkooman/otp-verifier` `^0.3`
 - support `dnsSuffix` configuration option
