@@ -55,7 +55,7 @@ class ServerManager
                 $socketAddressList[] = sprintf(
                     'tcp://%s:%d',
                     $managementIp,
-                    11940 + $this->toPort($profileNumber, $i)
+                    11940 + self::toPort($profileNumber, $i)
                 );
             }
 
@@ -86,7 +86,7 @@ class ServerManager
                 $socketAddressList[] = sprintf(
                     'tcp://%s:%d',
                     $managementIp,
-                    11940 + $this->toPort($profileNumber, $i)
+                    11940 + self::toPort($profileNumber, $i)
                 );
             }
         }
@@ -102,7 +102,7 @@ class ServerManager
      *
      * @return int
      */
-    private function toPort($profileNumber, $processNumber)
+    private static function toPort($profileNumber, $processNumber)
     {
         // we have 2^16 - 11940 ports available for management ports, so let's
         // say we have 2^14 ports available to distribute over profiles and
