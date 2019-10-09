@@ -25,9 +25,6 @@ class VpnCa implements CaInterface
     /** @var string */
     private $easyRsaDataDir;
 
-    /** @var string */
-    private $openSslPath = '/usr/bin/openssl';
-
     /**
      * @param string $caDir
      * @param string $vpnCaPath
@@ -63,9 +60,9 @@ class VpnCa implements CaInterface
      */
     public function serverCert($commonName)
     {
-        $this->execVpnCa(sprintf('--server %s', $commonName));
+        $this->execVpnCa(sprintf('-server %s', $commonName));
 
-        return $this->certInfo($commonName);
+        return $this->serverCertInfo($commonName);
     }
 
     /**
@@ -85,9 +82,9 @@ class VpnCa implements CaInterface
             throw new CaException('can not issue certificates that expire in the past');
         }
 
-        $this->execVpnCa(sprintf('--client %s --not-after %s', $commonName, $expiresAt->format(DateTime::ATOM)));
+        $this->execVpnCa(sprintf('-client %s -not-after %s', $commonName, $expiresAt->format(DateTime::ATOM)));
 
-        return $this->certInfo($commonName);
+        return $this->clientCertInfo($commonName);
     }
 
     /**
@@ -124,21 +121,14 @@ class VpnCa implements CaInterface
             if ($hasEasyRsaCert && $hasEasyRsaKey) {
                 // we found old CA cert/key, copy it to new location
                 self::copy($easyRsaCert, sprintf('%s/ca.crt', $this->caDir));
-                // we actually need to convert the CA private key to the
-                // proper format so Go can read it... Weird that EasyRsa
-                // uses a different format...
-                // @see https://groups.google.com/d/msg/golang-nuts/hHFbXwyePDA/ZNZsXIQYrKMJ
-                //
-                //"You can fix this with:
-                //% openssl rsa -in key.pem -out rsakey.pem"
-                self::convertKey($easyRsaKey, sprintf('%s/ca.key', $this->caDir));
+                self::copy($easyRsaKey, sprintf('%s/ca.key', $this->caDir));
 
                 return;
             }
         }
 
         // intitialize new CA
-        $this->execVpnCa('--init');
+        $this->execVpnCa('-init');
     }
 
     /**
@@ -146,11 +136,37 @@ class VpnCa implements CaInterface
      *
      * @return array<string,string>
      */
-    private function certInfo($commonName)
+    private function clientCertInfo($commonName)
     {
-        $certData = $this->readCertificate(sprintf('%s/%s.crt', $this->caDir, $commonName));
-        $keyData = $this->readKey(sprintf('%s/%s.key', $this->caDir, $commonName));
+        return $this->certKeyInfo(
+            sprintf('%s/client/%s.crt', $this->caDir, $commonName),
+            sprintf('%s/client/%s.key', $this->caDir, $commonName)
+        );
+    }
 
+    /**
+     * @param string $commonName
+     *
+     * @return array<string,string>
+     */
+    private function serverCertInfo($commonName)
+    {
+        return $this->certKeyInfo(
+            sprintf('%s/server/%s.crt', $this->caDir, $commonName),
+            sprintf('%s/server/%s.key', $this->caDir, $commonName)
+        );
+    }
+
+    /**
+     * @param string $certFile
+     * @param string $keyFile
+     *
+     * @return array<string,string>
+     */
+    private function certKeyInfo($certFile, $keyFile)
+    {
+        $certData = $this->readCertificate($certFile);
+        $keyData = $this->readKey($keyFile);
         $parsedCert = openssl_x509_parse($certData);
 
         return [
@@ -184,23 +200,6 @@ class VpnCa implements CaInterface
     }
 
     /**
-     * @param string $inKey
-     * @param string $outKey
-     *
-     * @return void
-     */
-    private function convertKey($inKey, $outKey)
-    {
-        $command = sprintf(
-            $this->openSslPath.' rsa -in %s -out %s',
-            $inKey,
-            $outKey
-        );
-
-        self::exec($command);
-    }
-
-    /**
      * @param string $cmdArgs
      *
      * @return void
@@ -208,7 +207,7 @@ class VpnCa implements CaInterface
     private function execVpnCa($cmdArgs)
     {
         $command = sprintf(
-            $this->vpnCaPath.' --ca-dir %s %s',
+            $this->vpnCaPath.' -ca-dir %s %s',
             $this->caDir,
             $cmdArgs
         );
