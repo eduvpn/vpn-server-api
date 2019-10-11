@@ -8,6 +8,13 @@ This will help upgrades to a future 3.x release. Configuration changes during
 the 2.x life cycle are NOT required. Any existing configuration file will keep
 working!
 
+## 2.0.4
+
+- allow specifying the `tlsOneThree` profile option, taking a `bool` to force 
+  the server and client to use TLSv1.3. **NOTE** this only works when the OS 
+  has OpenSSL >= 1.1.1. See 
+  [eduVPN Blog](https://www.eduvpn.org/blog/openvpn_modern_crypto.html).
+
 ## 2.0.3
 
 - allow using [vpn-ca](https://github.com/fkooman/vpn-ca), the experimental CA 
