@@ -11,9 +11,10 @@ working!
 ## 2.0.4
 
 - allow specifying the `tlsOneThree` profile option, taking a `bool` to force 
-  the server and client to use TLSv1.3. **NOTE** this only works when the OS 
-  has OpenSSL >= 1.1.1. See 
-  [eduVPN Blog](https://www.eduvpn.org/blog/openvpn_modern_crypto.html).
+  the server and client to use TLSv1.3. **NOTE** this only works when both the
+  server and client(s) use OpenSSL >= 1.1.1. This is **FOR TESTING ONLY**. See 
+  the [eduVPN Blog](https://www.eduvpn.org/blog/openvpn_modern_crypto.html) for
+  more information.
 
 ## 2.0.3
 
