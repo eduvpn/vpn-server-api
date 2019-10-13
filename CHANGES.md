@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.4 (...)
+- mention `tlsOneThree` as a configuration option in CONFIG_CHANGES to support 
+  requiring client to use TLSv1.3
+- updates for [vpn-ca](https://github.com/fkooman/vpn-ca) changes
+
 ## 2.0.3 (2019-08-29)
 - no longer require OpenVPN to generate `tls-crypt` key
 - add experimental [vpn-ca](https://github.com/fkooman/vpn-ca) support
