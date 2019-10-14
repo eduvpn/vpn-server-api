@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.4 (...)
+## 2.0.4 (2019-10-14)
 - mention `tlsOneThree` as a configuration option in CONFIG_CHANGES to support 
   requiring client to use TLSv1.3
 - updates for [vpn-ca](https://github.com/fkooman/vpn-ca) changes
