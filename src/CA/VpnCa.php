@@ -62,14 +62,13 @@ class VpnCa implements CaInterface
     {
         $this->execVpnCa(sprintf('-server %s', $commonName));
 
-        return $this->serverCertInfo($commonName);
+        return $this->certInfo($commonName);
     }
 
     /**
      * Generate a certificate for a VPN client.
      *
-     * @param string    $commonName
-     * @param \DateTime $expiresAt
+     * @param string $commonName
      *
      * @return array the certificate and key in array with keys 'cert', 'key',
      *               'valid_from' and 'valid_to'
@@ -84,7 +83,7 @@ class VpnCa implements CaInterface
 
         $this->execVpnCa(sprintf('-client %s -not-after %s', $commonName, $expiresAt->format(DateTime::ATOM)));
 
-        return $this->clientCertInfo($commonName);
+        return $this->certInfo($commonName);
     }
 
     /**
@@ -136,24 +135,11 @@ class VpnCa implements CaInterface
      *
      * @return array<string,string>
      */
-    private function clientCertInfo($commonName)
+    private function certInfo($commonName)
     {
         return $this->certKeyInfo(
-            sprintf('%s/client/%s.crt', $this->caDir, $commonName),
-            sprintf('%s/client/%s.key', $this->caDir, $commonName)
-        );
-    }
-
-    /**
-     * @param string $commonName
-     *
-     * @return array<string,string>
-     */
-    private function serverCertInfo($commonName)
-    {
-        return $this->certKeyInfo(
-            sprintf('%s/server/%s.crt', $this->caDir, $commonName),
-            sprintf('%s/server/%s.key', $this->caDir, $commonName)
+            sprintf('%s/%s.crt', $this->caDir, $commonName),
+            sprintf('%s/%s.key', $this->caDir, $commonName)
         );
     }
 
@@ -229,9 +215,7 @@ class VpnCa implements CaInterface
         );
 
         if (0 !== $returnValue) {
-            throw new RuntimeException(
-                sprintf('command "%s" did not complete successfully: "%s"', $execCmd, implode(PHP_EOL, $commandOutput))
-            );
+            throw new RuntimeException(sprintf('command "%s" did not complete successfully: "%s"', $execCmd, implode(PHP_EOL, $commandOutput)));
         }
     }
 
