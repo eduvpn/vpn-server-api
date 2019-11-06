@@ -18,6 +18,9 @@ use LC\Common\Http\ServiceModuleInterface;
 use LC\Server\OpenVpn\ServerManager;
 use LC\Server\Storage;
 
+/**
+ * Use direct OpenVPN management port socket connections.
+ */
 class OpenVpnModule implements ServiceModuleInterface
 {
     /** @var \LC\Server\OpenVpn\ServerManager */
