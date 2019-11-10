@@ -67,35 +67,32 @@ class OpenVpnModuleTest extends TestCase
     {
         $this->assertSame(
             [
-                [
-                    'id' => 'internet',
-                    'connections' => [
-                        [
-                            'common_name' => 'f3bb6f8efb4dc64be35e1044cf1b5e76',
-                            'virtual_address' => [
-                                '10.128.7.3',
-                                'fd60:4a08:2f59:ba0::1001',
-                            ],
-                            'user_id' => 'foo',
-                            'user_is_disabled' => '0',
-                            'display_name' => 'Display Name',
-                            'valid_from' => '1970-05-23T21:21:18+00:00',
-                            'valid_to' => '1970-09-29T11:46:29+00:00',
-                            'client_id' => null,
+                'internet' => [
+                    [
+                        'common_name' => 'f3bb6f8efb4dc64be35e1044cf1b5e76',
+                        'virtual_address' => [
+                            '10.128.7.3',
+                            'fd60:4a08:2f59:ba0::1001',
                         ],
-                        [
-                            'common_name' => '78f4a3c26062a434b01892e2b23126d1',
-                            'virtual_address' => [
-                                '10.128.7.4',
-                                'fd60:4a08:2f59:ba0::1002',
-                            ],
-                            'user_id' => 'foo',
-                            'user_is_disabled' => '0',
-                            'display_name' => 'Display Name 2',
-                            'valid_from' => '1970-05-23T21:21:18+00:00',
-                            'valid_to' => '1970-09-29T11:46:29+00:00',
-                            'client_id' => null,
+                        'user_id' => 'foo',
+                        'user_is_disabled' => '0',
+                        'display_name' => 'Display Name',
+                        'valid_from' => '1970-05-23T21:21:18+00:00',
+                        'valid_to' => '1970-09-29T11:46:29+00:00',
+                        'client_id' => null,
+                    ],
+                    [
+                        'common_name' => '78f4a3c26062a434b01892e2b23126d1',
+                        'virtual_address' => [
+                            '10.128.7.4',
+                            'fd60:4a08:2f59:ba0::1002',
                         ],
+                        'user_id' => 'foo',
+                        'user_is_disabled' => '0',
+                        'display_name' => 'Display Name 2',
+                        'valid_from' => '1970-05-23T21:21:18+00:00',
+                        'valid_to' => '1970-09-29T11:46:29+00:00',
+                        'client_id' => null,
                     ],
                 ],
             ],

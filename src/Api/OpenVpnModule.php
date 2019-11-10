@@ -55,35 +55,34 @@ class OpenVpnModule implements ServiceModuleInterface
                     $clientId = InputValidation::clientId($clientId);
                 }
 
+                $connectionList = [];
                 $clientConnections = $this->serverManager->connections();
-                // add user information to connection information
-                foreach ($clientConnections as $k => $v) {
-                    foreach ($v['connections'] as $k1 => $v2) {
-                        if (false === $certInfo = $this->storage->getUserCertificateInfo($v2['common_name'])) {
-                            error_log(sprintf('"common_name "%s" not found', $v2['common_name']));
-                            unset($clientConnections[$k]['connections'][$k1]);
+                foreach ($clientConnections as $v) {
+                    $profileId = $v['id'];
+                    $connectionList[$profileId] = [];
+                    foreach ($v['connections'] as $connectionInfo) {
+                        if (false === $certInfo = $this->storage->getUserCertificateInfo($connectionInfo['common_name'])) {
+                            error_log(sprintf('"common_name "%s" not found', $connectionInfo['common_name']));
                             continue;
                         }
                         if (null !== $userId) {
                             // filter by userId
                             if ($userId !== $certInfo['user_id']) {
-                                unset($clientConnections[$k]['connections'][$k1]);
                                 continue;
                             }
                         }
                         if (null !== $clientId) {
                             // filter by clientId
                             if ($clientId !== $certInfo['client_id']) {
-                                unset($clientConnections[$k]['connections'][$k1]);
                                 continue;
                             }
                         }
 
-                        $clientConnections[$k]['connections'][$k1] = array_merge($v2, $certInfo);
+                        $connectionList[$profileId][] = array_merge($connectionInfo, $certInfo);
                     }
                 }
 
-                return new ApiResponse('client_connections', $clientConnections);
+                return new ApiResponse('client_connections', $connectionList);
             }
         );
 
@@ -96,8 +95,9 @@ class OpenVpnModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
+                $this->serverManager->kill($commonName);
 
-                return new ApiResponse('kill_client', $this->serverManager->kill($commonName));
+                return new ApiResponse('kill_client');
             }
         );
     }
