@@ -151,7 +151,6 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
                 $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
-
                 $managementIpPortList = [];
                 foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
                     $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
@@ -166,7 +165,7 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
                     }
                 }
 
-                // send the "DISCONNECT" commanf for all IPs and/ports
+                // send the "DISCONNECT" command for all IPs and/ports
                 foreach ($managementIpPortList as $managementIp => $portList) {
                     try {
                         $this->daemonSocket->open($managementIp);
