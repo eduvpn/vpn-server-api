@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.5 (...)
+- update for new vpn-ca, client and server certificates are no longer written
+  in separate directories
+- implement vpn-daemon support
+- update client connection API for portal
+
 ## 2.0.4 (2019-10-14)
 - mention `tlsOneThree` as a configuration option in CONFIG_CHANGES to support 
   requiring client to use TLSv1.3

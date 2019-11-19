@@ -8,6 +8,13 @@ This will help upgrades to a future 3.x release. Configuration changes during
 the 2.x life cycle are NOT required. Any existing configuration file will keep
 working!
 
+## 2.0.5 
+
+- allow enabling [vpn-daemon](https://github.com/letsconnectvpn/vpn-daemon) 
+  support with the `useVpnDaemon` option that takes a boolean. When the option 
+  is NOT specified it defaults to `false`. This is a GLOBAL option, so all 
+  profiles will use the daemon to talk to OpenVPN processes.
+
 ## 2.0.4
 
 - allow specifying the `tlsOneThree` profile option, taking a `bool` to force 
