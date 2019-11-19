@@ -23,6 +23,7 @@ use LC\Server\Api\CertificatesModule;
 use LC\Server\Api\ConnectionsModule;
 use LC\Server\Api\InfoModule;
 use LC\Server\Api\LogModule;
+use LC\Server\Api\OpenVpnDaemonModule;
 use LC\Server\Api\OpenVpnModule;
 use LC\Server\Api\StatsModule;
 use LC\Server\Api\SystemMessagesModule;
@@ -30,6 +31,7 @@ use LC\Server\Api\UserMessagesModule;
 use LC\Server\Api\UsersModule;
 use LC\Server\CA\EasyRsaCa;
 use LC\Server\CA\VpnCa;
+use LC\Server\OpenVpn\DaemonSocket;
 use LC\Server\OpenVpn\ServerManager;
 use LC\Server\Storage;
 use LC\Server\TlsCrypt;
@@ -88,12 +90,22 @@ try {
         )
     );
 
-    $service->addModule(
-        new OpenVpnModule(
-            new ServerManager($config, $logger, new ManagementSocket()),
-            $storage
-        )
-    );
+    if ($config->hasItem('useVpnDaemon') && $config->getItem('useVpnDaemon')) {
+        $openVpnDaemonModule = new OpenVpnDaemonModule(
+            $config,
+            $storage,
+            new DaemonSocket(sprintf('%s/vpn-daemon', $configDir))
+        );
+        $openVpnDaemonModule->setLogger($logger);
+        $service->addModule($openVpnDaemonModule);
+    } else {
+        $service->addModule(
+            new OpenVpnModule(
+                new ServerManager($config, $logger, new ManagementSocket()),
+                $storage
+            )
+        );
+    }
 
     $service->addModule(
         new LogModule(
