@@ -95,8 +95,7 @@ class EasyRsaCa implements CaInterface
     /**
      * Generate a certificate for a VPN client.
      *
-     * @param string    $commonName
-     * @param \DateTime $expiresAt
+     * @param string $commonName
      *
      * @return array the certificate and key in array with keys 'cert', 'key',
      *               'valid_from' and 'valid_to'
@@ -109,7 +108,7 @@ class EasyRsaCa implements CaInterface
 
         // prevent expiresAt to be in the past
         $dateTime = new DateTime();
-        if ($dateTime >= $expiresAt) {
+        if ($dateTime->getTimestamp() >= $expiresAt->getTimestamp()) {
             throw new CaException('can not issue certificates that expire in the past');
         }
 
@@ -215,9 +214,7 @@ class EasyRsaCa implements CaInterface
         );
 
         if (0 !== $returnValue) {
-            throw new RuntimeException(
-                sprintf('command "%s" did not complete successfully: "%s"', $command, implode(PHP_EOL, $commandOutput))
-            );
+            throw new RuntimeException(sprintf('command "%s" did not complete successfully: "%s"', $command, implode(PHP_EOL, $commandOutput)));
         }
     }
 }

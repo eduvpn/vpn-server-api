@@ -64,7 +64,7 @@ class DaemonSocket
      */
     public function disconnect(array $commonNameList)
     {
-        $disconnectResponse = $this->sendCommand(sprintf('DISCONNECT %s', implode(' ', $commonNameList)));
+        $this->sendCommand(sprintf('DISCONNECT %s', implode(' ', $commonNameList)));
     }
 
     /**
