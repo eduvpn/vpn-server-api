@@ -30,7 +30,6 @@ class Storage implements OtpStorageInterface
     private $dateTime;
 
     /**
-     * @param \PDO   $db
      * @param string $schemaDir
      */
     public function __construct(PDO $db, $schemaDir)
@@ -45,8 +44,6 @@ class Storage implements OtpStorageInterface
     }
 
     /**
-     * @param \DateTime $dateTime
-     *
      * @return void
      */
     public function setDateTime(DateTime $dateTime)
@@ -187,7 +184,6 @@ SQL
 
     /**
      * @param string        $userId
-     * @param \DateTime     $sessionExpiresAt
      * @param array<string> $permissionList
      *
      * @return void
@@ -217,8 +213,6 @@ SQL
      * @param string      $userId
      * @param string      $commonName
      * @param string      $displayName
-     * @param \DateTime   $validFrom
-     * @param \DateTime   $validTo
      * @param string|null $clientId
      *
      * @return void
@@ -419,11 +413,10 @@ SQL
     }
 
     /**
-     * @param string    $profileId
-     * @param string    $commonName
-     * @param string    $ip4
-     * @param string    $ip6
-     * @param \DateTime $connectedAt
+     * @param string $profileId
+     * @param string $commonName
+     * @param string $ip4
+     * @param string $ip6
      *
      * @return void
      */
@@ -502,13 +495,11 @@ SQL
     }
 
     /**
-     * @param string    $profileId
-     * @param string    $commonName
-     * @param string    $ip4
-     * @param string    $ip6
-     * @param \DateTime $connectedAt
-     * @param \DateTime $disconnectedAt
-     * @param int       $bytesTransferred
+     * @param string $profileId
+     * @param string $commonName
+     * @param string $ip4
+     * @param string $ip6
+     * @param int    $bytesTransferred
      *
      * @return void
      */
@@ -582,8 +573,6 @@ SQL
     }
 
     /**
-     * @param \DateTime $dateTime
-     *
      * @return void
      */
     public function cleanConnectionLog(DateTime $dateTime)
@@ -605,8 +594,6 @@ SQL
     }
 
     /**
-     * @param \DateTime $dateTime
-     *
      * @return void
      */
     public function cleanUserMessages(DateTime $dateTime)
@@ -770,8 +757,7 @@ SQL
     }
 
     /**
-     * @param string               $userId
-     * @param \fkooman\Otp\OtpInfo $otpInfo
+     * @param string $userId
      *
      * @return void
      */
@@ -816,9 +802,8 @@ SQL
     }
 
     /**
-     * @param string    $userId
-     * @param string    $otpKey
-     * @param \DateTime $dateTime
+     * @param string $userId
+     * @param string $otpKey
      *
      * @return bool
      */
@@ -848,8 +833,6 @@ SQL
     }
 
     /**
-     * @param \DateTime $dateTime
-     *
      * @return void
      */
     public function cleanExpiredCertificates(DateTime $dateTime)
@@ -861,8 +844,6 @@ SQL
     }
 
     /**
-     * @param \DateTime $dateTime
-     *
      * @return void
      */
     public function cleanOtpLog(DateTime $dateTime)

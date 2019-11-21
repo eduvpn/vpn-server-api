@@ -36,8 +36,7 @@ class TestCa implements CaInterface
     /**
      * Generate a certificate for a VPN client.
      *
-     * @param string    $commonName
-     * @param \DateTime $expiresAt
+     * @param string $commonName
      *
      * @return array the certificate and key in array with keys 'cert', 'key',
      *               'valid_from' and 'valid_to'
