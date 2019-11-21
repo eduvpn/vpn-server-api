@@ -3,7 +3,7 @@
 ## 2.1.0 (2019-11-21)
 - update for new vpn-ca, client and server certificates are no longer written
   in separate directories
-- implement vpn-daemon support
+- implement VPN Daemon support
 - update client connection API for portal
 
 ## 2.0.4 (2019-10-14)
