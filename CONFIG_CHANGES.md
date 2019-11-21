@@ -8,7 +8,7 @@ This will help upgrades to a future 3.x release. Configuration changes during
 the 2.x life cycle are NOT required. Any existing configuration file will keep
 working!
 
-## 2.0.5 
+## 2.1.0
 
 - allow enabling [vpn-daemon](https://github.com/letsconnectvpn/vpn-daemon) 
   support with the `useVpnDaemon` option that takes a boolean. When the option 
