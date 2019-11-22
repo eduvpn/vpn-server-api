@@ -12,7 +12,6 @@ $baseDir = dirname(__DIR__);
 
 use LC\Common\Config;
 use LC\Common\FileIO;
-use LC\Server\CA\EasyRsaCa;
 use LC\Server\CA\VpnCa;
 use LC\Server\Storage;
 use LC\Server\TlsCrypt;
@@ -25,18 +24,12 @@ try {
         sprintf('%s/config.php', $configDir)
     );
 
-    $easyRsaDir = sprintf('%s/easy-rsa', $baseDir);
+    // we need easyRsaDataDir for migrations to vpn-ca
     $easyRsaDataDir = sprintf('%s/easy-rsa', $dataDir);
     $vpnCaDir = sprintf('%s/ca', $dataDir);
-
-    if (null === $vpnCaPath = $config->optionalItem('vpnCaPath')) {
-        // we want to use (legacy) EasyRsaCa
-        $ca = new EasyRsaCa($easyRsaDir, $easyRsaDataDir);
-    } else {
-        // we want to use VpnCA
-        // VpnCa gets the easyRsaDataDir in case a migration is needed...
-        $ca = new VpnCa($vpnCaDir, $vpnCaPath, $easyRsaDataDir);
-    }
+    $vpnCaPath = $config->optionalItem('vpnCaPath', '/usr/bin/vpn-ca');
+    // VpnCa gets the easyRsaDataDir in case a migration is needed...
+    $ca = new VpnCa($vpnCaDir, $vpnCaPath, $easyRsaDataDir);
 
     $storage = new Storage(
         new PDO(
