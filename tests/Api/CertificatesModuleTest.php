@@ -41,7 +41,7 @@ class CertificatesModuleTest extends TestCase
             new CertificatesModule(
                 new TestCa(),
                 $storage,
-                TlsCrypt::fromFile(sprintf('%s/data/ta.key', \dirname(__DIR__))),
+                new TlsCrypt(sprintf('%s/data', \dirname(__DIR__))),
                 $random
             )
         );
@@ -90,14 +90,14 @@ EOF;
 
         $this->assertSame(
             [
-                'ta' => $testKey,
+                'tls_crypt' => $testKey,
                 'ca' => 'Ca',
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'abcdef'],
                 'GET',
                 'server_info',
-                [],
+                ['profile_id' => 'internet'],
                 []
             )
         );
@@ -121,7 +121,7 @@ EOF;
                 'private_key' => 'ServerCert for vpn.example',
                 'valid_from' => 1234567890,
                 'valid_to' => 2345678901,
-                'ta' => $testKey,
+                'tls_crypt' => $testKey,
                 'ca' => 'Ca',
             ],
             $this->makeRequest(
@@ -129,7 +129,10 @@ EOF;
                 'POST',
                 'add_server_certificate',
                 [],
-                ['common_name' => 'vpn.example']
+                [
+                    'profile_id' => 'internet',
+                    'common_name' => 'vpn.example',
+                ]
             )
         );
     }

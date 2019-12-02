@@ -102,8 +102,10 @@ class CertificatesModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
+                $profileId = InputValidation::profileId($request->getQueryParameter('profile_id'));
+
                 $serverInfo = [
-                    'ta' => $this->tlsCrypt->raw(),
+                    'tls_crypt' => $this->tlsCrypt->get($profileId),
                     'ca' => $this->ca->caCert(),
                 ];
 
@@ -119,11 +121,11 @@ class CertificatesModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
+                $profileId = InputValidation::profileId($request->getPostParameter('profile_id'));
                 $commonName = InputValidation::serverCommonName($request->getPostParameter('common_name'));
 
                 $certInfo = $this->ca->serverCert($commonName);
-                // add TLS Auth
-                $certInfo['ta'] = $this->tlsCrypt->raw();
+                $certInfo['tls_crypt'] = $this->tlsCrypt->get($profileId, true);
                 $certInfo['ca'] = $this->ca->caCert();
 
                 return new ApiResponse('add_server_certificate', $certInfo, 201);

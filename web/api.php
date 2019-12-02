@@ -142,7 +142,7 @@ try {
         new CertificatesModule(
             $ca,
             $storage,
-            TlsCrypt::fromFile(sprintf('%s/ta.key', $dataDir)),
+            new TlsCrypt($dataDir),
             new Random()
         )
     );
