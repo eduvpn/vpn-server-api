@@ -72,7 +72,6 @@ class TlsCrypt
 -----BEGIN OpenVPN Static key V1-----
 $randomData
 -----END OpenVPN Static key V1-----
-
 EOF;
 
         return $tlsCrypt;
