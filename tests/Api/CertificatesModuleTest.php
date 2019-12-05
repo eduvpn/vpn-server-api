@@ -16,6 +16,7 @@ use LC\Common\Http\Service;
 use LC\Server\Api\CertificatesModule;
 use LC\Server\Storage;
 use LC\Server\Tests\TestCa;
+use LC\Server\Tests\TestRandom;
 use LC\Server\TlsCrypt;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -27,9 +28,7 @@ class CertificatesModuleTest extends TestCase
 
     public function setUp()
     {
-        $random = $this->getMockBuilder('LC\Common\RandomInterface')->getMock();
-        $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
-
+        $random = new TestRandom(['random_1', 'random_2']);
         $storage = new Storage(
             new PDO('sqlite::memory:'),
             'schema',
