@@ -1,7 +1,8 @@
 # Changelog
 
-## 2.1.1 (...)
-- support per profile tls-crypt keys
+## 2.1.1 (2019-12-10)
+- support per profile tls-crypt keys for new deployments. Existing setups will
+  keep one key for all profiles
 
 ## 2.1.0 (2019-11-21)
 - update for new vpn-ca, client and server certificates are no longer written
