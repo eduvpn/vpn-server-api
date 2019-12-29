@@ -40,7 +40,7 @@ class UserMessagesModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
+                $userId = InputValidation::userId($request->requireQueryParameter('user_id'));
 
                 return new ApiResponse('user_messages', $this->storage->userMessages($userId));
             }

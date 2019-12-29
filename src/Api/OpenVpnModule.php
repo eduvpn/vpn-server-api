@@ -48,10 +48,10 @@ class OpenVpnModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                if (null !== $userId = $request->getQueryParameter('user_id', false)) {
+                if (null !== $userId = $request->optionalQueryParameter('user_id')) {
                     $userId = InputValidation::userId($userId);
                 }
-                if (null !== $clientId = $request->getQueryParameter('client_id', false)) {
+                if (null !== $clientId = $request->optionalQueryParameter('client_id')) {
                     $clientId = InputValidation::clientId($clientId);
                 }
 
@@ -94,7 +94,7 @@ class OpenVpnModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
+                $commonName = InputValidation::commonName($request->requirePostParameter('common_name'));
                 $this->serverManager->kill($commonName);
 
                 return new ApiResponse('kill_client');

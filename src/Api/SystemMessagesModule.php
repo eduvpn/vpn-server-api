@@ -40,7 +40,7 @@ class SystemMessagesModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $type = InputValidation::messageType($request->getQueryParameter('message_type'));
+                $type = InputValidation::messageType($request->requireQueryParameter('message_type'));
 
                 return new ApiResponse('system_messages', $this->storage->systemMessages($type));
             }
@@ -54,13 +54,13 @@ class SystemMessagesModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $type = InputValidation::messageType($request->getPostParameter('message_type'));
+                $type = InputValidation::messageType($request->requirePostParameter('message_type'));
 
                 // we do NOT sanitize or verify message as *everything* is
                 // allowed! It will never be used as-is for showing in the
                 // browser, as the user portal will escape it before showing
                 // and the apps MUST interprete it as "text/plain".
-                $message = $request->getPostParameter('message_body');
+                $message = $request->requirePostParameter('message_body');
 
                 $this->storage->addSystemMessage($type, $message);
 
@@ -76,7 +76,7 @@ class SystemMessagesModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $messageId = InputValidation::messageId($request->getPostParameter('message_id'));
+                $messageId = InputValidation::messageId($request->requirePostParameter('message_id'));
 
                 $this->storage->deleteSystemMessage($messageId);
 

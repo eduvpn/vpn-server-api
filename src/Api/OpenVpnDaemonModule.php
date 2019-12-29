@@ -70,11 +70,11 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                if (null !== $userId = $request->getQueryParameter('user_id', false)) {
+                if (null !== $userId = $request->optionalQueryParameter('user_id')) {
                     // limit results by user_id
                     $userId = InputValidation::userId($userId);
                 }
-                if (null !== $clientId = $request->getQueryParameter('client_id', false)) {
+                if (null !== $clientId = $request->optionalQueryParameter('client_id')) {
                     // limit results by client_id
                     $clientId = InputValidation::clientId($clientId);
                 }
@@ -150,7 +150,7 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
+                $commonName = InputValidation::commonName($request->requirePostParameter('common_name'));
                 $managementIpPortList = [];
                 foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
                     $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
