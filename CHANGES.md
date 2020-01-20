@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.1.2 (2020-01-20)
+- update for new `LC/common`
+
 ## 2.1.1 (2019-12-10)
 - support per profile tls-crypt keys for new deployments. Existing setups will
   keep one key for all profiles
