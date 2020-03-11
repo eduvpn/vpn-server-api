@@ -44,10 +44,10 @@ try {
     $dataDir = sprintf('%s/data', $baseDir);
     $logger = new Logger($argv[0]);
 
-    $showVerbose = false;
+    $alertOnly = false;
     foreach ($argv as $arg) {
-        if ('--verbose' === $arg) {
-            $showVerbose = true;
+        if ('--alert' === $arg) {
+            $alertOnly = true;
         }
     }
 
@@ -71,11 +71,9 @@ try {
         foreach ($openVpnDaemonModule->getConnectionList(null, null) as $profileId => $connectionInfoList) {
             $activeConnectionCount = count($connectionInfoList);
             $profileMaxClientLimit = $maxClientLimit[$profileId];
-            $output .= $profileId.','.$activeConnectionCount.','.$profileMaxClientLimit.','.floor($activeConnectionCount / $profileMaxClientLimit * 100).'%'.PHP_EOL;
-            if ($showVerbose) {
-                foreach ($connectionInfoList as $connectionInfo) {
-                    $output .= sprintf("%s\t%s\t%s", $profileId, $connectionInfo['common_name'], implode(', ', $connectionInfo['virtual_address'])).PHP_EOL;
-                }
+            $percentInUse = floor($activeConnectionCount / $profileMaxClientLimit * 100);
+            if (!$alertOnly || ($alertOnly && 90 <= $percentInUse)) {
+                $output .= $profileId.','.$activeConnectionCount.','.$profileMaxClientLimit.','.$percentInUse.'%'.PHP_EOL;
             }
         }
 
@@ -92,11 +90,9 @@ try {
         foreach ($serverManager->connections() as $profile) {
             $activeConnectionCount = count($connectionInfoList);
             $profileMaxClientLimit = $maxClientLimit[$profileId];
-            $output .= $profile['id'].','.$activeConnectionCount.','.$profileMaxClientLimit.','.floor($activeConnectionCount / $profileMaxClientLimit * 100).'%'.PHP_EOL;
-            if ($showVerbose) {
-                foreach ($profile['connections'] as $connection) {
-                    $output .= sprintf("\t%s\t%s", $connection['common_name'], implode(', ', $connection['virtual_address'])).PHP_EOL;
-                }
+            $percentInUse = floor($activeConnectionCount / $profileMaxClientLimit * 100);
+            if (!$alertOnly || ($alertOnly && 90 <= $percentInUse)) {
+                $output .= $profile['id'].','.$activeConnectionCount.','.$profileMaxClientLimit.','.$percentInUse.'%'.PHP_EOL;
             }
         }
 
