@@ -13,14 +13,17 @@ $baseDir = dirname(__DIR__);
 use LC\Common\Config;
 use LC\Common\Logger;
 use LC\OpenVpn\ManagementSocket;
+use LC\Server\Api\OpenVpnDaemonModule;
+use LC\Server\OpenVpn\DaemonSocket;
 use LC\Server\OpenVpn\ServerManager;
 use LC\Server\Storage;
 
 try {
     $dateTime = new DateTime();
-    $configFile = sprintf('%s/config/config.php', $baseDir);
+    $configDir = sprintf('%s/config', $baseDir);
+    $configFile = sprintf('%s/config.php', $configDir);
     $config = Config::fromFile($configFile);
-
+    $logger = new Logger($argv[0]);
     $dataDir = sprintf('%s/data', $baseDir);
     $storage = new Storage(
         new PDO(
@@ -29,28 +32,49 @@ try {
         sprintf('%s/schema', $baseDir)
     );
 
-    $serverManager = new ServerManager(
-        $config,
-        new Logger($argv[0]),
-        new ManagementSocket()
-    );
-
-    foreach ($serverManager->connections() as $profile) {
-        foreach ($profile['connections'] as $connection) {
-            // get information about the certificate based on commonName
-            $commonName = $connection['common_name'];
-            $userCertificateInfo = $storage->getUserCertificateInfo($commonName);
-            if (false === $userCertificateInfo) {
-                // the certificate was not found (anymore), disconnect!
-                $serverManager->kill($commonName);
-                continue;
+    if ($config->hasItem('useVpnDaemon') && $config->getItem('useVpnDaemon')) {
+        // with vpn-daemon
+        $openVpnDaemonModule = new OpenVpnDaemonModule(
+            $config,
+            $storage,
+            new DaemonSocket(sprintf('%s/vpn-daemon', $configDir))
+        );
+        $openVpnDaemonModule->setLogger($logger);
+        foreach ($openVpnDaemonModule->getConnectionList(null, null) as $profileId => $connectionInfoList) {
+            foreach ($connectionInfoList as $connectionInfo) {
+                // check expiry of certificate
+                $expiresAt = new DateTime($connectionInfo['valid_to']);
+                if ($dateTime > $expiresAt) {
+                    // certificate expired, disconnect!
+                    $openVpnDaemonModule->killClient($connectionInfo['common_name']);
+                }
             }
+        }
+    } else {
+        // without vpn-daemon
+        $serverManager = new ServerManager(
+            $config,
+            $logger,
+            new ManagementSocket()
+        );
 
-            // check expiry of certificate
-            $expiresAt = new DateTime($userCertificateInfo['valid_to']);
-            if ($dateTime > $expiresAt) {
-                // certificate expired, disconnect!
-                $serverManager->kill($commonName);
+        foreach ($serverManager->connections() as $profile) {
+            foreach ($profile['connections'] as $connection) {
+                // get information about the certificate based on commonName
+                $commonName = $connection['common_name'];
+                $userCertificateInfo = $storage->getUserCertificateInfo($commonName);
+                if (false === $userCertificateInfo) {
+                    // the certificate was not found (anymore), disconnect!
+                    $serverManager->kill($commonName);
+                    continue;
+                }
+
+                // check expiry of certificate
+                $expiresAt = new DateTime($userCertificateInfo['valid_to']);
+                if ($dateTime > $expiresAt) {
+                    // certificate expired, disconnect!
+                    $serverManager->kill($commonName);
+                }
             }
         }
     }
