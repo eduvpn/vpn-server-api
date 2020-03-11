@@ -25,6 +25,13 @@ try {
     $dataDir = sprintf('%s/data', $baseDir);
     $logger = new Logger($argv[0]);
 
+    $showVerbose = false;
+    foreach ($argv as $arg) {
+        if ('--verbose' === $arg) {
+            $showVerbose = true;
+        }
+    }
+
     if ($config->hasItem('useVpnDaemon') && $config->getItem('useVpnDaemon')) {
         // with vpn-daemon
         $storage = new Storage(
@@ -41,8 +48,11 @@ try {
         $openVpnDaemonModule->setLogger($logger);
         $output = '';
         foreach ($openVpnDaemonModule->getConnectionList(null, null) as $profileId => $connectionInfoList) {
-            foreach ($connectionInfoList as $connectionInfo) {
-                $output .= sprintf("%s\t%s\t%s", $profileId, $connectionInfo['common_name'], implode(', ', $connectionInfo['virtual_address'])).PHP_EOL;
+            $output .= $profileId.','.count($connectionInfoList).PHP_EOL;
+            if ($showVerbose) {
+                foreach ($connectionInfoList as $connectionInfo) {
+                    $output .= sprintf("%s\t%s\t%s", $profileId, $connectionInfo['common_name'], implode(', ', $connectionInfo['virtual_address'])).PHP_EOL;
+                }
             }
         }
 
@@ -57,10 +67,11 @@ try {
 
         $output = '';
         foreach ($serverManager->connections() as $profile) {
-            $output[] = $profile['id'];
-
-            foreach ($profile['connections'] as $connection) {
-                $output .= sprintf("\t%s\t%s", $connection['common_name'], implode(', ', $connection['virtual_address'])).PHP_EOL;
+            $output .= $profile['id'].','.count($profile['connections']).PHP_EOL;
+            if ($showVerbose) {
+                foreach ($profile['connections'] as $connection) {
+                    $output .= sprintf("\t%s\t%s", $connection['common_name'], implode(', ', $connection['virtual_address'])).PHP_EOL;
+                }
             }
         }
 
