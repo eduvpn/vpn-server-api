@@ -39,14 +39,14 @@ try {
             new DaemonSocket(sprintf('%s/vpn-daemon', $configDir))
         );
         $openVpnDaemonModule->setLogger($logger);
-        $output = [];
+        $output = '';
         foreach ($openVpnDaemonModule->getConnectionList(null, null) as $profileId => $connectionInfoList) {
             foreach ($connectionInfoList as $connectionInfo) {
-                $output[] = sprintf("%s\t%s\t%s", $profileId, $connectionInfo['common_name'], implode(', ', $connectionInfo['virtual_address']));
+                $output .= sprintf("%s\t%s\t%s", $profileId, $connectionInfo['common_name'], implode(', ', $connectionInfo['virtual_address'])).PHP_EOL;
             }
         }
 
-        echo implode(PHP_EOL, $output).PHP_EOL;
+        echo $output;
     } else {
         // without vpn-daemon
         $serverManager = new ServerManager(
@@ -55,16 +55,16 @@ try {
             new ManagementSocket()
         );
 
-        $output = [];
+        $output = '';
         foreach ($serverManager->connections() as $profile) {
             $output[] = $profile['id'];
 
             foreach ($profile['connections'] as $connection) {
-                $output[] = sprintf("\t%s\t%s", $connection['common_name'], implode(', ', $connection['virtual_address']));
+                $output .= sprintf("\t%s\t%s", $connection['common_name'], implode(', ', $connection['virtual_address'])).PHP_EOL;
             }
         }
 
-        echo implode(PHP_EOL, $output).PHP_EOL;
+        echo $output;
     }
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
