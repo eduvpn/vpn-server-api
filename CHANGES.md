@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.3 (2020-03-12)
+- rework `status` tool to list number of connected clients and how close to 
+  capacity (available IPv4 addresses) to server is
+
 ## 2.1.2 (2020-01-20)
 - update for new `LC/common`
 
