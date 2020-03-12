@@ -72,9 +72,10 @@ try {
             $activeConnectionCount = count($connectionInfoList);
             $profileMaxClientLimit = $maxClientLimit[$profileId];
             $percentInUse = floor($activeConnectionCount / $profileMaxClientLimit * 100);
-            if (!$alertOnly || ($alertOnly && 90 <= $percentInUse)) {
-                $output .= $profileId.','.$activeConnectionCount.','.$profileMaxClientLimit.','.$percentInUse.'%'.PHP_EOL;
+            if ($alertOnly && 90 > $percentInUse) {
+                continue;
             }
+            $output .= $profileId.','.$activeConnectionCount.','.$profileMaxClientLimit.','.$percentInUse.'%'.PHP_EOL;
         }
 
         echo $output;
@@ -88,12 +89,13 @@ try {
 
         $output = '';
         foreach ($serverManager->connections() as $profile) {
-            $activeConnectionCount = count($connectionInfoList);
-            $profileMaxClientLimit = $maxClientLimit[$profileId];
+            $activeConnectionCount = count($profile['connections']);
+            $profileMaxClientLimit = $maxClientLimit[$profile['id']];
             $percentInUse = floor($activeConnectionCount / $profileMaxClientLimit * 100);
-            if (!$alertOnly || ($alertOnly && 90 <= $percentInUse)) {
-                $output .= $profile['id'].','.$activeConnectionCount.','.$profileMaxClientLimit.','.$percentInUse.'%'.PHP_EOL;
+            if ($alertOnly && 90 > $percentInUse) {
+                continue;
             }
+            $output .= $profile['id'].','.$activeConnectionCount.','.$profileMaxClientLimit.','.$percentInUse.'%'.PHP_EOL;
         }
 
         echo $output;
