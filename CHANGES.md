@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.4 (2020-03-16)
+- update for new [vpn-ca](https://git.tuxed.net/LC/vpn-ca/about/)
+- better error capturing when running `vpn-ca` command from `VpnCa` class
+
 ## 2.1.3 (2020-03-12)
 - rework `status` tool to list number of connected clients and how close to 
   capacity (available IPv4 addresses) to server is
