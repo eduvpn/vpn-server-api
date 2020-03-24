@@ -45,9 +45,17 @@ try {
     $logger = new Logger($argv[0]);
 
     $alertOnly = false;
+    $alertPercentage = 90;
     foreach ($argv as $arg) {
         if ('--alert' === $arg) {
             $alertOnly = true;
+            continue;
+        }
+        if ($alertOnly) {
+            // capture parameter after "--alert" and use that as percentage
+            if (is_numeric($arg) && 0 <= $arg && 100 >= $arg) {
+                $alertPercentage = (int) $arg;
+            }
         }
     }
 
@@ -72,7 +80,7 @@ try {
             $activeConnectionCount = count($connectionInfoList);
             $profileMaxClientLimit = $maxClientLimit[$profileId];
             $percentInUse = floor($activeConnectionCount / $profileMaxClientLimit * 100);
-            if ($alertOnly && 90 > $percentInUse) {
+            if ($alertOnly && $alertPercentage > $percentInUse) {
                 continue;
             }
             $output .= $profileId.','.$activeConnectionCount.','.$profileMaxClientLimit.','.$percentInUse.'%'.PHP_EOL;
