@@ -37,6 +37,32 @@ function getMaxClientLimit(Config $config)
     return $maxConcurrentConnectionLimitList;
 }
 
+/**
+ * @param string $outFormat
+ *
+ * @return string
+ */
+function outputConversion(array $outputData, $outFormat)
+{
+    switch ($outFormat) {
+        case 'csv':
+            if (0 === count($outputData)) {
+                return;
+            }
+            $headerKeys = array_keys($outputData[0]);
+            echo implode(',', $headerKeys).PHP_EOL;
+            foreach ($outputData as $outputRow) {
+                echo implode(',', array_values($outputRow)).PHP_EOL;
+            }
+            break;
+        case 'json':
+            echo json_encode($outputData, JSON_PRETTY_PRINT);
+            break;
+        default:
+            throw new Exception('unsupported output format "'.$outFormat.'"');
+    }
+}
+
 try {
     $configDir = sprintf('%s/config', $baseDir);
     $configFile = sprintf('%s/config.php', $configDir);
@@ -45,17 +71,24 @@ try {
     $logger = new Logger($argv[0]);
 
     $alertOnly = false;
+    $outFormat = 'csv';
+    $searchForPercentage = false;
     $alertPercentage = 90;
     foreach ($argv as $arg) {
         if ('--alert' === $arg) {
             $alertOnly = true;
+            $searchForPercentage = true;
             continue;
         }
-        if ($alertOnly) {
+        if ($searchForPercentage) {
             // capture parameter after "--alert" and use that as percentage
             if (is_numeric($arg) && 0 <= $arg && 100 >= $arg) {
                 $alertPercentage = (int) $arg;
             }
+            $searchForPercentage = false;
+        }
+        if ('--json' === $arg) {
+            $outFormat = 'json';
         }
     }
 
@@ -75,7 +108,7 @@ try {
             new DaemonSocket(sprintf('%s/vpn-daemon', $configDir))
         );
         $openVpnDaemonModule->setLogger($logger);
-        $output = '';
+        $outputData = [];
         foreach ($openVpnDaemonModule->getConnectionList(null, null) as $profileId => $connectionInfoList) {
             $activeConnectionCount = count($connectionInfoList);
             $profileMaxClientLimit = $maxClientLimit[$profileId];
@@ -83,10 +116,14 @@ try {
             if ($alertOnly && $alertPercentage > $percentInUse) {
                 continue;
             }
-            $output .= $profileId.','.$activeConnectionCount.','.$profileMaxClientLimit.','.$percentInUse.'%'.PHP_EOL;
+            $outputData[] = [
+                'profile_id' => $profileId,
+                'active_connection_count' => $activeConnectionCount,
+                'max_connection_count' => $profileMaxClientLimit,
+                'percentage_in_use' => $percentInUse,
+            ];
         }
-
-        echo $output;
+        echo outputConversion($outputData, $outFormat);
     } else {
         // without vpn-daemon
         $serverManager = new ServerManager(
@@ -95,7 +132,7 @@ try {
             new ManagementSocket()
         );
 
-        $output = '';
+        $outputData = [];
         foreach ($serverManager->connections() as $profile) {
             $activeConnectionCount = count($profile['connections']);
             $profileMaxClientLimit = $maxClientLimit[$profile['id']];
@@ -103,10 +140,14 @@ try {
             if ($alertOnly && 90 > $percentInUse) {
                 continue;
             }
-            $output .= $profile['id'].','.$activeConnectionCount.','.$profileMaxClientLimit.','.$percentInUse.'%'.PHP_EOL;
+            $outputData[] = [
+                'profile_id' => $profile['id'],
+                'active_connection_count' => $activeConnectionCount,
+                'max_connection_count' => $profileMaxClientLimit,
+                'percentage_in_use' => $percentInUse,
+            ];
         }
-
-        echo $output;
+        echo outputConversion($outputData, $outFormat);
     }
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
