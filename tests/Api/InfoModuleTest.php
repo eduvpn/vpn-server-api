@@ -57,7 +57,6 @@ class InfoModuleTest extends TestCase
                       'dnsSuffix' => [],
                       'enableAcl' => false,
                       'enableLog' => false,
-                      'excludeRoutes' => [],
                       'exposedVpnProtoPorts' => [],
                       'extIf' => 'eth0',
                       'hideProfile' => false,

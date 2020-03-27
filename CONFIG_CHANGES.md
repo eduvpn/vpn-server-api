@@ -8,13 +8,6 @@ This will help upgrades to a future 3.x release. Configuration changes during
 the 2.x life cycle are NOT required. Any existing configuration file will keep
 working!
 
-## 2.1.5
-
-- a new **EXPERIMENTAL** option `excludeRoutes` is introduced that takes an 
-  array of IPv4 and IPv6 IP ranges in prefix notation. The specified networks
-  will be sent directly through the device's default gateway instead of over
-  the VPN.
-
 ## 2.1.0
 
 - allow enabling [vpn-daemon](https://github.com/letsconnectvpn/vpn-daemon) 
