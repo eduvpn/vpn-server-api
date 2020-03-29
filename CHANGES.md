@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.1.5 (2020-03-29)
+
+- `status` tool now supports JSON output format using `--json`
+- `status` tool now allows for specifying the `--alert` percentage as a 
+  parameter
+- `status` tool now has the option to also list connections using the 
+  `--connections` flag. Only with `--json` and 
+  [vpn-daemon](https://github.com/eduvpn/documentation/blob/v2/ADD_DAEMON_NODE.md)
+- `status` tool has `--help` flag now
+
 ## 2.1.4 (2020-03-16)
 - update for new [vpn-ca](https://git.tuxed.net/LC/vpn-ca/about/)
 - better error capturing when running `vpn-ca` command from `VpnCa` class
