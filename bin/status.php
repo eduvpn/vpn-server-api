@@ -38,6 +38,19 @@ function getMaxClientLimit(Config $config)
 }
 
 /**
+ * @return void
+ */
+function showHelp(array $argv)
+{
+    echo 'SYNTAX: '.$argv[0].PHP_EOL.PHP_EOL;
+    echo '--json                use JSON output format'.PHP_EOL;
+    echo '--alert [percentage]  only show entries where IP space use is over specified'.PHP_EOL;
+    echo '                      percentage. The default percentage for --alert is 90 '.PHP_EOL;
+    echo '--connections         include connected clients (only with --json and when'.PHP_EOL;
+    echo '                      using vpn-daemon)'.PHP_EOL;
+}
+
+/**
  * @param bool $asJson
  *
  * @return string
@@ -74,6 +87,7 @@ try {
     $alertPercentage = 90;
     $includeConnections = false;    // only for JSON
     $searchForPercentage = false;
+    $showHelp = false;
     foreach ($argv as $arg) {
         if ('--alert' === $arg) {
             $alertOnly = true;
@@ -93,6 +107,15 @@ try {
         if ('--connections' === $arg) {
             $includeConnections = true;
         }
+        if ('--help' === $arg || '-h' === $arg || '-help' === $arg) {
+            $showHelp = true;
+        }
+    }
+
+    if ($showHelp) {
+        showHelp($argv);
+
+        return;
     }
 
     $maxClientLimit = getMaxClientLimit($config);
@@ -140,7 +163,7 @@ try {
         }
         echo outputConversion($outputData, $asJson);
     } else {
-        // without vpn-daemon
+        // without vpn-daemon, no list of connected users
         $serverManager = new ServerManager(
             $config,
             $logger,
@@ -161,9 +184,6 @@ try {
                 'max_connection_count' => $profileMaxClientLimit,
                 'percentage_in_use' => $percentInUse,
             ];
-            if ($asJson && $includeConnections) {
-                $outputRow['connection_list'] = $profile['connections'];
-            }
             $outputData[] = $outputRow;
         }
         echo outputConversion($outputData, $asJson);
