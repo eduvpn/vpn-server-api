@@ -38,28 +38,27 @@ function getMaxClientLimit(Config $config)
 }
 
 /**
- * @param string $outFormat
+ * @param bool $asJson
  *
  * @return string
  */
-function outputConversion(array $outputData, $outFormat)
+function outputConversion(array $outputData, $asJson)
 {
-    switch ($outFormat) {
-        case 'csv':
-            if (0 === count($outputData)) {
-                return;
-            }
-            $headerKeys = array_keys($outputData[0]);
-            echo implode(',', $headerKeys).PHP_EOL;
-            foreach ($outputData as $outputRow) {
-                echo implode(',', array_values($outputRow)).PHP_EOL;
-            }
-            break;
-        case 'json':
-            echo json_encode($outputData, JSON_PRETTY_PRINT);
-            break;
-        default:
-            throw new Exception('unsupported output format "'.$outFormat.'"');
+    // JSON
+    if ($asJson) {
+        echo json_encode($outputData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+        return;
+    }
+
+    // CSV
+    if (0 === count($outputData)) {
+        return;
+    }
+    $headerKeys = array_keys($outputData[0]);
+    echo implode(',', $headerKeys).PHP_EOL;
+    foreach ($outputData as $outputRow) {
+        echo implode(',', array_values($outputRow)).PHP_EOL;
     }
 }
 
@@ -71,9 +70,10 @@ try {
     $logger = new Logger($argv[0]);
 
     $alertOnly = false;
-    $outFormat = 'csv';
-    $searchForPercentage = false;
+    $asJson = false;
     $alertPercentage = 90;
+    $includeConnections = false;    // only for JSON
+    $searchForPercentage = false;
     foreach ($argv as $arg) {
         if ('--alert' === $arg) {
             $alertOnly = true;
@@ -88,7 +88,10 @@ try {
             $searchForPercentage = false;
         }
         if ('--json' === $arg) {
-            $outFormat = 'json';
+            $asJson = true;
+        }
+        if ('--connections' === $arg) {
+            $includeConnections = true;
         }
     }
 
@@ -110,20 +113,32 @@ try {
         $openVpnDaemonModule->setLogger($logger);
         $outputData = [];
         foreach ($openVpnDaemonModule->getConnectionList(null, null) as $profileId => $connectionInfoList) {
-            $activeConnectionCount = count($connectionInfoList);
+            // extract only stuff we need
+            $displayConnectionInfo = [];
+            foreach ($connectionInfoList as $connectionInfo) {
+                $displayConnectionInfo[] = [
+                    'user_id' => $connectionInfo['user_id'],
+                    'virtual_address' => $connectionInfo['virtual_address'],
+                ];
+            }
+            $activeConnectionCount = count($displayConnectionInfo);
             $profileMaxClientLimit = $maxClientLimit[$profileId];
             $percentInUse = floor($activeConnectionCount / $profileMaxClientLimit * 100);
             if ($alertOnly && $alertPercentage > $percentInUse) {
                 continue;
             }
-            $outputData[] = [
+            $outputRow = [
                 'profile_id' => $profileId,
                 'active_connection_count' => $activeConnectionCount,
                 'max_connection_count' => $profileMaxClientLimit,
                 'percentage_in_use' => $percentInUse,
             ];
+            if ($asJson && $includeConnections) {
+                $outputRow['connection_list'] = $displayConnectionInfo;
+            }
+            $outputData[] = $outputRow;
         }
-        echo outputConversion($outputData, $outFormat);
+        echo outputConversion($outputData, $asJson);
     } else {
         // without vpn-daemon
         $serverManager = new ServerManager(
@@ -140,14 +155,18 @@ try {
             if ($alertOnly && 90 > $percentInUse) {
                 continue;
             }
-            $outputData[] = [
+            $outputRow = [
                 'profile_id' => $profile['id'],
                 'active_connection_count' => $activeConnectionCount,
                 'max_connection_count' => $profileMaxClientLimit,
                 'percentage_in_use' => $percentInUse,
             ];
+            if ($asJson && $includeConnections) {
+                $outputRow['connection_list'] = $profile['connections'];
+            }
+            $outputData[] = $outputRow;
         }
-        echo outputConversion($outputData, $outFormat);
+        echo outputConversion($outputData, $asJson);
     }
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
