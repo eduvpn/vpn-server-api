@@ -72,9 +72,9 @@ class DaemonSocket
      */
     public function close()
     {
-        if (null !== $this->daemonSocket) {
+        if (null !== $daemonSocket = $this->daemonSocket) {
             // we don't care if it fails, fail in silence...
-            @fclose($this->daemonSocket);
+            @fclose($daemonSocket);
         }
     }
 
@@ -154,7 +154,7 @@ class DaemonSocket
     /**
      * @param array<string> $connectionList
      *
-     * @return array<array-key, array{common_name: string, virtual_address: array{0: string, 1: string}}>
+     * @return array<array-key, array{management_port: int, common_name: string, virtual_address: array{0: string, 1: string}}>
      */
     private static function parseConnectionList(array $connectionList)
     {
@@ -162,8 +162,9 @@ class DaemonSocket
         foreach ($connectionList as $connectionLine) {
             $clientInfo = explode(' ', $connectionLine);
             $clientInfoList[] = [
-                'common_name' => $clientInfo[0],
-                'virtual_address' => [$clientInfo[1], $clientInfo[2]],
+                'management_port' => (int) $clientInfo[0],
+                'common_name' => $clientInfo[1],
+                'virtual_address' => [$clientInfo[2], $clientInfo[3]],
             ];
         }
 

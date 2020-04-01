@@ -138,7 +138,14 @@ try {
         foreach ($openVpnDaemonModule->getConnectionList(null, null) as $profileId => $connectionInfoList) {
             // extract only stuff we need
             $displayConnectionInfo = [];
+            $portClientCount = [];
             foreach ($connectionInfoList as $connectionInfo) {
+                $managementPort = $connectionInfo['management_port'];
+                if (!array_key_exists($managementPort, $portClientCount)) {
+                    $portClientCount[$managementPort] = 0;
+                }
+                ++$portClientCount[$connectionInfo['management_port']];
+
                 $displayConnectionInfo[] = [
                     'user_id' => $connectionInfo['user_id'],
                     'virtual_address' => $connectionInfo['virtual_address'],
@@ -158,6 +165,7 @@ try {
             ];
             if ($asJson && $includeConnections) {
                 $outputRow['connection_list'] = $displayConnectionInfo;
+                $outputRow['port_client_count'] = $portClientCount;
             }
             $outputData[] = $outputRow;
         }
