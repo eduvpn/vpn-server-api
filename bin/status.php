@@ -38,6 +38,43 @@ function getMaxClientLimit(Config $config)
 }
 
 /**
+ * @return array
+ */
+function getProfilePortMapping(Config $config)
+{
+    $profileIdList = array_keys($config->getItem('vpnProfiles'));
+    $profilePortMapping = [];
+    foreach ($profileIdList as $profileId) {
+        $profileConfig = new ProfileConfig($config->getSection('vpnProfiles')->getItem($profileId));
+        $profileNumber = $profileConfig->getItem('profileNumber');
+        $vpnProtoPorts = $profileConfig->getItem('vpnProtoPorts');
+        $profilePortMapping[$profileId] = ['vpnProtoPorts' => $vpnProtoPorts, 'profileNumber' => $profileNumber];
+    }
+
+    return $profilePortMapping;
+}
+
+/**
+ * @return array
+ */
+function convertToProtoPort(array $profilePortMapping, array $portClientCount)
+{
+    $profileNumber = $profilePortMapping['profileNumber'];
+    $vpnProtoPorts = $profilePortMapping['vpnProtoPorts'];
+    $protoPortCount = [];
+    foreach ($vpnProtoPorts as $k => $vpnProtoPort) {
+        $managementPort = 11940 + OpenVpnDaemonModule::toPort($profileNumber, $k);
+        $clientCount = 0;
+        if (array_key_exists($managementPort, $portClientCount)) {
+            $clientCount = $portClientCount[$managementPort];
+        }
+        $protoPortCount[$vpnProtoPort] = $clientCount;
+    }
+
+    return $protoPortCount;
+}
+
+/**
  * @return void
  */
 function showHelp(array $argv)
@@ -165,7 +202,7 @@ try {
             ];
             if ($asJson && $includeConnections) {
                 $outputRow['connection_list'] = $displayConnectionInfo;
-                $outputRow['port_client_count'] = $portClientCount;
+                $outputRow['port_client_count'] = convertToProtoPort(getProfilePortMapping($config)[$profileId], $portClientCount);
             }
             $outputData[] = $outputRow;
         }

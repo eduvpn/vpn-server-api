@@ -211,7 +211,7 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
      *
      * @return int
      */
-    private static function toPort($profileNumber, $processNumber)
+    public static function toPort($profileNumber, $processNumber)
     {
         if (1 > $profileNumber || 64 < $profileNumber) {
             throw new RangeException('1 <= profileNumber <= 64');
