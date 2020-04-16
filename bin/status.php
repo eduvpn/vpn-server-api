@@ -200,9 +200,11 @@ try {
                 'max_connection_count' => $profileMaxClientLimit,
                 'percentage_in_use' => $percentInUse,
             ];
-            if ($asJson && $includeConnections) {
-                $outputRow['connection_list'] = $displayConnectionInfo;
+            if ($asJson) {
                 $outputRow['port_client_count'] = convertToProtoPort(getProfilePortMapping($config)[$profileId], $portClientCount);
+                if ($includeConnections) {
+                    $outputRow['connection_list'] = $displayConnectionInfo;
+                }
             }
             $outputData[] = $outputRow;
         }

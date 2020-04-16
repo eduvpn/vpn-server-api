@@ -1,7 +1,10 @@
 # Changelog
 
-## 2.1.5 (2020-03-29)
+## 2.1.6 (2020-04-16)
+- expose `port_client_count` which shows you the number of connections per 
+  OpenVPN process through `vpn-server-api-status --json`
 
+## 2.1.5 (2020-03-29)
 - `status` tool now supports JSON output format using `--json`
 - `status` tool now allows for specifying the `--alert` percentage as a 
   parameter
