@@ -115,7 +115,7 @@ class ConnectionsModule implements ServiceModuleInterface
         // verify status of certificate/user
         if (false === $result = $this->storage->getUserCertificateInfo($commonName)) {
             // if a certificate does no longer exist, we cannot figure out the user
-            return new ApiErrorResponse('connect', 'user or certificate does not exist');
+            return new ApiErrorResponse('connect', sprintf('user or certificate does not exist [profile_id: %s, common_name: %s]', $profileId, $commonName));
         }
 
         // XXX should we check whether or not session is expired yet?!
@@ -143,8 +143,9 @@ class ConnectionsModule implements ServiceModuleInterface
         if ($profileConfig->getItem('enableAcl')) {
             // ACL enabled
             $userPermissionList = $this->storage->getPermissionList($externalUserId);
-            if (false === self::hasPermission($userPermissionList, $profileConfig->getSection('aclPermissionList')->toArray())) {
-                $msg = '[VPN] unable to connect, user does not have required permissions';
+            $profilePermissionList = $profileConfig->getSection('aclPermissionList')->toArray();
+            if (false === self::hasPermission($userPermissionList, $profilePermissionList)) {
+                $msg = sprintf('[VPN] unable to connect, user permissions are [%s], but requires any of [%s]', implode(',', $userPermissionList), implode(',', $profilePermissionList));
                 $this->storage->addUserMessage($externalUserId, 'notification', $msg);
 
                 return new ApiErrorResponse('connect', $msg);
