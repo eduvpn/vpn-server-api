@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.7 (...)
+- better logging in case permissions for connecting to VPN are not available
+- log user logins with updated permissions/expiry times
+- enforce `user_update_session_info` to be a time in the future (and log it)
+- consult `session_expires_at` in database before allowing VPN connection 
+  (and log it)
+
+
 ## 2.1.6 (2020-04-16)
 - expose `port_client_count` which shows you the number of connections per 
   OpenVPN process through `vpn-server-api-status --json`

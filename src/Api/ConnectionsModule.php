@@ -29,10 +29,22 @@ class ConnectionsModule implements ServiceModuleInterface
     /** @var \LC\Server\Storage */
     private $storage;
 
+    /** @var \DateTime */
+    private $dateTime;
+
     public function __construct(Config $config, Storage $storage)
     {
         $this->config = $config;
         $this->storage = $storage;
+        $this->dateTime = new DateTime();
+    }
+
+    /**
+     * @return void
+     */
+    public function setDateTime(DateTime $dateTime)
+    {
+        $this->dateTime = $dateTime;
     }
 
     /**
@@ -118,16 +130,25 @@ class ConnectionsModule implements ServiceModuleInterface
             return new ApiErrorResponse('connect', sprintf('user or certificate does not exist [profile_id: %s, common_name: %s]', $profileId, $commonName));
         }
 
-        // XXX should we check whether or not session is expired yet?!
+        $userId = $result['user_id'];
+
+        // this is always string, but DB gives back scalar|null
+        $sessionExpiresAt = new DateTime((string) $this->storage->getSessionExpiresAt($userId));
+        if ($sessionExpiresAt->getTimestamp() < $this->dateTime->getTimestamp()) {
+            $errMsg = sprintf('[VPN] the certificate is still valid, but the session expired at %s', $sessionExpiresAt->format(DateTime::ATOM));
+            $this->storage->addUserMessage($userId, 'notification', $errMsg);
+
+            return new ApiErrorResponse('connect', $errMsg);
+        }
 
         if ($result['user_is_disabled']) {
             $msg = '[VPN] unable to connect, account is disabled';
-            $this->storage->addUserMessage($result['user_id'], 'notification', $msg);
+            $this->storage->addUserMessage($userId, 'notification', $msg);
 
             return new ApiErrorResponse('connect', $msg);
         }
 
-        return $this->verifyAcl($profileId, $result['user_id']);
+        return $this->verifyAcl($profileId, $userId);
     }
 
     /**

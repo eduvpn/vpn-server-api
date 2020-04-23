@@ -24,6 +24,8 @@ use LC\Server\Storage;
 
 class UsersModule implements ServiceModuleInterface
 {
+    /** @var \DateTime */
+    protected $dateTime;
     /** @var \LC\Common\Config */
     private $config;
 
@@ -34,6 +36,15 @@ class UsersModule implements ServiceModuleInterface
     {
         $this->config = $config;
         $this->storage = $storage;
+        $this->dateTime = new DateTime();
+    }
+
+    /**
+     * @return void
+     */
+    public function setDateTime(DateTime $dateTime)
+    {
+        $this->dateTime = $dateTime;
     }
 
     /**
@@ -241,8 +252,24 @@ class UsersModule implements ServiceModuleInterface
                 $userId = InputValidation::userId($request->requirePostParameter('user_id'));
                 $permissionList = InputValidation::permissionList($request->requirePostParameter('permission_list'));
                 $sessionExpiresAt = new DateTime($request->requirePostParameter('session_expires_at'));
-                // XXX make sure it is in the future!
+
+                if ($sessionExpiresAt->getTimestamp() < $this->dateTime->getTimestamp()) {
+                    $errMsg = sprintf('session set to expire at {%s} which is in the past', $sessionExpiresAt->format(DateTime::ATOM));
+                    $this->storage->addUserMessage($userId, 'error', $errMsg);
+
+                    return new ApiErrorResponse('user_update_session_info', $errMsg);
+                }
+
                 $this->storage->updateSessionInfo($userId, $sessionExpiresAt, $permissionList);
+                $this->storage->addUserMessage(
+                    $userId,
+                    'notification',
+                    sprintf(
+                        'updated session info {permission_list: [%s], expires_at: %s}',
+                        implode(',', $permissionList),
+                        $sessionExpiresAt->format(DateTime::ATOM)
+                    )
+                );
 
                 return new ApiResponse('user_update_session_info');
             }

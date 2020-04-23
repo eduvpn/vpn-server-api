@@ -87,7 +87,7 @@ SQL
     /**
      * @param string $userId
      *
-     * @return string|null
+     * @return scalar|null
      */
     public function getSessionExpiresAt($userId)
     {
