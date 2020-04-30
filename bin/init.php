@@ -22,12 +22,10 @@ try {
         sprintf('%s/config.php', $configDir)
     );
 
-    // we need easyRsaDataDir for migrations to vpn-ca
+    // we need easyRsaDataDir for migrations from easy-rsa to vpn-ca
     $easyRsaDataDir = sprintf('%s/easy-rsa', $dataDir);
     $vpnCaDir = sprintf('%s/ca', $dataDir);
-    $vpnCaPath = $config->optionalItem('vpnCaPath', '/usr/bin/vpn-ca');
-    // VpnCa gets the easyRsaDataDir in case a migration is needed...
-    $ca = new VpnCa($vpnCaDir, $vpnCaPath, $easyRsaDataDir);
+    $ca = new VpnCa($vpnCaDir, $easyRsaDataDir);
 
     $storage = new Storage(
         new PDO(
