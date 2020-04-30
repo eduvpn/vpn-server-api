@@ -27,37 +27,41 @@ class UsersModuleTest extends TestCase
     /** @var \LC\Common\Http\Service */
     private $service;
 
+    /** @var \LC\Server\Storage */
+    private $storage;
+
     public function setUp()
     {
-        $storage = new Storage(
+        $this->storage = new Storage(
             new PDO('sqlite::memory:'),
             'schema'
         );
-        $storage->setDateTime(new DateTime('2018-01-01 01:00:00'));
-        $storage->init();
-        $storage->addCertificate('foo', 'abcd1234', 'ABCD1234', new DateTime('@12345678'), new DateTime('@23456789'), null);
-        $storage->disableUser('bar');
-        $storage->disableUser('baz');
-        $storage->enableUser('baz');
-        $storage->setOtpSecret('bar', new OtpInfo('XO66UFFKDOWLG5LJP5TU2SCD7D4HKEM3', 'sha1', 6, 30));
+        $this->storage->setDateTime(new DateTime('2018-01-01 01:00:00'));
+        $this->storage->init();
+        $this->storage->addCertificate('foo', 'abcd1234', 'ABCD1234', new DateTime('@12345678'), new DateTime('@23456789'), null);
+        $this->storage->disableUser('bar');
+        $this->storage->disableUser('baz');
+        $this->storage->enableUser('baz');
+        $this->storage->setOtpSecret('bar', new OtpInfo('XO66UFFKDOWLG5LJP5TU2SCD7D4HKEM3', 'sha1', 6, 30));
 
         // user "baz" has a secret, and already used a key for replay testing
-        $storage->setOtpSecret('baz', new OtpInfo('NTEVDXNSX5EXJQHOWDJBRB47EYGR5EED', 'sha1', 6, 30));
+        $this->storage->setOtpSecret('baz', new OtpInfo('NTEVDXNSX5EXJQHOWDJBRB47EYGR5EED', 'sha1', 6, 30));
         $frkOtp = new FrkOtp();
         $dateTime = new DateTime();
         $totpKey = $frkOtp->totp(Base32::decodeUpper('NTEVDXNSX5EXJQHOWDJBRB47EYGR5EED'), 'sha1', 6, $dateTime->getTimestamp(), 30);
 
-        $storage->recordOtpKey('baz', $totpKey, new DateTime('2018-01-01 08:00:00'));
-        $storage->updateSessionInfo('bar', new DateTime('2018-01-01 02:00:00'), ['all', 'employees']);
+        $this->storage->recordOtpKey('baz', $totpKey, new DateTime('2018-01-01 08:00:00'));
+        $this->storage->updateSessionInfo('bar', new DateTime('2018-01-01 02:00:00'), ['all', 'employees']);
 
         $config = Config::fromFile(sprintf('%s/data/user_permissions_config.php', __DIR__));
-        $this->service = new Service();
-        $this->service->addModule(
-            new UsersModule(
-                $config,
-                $storage
-            )
+
+        $usersModule = new UsersModule(
+            $config,
+            $this->storage
         );
+        $usersModule->setDateTime(new DateTime('2018-01-01 01:00:00'));
+        $this->service = new Service();
+        $this->service->addModule($usersModule);
 
         $bearerAuthentication = new BasicAuthenticationHook(
             [
@@ -265,6 +269,34 @@ class UsersModuleTest extends TestCase
                     'user_id' => 'foo',
                 ]
             )
+        );
+    }
+
+    public function testUpdateSessionInfo()
+    {
+        $this->assertTrue(
+            $this->makeRequest(
+                ['vpn-user-portal', 'aabbcc'],
+                'POST',
+                'user_update_session_info',
+                [],
+                [
+                    'user_id' => 'foo',
+                    'permission_list' => '["employee"]',
+                    'session_expires_at' => '2018-01-01T08:00:00+00:00',
+                ]
+            )
+        );
+        $this->assertSame(
+            [
+                [
+                    'id' => '1',
+                    'type' => 'notification',
+                    'message' => 'updated session info {permission_list: [employee], expires_at: 2018-01-01T08:00:00+00:00}',
+                    'date_time' => '2018-01-01T01:00:00+00:00',
+                ],
+            ],
+            $this->storage->userMessages('foo')
         );
     }
 

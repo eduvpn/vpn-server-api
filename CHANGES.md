@@ -1,5 +1,41 @@
 # Changelog
 
+## 2.1.7 (...)
+- better logging in case permissions for connecting to VPN are not available
+- log user logins with updated permissions/expiry times
+- enforce `user_update_session_info` to be a time in the future (and log it)
+- consult `session_expires_at` in database before allowing VPN connection 
+  (and log it)
+
+
+## 2.1.6 (2020-04-16)
+- expose `port_client_count` which shows you the number of connections per 
+  OpenVPN process through `vpn-server-api-status --json`
+
+## 2.1.5 (2020-03-29)
+- `status` tool now supports JSON output format using `--json`
+- `status` tool now allows for specifying the `--alert` percentage as a 
+  parameter
+- `status` tool now has the option to also list connections using the 
+  `--connections` flag. Only with `--json` and 
+  [vpn-daemon](https://github.com/eduvpn/documentation/blob/v2/ADD_DAEMON_NODE.md)
+- `status` tool has `--help` flag now
+
+## 2.1.4 (2020-03-16)
+- update for new [vpn-ca](https://git.tuxed.net/LC/vpn-ca/about/)
+- better error capturing when running `vpn-ca` command from `VpnCa` class
+
+## 2.1.3 (2020-03-12)
+- rework `status` tool to list number of connected clients and how close to 
+  capacity (available IPv4 addresses) to server is
+
+## 2.1.2 (2020-01-20)
+- update for new `LC/common`
+
+## 2.1.1 (2019-12-10)
+- support per profile tls-crypt keys for new deployments. Existing setups will
+  keep one key for all profiles
+
 ## 2.1.0 (2019-11-21)
 - update for new vpn-ca, client and server certificates are no longer written
   in separate directories

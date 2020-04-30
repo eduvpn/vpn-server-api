@@ -70,73 +70,15 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                if (null !== $userId = $request->getQueryParameter('user_id', false)) {
+                if (null !== $userId = $request->optionalQueryParameter('user_id')) {
                     // limit results by user_id
                     $userId = InputValidation::userId($userId);
                 }
-                if (null !== $clientId = $request->getQueryParameter('client_id', false)) {
+                if (null !== $clientId = $request->optionalQueryParameter('client_id')) {
                     // limit results by client_id
                     $clientId = InputValidation::clientId($clientId);
                 }
-
-                // figure out the managementIp + portList for each profile...
-                $profileManagementIpPortList = [];
-                foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
-                    $profileManagementIpPortList[$profileId] = [];
-                    $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
-                    $profileManagementIpPortList[$profileId]['managementIp'] = $profileConfig->getItem('managementIp');
-                    $profileNumber = $profileConfig->getItem('profileNumber');
-                    $profileManagementIpPortList[$profileId]['portList'] = [];
-                    for ($i = 0; $i < \count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
-                        $profileManagementIpPortList[$profileId]['portList'][] = 11940 + self::toPort($profileNumber, $i);
-                    }
-                }
-
-                // walk over every profile, fetch the connected clients for
-                // that profile and augment it with info from storage,
-                // optionally filter it...
-                //
-                // FIXME: do not connect (again) as long as managementIp
-                // remains the same!
-                $connectionList = [];
-                foreach ($profileManagementIpPortList as $profileId => $managementIpPortList) {
-                    $connectionList[$profileId] = [];
-                    $managementIp = $managementIpPortList['managementIp'];
-                    $portList = $managementIpPortList['portList'];
-                    try {
-                        $this->daemonSocket->open($managementIp);
-                        $this->daemonSocket->setPorts($portList);
-                        $daemonConnectionList = $this->daemonSocket->connections();
-
-                        foreach ($daemonConnectionList as $connectionInfo) {
-                            $commonName = $connectionInfo['common_name'];
-                            if (false === $certInfo = $this->storage->getUserCertificateInfo($commonName)) {
-                                // we do not have information on this CN, what is going on?!
-                                $this->logger->warning(sprintf('"common_name "%s" not found', $commonName));
-                                continue;
-                            }
-                            if (null !== $userId) {
-                                // filter by userId
-                                if ($userId !== $certInfo['user_id']) {
-                                    continue;
-                                }
-                            }
-                            if (null !== $clientId) {
-                                // filter by clientId
-                                if ($clientId !== $certInfo['client_id']) {
-                                    continue;
-                                }
-                            }
-
-                            // add this connection to the list
-                            $connectionList[$profileId][] = array_merge($connectionInfo, $certInfo);
-                        }
-                    } catch (RuntimeException $e) {
-                        // can't do much here...
-                        $this->logger->warning(sprintf('DAEMON %s [%s]: %s', $managementIp, implode(',', $portList), $e->getMessage()));
-                    }
-                    $this->daemonSocket->close();
-                }
+                $connectionList = $this->getConnectionList($userId, $clientId);
 
                 return new ApiResponse('client_connections', $connectionList);
             }
@@ -150,37 +92,117 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
-                $managementIpPortList = [];
-                foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
-                    $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
-                    $managementIp = $profileConfig->getItem('managementIp');
-                    if (!\array_key_exists($managementIp, $managementIpPortList)) {
-                        // multiple profiles can have the same managementIp
-                        $managementIpPortList[$managementIp] = [];
-                    }
-                    $profileNumber = $profileConfig->getItem('profileNumber');
-                    for ($i = 0; $i < \count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
-                        $managementIpPortList[$managementIp][] = 11940 + self::toPort($profileNumber, $i);
-                    }
-                }
-
-                // send the "DISCONNECT" command for all IPs and/ports
-                foreach ($managementIpPortList as $managementIp => $portList) {
-                    try {
-                        $this->daemonSocket->open($managementIp);
-                        $this->daemonSocket->setPorts($portList);
-                        $this->daemonSocket->disconnect([$commonName]);
-                    } catch (RuntimeException $e) {
-                        // can't do much here...
-                        $this->logger->warning(sprintf('DAEMON %s [%s]: %s', $managementIp, implode(',', $portList), $e->getMessage()));
-                    }
-                    $this->daemonSocket->close();
-                }
+                $commonName = InputValidation::commonName($request->requirePostParameter('common_name'));
+                $this->killClient($commonName);
 
                 return new ApiResponse('kill_client');
             }
         );
+    }
+
+    /**
+     * @param string|null $userId
+     * @param string|null $clientId
+     *
+     * @return array
+     */
+    public function getConnectionList($userId, $clientId)
+    {
+        // figure out the managementIp + portList for each profile...
+        $profileManagementIpPortList = [];
+        foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
+            $profileManagementIpPortList[$profileId] = [];
+            $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
+            $profileManagementIpPortList[$profileId]['managementIp'] = $profileConfig->getItem('managementIp');
+            $profileNumber = $profileConfig->getItem('profileNumber');
+            $profileManagementIpPortList[$profileId]['portList'] = [];
+            for ($i = 0; $i < \count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
+                $profileManagementIpPortList[$profileId]['portList'][] = 11940 + self::toPort($profileNumber, $i);
+            }
+        }
+
+        // walk over every profile, fetch the connected clients for
+        // that profile and augment it with info from storage,
+        // optionally filter it...
+        //
+        // FIXME: do not connect (again) as long as managementIp
+        // remains the same!
+        $connectionList = [];
+        foreach ($profileManagementIpPortList as $profileId => $managementIpPortList) {
+            $connectionList[$profileId] = [];
+            $managementIp = $managementIpPortList['managementIp'];
+            $portList = $managementIpPortList['portList'];
+            try {
+                $this->daemonSocket->open($managementIp);
+                $this->daemonSocket->setPorts($portList);
+                $daemonConnectionList = $this->daemonSocket->connections();
+
+                foreach ($daemonConnectionList as $connectionInfo) {
+                    $commonName = $connectionInfo['common_name'];
+                    if (false === $certInfo = $this->storage->getUserCertificateInfo($commonName)) {
+                        // we do not have information on this CN, what is going on?!
+                        $this->logger->warning(sprintf('"common_name "%s" not found', $commonName));
+                        continue;
+                    }
+                    if (null !== $userId) {
+                        // filter by userId
+                        if ($userId !== $certInfo['user_id']) {
+                            continue;
+                        }
+                    }
+                    if (null !== $clientId) {
+                        // filter by clientId
+                        if ($clientId !== $certInfo['client_id']) {
+                            continue;
+                        }
+                    }
+
+                    // add this connection to the list
+                    $connectionList[$profileId][] = array_merge($connectionInfo, $certInfo);
+                }
+            } catch (RuntimeException $e) {
+                // can't do much here...
+                $this->logger->warning(sprintf('DAEMON %s [%s]: %s', $managementIp, implode(',', $portList), $e->getMessage()));
+            }
+            $this->daemonSocket->close();
+        }
+
+        return $connectionList;
+    }
+
+    /**
+     * @param string $commonName
+     *
+     * @return void
+     */
+    public function killClient($commonName)
+    {
+        $managementIpPortList = [];
+        foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
+            $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
+            $managementIp = $profileConfig->getItem('managementIp');
+            if (!\array_key_exists($managementIp, $managementIpPortList)) {
+                // multiple profiles can have the same managementIp
+                $managementIpPortList[$managementIp] = [];
+            }
+            $profileNumber = $profileConfig->getItem('profileNumber');
+            for ($i = 0; $i < \count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
+                $managementIpPortList[$managementIp][] = 11940 + self::toPort($profileNumber, $i);
+            }
+        }
+
+        // send the "DISCONNECT" command for all IPs and/ports
+        foreach ($managementIpPortList as $managementIp => $portList) {
+            try {
+                $this->daemonSocket->open($managementIp);
+                $this->daemonSocket->setPorts($portList);
+                $this->daemonSocket->disconnect([$commonName]);
+            } catch (RuntimeException $e) {
+                // can't do much here...
+                $this->logger->warning(sprintf('DAEMON %s [%s]: %s', $managementIp, implode(',', $portList), $e->getMessage()));
+            }
+            $this->daemonSocket->close();
+        }
     }
 
     /**
@@ -189,7 +211,7 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
      *
      * @return int
      */
-    private static function toPort($profileNumber, $processNumber)
+    public static function toPort($profileNumber, $processNumber)
     {
         if (1 > $profileNumber || 64 < $profileNumber) {
             throw new RangeException('1 <= profileNumber <= 64');

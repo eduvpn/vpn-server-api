@@ -40,8 +40,8 @@ class LogModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $dateTime = InputValidation::dateTime($request->getQueryParameter('date_time'));
-                $ipAddress = InputValidation::ipAddress($request->getQueryParameter('ip_address'));
+                $dateTime = InputValidation::dateTime($request->requireQueryParameter('date_time'));
+                $ipAddress = InputValidation::ipAddress($request->requireQueryParameter('ip_address'));
 
                 $logData = $this->storage->getLogEntry($dateTime, $ipAddress);
 

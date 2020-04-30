@@ -16,33 +16,52 @@ use RuntimeException;
 class TlsCrypt
 {
     /** @var string */
-    private $tlsCrypt;
+    private $keyDir;
 
     /**
-     * @param string $tlsCrypt
+     * @param string $keyDir
      */
-    public function __construct($tlsCrypt)
+    public function __construct($keyDir)
     {
-        if (false === strpos($tlsCrypt, '2048 bit OpenVPN static key')) {
-            throw new RuntimeException('provided string is not an OpenVPN static key');
-        }
-        $this->tlsCrypt = $tlsCrypt;
+        $this->keyDir = $keyDir;
     }
 
     /**
-     * @param string $tlsCryptFile
+     * @param string $profileId
+     * @param bool   $allowCreate
      *
-     * @return self
+     * @return string
      */
-    public static function fromFile($tlsCryptFile)
+    public function get($profileId, $allowCreate = false)
     {
-        return new self(FileIO::readFile($tlsCryptFile));
+        // check whether we still have global legacy "ta.key". Use it if we
+        // find it...
+        $globalTlsCryptKey = sprintf('%s/ta.key', $this->keyDir);
+        if (@file_exists($globalTlsCryptKey)) {
+            return FileIO::readFile($globalTlsCryptKey);
+        }
+
+        // check whether we already have profile tls-crypt key...
+        $profileTlsCryptKey = sprintf('%s/tls-crypt-%s.key', $this->keyDir, $profileId);
+        if (@file_exists($profileTlsCryptKey)) {
+            return FileIO::readFile($profileTlsCryptKey);
+        }
+
+        if (!$allowCreate) {
+            throw new RuntimeException(sprintf('tls-crypt key "%s" could not be found', $profileTlsCryptKey));
+        }
+
+        // no key yet, create one
+        $tlsCryptKey = self::generate();
+        FileIO::writeFile($profileTlsCryptKey, $tlsCryptKey);
+
+        return FileIO::readFile($profileTlsCryptKey);
     }
 
     /**
-     * @return self
+     * @return string
      */
-    public static function generate()
+    private static function generate()
     {
         // Same as $(openvpn --genkey --secret <file>)
         $randomData = wordwrap(Hex::encode(random_bytes(256)), 32, "\n", true);
@@ -53,17 +72,8 @@ class TlsCrypt
 -----BEGIN OpenVPN Static key V1-----
 $randomData
 -----END OpenVPN Static key V1-----
-
 EOF;
 
-        return new self($tlsCrypt);
-    }
-
-    /**
-     * @return string
-     */
-    public function raw()
-    {
-        return $this->tlsCrypt;
+        return $tlsCrypt;
     }
 }

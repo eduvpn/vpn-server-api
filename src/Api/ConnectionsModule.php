@@ -29,10 +29,22 @@ class ConnectionsModule implements ServiceModuleInterface
     /** @var \LC\Server\Storage */
     private $storage;
 
+    /** @var \DateTime */
+    private $dateTime;
+
     public function __construct(Config $config, Storage $storage)
     {
         $this->config = $config;
         $this->storage = $storage;
+        $this->dateTime = new DateTime();
+    }
+
+    /**
+     * @return void
+     */
+    public function setDateTime(DateTime $dateTime)
+    {
+        $this->dateTime = $dateTime;
     }
 
     /**
@@ -70,11 +82,11 @@ class ConnectionsModule implements ServiceModuleInterface
      */
     public function connect(Request $request)
     {
-        $profileId = InputValidation::profileId($request->getPostParameter('profile_id'));
-        $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
-        $ip4 = InputValidation::ip4($request->getPostParameter('ip4'));
-        $ip6 = InputValidation::ip6($request->getPostParameter('ip6'));
-        $connectedAt = InputValidation::connectedAt($request->getPostParameter('connected_at'));
+        $profileId = InputValidation::profileId($request->requirePostParameter('profile_id'));
+        $commonName = InputValidation::commonName($request->requirePostParameter('common_name'));
+        $ip4 = InputValidation::ip4($request->requirePostParameter('ip4'));
+        $ip6 = InputValidation::ip6($request->requirePostParameter('ip6'));
+        $connectedAt = InputValidation::connectedAt($request->requirePostParameter('connected_at'));
 
         if (null !== $response = $this->verifyConnection($profileId, $commonName)) {
             return $response;
@@ -90,14 +102,14 @@ class ConnectionsModule implements ServiceModuleInterface
      */
     public function disconnect(Request $request)
     {
-        $profileId = InputValidation::profileId($request->getPostParameter('profile_id'));
-        $commonName = InputValidation::commonName($request->getPostParameter('common_name'));
-        $ip4 = InputValidation::ip4($request->getPostParameter('ip4'));
-        $ip6 = InputValidation::ip6($request->getPostParameter('ip6'));
+        $profileId = InputValidation::profileId($request->requirePostParameter('profile_id'));
+        $commonName = InputValidation::commonName($request->requirePostParameter('common_name'));
+        $ip4 = InputValidation::ip4($request->requirePostParameter('ip4'));
+        $ip6 = InputValidation::ip6($request->requirePostParameter('ip6'));
 
-        $connectedAt = InputValidation::connectedAt($request->getPostParameter('connected_at'));
-        $disconnectedAt = InputValidation::disconnectedAt($request->getPostParameter('disconnected_at'));
-        $bytesTransferred = InputValidation::bytesTransferred($request->getPostParameter('bytes_transferred'));
+        $connectedAt = InputValidation::connectedAt($request->requirePostParameter('connected_at'));
+        $disconnectedAt = InputValidation::disconnectedAt($request->requirePostParameter('disconnected_at'));
+        $bytesTransferred = InputValidation::bytesTransferred($request->requirePostParameter('bytes_transferred'));
 
         $this->storage->clientDisconnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)), new DateTime(sprintf('@%d', $disconnectedAt)), $bytesTransferred);
 
@@ -115,19 +127,28 @@ class ConnectionsModule implements ServiceModuleInterface
         // verify status of certificate/user
         if (false === $result = $this->storage->getUserCertificateInfo($commonName)) {
             // if a certificate does no longer exist, we cannot figure out the user
-            return new ApiErrorResponse('connect', 'user or certificate does not exist');
+            return new ApiErrorResponse('connect', sprintf('user or certificate does not exist [profile_id: %s, common_name: %s]', $profileId, $commonName));
         }
 
-        // XXX should we check whether or not session is expired yet?!
+        $userId = $result['user_id'];
+
+        // this is always string, but DB gives back scalar|null
+        $sessionExpiresAt = new DateTime((string) $this->storage->getSessionExpiresAt($userId));
+        if ($sessionExpiresAt->getTimestamp() < $this->dateTime->getTimestamp()) {
+            $errMsg = sprintf('[VPN] the certificate is still valid, but the session expired at %s', $sessionExpiresAt->format(DateTime::ATOM));
+            $this->storage->addUserMessage($userId, 'notification', $errMsg);
+
+            return new ApiErrorResponse('connect', $errMsg);
+        }
 
         if ($result['user_is_disabled']) {
             $msg = '[VPN] unable to connect, account is disabled';
-            $this->storage->addUserMessage($result['user_id'], 'notification', $msg);
+            $this->storage->addUserMessage($userId, 'notification', $msg);
 
             return new ApiErrorResponse('connect', $msg);
         }
 
-        return $this->verifyAcl($profileId, $result['user_id']);
+        return $this->verifyAcl($profileId, $userId);
     }
 
     /**
@@ -143,8 +164,9 @@ class ConnectionsModule implements ServiceModuleInterface
         if ($profileConfig->getItem('enableAcl')) {
             // ACL enabled
             $userPermissionList = $this->storage->getPermissionList($externalUserId);
-            if (false === self::hasPermission($userPermissionList, $profileConfig->getSection('aclPermissionList')->toArray())) {
-                $msg = '[VPN] unable to connect, user does not have required permissions';
+            $profilePermissionList = $profileConfig->getSection('aclPermissionList')->toArray();
+            if (false === self::hasPermission($userPermissionList, $profilePermissionList)) {
+                $msg = sprintf('[VPN] unable to connect, user permissions are [%s], but requires any of [%s]', implode(',', $userPermissionList), implode(',', $profilePermissionList));
                 $this->storage->addUserMessage($externalUserId, 'notification', $msg);
 
                 return new ApiErrorResponse('connect', $msg);

@@ -11,10 +11,8 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
 use LC\Common\Config;
-use LC\Common\FileIO;
 use LC\Server\CA\VpnCa;
 use LC\Server\Storage;
-use LC\Server\TlsCrypt;
 
 try {
     $dataDir = sprintf('%s/data', $baseDir);
@@ -38,9 +36,6 @@ try {
         sprintf('%s/schema', $baseDir)
     );
     $storage->init();
-
-    $tlsCrypt = TlsCrypt::generate();
-    FileIO::writeFile(sprintf('%s/ta.key', $dataDir), $tlsCrypt->raw());
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
     exit(1);

@@ -16,6 +16,7 @@ use LC\Common\Http\Service;
 use LC\Server\Api\CertificatesModule;
 use LC\Server\Storage;
 use LC\Server\Tests\TestCa;
+use LC\Server\Tests\TestRandom;
 use LC\Server\TlsCrypt;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -27,9 +28,7 @@ class CertificatesModuleTest extends TestCase
 
     public function setUp()
     {
-        $random = $this->getMockBuilder('LC\Common\RandomInterface')->getMock();
-        $random->method('get')->will($this->onConsecutiveCalls('random_1', 'random_2'));
-
+        $random = new TestRandom(['random_1', 'random_2']);
         $storage = new Storage(
             new PDO('sqlite::memory:'),
             'schema',
@@ -41,7 +40,7 @@ class CertificatesModuleTest extends TestCase
             new CertificatesModule(
                 new TestCa(),
                 $storage,
-                TlsCrypt::fromFile(sprintf('%s/data/ta.key', \dirname(__DIR__))),
+                new TlsCrypt(sprintf('%s/data', \dirname(__DIR__))),
                 $random
             )
         );
@@ -90,14 +89,14 @@ EOF;
 
         $this->assertSame(
             [
-                'ta' => $testKey,
+                'tls_crypt' => $testKey,
                 'ca' => 'Ca',
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'abcdef'],
                 'GET',
                 'server_info',
-                [],
+                ['profile_id' => 'internet'],
                 []
             )
         );
@@ -121,7 +120,7 @@ EOF;
                 'private_key' => 'ServerCert for vpn.example',
                 'valid_from' => 1234567890,
                 'valid_to' => 2345678901,
-                'ta' => $testKey,
+                'tls_crypt' => $testKey,
                 'ca' => 'Ca',
             ],
             $this->makeRequest(
@@ -129,7 +128,10 @@ EOF;
                 'POST',
                 'add_server_certificate',
                 [],
-                ['common_name' => 'vpn.example']
+                [
+                    'profile_id' => 'internet',
+                    'common_name' => 'vpn.example',
+                ]
             )
         );
     }

@@ -24,6 +24,8 @@ use LC\Server\Storage;
 
 class UsersModule implements ServiceModuleInterface
 {
+    /** @var \DateTime */
+    protected $dateTime;
     /** @var \LC\Common\Config */
     private $config;
 
@@ -34,6 +36,15 @@ class UsersModule implements ServiceModuleInterface
     {
         $this->config = $config;
         $this->storage = $storage;
+        $this->dateTime = new DateTime();
+    }
+
+    /**
+     * @return void
+     */
+    public function setDateTime(DateTime $dateTime)
+    {
+        $this->dateTime = $dateTime;
     }
 
     /**
@@ -61,9 +72,9 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
-                $totpSecret = InputValidation::totpSecret($request->getPostParameter('totp_secret'));
+                $userId = InputValidation::userId($request->requirePostParameter('user_id'));
+                $totpKey = InputValidation::totpKey($request->requirePostParameter('totp_key'));
+                $totpSecret = InputValidation::totpSecret($request->requirePostParameter('totp_secret'));
 
                 // check if there is already a TOTP secret registered for this user
                 if (false !== $this->storage->getOtpSecret($userId)) {
@@ -93,8 +104,8 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $totpKey = InputValidation::totpKey($request->getPostParameter('totp_key'));
+                $userId = InputValidation::userId($request->requirePostParameter('user_id'));
+                $totpKey = InputValidation::totpKey($request->requirePostParameter('totp_key'));
 
                 $totp = new Totp($this->storage);
                 try {
@@ -118,7 +129,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
+                $userId = InputValidation::userId($request->requireQueryParameter('user_id'));
 
                 return new ApiResponse('has_totp_secret', false !== $this->storage->getOtpSecret($userId));
             }
@@ -132,7 +143,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = InputValidation::userId($request->getPostParameter('user_id'));
+                $userId = InputValidation::userId($request->requirePostParameter('user_id'));
 
                 $this->storage->deleteOtpSecret($userId);
                 $this->storage->addUserMessage($userId, 'notification', 'TOTP secret deleted');
@@ -149,7 +160,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
+                $userId = InputValidation::userId($request->requireQueryParameter('user_id'));
 
                 return new ApiResponse('is_disabled_user', $this->storage->isDisabledUser($userId));
             }
@@ -163,7 +174,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = InputValidation::userId($request->getPostParameter('user_id'));
+                $userId = InputValidation::userId($request->requirePostParameter('user_id'));
 
                 $this->storage->disableUser($userId);
                 $this->storage->addUserMessage($userId, 'notification', 'account disabled');
@@ -180,7 +191,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = InputValidation::userId($request->getPostParameter('user_id'));
+                $userId = InputValidation::userId($request->requirePostParameter('user_id'));
 
                 $this->storage->enableUser($userId);
                 $this->storage->addUserMessage($userId, 'notification', 'account (re)enabled');
@@ -197,7 +208,7 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = InputValidation::userId($request->getPostParameter('user_id'));
+                $userId = InputValidation::userId($request->requirePostParameter('user_id'));
                 $this->storage->deleteUser($userId);
 
                 return new ApiResponse('delete_user');
@@ -211,7 +222,7 @@ class UsersModule implements ServiceModuleInterface
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
-                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
+                $userId = InputValidation::userId($request->requireQueryParameter('user_id'));
 
                 return new ApiResponse('user_session_expires_at', $this->storage->getSessionExpiresAt($userId));
             }
@@ -224,7 +235,7 @@ class UsersModule implements ServiceModuleInterface
              */
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
-                $userId = InputValidation::userId($request->getQueryParameter('user_id'));
+                $userId = InputValidation::userId($request->requireQueryParameter('user_id'));
 
                 return new ApiResponse('user_permission_list', $this->storage->getPermissionList($userId));
             }
@@ -238,11 +249,27 @@ class UsersModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-user-portal']);
 
-                $userId = InputValidation::userId($request->getPostParameter('user_id'));
-                $permissionList = InputValidation::permissionList($request->getPostParameter('permission_list'));
-                $sessionExpiresAt = new DateTime($request->getPostParameter('session_expires_at'));
-                // XXX make sure it is in the future!
+                $userId = InputValidation::userId($request->requirePostParameter('user_id'));
+                $permissionList = InputValidation::permissionList($request->requirePostParameter('permission_list'));
+                $sessionExpiresAt = new DateTime($request->requirePostParameter('session_expires_at'));
+
+                if ($sessionExpiresAt->getTimestamp() < $this->dateTime->getTimestamp()) {
+                    $errMsg = sprintf('session set to expire at {%s} which is in the past', $sessionExpiresAt->format(DateTime::ATOM));
+                    $this->storage->addUserMessage($userId, 'error', $errMsg);
+
+                    return new ApiErrorResponse('user_update_session_info', $errMsg);
+                }
+
                 $this->storage->updateSessionInfo($userId, $sessionExpiresAt, $permissionList);
+                $this->storage->addUserMessage(
+                    $userId,
+                    'notification',
+                    sprintf(
+                        'updated session info {permission_list: [%s], expires_at: %s}',
+                        implode(',', $permissionList),
+                        $sessionExpiresAt->format(DateTime::ATOM)
+                    )
+                );
 
                 return new ApiResponse('user_update_session_info');
             }

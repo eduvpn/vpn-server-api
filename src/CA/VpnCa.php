@@ -60,7 +60,7 @@ class VpnCa implements CaInterface
      */
     public function serverCert($commonName)
     {
-        $this->execVpnCa(sprintf('-server %s', $commonName));
+        $this->execVpnCa(sprintf('-server %s -not-after CA', $commonName));
 
         return $this->certInfo($commonName);
     }
@@ -203,7 +203,7 @@ class VpnCa implements CaInterface
     private static function exec($execCmd)
     {
         exec(
-            $execCmd,
+            sprintf('%s 2>&1', $execCmd),
             $commandOutput,
             $returnValue
         );
