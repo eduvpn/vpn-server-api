@@ -8,6 +8,13 @@ This will help upgrades to a future 3.x release. Configuration changes during
 the 2.x life cycle are NOT required. Any existing configuration file will keep
 working!
 
+## 2.2.0
+
+- the option `vpnCaPath` now defaults to `/usr/bin/vpn-ca`, when not specified,
+  since switching to [vpn-ca](https://github.com/letsconnectvpn/vpn-ca) by
+  default. You can still override this, but that is mostly useful for 
+  development purposes. The option can be removed for normal deployments.
+
 ## 2.1.0
 
 - allow enabling [vpn-daemon](https://github.com/letsconnectvpn/vpn-daemon) 
