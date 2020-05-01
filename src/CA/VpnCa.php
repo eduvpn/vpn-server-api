@@ -137,10 +137,16 @@ class VpnCa implements CaInterface
      */
     private function certInfo($commonName)
     {
-        return $this->certKeyInfo(
+        $certKeyInfo = $this->certKeyInfo(
             sprintf('%s/%s.crt', $this->caDir, $commonName),
             sprintf('%s/%s.key', $this->caDir, $commonName)
         );
+
+        // delete the crt and key from disk as we no longer need them
+        self::delete(sprintf('%s/%s.crt', $this->caDir, $commonName));
+        self::delete(sprintf('%s/%s.key', $this->caDir, $commonName));
+
+        return $certKeyInfo;
     }
 
     /**
@@ -223,6 +229,18 @@ class VpnCa implements CaInterface
     {
         if (false === @copy($srcFile, $dstFile)) {
             throw new RuntimeException(sprintf('unable to copy "%s" to "%s"', $srcFile, $dstFile));
+        }
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return void
+     */
+    private static function delete($fileName)
+    {
+        if (false === @unlink($fileName)) {
+            throw new RuntimeException(sprintf('unable to delete "%s"', $fileName));
         }
     }
 }
