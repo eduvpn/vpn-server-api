@@ -20,18 +20,20 @@ class VpnCa implements CaInterface
     private $caDir;
 
     /** @var string */
-    private $vpnCaPath = '/usr/bin/vpn-ca';
+    private $vpnCaPath;
 
     /** @var string */
     private $easyRsaDataDir;
 
     /**
      * @param string $caDir
+     * @param string $vpnCaPath
      * @param string $easyRsaDataDir
      */
-    public function __construct($caDir, $easyRsaDataDir)
+    public function __construct($caDir, $vpnCaPath, $easyRsaDataDir)
     {
         $this->caDir = $caDir;
+        $this->vpnCaPath = $vpnCaPath;
         $this->easyRsaDataDir = $easyRsaDataDir;
         $this->init();
     }
