@@ -2,11 +2,14 @@
 
 ## 2.1.7 (...)
 - better logging in case permissions for connecting to VPN are not available
-- log user logins with updated permissions/expiry times
+- log user login with updated permissions/expiry times
 - enforce `user_update_session_info` to be a time in the future (and log it)
 - consult `session_expires_at` in database before allowing VPN connection 
   (and log it)
-
+- switch to [vpn-ca](https://github.com/letsconnectvpn/vpn-ca) for issuing
+  certificates, drop [easy-rsa](https://github.com/OpenVPN/easy-rsa)
+- remove issued certificates/keys from disk as they are not needed after 
+  initial issuance
 
 ## 2.1.6 (2020-04-16)
 - expose `port_client_count` which shows you the number of connections per 
