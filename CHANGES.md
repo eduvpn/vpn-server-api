@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.0 (...)
+## 2.2.0 (2020-05-03)
 - better logging in case permissions for connecting to VPN are not available
 - log user login with updated permissions/expiry times
 - enforce `user_update_session_info` to be a time in the future (and log it)
