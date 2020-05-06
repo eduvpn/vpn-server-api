@@ -132,13 +132,21 @@ class ConnectionsModule implements ServiceModuleInterface
 
         $userId = $result['user_id'];
 
-        // this is always string, but DB gives back scalar|null
-        $sessionExpiresAt = new DateTime((string) $this->storage->getSessionExpiresAt($userId));
-        if ($sessionExpiresAt->getTimestamp() < $this->dateTime->getTimestamp()) {
-            $errMsg = sprintf('[VPN] the certificate is still valid, but the session expired at %s', $sessionExpiresAt->format(DateTime::ATOM));
-            $this->storage->addUserMessage($userId, 'notification', $errMsg);
+        if (false === strpos($userId, '!!')) {
+            // FIXME "!!" indicates it is a remote guest user coming in with a
+            // foreign OAuth token, for those we do NOT check expiry.. this is
+            // really ugly hack, we need to get rid of sessionExpiresAt
+            // completely instead! This check is skipped when a non remote
+            // guest user id contains '!!' for some reason...
+            //
+            // this is always string, but DB gives back scalar|null
+            $sessionExpiresAt = new DateTime((string) $this->storage->getSessionExpiresAt($userId));
+            if ($sessionExpiresAt->getTimestamp() < $this->dateTime->getTimestamp()) {
+                $errMsg = sprintf('[VPN] the certificate is still valid, but the session expired at %s', $sessionExpiresAt->format(DateTime::ATOM));
+                $this->storage->addUserMessage($userId, 'notification', $errMsg);
 
-            return new ApiErrorResponse('connect', $errMsg);
+                return new ApiErrorResponse('connect', $errMsg);
+            }
         }
 
         if ($result['user_is_disabled']) {

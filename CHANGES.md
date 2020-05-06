@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.1 (2020-05-06)
+- do not check `session_expires_at` for guest users that do not login locally
+
 ## 2.2.0 (2020-05-03)
 - better logging in case permissions for connecting to VPN are not available
 - log user login with updated permissions/expiry times
