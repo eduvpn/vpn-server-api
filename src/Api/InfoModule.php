@@ -9,6 +9,7 @@
 
 namespace LC\Server\Api;
 
+use DateTime;
 use LC\Common\Config;
 use LC\Common\FileIO;
 use LC\Common\Http\ApiResponse;
@@ -73,11 +74,14 @@ class InfoModule implements ServiceModuleInterface
                 $certData = trim(FileIO::readFile($this->caDir.'/ca.crt'));
                 $parsedCert = openssl_x509_parse($certData);
 
+                $validFrom = new DateTime('@'.$parsedCert['validFrom_time_t']);
+                $validTo = new DateTime('@'.$parsedCert['validTo_time_t']);
+
                 return new ApiResponse(
                     'ca_info',
                     [
-                        'valid_from' => $parsedCert['validFrom_time_t'],
-                        'valid_to' => $parsedCert['validTo_time_t'],
+                        'valid_from' => $validFrom->format(DateTime::ATOM),
+                        'valid_to' => $validTo->format(DateTime::ATOM),
                     ]
                 );
 

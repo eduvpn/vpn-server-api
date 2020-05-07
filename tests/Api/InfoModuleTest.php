@@ -90,8 +90,8 @@ class InfoModuleTest extends TestCase
     {
         $this->assertSame(
             [
-                'valid_from' => 1588859491,
-                'valid_to' => 1746626191,
+                'valid_from' => '2020-05-07T13:51:31+00:00',
+                'valid_to' => '2025-05-07T13:56:31+00:00',
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],
