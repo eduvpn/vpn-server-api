@@ -43,6 +43,7 @@ try {
 
     $dataDir = sprintf('%s/data', $baseDir);
     $configDir = sprintf('%s/config', $baseDir);
+    $vpnCaDir = sprintf('%s/ca', $dataDir);
 
     $config = Config::fromFile(
         sprintf('%s/config.php', $configDir)
@@ -85,7 +86,8 @@ try {
 
     $service->addModule(
         new InfoModule(
-            $config
+            $config,
+            $vpnCaDir
         )
     );
 
@@ -126,7 +128,6 @@ try {
 
     // we need easyRsaDataDir for migrations to vpn-ca
     $easyRsaDataDir = sprintf('%s/easy-rsa', $dataDir);
-    $vpnCaDir = sprintf('%s/ca', $dataDir);
     $vpnCaPath = $config->optionalItem('vpnCaPath', '/usr/bin/vpn-ca');
     // VpnCa gets the easyRsaDataDir in case a migration is needed...
     $ca = new VpnCa($vpnCaDir, $vpnCaPath, $easyRsaDataDir);

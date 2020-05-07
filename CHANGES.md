@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.2 (...)
+- expose CA information
+
 ## 2.2.1 (2020-05-06)
 - do not check `session_expires_at` for guest users that do not login locally
 

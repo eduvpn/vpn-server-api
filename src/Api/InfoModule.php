@@ -10,6 +10,7 @@
 namespace LC\Server\Api;
 
 use LC\Common\Config;
+use LC\Common\FileIO;
 use LC\Common\Http\ApiResponse;
 use LC\Common\Http\AuthUtils;
 use LC\Common\Http\Request;
@@ -22,9 +23,16 @@ class InfoModule implements ServiceModuleInterface
     /** @var \LC\Common\Config */
     private $config;
 
-    public function __construct(Config $config)
+    /** @var string */
+    private $caDir;
+
+    /**
+     * @param string $caDir
+     */
+    public function __construct(Config $config, $caDir)
     {
         $this->config = $config;
+        $this->caDir = $caDir;
     }
 
     /**
@@ -50,6 +58,30 @@ class InfoModule implements ServiceModuleInterface
                 }
 
                 return new ApiResponse('profile_list', $profileList);
+            }
+        );
+
+        /* INFO */
+        $service->get(
+            '/ca_info',
+            /**
+             * @return \LC\Common\Http\Response
+             */
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+
+                $certData = trim(FileIO::readFile($this->caDir.'/ca.crt'));
+                $parsedCert = openssl_x509_parse($certData);
+
+                return new ApiResponse(
+                    'ca_info',
+                    [
+                        'valid_from' => $parsedCert['validFrom_time_t'],
+                        'valid_to' => $parsedCert['validTo_time_t'],
+                    ]
+                );
+
+                return new ApiResponse('ca_info', $caInfo);
             }
         );
     }

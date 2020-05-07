@@ -28,7 +28,8 @@ class InfoModuleTest extends TestCase
         $this->service = new Service();
         $this->service->addModule(
             new InfoModule(
-                $config
+                $config,
+                __DIR__.'/data',
             )
         );
 
@@ -79,6 +80,23 @@ class InfoModuleTest extends TestCase
                 ['vpn-user-portal', 'aabbcc'],
                 'GET',
                 'profile_list',
+                [],
+                []
+            )
+        );
+    }
+
+    public function testCaInfo()
+    {
+        $this->assertSame(
+            [
+                'valid_from' => 1588859491,
+                'valid_to' => 1746626191,
+            ],
+            $this->makeRequest(
+                ['vpn-user-portal', 'aabbcc'],
+                'GET',
+                'ca_info',
                 [],
                 []
             )
