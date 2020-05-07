@@ -29,7 +29,7 @@ class InfoModuleTest extends TestCase
         $this->service->addModule(
             new InfoModule(
                 $config,
-                __DIR__.'/data',
+                __DIR__.'/data'
             )
         );
 
