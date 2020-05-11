@@ -10,6 +10,7 @@
 namespace LC\Server;
 
 use DateTime;
+use PDO;
 
 class Stats
 {
@@ -36,19 +37,44 @@ class Stats
         ];
 
         foreach ($profileIdList as $profileId) {
-            $logEntries = $this->storage->getLogEntries($profileId);
-
             $statsData = [];
             $timeConnection = [];
             $uniqueUsers = [];
 
-            foreach ($logEntries as $entry) {
-                $userId = $entry['user_id'];
-                $connectedAt = $entry['connected_at'];
-                $disconnectedAt = $entry['disconnected_at'];
-                $connectedAtDateTime = new DateTime($entry['connected_at']);
-                $dateOfConnection = $connectedAtDateTime->format('Y-m-d');
+            $db = $this->storage->getPdo();
+            $stmt = $db->prepare(
+<<< 'SQL'
+    SELECT 
+        user_id,
+        common_name, 
+        connected_at, 
+        disconnected_at, 
+        bytes_transferred
+    FROM 
+        connection_log
+    WHERE
+        profile_id = :profile_id
+    AND
+        disconnected_at IS NOT NULL
+    ORDER BY
+        connected_at
+SQL
+            );
 
+            $stmt->bindValue(':profile_id', $profileId, PDO::PARAM_STR);
+            $stmt->execute();
+
+            while ($entry = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                /** @var string */
+                $userId = $entry['user_id'];
+                /** @var string */
+                $connectedAt = $entry['connected_at'];
+                /** @var string|null */
+                $disconnectedAt = $entry['disconnected_at'];
+                $connectedAtDateTime = new DateTime($connectedAt);
+                $dateOfConnection = $connectedAtDateTime->format('Y-m-d');
+                /** @var int|null */
+                $bytesTransferred = $entry['bytes_transferred'];
                 if (!\array_key_exists($dateOfConnection, $statsData)) {
                     $statsData[$dateOfConnection] = [
                         'number_of_connections' => 0,
@@ -58,7 +84,7 @@ class Stats
                 }
 
                 ++$statsData[$dateOfConnection]['number_of_connections'];
-                $statsData[$dateOfConnection]['bytes_transferred'] += $entry['bytes_transferred'];
+                $statsData[$dateOfConnection]['bytes_transferred'] += $bytesTransferred;
 
                 // add it to table to be able to determine max concurrent connection
                 // count
