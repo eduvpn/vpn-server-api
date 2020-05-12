@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.2 (...)
+## 2.2.2 (2020-05-12)
 - expose CA information through API
 - rework stats generation not to require a lot of memory on high-use systems
   (issue #73)
