@@ -1,7 +1,9 @@
 # Changelog
 
 ## 2.2.2 (...)
-- expose CA information
+- expose CA information through API
+- rework stats generation not to require a lot of memory on high-use systems
+  (issue #73)
 
 ## 2.2.1 (2020-05-06)
 - do not check `session_expires_at` for guest users that do not login locally
