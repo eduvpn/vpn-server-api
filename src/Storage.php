@@ -144,8 +144,6 @@ SQL
         COUNT(DISTINCT user_id) AS client_count 
     FROM
         certificates 
-    WHERE
-        client_id IS NOT NULL 
     GROUP BY 
         client_id 
     ORDER BY 
