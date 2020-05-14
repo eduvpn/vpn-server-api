@@ -15,6 +15,7 @@ use LC\Common\Http\AuthUtils;
 use LC\Common\Http\Request;
 use LC\Common\Http\Service;
 use LC\Common\Http\ServiceModuleInterface;
+use LC\Server\Storage;
 use RuntimeException;
 
 class StatsModule implements ServiceModuleInterface
@@ -22,12 +23,16 @@ class StatsModule implements ServiceModuleInterface
     /** @var string */
     private $dataDir;
 
+    /** @var \LC\Server\Storage */
+    private $storage;
+
     /**
      * @param string $dataDir
      */
-    public function __construct($dataDir)
+    public function __construct($dataDir, Storage $storage)
     {
         $this->dataDir = $dataDir;
+        $this->storage = $storage;
     }
 
     /**
@@ -50,6 +55,18 @@ class StatsModule implements ServiceModuleInterface
                     // no stats file available yet
                     return new ApiResponse('stats', false);
                 }
+            }
+        );
+
+        $service->get(
+            '/app_usage',
+            /**
+             * @return \LC\Common\Http\Response
+             */
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+
+                return new ApiResponse('app_usage', $this->storage->getAppUsage());
             }
         );
     }

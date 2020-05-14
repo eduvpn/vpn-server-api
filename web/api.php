@@ -73,7 +73,8 @@ try {
 
     $service->addModule(
         new StatsModule(
-            $dataDir
+            $dataDir,
+            $storage
         )
     );
 

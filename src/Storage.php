@@ -133,6 +133,31 @@ SQL
     }
 
     /**
+     * @return array
+     */
+    public function getAppUsage()
+    {
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    SELECT 
+        client_id,
+        COUNT(DISTINCT user_id) AS client_count 
+    FROM
+        certificates 
+    WHERE
+        client_id IS NOT NULL 
+    GROUP BY 
+        client_id 
+    ORDER BY 
+        client_count DESC
+SQL
+        );
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * @param string $commonName
      *
      * @return false|array
