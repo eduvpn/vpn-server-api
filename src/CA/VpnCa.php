@@ -78,7 +78,7 @@ class VpnCa implements CaInterface
         // prevent expiresAt to be in the past
         $dateTime = new DateTime();
         if ($dateTime->getTimestamp() >= $expiresAt->getTimestamp()) {
-            throw new CaException('can not issue certificates that expire in the past');
+            throw new CaException(sprintf('can not issue certificates that expire in the past (%s)', $expiresAt->format(DateTime::ATOM)));
         }
 
         $this->execVpnCa(sprintf('-client %s -not-after %s', $commonName, $expiresAt->format(DateTime::ATOM)));
