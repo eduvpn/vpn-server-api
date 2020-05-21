@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.3 (2020-05-21)
+- expose `/app_usage` internal API
+- better error message when trying to issue certificates that expire in the 
+  past
+
 ## 2.2.2 (2020-05-12)
 - expose CA information through API
 - rework stats generation not to require a lot of memory on high-use systems
