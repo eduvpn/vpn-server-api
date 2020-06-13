@@ -55,15 +55,19 @@ class ConnectionsModule implements ServiceModuleInterface
 
                 try {
                     $connectInfo = $this->connect($request);
-                    $this->storage->addUserMessage($connectInfo['user_id'], 'notification', sprintf('[VPN] connect: [%s]', http_build_query($connectInfo)));
+                    $this->storage->addUserMessage(
+                        $connectInfo['user_id'],
+                        'notification',
+                        sprintf('[CONNECT] Profile ID: %s, IPv4: %s, IPv6: %s', $connectInfo['profile_id'], $connectInfo['ip_four'], $connectInfo['ip_six'])
+                    );
 
                     return new ApiResponse('connect');
                 } catch (ConnectionsModuleException $e) {
                     if (null !== $userId = $e->getUserId()) {
-                        $this->storage->addUserMessage($userId, 'notification', '[VPN] '.$e->getMessage());
+                        $this->storage->addUserMessage($userId, 'notification', '[CONNECT] ERROR: '.$e->getMessage());
                     }
 
-                    return new ApiErrorResponse('connect', '[VPN] '.$e->getMessage());
+                    return new ApiErrorResponse('connect', '[CONNECT] ERROR: '.$e->getMessage());
                 }
             }
         );
@@ -79,16 +83,20 @@ class ConnectionsModule implements ServiceModuleInterface
                 try {
                     $disconnectInfo = $this->disconnect($request);
                     if (null !== $userId = $disconnectInfo['user_id']) {
-                        $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] disconnect: [%s]', http_build_query($disconnectInfo)));
+                        $this->storage->addUserMessage(
+                            $userId,
+                            'notification',
+                            sprintf('[DISCONNECT] Profile ID: %s, Bytes Transferred: %d', $disconnectInfo['profile_id'], $disconnectInfo['bytes_transferred'])
+                        );
                     }
 
                     return new ApiResponse('disconnect');
                 } catch (ConnectionsModuleException $e) {
                     if (null !== $userId = $e->getUserId()) {
-                        $this->storage->addUserMessage($userId, 'notification', '[VPN] '.$e->getMessage());
+                        $this->storage->addUserMessage($userId, 'notification', '[DISCONNECT] ERROR: '.$e->getMessage());
                     }
 
-                    return new ApiErrorResponse('disconnect', '[VPN] '.$e->getMessage());
+                    return new ApiErrorResponse('disconnect', '[DISCONNECT] ERROR: '.$e->getMessage());
                 }
             }
         );
@@ -117,7 +125,7 @@ class ConnectionsModule implements ServiceModuleInterface
     }
 
     /**
-     * @return array{user_id:string|null,bytes_transferred:int}
+     * @return array{user_id:string|null,profile_id:string,bytes_transferred:int}
      */
     public function disconnect(Request $request)
     {
@@ -135,11 +143,12 @@ class ConnectionsModule implements ServiceModuleInterface
         if (false === $userCertInfo = $this->storage->getUserCertificateInfo($commonName)) {
             // we no longer have a mapping between the certificate and a user,
             // as it was probably deleted...
-            return ['user_id' => null, 'bytes_transferred' => 0];
+            return ['user_id' => null, 'profile_id' => $profileId, 'bytes_transferred' => 0];
         }
 
         return [
             'user_id' => (string) $userCertInfo['user_id'],
+            'profile_id' => $profileId,
             'bytes_transferred' => $bytesTransferred,
         ];
     }

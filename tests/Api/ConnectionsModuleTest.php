@@ -98,7 +98,7 @@ class ConnectionsModuleTest extends TestCase
         $this->assertSame(
             [
                 'ok' => false,
-                'error' => '[VPN] unable to connect, user permissions are [students], but requires any of [employees]',
+                'error' => '[CONNECT] ERROR: unable to connect, user permissions are [students], but requires any of [employees]',
             ],
             $this->makeRequest(
                 ['vpn-server-node', 'aabbcc'],
