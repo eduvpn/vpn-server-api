@@ -527,6 +527,37 @@ SQL
     }
 
     /**
+     * @param string $userId
+     *
+     * @return array
+     */
+    public function getConnectionLogForUser($userId)
+    {
+        $stmt = $this->db->prepare(
+<<< 'SQL'
+    SELECT 
+        user_id,
+        common_name,
+        profile_id, 
+        ip4, 
+        ip6, 
+        connected_at, 
+        disconnected_at,
+        bytes_transferred
+        client_lost
+    FROM
+        connection_log
+    WHERE
+        user_id = :user_id
+SQL
+        );
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
      * @param string $ipAddress
      *
      * @return false|array

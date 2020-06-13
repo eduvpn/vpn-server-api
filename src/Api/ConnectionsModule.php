@@ -54,12 +54,7 @@ class ConnectionsModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
                 try {
-                    $connectInfo = $this->connect($request);
-                    $this->storage->addUserMessage(
-                        $connectInfo['user_id'],
-                        'notification',
-                        sprintf('[CONNECT] Profile ID: %s, IPv4: %s, IPv6: %s', $connectInfo['profile_id'], $connectInfo['ip_four'], $connectInfo['ip_six'])
-                    );
+                    $this->connect($request);
 
                     return new ApiResponse('connect');
                 } catch (ConnectionsModuleException $e) {
@@ -81,14 +76,7 @@ class ConnectionsModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
                 try {
-                    $disconnectInfo = $this->disconnect($request);
-                    if (null !== $userId = $disconnectInfo['user_id']) {
-                        $this->storage->addUserMessage(
-                            $userId,
-                            'notification',
-                            sprintf('[DISCONNECT] Profile ID: %s, Bytes Transferred: %d', $disconnectInfo['profile_id'], $disconnectInfo['bytes_transferred'])
-                        );
-                    }
+                    $this->disconnect($request);
 
                     return new ApiResponse('disconnect');
                 } catch (ConnectionsModuleException $e) {
@@ -103,7 +91,7 @@ class ConnectionsModule implements ServiceModuleInterface
     }
 
     /**
-     * @return array{user_id:string,profile_id:string,ip_four:string,ip_six:string}
+     * @return void
      */
     public function connect(Request $request)
     {
@@ -113,19 +101,12 @@ class ConnectionsModule implements ServiceModuleInterface
         $ip6 = InputValidation::ip6($request->requirePostParameter('ip6'));
         $connectedAt = InputValidation::connectedAt($request->requirePostParameter('connected_at'));
 
-        $userId = $this->verifyConnection($profileId, $commonName);
+        $this->verifyConnection($profileId, $commonName);
         $this->storage->clientConnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)));
-
-        return [
-            'user_id' => $userId,
-            'profile_id' => $profileId,
-            'ip_four' => $ip4,
-            'ip_six' => $ip6,
-        ];
     }
 
     /**
-     * @return array{user_id:string|null,profile_id:string,bytes_transferred:int}
+     * @return void
      */
     public function disconnect(Request $request)
     {
@@ -139,25 +120,13 @@ class ConnectionsModule implements ServiceModuleInterface
         $bytesTransferred = InputValidation::bytesTransferred($request->requirePostParameter('bytes_transferred'));
 
         $this->storage->clientDisconnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)), new DateTime(sprintf('@%d', $disconnectedAt)), $bytesTransferred);
-
-        if (false === $userCertInfo = $this->storage->getUserCertificateInfo($commonName)) {
-            // we no longer have a mapping between the certificate and a user,
-            // as it was probably deleted...
-            return ['user_id' => null, 'profile_id' => $profileId, 'bytes_transferred' => 0];
-        }
-
-        return [
-            'user_id' => (string) $userCertInfo['user_id'],
-            'profile_id' => $profileId,
-            'bytes_transferred' => $bytesTransferred,
-        ];
     }
 
     /**
      * @param string $profileId
      * @param string $commonName
      *
-     * @return string
+     * @return void
      */
     private function verifyConnection($profileId, $commonName)
     {
@@ -188,8 +157,6 @@ class ConnectionsModule implements ServiceModuleInterface
         }
 
         $this->verifyAcl($profileId, $userId);
-
-        return $userId;
     }
 
     /**

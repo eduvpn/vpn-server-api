@@ -45,5 +45,19 @@ class UserMessagesModule implements ServiceModuleInterface
                 return new ApiResponse('user_messages', $this->storage->userMessages($userId));
             }
         );
+
+        $service->get(
+            '/user_connection_log',
+            /**
+             * @return \LC\Common\Http\Response
+             */
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+
+                $userId = InputValidation::userId($request->requireQueryParameter('user_id'));
+
+                return new ApiResponse('user_connection_log', $this->storage->getConnectionLogForUser($userId));
+            }
+        );
     }
 }
