@@ -14,7 +14,6 @@ use LC\Common\Config;
 use LC\Common\Http\BasicAuthenticationHook;
 use LC\Common\Http\Request;
 use LC\Common\Http\Service;
-use LC\Server\Api\ConnectionsModule;
 use LC\Server\Storage;
 use PDO;
 use PHPUnit\Framework\TestCase;
@@ -38,7 +37,7 @@ class ConnectionsModuleTest extends TestCase
         $storage->clientConnect('internet', '12345678901234567890123456789012', '10.10.10.10', 'fd00:4242:4242:4242::', new DateTime('@12345678'));
 
         $config = Config::fromFile(sprintf('%s/data/config.php', __DIR__));
-        $connectionsModule = new ConnectionsModule(
+        $connectionsModule = new TestConnectionsModule(
             $config,
             $storage
         );

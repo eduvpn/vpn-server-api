@@ -19,32 +19,25 @@ use LC\Common\Http\Request;
 use LC\Common\Http\Service;
 use LC\Common\Http\ServiceModuleInterface;
 use LC\Common\ProfileConfig;
+use LC\Server\Api\Exception\ConnectionsModuleException;
 use LC\Server\Storage;
 
 class ConnectionsModule implements ServiceModuleInterface
 {
+    /** @var \DateTime */
+    protected $dateTime;
+
     /** @var \LC\Common\Config */
     private $config;
 
     /** @var \LC\Server\Storage */
     private $storage;
 
-    /** @var \DateTime */
-    private $dateTime;
-
     public function __construct(Config $config, Storage $storage)
     {
         $this->config = $config;
         $this->storage = $storage;
         $this->dateTime = new DateTime();
-    }
-
-    /**
-     * @return void
-     */
-    public function setDateTime(DateTime $dateTime)
-    {
-        $this->dateTime = $dateTime;
     }
 
     /**
@@ -60,7 +53,18 @@ class ConnectionsModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
-                return $this->connect($request);
+                try {
+                    $connectInfo = $this->connect($request);
+                    $this->storage->addUserMessage($connectInfo['user_id'], 'notification', sprintf('[VPN] connect: [%s]', http_build_query($connectInfo)));
+
+                    return new ApiResponse('connect');
+                } catch (ConnectionsModuleException $e) {
+                    if (null !== $userId = $e->getUserId()) {
+                        $this->storage->addUserMessage($userId, 'notification', '[VPN] '.$e->getMessage());
+                    }
+
+                    return new ApiErrorResponse('connect', '[VPN] '.$e->getMessage());
+                }
             }
         );
 
@@ -72,13 +76,26 @@ class ConnectionsModule implements ServiceModuleInterface
             function (Request $request, array $hookData) {
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
-                return $this->disconnect($request);
+                try {
+                    $disconnectInfo = $this->disconnect($request);
+                    if (null !== $userId = $disconnectInfo['user_id']) {
+                        $this->storage->addUserMessage($userId, 'notification', sprintf('[VPN] disconnect: [%s]', http_build_query($disconnectInfo)));
+                    }
+
+                    return new ApiResponse('disconnect');
+                } catch (ConnectionsModuleException $e) {
+                    if (null !== $userId = $e->getUserId()) {
+                        $this->storage->addUserMessage($userId, 'notification', '[VPN] '.$e->getMessage());
+                    }
+
+                    return new ApiErrorResponse('disconnect', '[VPN] '.$e->getMessage());
+                }
             }
         );
     }
 
     /**
-     * @return \LC\Common\Http\Response
+     * @return array{user_id:string,profile_id:string,ip_four:string,ip_six:string}
      */
     public function connect(Request $request)
     {
@@ -88,17 +105,19 @@ class ConnectionsModule implements ServiceModuleInterface
         $ip6 = InputValidation::ip6($request->requirePostParameter('ip6'));
         $connectedAt = InputValidation::connectedAt($request->requirePostParameter('connected_at'));
 
-        if (null !== $response = $this->verifyConnection($profileId, $commonName)) {
-            return $response;
-        }
-
+        $userId = $this->verifyConnection($profileId, $commonName);
         $this->storage->clientConnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)));
 
-        return new ApiResponse('connect');
+        return [
+            'user_id' => $userId,
+            'profile_id' => $profileId,
+            'ip_four' => $ip4,
+            'ip_six' => $ip6,
+        ];
     }
 
     /**
-     * @return \LC\Common\Http\Response
+     * @return array{user_id:string|null,bytes_transferred:int}
      */
     public function disconnect(Request $request)
     {
@@ -113,24 +132,33 @@ class ConnectionsModule implements ServiceModuleInterface
 
         $this->storage->clientDisconnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)), new DateTime(sprintf('@%d', $disconnectedAt)), $bytesTransferred);
 
-        return new ApiResponse('disconnect');
+        if (false === $userCertInfo = $this->storage->getUserCertificateInfo($commonName)) {
+            // we no longer have a mapping between the certificate and a user,
+            // as it was probably deleted...
+            return ['user_id' => null, 'bytes_transferred' => 0];
+        }
+
+        return [
+            'user_id' => (string) $userCertInfo['user_id'],
+            'bytes_transferred' => $bytesTransferred,
+        ];
     }
 
     /**
      * @param string $profileId
      * @param string $commonName
      *
-     * @return \LC\Common\Http\ApiErrorResponse|null
+     * @return string
      */
     private function verifyConnection($profileId, $commonName)
     {
         // verify status of certificate/user
-        if (false === $result = $this->storage->getUserCertificateInfo($commonName)) {
-            // if a certificate does no longer exist, we cannot figure out the user
-            return new ApiErrorResponse('connect', sprintf('user or certificate does not exist [profile_id: %s, common_name: %s]', $profileId, $commonName));
+        if (false === $userCertInfo = $this->storage->getUserCertificateInfo($commonName)) {
+            // we do not (yet) know the user as only an existing *//* certificate can be linked back to a user...
+            throw new ConnectionsModuleException(null, sprintf('user or certificate does not exist [profile_id: %s, common_name: %s]', $profileId, $commonName));
         }
 
-        $userId = $result['user_id'];
+        $userId = $userCertInfo['user_id'];
 
         if (false === strpos($userId, '!!')) {
             // FIXME "!!" indicates it is a remote guest user coming in with a
@@ -142,46 +170,36 @@ class ConnectionsModule implements ServiceModuleInterface
             // this is always string, but DB gives back scalar|null
             $sessionExpiresAt = new DateTime((string) $this->storage->getSessionExpiresAt($userId));
             if ($sessionExpiresAt->getTimestamp() < $this->dateTime->getTimestamp()) {
-                $errMsg = sprintf('[VPN] the certificate is still valid, but the session expired at %s', $sessionExpiresAt->format(DateTime::ATOM));
-                $this->storage->addUserMessage($userId, 'notification', $errMsg);
-
-                return new ApiErrorResponse('connect', $errMsg);
+                throw new ConnectionsModuleException($userId, sprintf('the certificate is still valid, but the session expired at %s', $sessionExpiresAt->format(DateTime::ATOM)));
             }
         }
 
-        if ($result['user_is_disabled']) {
-            $msg = '[VPN] unable to connect, account is disabled';
-            $this->storage->addUserMessage($userId, 'notification', $msg);
-
-            return new ApiErrorResponse('connect', $msg);
+        if ($userCertInfo['user_is_disabled']) {
+            throw new ConnectionsModuleException($userId, 'unable to connect, account is disabled');
         }
 
-        return $this->verifyAcl($profileId, $userId);
+        $this->verifyAcl($profileId, $userId);
+
+        return $userId;
     }
 
     /**
      * @param string $profileId
-     * @param string $externalUserId
+     * @param string $userId
      *
-     * @return \LC\Common\Http\ApiErrorResponse|null
+     * @return void
      */
-    private function verifyAcl($profileId, $externalUserId)
+    private function verifyAcl($profileId, $userId)
     {
-        // verify ACL
         $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
         if ($profileConfig->getItem('enableAcl')) {
-            // ACL enabled
-            $userPermissionList = $this->storage->getPermissionList($externalUserId);
+            // ACL is enabled for this profile
+            $userPermissionList = $this->storage->getPermissionList($userId);
             $profilePermissionList = $profileConfig->getSection('aclPermissionList')->toArray();
             if (false === self::hasPermission($userPermissionList, $profilePermissionList)) {
-                $msg = sprintf('[VPN] unable to connect, user permissions are [%s], but requires any of [%s]', implode(',', $userPermissionList), implode(',', $profilePermissionList));
-                $this->storage->addUserMessage($externalUserId, 'notification', $msg);
-
-                return new ApiErrorResponse('connect', $msg);
+                throw new ConnectionsModuleException($userId, sprintf('unable to connect, user permissions are [%s], but requires any of [%s]', implode(',', $userPermissionList), implode(',', $profilePermissionList)));
             }
         }
-
-        return null;
     }
 
     /**
