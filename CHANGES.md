@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.4 (2020-06-29)
+- better connect/disconnect logging
+- expose connection history of a user through API
+
 ## 2.2.3 (2020-05-21)
 - expose `/app_usage` internal API
 - better error message when trying to issue certificates that expire in the 
