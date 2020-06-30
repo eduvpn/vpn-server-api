@@ -536,21 +536,25 @@ SQL
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT 
-        user_id,
-        common_name,
-        profile_id, 
-        ip4, 
-        ip6, 
-        connected_at, 
-        disconnected_at,
-        bytes_transferred,
-        client_lost
+        l.user_id,
+        l.common_name,
+        l.profile_id, 
+        l.ip4, 
+        l.ip6, 
+        l.connected_at, 
+        l.disconnected_at,
+        l.bytes_transferred,
+        l.client_lost,
+        c.client_id AS client_id
     FROM
-        connection_log
+        connection_log l,
+        certificates c
     WHERE
-        user_id = :user_id
+        l.user_id = :user_id
+    AND
+        l.common_name = c.common_name
     ORDER BY
-        connected_at
+        l.connected_at
     DESC
 SQL
         );
