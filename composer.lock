@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d39801a6a99f3d9e00c969be0849bda4",
+    "content-hash": "bf3d35803f185bc7680db1be91617798",
     "packages": [
         {
             "name": "fkooman/otp-verifier",

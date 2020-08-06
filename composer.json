@@ -49,11 +49,11 @@
         "fkooman/sqlite-migrate": "^0",
         "lc/common": "v2.x-dev",
         "lc/openvpn-connection-manager": "^1",
+        "paragonie/constant_time_encoding": "^1|^2",
         "php": ">=5.4",
         "psr/log": "^1"
     },
     "require-dev": {
-        "paragonie/constant_time_encoding": "^1|^2",
         "phpunit/phpunit": "^4.8.35|^5|^6|^7"
     },
     "support": {
