@@ -1,3 +1,10 @@
+**Summary**: Server API for Let's Connect! and eduVPN 
+
+**Description**: Server API for Let's Connect! and eduVPN managing the CA and 
+configuration of the VPN server.
+
+**License**:  AGPL-3.0-or-later
+
 # Introduction
 
 This project is the server API of the Let's Connect! software. It is used by 
