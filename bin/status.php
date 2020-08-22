@@ -90,7 +90,7 @@ function showHelp(array $argv)
 /**
  * @param bool $asJson
  *
- * @return string
+ * @return void
  */
 function outputConversion(array $outputData, $asJson)
 {
@@ -208,7 +208,7 @@ try {
             }
             $outputData[] = $outputRow;
         }
-        echo outputConversion($outputData, $asJson);
+        outputConversion($outputData, $asJson);
     } else {
         // without vpn-daemon, no list of connected users
         $serverManager = new ServerManager(
@@ -233,7 +233,7 @@ try {
             ];
             $outputData[] = $outputRow;
         }
-        echo outputConversion($outputData, $asJson);
+        outputConversion($outputData, $asJson);
     }
 } catch (Exception $e) {
     echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
