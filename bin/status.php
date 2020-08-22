@@ -168,7 +168,7 @@ try {
         $openVpnDaemonModule = new OpenVpnDaemonModule(
             $config,
             $storage,
-            new DaemonSocket(sprintf('%s/vpn-daemon', $configDir))
+            new DaemonSocket(sprintf('%s/vpn-daemon', $configDir), $config->optionalItem('vpnDaemonTls', true))
         );
         $openVpnDaemonModule->setLogger($logger);
         $outputData = [];

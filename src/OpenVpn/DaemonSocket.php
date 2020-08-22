@@ -19,12 +19,17 @@ class DaemonSocket
     /** @var string */
     private $certDir;
 
+    /** @var bool */
+    private $useTls;
+
     /**
      * @param string $certDir
+     * @param bool   $useTls
      */
-    public function __construct($certDir)
+    public function __construct($certDir, $useTls)
     {
         $this->certDir = $certDir;
+        $this->useTls = $useTls;
     }
 
     /**
@@ -34,7 +39,7 @@ class DaemonSocket
      */
     public function open($managementIp)
     {
-        $this->daemonSocket = self::getSocket($managementIp, $this->certDir);
+        $this->daemonSocket = self::getSocket($managementIp, $this->certDir, $this->useTls);
     }
 
     /**
@@ -81,12 +86,15 @@ class DaemonSocket
     /**
      * @param string $managementIp
      * @param string $certDir
+     * @param bool   $useTls
      *
      * @return resource
      */
-    private static function getSocket($managementIp, $certDir)
+    private static function getSocket($managementIp, $certDir, $useTls)
     {
-        if ('127.0.0.1' !== $managementIp) {
+        // never use TLS to connect to localhost, no matter whether useTls is
+        // true...
+        if (!\in_array($managementIp, ['127.0.0.1', '::1'], true) && $useTls) {
             // we MUST have a TLS cert
             // @see https://www.php.net/manual/en/context.ssl.php
             // @see https://www.php.net/manual/en/transports.inet.php

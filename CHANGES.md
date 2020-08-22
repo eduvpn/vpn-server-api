@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.5 (...)
+- make it possible to disable TLS connections to remote VPN daemons
+
 ## 2.2.4 (2020-06-29)
 - better connect/disconnect logging
 - expose connection history of a user through API

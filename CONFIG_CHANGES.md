@@ -8,6 +8,15 @@ This will help upgrades to a future 3.x release. Configuration changes during
 the 2.x life cycle are NOT required. Any existing configuration file will keep
 working!
 
+## 2.2.5
+
+- the `useVpnDaemon` option got a sibling: `vpnDaemonTls` which defaults to 
+  `true`. This means that by default VPN Daemon connections to IP addresses as
+  specified in `managementIp` other than `127.0.0.1`, or `::1`, will require 
+  TLS. Setting it to `false` disables TLS. This is useful when you have 
+  multiple nodes in the same data center where TLS between controller and node 
+  is not that important.
+  
 ## 2.2.0
 
 - the option `vpnCaPath` now defaults to `/usr/bin/vpn-ca`, when not specified,
