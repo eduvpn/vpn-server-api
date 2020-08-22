@@ -3,6 +3,7 @@
   <projectFiles>
     <directory name="src"/>
     <directory name="web"/>
+    <directory name="bin"/>
     <ignoreFiles>
       <directory name="vendor"/>
     </ignoreFiles>
