@@ -12,7 +12,6 @@ namespace LC\Server\Api;
 use DateTime;
 use fkooman\Otp\Exception\OtpException;
 use fkooman\Otp\Totp;
-use LC\Common\Config;
 use LC\Common\Http\ApiErrorResponse;
 use LC\Common\Http\ApiResponse;
 use LC\Common\Http\AuthUtils;
@@ -26,15 +25,12 @@ class UsersModule implements ServiceModuleInterface
 {
     /** @var \DateTime */
     protected $dateTime;
-    /** @var \LC\Common\Config */
-    private $config;
 
     /** @var \LC\Server\Storage */
     private $storage;
 
-    public function __construct(Config $config, Storage $storage)
+    public function __construct(Storage $storage)
     {
-        $this->config = $config;
         $this->storage = $storage;
         $this->dateTime = new DateTime();
     }
