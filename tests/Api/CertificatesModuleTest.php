@@ -10,6 +10,7 @@
 namespace LC\Server\Tests\Api;
 
 use DateTime;
+use LC\Common\Config;
 use LC\Common\Http\BasicAuthenticationHook;
 use LC\Common\Http\Request;
 use LC\Common\Http\Service;
@@ -38,6 +39,7 @@ class CertificatesModuleTest extends TestCase
         $this->service = new Service();
         $this->service->addModule(
             new CertificatesModule(
+                Config::fromFile(\dirname(\dirname(__DIR__)).'/config/config.php.example'),
                 new TestCa(),
                 $storage,
                 new TlsCrypt(sprintf('%s/data', \dirname(__DIR__))),
@@ -130,7 +132,6 @@ EOF;
                 [],
                 [
                     'profile_id' => 'internet',
-                    'common_name' => 'vpn.example',
                 ]
             )
         );

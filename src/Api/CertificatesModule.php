@@ -10,6 +10,7 @@
 namespace LC\Server\Api;
 
 use DateTime;
+use LC\Common\Config;
 use LC\Common\Http\ApiErrorResponse;
 use LC\Common\Http\ApiResponse;
 use LC\Common\Http\AuthUtils;
@@ -17,6 +18,7 @@ use LC\Common\Http\InputValidation;
 use LC\Common\Http\Request;
 use LC\Common\Http\Service;
 use LC\Common\Http\ServiceModuleInterface;
+use LC\Common\ProfileConfig;
 use LC\Common\RandomInterface;
 use LC\Server\CA\CaInterface;
 use LC\Server\Storage;
@@ -24,6 +26,9 @@ use LC\Server\TlsCrypt;
 
 class CertificatesModule implements ServiceModuleInterface
 {
+    /** @var \LC\Common\Config */
+    private $config;
+
     /** @var \LC\Server\CA\CaInterface */
     private $ca;
 
@@ -36,8 +41,9 @@ class CertificatesModule implements ServiceModuleInterface
     /** @var \LC\Common\RandomInterface */
     private $random;
 
-    public function __construct(CaInterface $ca, Storage $storage, TlsCrypt $tlsCrypt, RandomInterface $random)
+    public function __construct(Config $config, CaInterface $ca, Storage $storage, TlsCrypt $tlsCrypt, RandomInterface $random)
     {
+        $this->config = $config;
         $this->ca = $ca;
         $this->storage = $storage;
         $this->tlsCrypt = $tlsCrypt;
@@ -121,9 +127,9 @@ class CertificatesModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
                 $profileId = InputValidation::profileId($request->requirePostParameter('profile_id'));
-                $commonName = InputValidation::serverCommonName($request->requirePostParameter('common_name'));
-
-                $certInfo = $this->ca->serverCert($commonName);
+                $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
+                $serverName = $profileConfig->getItem('hostName');
+                $certInfo = $this->ca->serverCert($serverName);
                 $certInfo['tls_crypt'] = $this->tlsCrypt->get($profileId, true);
                 $certInfo['ca'] = $this->ca->caCert();
 

@@ -134,6 +134,7 @@ try {
 
     $service->addModule(
         new CertificatesModule(
+            $config,
             $ca,
             $storage,
             new TlsCrypt($dataDir),
