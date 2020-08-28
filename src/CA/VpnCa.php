@@ -60,7 +60,7 @@ class VpnCa implements CaInterface
      */
     public function serverCert($commonName)
     {
-        $this->execVpnCa(sprintf('-server %s -not-after CA', $commonName));
+        $this->execVpnCa(sprintf('-server -name "%s" -not-after CA', $commonName));
 
         return $this->certInfo($commonName);
     }
@@ -81,7 +81,7 @@ class VpnCa implements CaInterface
             throw new CaException(sprintf('can not issue certificates that expire in the past (%s)', $expiresAt->format(DateTime::ATOM)));
         }
 
-        $this->execVpnCa(sprintf('-client %s -not-after %s', $commonName, $expiresAt->format(DateTime::ATOM)));
+        $this->execVpnCa(sprintf('-client -name "%s" -not-after %s', $commonName, $expiresAt->format(DateTime::ATOM)));
 
         return $this->certInfo($commonName);
     }
@@ -127,7 +127,7 @@ class VpnCa implements CaInterface
         }
 
         // intitialize new CA
-        $this->execVpnCa('-init');
+        $this->execVpnCa('-init-ca');
     }
 
     /**
@@ -198,7 +198,7 @@ class VpnCa implements CaInterface
      */
     private function execVpnCa($cmdArgs)
     {
-        self::exec($this->vpnCaPath.sprintf(' -ca-dir %s %s', $this->caDir, $cmdArgs));
+        self::exec(sprintf('CA_DIR=%s %s %s', $this->caDir, $this->vpnCaPath, $cmdArgs));
     }
 
     /**
