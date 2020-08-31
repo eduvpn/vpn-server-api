@@ -127,7 +127,7 @@ class VpnCa implements CaInterface
         }
 
         // intitialize new CA
-        $this->execVpnCa('-init-ca');
+        $this->execVpnCa('-init-ca -name "VPN CA"');
     }
 
     /**

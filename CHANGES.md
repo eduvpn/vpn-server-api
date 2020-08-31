@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.6 (2020-08-31)
+- restore default CA CN to be `VPN CA` instead of `Root CA`
+
 ## 2.2.5 (2020-08-31)
 - make it possible to disable TLS connections to remote VPN daemons
 - also expose `client_id` when getting the connection log
