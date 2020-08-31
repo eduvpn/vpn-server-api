@@ -2,6 +2,15 @@
 
 ## 2.2.5 (...)
 - make it possible to disable TLS connections to remote VPN daemons
+- also expose client_id when getting the connection log
+- fix type errors in bin/status.php
+- make using TLS to communicicate between controller and node using VPN daemon 
+  optional
+- add bin/suggest-ip.php script to print an IPv4 and IPv6 range as a suggestion
+  to use for your VPN profile configuration
+- OpenVPN server certs now get the hostName from the profile
+- update for new vpn-ca
+- remove bin/random-ip.php
 
 ## 2.2.4 (2020-06-29)
 - better connect/disconnect logging
