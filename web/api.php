@@ -129,8 +129,9 @@ try {
     // we need easyRsaDataDir for migrations to vpn-ca
     $easyRsaDataDir = sprintf('%s/easy-rsa', $dataDir);
     $vpnCaPath = $config->optionalItem('vpnCaPath', '/usr/bin/vpn-ca');
+    $vpnCaAlgo = $config->optionalItem('vpnCaAlgo', 'RSA');
     // VpnCa gets the easyRsaDataDir in case a migration is needed...
-    $ca = new VpnCa($vpnCaDir, $vpnCaPath, $easyRsaDataDir);
+    $ca = new VpnCa($vpnCaDir, $vpnCaAlgo, $vpnCaPath, $easyRsaDataDir);
 
     $service->addModule(
         new CertificatesModule(
