@@ -203,7 +203,7 @@ class VpnCa implements CaInterface
      */
     private function execVpnCa($cmdArgs)
     {
-        self::exec(sprintf('CA_DIR=%s CA_ALGO=%s %s %s', $this->caDir, $this->caAlgo, $this->vpnCaPath, $cmdArgs));
+        self::exec(sprintf('CA_DIR=%s CA_KEY_ALGO=%s %s %s', $this->caDir, $this->caAlgo, $this->vpnCaPath, $cmdArgs));
     }
 
     /**
