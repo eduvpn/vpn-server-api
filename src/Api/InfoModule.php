@@ -82,7 +82,7 @@ class InfoModule implements ServiceModuleInterface
                     [
                         'valid_from' => $validFrom->format(DateTime::ATOM),
                         'valid_to' => $validTo->format(DateTime::ATOM),
-                        'ca_key_algo' => $this->config->optionalItem('vpnCaKeyAlgo', 'RSA'),
+                        'ca_key_type' => $this->config->optionalItem('vpnCaKeyType', 'RSA'),
                     ]
                 );
 

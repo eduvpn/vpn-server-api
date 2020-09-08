@@ -26,9 +26,9 @@ try {
     $easyRsaDataDir = sprintf('%s/easy-rsa', $dataDir);
     $vpnCaDir = sprintf('%s/ca', $dataDir);
     $vpnCaPath = $config->optionalItem('vpnCaPath', '/usr/bin/vpn-ca');
-    $vpnCaKeyAlgo = $config->optionalItem('vpnCaKeyAlgo', 'RSA');
+    $vpnCaKeyType = $config->optionalItem('vpnCaKeyType', 'RSA');
     // VpnCa gets the easyRsaDataDir in case a migration is needed...
-    $ca = new VpnCa($vpnCaDir, $vpnCaKeyAlgo, $vpnCaPath, $easyRsaDataDir);
+    $ca = new VpnCa($vpnCaDir, $vpnCaKeyType, $vpnCaPath, $easyRsaDataDir);
 
     $storage = new Storage(
         new PDO(

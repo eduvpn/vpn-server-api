@@ -8,6 +8,15 @@ This will help upgrades to a future 3.x release. Configuration changes during
 the 2.x life cycle are NOT required. Any existing configuration file will keep
 working!
 
+## 2.2.7
+
+- the generated CA key type configurable with the `vpnCaKeyType` configuration 
+  option. The default is `RSA`, but `ECDSA` (NIST P-256) and `EdDSA` (Ed25519) 
+  are also supported. Note that `EdDSA` is only supported on Fedora and Debian 
+  >= 10 servers. We did not do extensive tests regarding client support after 
+  publishing [this](https://www.eduvpn.org/blog/openvpn_modern_crypto.html) 
+  blog post. **USE WITH CARE, THIS IS NOT OFFICIALLY SUPPORTED YET!** 
+
 ## 2.2.5
 
 - the `useVpnDaemon` option got a sibling: `vpnDaemonTls` which defaults to 

@@ -20,7 +20,7 @@ class VpnCa implements CaInterface
     private $caDir;
 
     /** @var string */
-    private $caAlgo;
+    private $caKeyType;
 
     /** @var string */
     private $vpnCaPath;
@@ -30,14 +30,14 @@ class VpnCa implements CaInterface
 
     /**
      * @param string $caDir
-     * @param string $caAlgo
+     * @param string $caKeyType
      * @param string $vpnCaPath
      * @param string $easyRsaDataDir
      */
-    public function __construct($caDir, $caAlgo, $vpnCaPath, $easyRsaDataDir)
+    public function __construct($caDir, $caKeyType, $vpnCaPath, $easyRsaDataDir)
     {
         $this->caDir = $caDir;
-        $this->caAlgo = $caAlgo;
+        $this->caKeyType = $caKeyType;
         $this->vpnCaPath = $vpnCaPath;
         $this->easyRsaDataDir = $easyRsaDataDir;
         $this->init();
@@ -203,7 +203,7 @@ class VpnCa implements CaInterface
      */
     private function execVpnCa($cmdArgs)
     {
-        self::exec(sprintf('CA_DIR=%s CA_KEY_ALGO=%s %s %s', $this->caDir, $this->caAlgo, $this->vpnCaPath, $cmdArgs));
+        self::exec(sprintf('CA_DIR=%s CA_KEY_TYPE=%s %s %s', $this->caDir, $this->caKeyType, $this->vpnCaPath, $cmdArgs));
     }
 
     /**
