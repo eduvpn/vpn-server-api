@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.7 (2020-09-08)
+- implement (experimental) support for `ECDSA` and `EdDSA` key types
+
 ## 2.2.6 (2020-08-31)
 - restore default CA CN to be `VPN CA` instead of `Root CA`
 
