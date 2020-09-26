@@ -2,6 +2,7 @@
 
 ## 2.2.8 (...)
 - implement changes for updated `Config` API
+- fix `vpn-server-api-suggest-ip` on CentOS 7 (random_compat)
 
 ## 2.2.7 (2020-09-08)
 - implement (experimental) support for `ECDSA` and `EdDSA` key types
