@@ -10,7 +10,6 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
-use LC\Common\CliParser;
 use LC\Common\Config;
 use LC\Common\FileIO;
 
@@ -20,21 +19,18 @@ $credentials = [
 ];
 
 try {
-    $p = new CliParser(
-        'Update the API secrets used by the various components',
-        [
-            'prefix' => ['the prefix of the installed modules (DEFAULT: /usr/share)', true, false],
-        ]
-    );
-
-    $opt = $p->parse($argv);
-    if ($opt->hasItem('help')) {
-        echo $p->help();
-        exit(0);
-    }
     $prefix = '/usr/share';
-    if ($opt->hasItem('prefix')) {
-        $prefix = $opt->getItem('prefix');
+    for ($i = 1; $i < $argc; ++$i) {
+        if ('--prefix' === $argv[$i]) {
+            if ($i + 1 < $argc) {
+                $prefix = $argv[$i + 1];
+            }
+            continue;
+        }
+        if ('--help' === $argv[$i]) {
+            echo 'SYNTAX: '.$argv[0].' [--prefix PREFIX]'.PHP_EOL;
+            exit(0);
+        }
     }
 
     // api provider

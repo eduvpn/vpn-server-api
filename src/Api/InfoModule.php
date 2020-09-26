@@ -51,7 +51,7 @@ class InfoModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-user-portal', 'vpn-server-node']);
 
                 $profileList = [];
-                foreach ($this->config->getSection('vpnProfiles')->toArray() as $profileId => $profileData) {
+                foreach ($this->config->requireArray('vpnProfiles') as $profileId => $profileData) {
                     $profileConfig = new ProfileConfig($profileData);
                     $profileConfigArray = $profileConfig->toArray();
                     ksort($profileConfigArray);
@@ -82,7 +82,7 @@ class InfoModule implements ServiceModuleInterface
                     [
                         'valid_from' => $validFrom->format(DateTime::ATOM),
                         'valid_to' => $validTo->format(DateTime::ATOM),
-                        'ca_key_type' => $this->config->optionalItem('vpnCaKeyType', 'RSA'),
+                        'ca_key_type' => $this->config->requireString('vpnCaKeyType', 'RSA'),
                     ]
                 );
 

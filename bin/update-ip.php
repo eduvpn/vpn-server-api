@@ -10,7 +10,6 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
-use LC\Common\CliParser;
 use LC\Common\Config;
 use LC\Common\FileIO;
 use LC\Common\ProfileConfig;
@@ -27,18 +26,30 @@ use LC\Common\ProfileConfig;
  */
 
 try {
-    $p = new CliParser(
-        'Automatically generate an IP address and basic config for a profile',
-        [
-            'profile' => ['the profile to target, e.g. internet', true, true],
-            'host' => ['the hostname clients connect to', true, true],
-        ]
-    );
+    $profileId = null;
+    $hostName = null;
+    for ($i = 1; $i < $argc; ++$i) {
+        if ('--profile' === $argv[$i]) {
+            if ($i + 1 < $argc) {
+                $profileId = $argv[$i + 1];
+            }
+            continue;
+        }
+        if ('--host' === $argv[$i]) {
+            if ($i + 1 < $argc) {
+                $hostName = $argv[$i + 1];
+            }
+            continue;
+        }
+        if ('--help' === $argv[$i]) {
+            echo 'SYNTAX: '.$argv[0].' --profile PROFILE_ID --host HOSTNAME'.PHP_EOL;
+            exit(0);
+        }
+    }
 
-    $opt = $p->parse($argv);
-    if ($opt->hasItem('help')) {
-        echo $p->help();
-        exit(0);
+    if (null === $profileId || null === $hostName) {
+        echo 'SYNTAX: '.$argv[0].' --profile PROFILE_ID --host HOSTNAME'.PHP_EOL;
+        exit(1);
     }
 
     $v4 = sprintf(
@@ -88,7 +99,7 @@ try {
 
     $configFile = sprintf('%s/config/config.php', $baseDir);
     $config = Config::fromFile($configFile);
-    $profileConfig = new ProfileConfig($config->getSection('vpnProfiles')->getSection($opt->getItem('profile'))->toArray());
+    $profileConfig = new ProfileConfig($config->s('vpnProfiles')->requireArray($profileId));
 
     $configData = $config->toArray();
     $profileConfigData = $profileConfig->toArray();
@@ -96,8 +107,8 @@ try {
     $profileConfigData['range'] = $v4;
     $profileConfigData['range6'] = $v6;
     $profileConfigData['dns'] = $nameServerList;
-    $profileConfigData['hostName'] = $opt->getItem('host');
-    $configData['vpnProfiles'][$opt->getItem('profile')] = $profileConfigData;
+    $profileConfigData['hostName'] = $hostName;
+    $configData['vpnProfiles'][$profileId] = $profileConfigData;
 
     Config::toFile($configFile, $configData, 0644);
 } catch (Exception $e) {

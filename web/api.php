@@ -51,7 +51,7 @@ try {
 
     $service = new Service();
     $basicAuthentication = new BasicAuthenticationHook(
-        $config->getSection('apiConsumers')->toArray(),
+        $config->requireArray('apiConsumers'),
         'vpn-server-backend'
     );
     $service->addBeforeHook('auth', $basicAuthentication);
@@ -91,11 +91,11 @@ try {
         )
     );
 
-    if ($config->hasItem('useVpnDaemon') && $config->getItem('useVpnDaemon')) {
+    if ($config->requireBool('useVpnDaemon', false)) {
         $openVpnDaemonModule = new OpenVpnDaemonModule(
             $config,
             $storage,
-            new DaemonSocket(sprintf('%s/vpn-daemon', $configDir), $config->optionalItem('vpnDaemonTls', true))
+            new DaemonSocket(sprintf('%s/vpn-daemon', $configDir), $config->requireBool('vpnDaemonTls', true))
         );
         $openVpnDaemonModule->setLogger($logger);
         $service->addModule($openVpnDaemonModule);
@@ -128,8 +128,8 @@ try {
 
     // we need easyRsaDataDir for migrations to vpn-ca
     $easyRsaDataDir = sprintf('%s/easy-rsa', $dataDir);
-    $vpnCaPath = $config->optionalItem('vpnCaPath', '/usr/bin/vpn-ca');
-    $vpnCaKeyType = $config->optionalItem('vpnCaKeyType', 'RSA');
+    $vpnCaPath = $config->requireString('vpnCaPath', '/usr/bin/vpn-ca');
+    $vpnCaKeyType = $config->requireString('vpnCaKeyType', 'RSA');
     // VpnCa gets the easyRsaDataDir in case a migration is needed...
     $ca = new VpnCa($vpnCaDir, $vpnCaKeyType, $vpnCaPath, $easyRsaDataDir);
 

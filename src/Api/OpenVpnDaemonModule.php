@@ -110,13 +110,13 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
     {
         // figure out the managementIp + portList for each profile...
         $profileManagementIpPortList = [];
-        foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
+        foreach (array_keys($this->config->requireArray('vpnProfiles')) as $profileId) {
             $profileManagementIpPortList[$profileId] = [];
-            $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
-            $profileManagementIpPortList[$profileId]['managementIp'] = $profileConfig->getItem('managementIp');
-            $profileNumber = $profileConfig->getItem('profileNumber');
+            $profileConfig = new ProfileConfig($this->config->s('vpnProfiles')->requireArray($profileId));
+            $profileManagementIpPortList[$profileId]['managementIp'] = $profileConfig->requireString('managementIp');
+            $profileNumber = $profileConfig->requireInt('profileNumber');
             $profileManagementIpPortList[$profileId]['portList'] = [];
-            for ($i = 0; $i < \count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
+            for ($i = 0; $i < \count($profileConfig->requireArray('vpnProtoPorts')); ++$i) {
                 $profileManagementIpPortList[$profileId]['portList'][] = 11940 + self::toPort($profileNumber, $i);
             }
         }
@@ -178,15 +178,15 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
     public function killClient($commonName)
     {
         $managementIpPortList = [];
-        foreach (array_keys($this->config->getSection('vpnProfiles')->toArray()) as $profileId) {
-            $profileConfig = new ProfileConfig($this->config->getSection('vpnProfiles')->getSection($profileId)->toArray());
-            $managementIp = $profileConfig->getItem('managementIp');
+        foreach (array_keys($this->config->requireArray('vpnProfiles')) as $profileId) {
+            $profileConfig = new ProfileConfig($this->config->s('vpnProfiles')->requireArray($profileId));
+            $managementIp = $profileConfig->requireString('managementIp');
             if (!\array_key_exists($managementIp, $managementIpPortList)) {
                 // multiple profiles can have the same managementIp
                 $managementIpPortList[$managementIp] = [];
             }
-            $profileNumber = $profileConfig->getItem('profileNumber');
-            for ($i = 0; $i < \count($profileConfig->getItem('vpnProtoPorts')); ++$i) {
+            $profileNumber = $profileConfig->requireInt('profileNumber');
+            for ($i = 0; $i < \count($profileConfig->requireArray('vpnProtoPorts')); ++$i) {
                 $managementIpPortList[$managementIp][] = 11940 + self::toPort($profileNumber, $i);
             }
         }

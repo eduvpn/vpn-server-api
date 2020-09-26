@@ -24,13 +24,13 @@ use LC\Server\Storage;
  */
 function getMaxClientLimit(Config $config)
 {
-    $profileIdList = array_keys($config->getItem('vpnProfiles'));
+    $profileIdList = array_keys($config->requireArray('vpnProfiles'));
 
     $maxConcurrentConnectionLimitList = [];
     foreach ($profileIdList as $profileId) {
-        $profileConfig = new ProfileConfig($config->getSection('vpnProfiles')->getItem($profileId));
-        list($ipFour, $ipFourPrefix) = explode('/', $profileConfig->getItem('range'));
-        $vpnProtoPortsCount = count($profileConfig->getItem('vpnProtoPorts'));
+        $profileConfig = new ProfileConfig($config->s('vpnProfiles')->requireArray($profileId));
+        list($ipFour, $ipFourPrefix) = explode('/', $profileConfig->requireString('range'));
+        $vpnProtoPortsCount = count($profileConfig->requireArray('vpnProtoPorts'));
         $maxConcurrentConnectionLimitList[$profileId] = ((int) pow(2, 32 - (int) $ipFourPrefix)) - 3 * $vpnProtoPortsCount;
     }
 
@@ -42,12 +42,12 @@ function getMaxClientLimit(Config $config)
  */
 function getProfilePortMapping(Config $config)
 {
-    $profileIdList = array_keys($config->getItem('vpnProfiles'));
+    $profileIdList = array_keys($config->requireArray('vpnProfiles'));
     $profilePortMapping = [];
     foreach ($profileIdList as $profileId) {
-        $profileConfig = new ProfileConfig($config->getSection('vpnProfiles')->getItem($profileId));
-        $profileNumber = $profileConfig->getItem('profileNumber');
-        $vpnProtoPorts = $profileConfig->getItem('vpnProtoPorts');
+        $profileConfig = new ProfileConfig($config->s('vpnProfiles')->requireArray($profileId));
+        $profileNumber = $profileConfig->requireInt('profileNumber');
+        $vpnProtoPorts = $profileConfig->requireArray('vpnProtoPorts');
         $profilePortMapping[$profileId] = ['vpnProtoPorts' => $vpnProtoPorts, 'profileNumber' => $profileNumber];
     }
 
@@ -157,7 +157,7 @@ try {
 
     $maxClientLimit = getMaxClientLimit($config);
 
-    if ($config->hasItem('useVpnDaemon') && $config->getItem('useVpnDaemon')) {
+    if ($config->requireBool('useVpnDaemon', false)) {
         // with vpn-daemon
         $storage = new Storage(
             new PDO(
@@ -168,7 +168,7 @@ try {
         $openVpnDaemonModule = new OpenVpnDaemonModule(
             $config,
             $storage,
-            new DaemonSocket(sprintf('%s/vpn-daemon', $configDir), $config->optionalItem('vpnDaemonTls', true))
+            new DaemonSocket(sprintf('%s/vpn-daemon', $configDir), $config->requireBool('vpnDaemonTls', true))
         );
         $openVpnDaemonModule->setLogger($logger);
         $outputData = [];

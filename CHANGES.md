@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.8 (...)
+- implement changes for updated `Config` API
+
 ## 2.2.7 (2020-09-08)
 - implement (experimental) support for `ECDSA` and `EdDSA` key types
 

@@ -30,7 +30,7 @@ try {
 
     $stats = new Stats($storage, new DateTime());
     $statsData = $stats->get(
-        array_keys($config->getSection('vpnProfiles')->toArray())
+        array_keys($config->requireArray('vpnProfiles'))
     );
 
     FileIO::writeJsonFile(

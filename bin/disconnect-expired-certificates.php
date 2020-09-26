@@ -32,12 +32,12 @@ try {
         sprintf('%s/schema', $baseDir)
     );
 
-    if ($config->hasItem('useVpnDaemon') && $config->getItem('useVpnDaemon')) {
+    if ($config->requireBool('useVpnDaemon', false)) {
         // with vpn-daemon
         $openVpnDaemonModule = new OpenVpnDaemonModule(
             $config,
             $storage,
-            new DaemonSocket(sprintf('%s/vpn-daemon', $configDir), $config->optionalItem('vpnDaemonTls', true))
+            new DaemonSocket(sprintf('%s/vpn-daemon', $configDir), $config->requireBool('vpnDaemonTls', true))
         );
         $openVpnDaemonModule->setLogger($logger);
         foreach ($openVpnDaemonModule->getConnectionList(null, null) as $profileId => $connectionInfoList) {
