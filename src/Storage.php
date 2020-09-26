@@ -832,17 +832,17 @@ SQL
 
     /**
      * @param string $userId
-     * @param string $otpKey
+     * @param string $totpKey
      *
      * @return bool
      */
-    public function recordOtpKey($userId, $otpKey, DateTime $dateTime)
+    public function recordOtpKey($userId, $totpKey, DateTime $dateTime)
     {
         $this->addUser($userId);
         // check if this user used the key before
         $stmt = $this->db->prepare('SELECT COUNT(*) FROM otp_log WHERE user_id = :user_id AND otp_key = :otp_key');
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':otp_key', $otpKey, PDO::PARAM_STR);
+        $stmt->bindValue(':otp_key', $totpKey, PDO::PARAM_STR);
         $stmt->execute();
         if (0 !== (int) $stmt->fetchColumn()) {
             return false;
@@ -854,7 +854,7 @@ SQL
         // constrained is violated
         $stmt = $this->db->prepare('INSERT INTO otp_log (user_id, otp_key, date_time) VALUES (:user_id, :otp_key, :date_time)');
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':otp_key', $otpKey, PDO::PARAM_STR);
+        $stmt->bindValue(':otp_key', $totpKey, PDO::PARAM_STR);
         $stmt->bindValue(':date_time', $dateTime->format(DateTime::ATOM), PDO::PARAM_STR);
         $stmt->execute();
 
