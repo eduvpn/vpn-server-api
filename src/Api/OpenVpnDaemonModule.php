@@ -110,9 +110,9 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
     {
         // figure out the managementIp + portList for each profile...
         $profileManagementIpPortList = [];
-        foreach (array_keys($this->config->requireArray('vpnProfiles')) as $profileId) {
+        foreach ($this->config->requireArray('vpnProfiles') as $profileId => $profileData) {
             $profileManagementIpPortList[$profileId] = [];
-            $profileConfig = new ProfileConfig($this->config->s('vpnProfiles')->requireArray($profileId));
+            $profileConfig = new ProfileConfig($profileData);
             $profileManagementIpPortList[$profileId]['managementIp'] = $profileConfig->requireString('managementIp');
             $profileNumber = $profileConfig->requireInt('profileNumber');
             $profileManagementIpPortList[$profileId]['portList'] = [];
@@ -178,8 +178,8 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
     public function killClient($commonName)
     {
         $managementIpPortList = [];
-        foreach (array_keys($this->config->requireArray('vpnProfiles')) as $profileId) {
-            $profileConfig = new ProfileConfig($this->config->s('vpnProfiles')->requireArray($profileId));
+        foreach ($this->config->requireArray('vpnProfiles') as $profileData) {
+            $profileConfig = new ProfileConfig($profileData);
             $managementIp = $profileConfig->requireString('managementIp');
             if (!\array_key_exists($managementIp, $managementIpPortList)) {
                 // multiple profiles can have the same managementIp

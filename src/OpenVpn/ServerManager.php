@@ -45,8 +45,8 @@ class ServerManager
         $clientConnections = [];
 
         // loop over all profiles
-        foreach (array_keys($this->config->requireArray('vpnProfiles')) as $profileId) {
-            $profileConfig = new ProfileConfig($this->config->s('vpnProfiles')->requireArray($profileId));
+        foreach ($this->config->requireArray('vpnProfiles') as $profileId => $profileData) {
+            $profileConfig = new ProfileConfig($profileData);
             $managementIp = $profileConfig->requireString('managementIp');
             $profileNumber = $profileConfig->requireInt('profileNumber');
 
@@ -78,11 +78,10 @@ class ServerManager
         $socketAddressList = [];
 
         // loop over all profiles
-        foreach (array_keys($this->config->requireArray('vpnProfiles')) as $profileId) {
-            $profileConfig = new ProfileConfig($this->config->s('vpnProfiles')->requireArray($profileId));
+        foreach ($this->config->requireArray('vpnProfiles') as $profileData) {
+            $profileConfig = new ProfileConfig($profileData);
             $managementIp = $profileConfig->requireString('managementIp');
             $profileNumber = $profileConfig->requireInt('profileNumber');
-
             for ($i = 0; $i < \count($profileConfig->requireArray('vpnProtoPorts')); ++$i) {
                 $socketAddressList[] = sprintf(
                     'tcp://%s:%d',
