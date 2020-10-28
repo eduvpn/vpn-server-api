@@ -12,7 +12,6 @@ $baseDir = dirname(__DIR__);
 
 use LC\Common\Config;
 use LC\Common\FileIO;
-use LC\Common\ProfileConfig;
 
 /*
  * Update the IP address configuration of vpn-server-api.
@@ -99,7 +98,7 @@ try {
 
     $configFile = sprintf('%s/config/config.php', $baseDir);
     $config = Config::fromFile($configFile);
-    $profileConfig = new ProfileConfig($config->s('vpnProfiles')->requireArray($profileId));
+    $profileConfig = new Config($config->s('vpnProfiles')->requireArray($profileId));
 
     $configData = $config->toArray();
     $profileConfigData = $profileConfig->toArray();

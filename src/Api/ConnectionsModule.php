@@ -167,11 +167,11 @@ class ConnectionsModule implements ServiceModuleInterface
      */
     private function verifyAcl($profileId, $userId)
     {
-        $profileConfig = new ProfileConfig($this->config->s('vpnProfiles')->requireArray($profileId));
-        if ($profileConfig->requireBool('enableAcl')) {
+        $profileConfig = new ProfileConfig($this->config->s('vpnProfiles')->s($profileId));
+        if ($profileConfig->enableAcl()) {
             // ACL is enabled for this profile
             $userPermissionList = $this->storage->getPermissionList($userId);
-            $profilePermissionList = $profileConfig->requireArray('aclPermissionList');
+            $profilePermissionList = $profileConfig->aclPermissionList();
             if (false === self::hasPermission($userPermissionList, $profilePermissionList)) {
                 throw new ConnectionsModuleException($userId, sprintf('unable to connect, user permissions are [%s], but requires any of [%s]', implode(',', $userPermissionList), implode(',', $profilePermissionList)));
             }

@@ -28,9 +28,9 @@ function getMaxClientLimit(Config $config)
 
     $maxConcurrentConnectionLimitList = [];
     foreach ($profileIdList as $profileId) {
-        $profileConfig = new ProfileConfig($config->s('vpnProfiles')->requireArray($profileId));
-        list($ipFour, $ipFourPrefix) = explode('/', $profileConfig->requireString('range'));
-        $vpnProtoPortsCount = count($profileConfig->requireArray('vpnProtoPorts'));
+        $profileConfig = new ProfileConfig($config->s('vpnProfiles')->s($profileId));
+        list($ipFour, $ipFourPrefix) = explode('/', $profileConfig->range());
+        $vpnProtoPortsCount = count($profileConfig->vpnProtoPorts());
         $maxConcurrentConnectionLimitList[$profileId] = ((int) pow(2, 32 - (int) $ipFourPrefix)) - 3 * $vpnProtoPortsCount;
     }
 
@@ -45,9 +45,9 @@ function getProfilePortMapping(Config $config)
     $profileIdList = array_keys($config->requireArray('vpnProfiles'));
     $profilePortMapping = [];
     foreach ($profileIdList as $profileId) {
-        $profileConfig = new ProfileConfig($config->s('vpnProfiles')->requireArray($profileId));
-        $profileNumber = $profileConfig->requireInt('profileNumber');
-        $vpnProtoPorts = $profileConfig->requireArray('vpnProtoPorts');
+        $profileConfig = new ProfileConfig($config->s('vpnProfiles')->s($profileId));
+        $profileNumber = $profileConfig->profileNumber();
+        $vpnProtoPorts = $profileConfig->vpnProtoPorts();
         $profilePortMapping[$profileId] = ['vpnProtoPorts' => $vpnProtoPorts, 'profileNumber' => $profileNumber];
     }
 
@@ -115,7 +115,7 @@ function outputConversion(array $outputData, $asJson)
 try {
     $configDir = sprintf('%s/config', $baseDir);
     $configFile = sprintf('%s/config.php', $configDir);
-    $config = ProfileConfig::fromFile($configFile);
+    $config = Config::fromFile($configFile);
     $dataDir = sprintf('%s/data', $baseDir);
     $logger = new Logger($argv[0]);
 

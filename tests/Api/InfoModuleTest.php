@@ -47,34 +47,13 @@ class InfoModuleTest extends TestCase
         $this->assertSame(
             [
                 'internet' => [
-                      'aclPermissionList' => [
-                      ],
-                      'blockLan' => false,
-                      'clientToClient' => false,
-                      'defaultGateway' => false,
-                      'displayName' => 'Internet Access',
-                      'dns' => [
-                      ],
-                      'dnsSuffix' => [],
-                      'enableAcl' => false,
-                      'enableLog' => false,
-                      'exposedVpnProtoPorts' => [],
-                      'extIf' => 'eth0',
-                      'hideProfile' => false,
-                      'hostName' => 'vpn.example',
-                      'listen' => '::',
-                      'managementIp' => '127.0.0.1',
-                      'profileNumber' => 1,
-                      'range' => '10.0.0.0/24',
-                      'range6' => 'fd00:4242:4242::/48',
-                      'routes' => [
-                      ],
-                      'tlsProtection' => 'tls-crypt',
-                      'vpnProtoPorts' => [
-                        0 => 'udp/1194',
-                        1 => 'tcp/1194',
-                      ],
-                    ],
+                    'profileNumber' => 1,
+                    'displayName' => 'Internet Access',
+                    'extIf' => 'eth0',
+                    'range' => '10.0.0.0/24',
+                    'range6' => 'fd00:4242:4242::/48',
+                    'hostName' => 'vpn.example',
+                ],
             ],
             $this->makeRequest(
                 ['vpn-user-portal', 'aabbcc'],

@@ -127,8 +127,8 @@ class CertificatesModule implements ServiceModuleInterface
                 AuthUtils::requireUser($hookData, ['vpn-server-node']);
 
                 $profileId = InputValidation::profileId($request->requirePostParameter('profile_id'));
-                $profileConfig = new ProfileConfig($this->config->s('vpnProfiles')->requireArray($profileId));
-                $serverName = $profileConfig->requireString('hostName');
+                $profileConfig = new ProfileConfig($this->config->s('vpnProfiles')->s($profileId));
+                $serverName = $profileConfig->hostName();
                 $certInfo = $this->ca->serverCert($serverName);
                 $certInfo['tls_crypt'] = $this->tlsCrypt->get($profileId, true);
                 $certInfo['ca'] = $this->ca->caCert();
