@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.9 (...)
+## 2.2.9 (2020-11-27)
 - update for `ProfileConfig` refactor
 
 ## 2.2.8 (2020-10-20)
