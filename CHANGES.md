@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.9 (...)
+- update for `ProfileConfig` refactor
+
 ## 2.2.8 (2020-10-20)
 - implement changes for updated `Config` API
 - fix `vpn-server-api-suggest-ip` on CentOS 7 (random_compat)
