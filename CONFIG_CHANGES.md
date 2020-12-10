@@ -8,6 +8,11 @@ This will help upgrades to a future 3.x release. Configuration changes during
 the 2.x life cycle are NOT required. Any existing configuration file will keep
 working!
 
+## 2.2.10
+
+- the `tlsProtection` configuration option was removed. It will always be 
+  `tls-crypt`. Specifying, or not specifying it will have no effect
+
 ## 2.2.7
 
 - the generated CA key type configurable with the `vpnCaKeyType` configuration 
