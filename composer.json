@@ -26,15 +26,15 @@
         },
         {
             "type": "vcs",
-            "url": "https://git.tuxed.net/LC/php-openvpn-connection-manager"
+            "url": "https://git.sr.ht/~fkooman/php-openvpn-connection-manager"
         },
         {
             "type": "vcs",
-            "url": "https://git.tuxed.net/fkooman/php-otp-verifier"
+            "url": "https://git.sr.ht/~fkooman/php-otp-verifier"
         },
         {
             "type": "vcs",
-            "url": "https://git.tuxed.net/fkooman/php-sqlite-migrate"
+            "url": "https://git.sr.ht/~fkooman/php-sqlite-migrate"
         }
     ],
     "require": {
@@ -58,7 +58,7 @@
     },
     "support": {
         "email": "eduvpn@surfnet.nl",
-        "source": "https://github.com/eduvpn/vpn-server-api"
+        "source": "https://git.sr.ht/~fkooman/vpn-server-api"
     },
     "type": "project"
 }

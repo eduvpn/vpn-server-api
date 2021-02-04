@@ -4,14 +4,14 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf3d35803f185bc7680db1be91617798",
+    "content-hash": "7022f6339470bbd4473f5fda51b4f274",
     "packages": [
         {
             "name": "fkooman/otp-verifier",
             "version": "0.3.1",
             "source": {
                 "type": "git",
-                "url": "https://git.tuxed.net/fkooman/php-otp-verifier",
+                "url": "https://git.sr.ht/~fkooman/php-otp-verifier",
                 "reference": "adf2ad12f12c88d6243af8e153c0e7ddfe6c3f37"
             },
             "require": {
@@ -59,7 +59,7 @@
             "version": "0.1.1",
             "source": {
                 "type": "git",
-                "url": "https://git.tuxed.net/fkooman/php-sqlite-migrate",
+                "url": "https://git.sr.ht/~fkooman/php-sqlite-migrate",
                 "reference": "605247a3e219f0ebf43beee3b37ec6af41d1eba4"
             },
             "require": {
@@ -150,7 +150,7 @@
             "dist": {
                 "type": "path",
                 "url": "../vpn-lib-common",
-                "reference": "afd253eadbdbfca18aea10bc89583557d7c1df87"
+                "reference": "f3c5433516d6bd6ab57af07085820ca18ba9b06b"
             },
             "require": {
                 "ext-curl": "*",
@@ -198,7 +198,7 @@
             "description": "Shared library for Let's Connect! and eduVPN",
             "support": {
                 "email": "eduvpn@surfnet.nl",
-                "source": "https://github.com/eduvpn/vpn-lib-common"
+                "source": "https://git.sr.ht/~fkooman/vpn-lib-common"
             },
             "transport-options": {
                 "relative": true
@@ -209,7 +209,7 @@
             "version": "1.0.3",
             "source": {
                 "type": "git",
-                "url": "https://git.tuxed.net/LC/php-openvpn-connection-manager",
+                "url": "https://git.sr.ht/~fkooman/php-openvpn-connection-manager",
                 "reference": "9712e920bdeefba455f7191f5ce7d1a61d81b708"
             },
             "require": {
