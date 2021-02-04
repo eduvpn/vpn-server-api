@@ -11,7 +11,6 @@ namespace LC\Server;
 
 use LC\Common\FileIO;
 use ParagonIE\ConstantTime\Hex;
-use RuntimeException;
 
 class TlsCrypt
 {
@@ -28,11 +27,10 @@ class TlsCrypt
 
     /**
      * @param string $profileId
-     * @param bool   $allowCreate
      *
      * @return string
      */
-    public function get($profileId, $allowCreate = false)
+    public function get($profileId)
     {
         // check whether we still have global legacy "ta.key". Use it if we
         // find it...
@@ -45,10 +43,6 @@ class TlsCrypt
         $profileTlsCryptKey = sprintf('%s/tls-crypt-%s.key', $this->keyDir, $profileId);
         if (@file_exists($profileTlsCryptKey)) {
             return FileIO::readFile($profileTlsCryptKey);
-        }
-
-        if (!$allowCreate) {
-            throw new RuntimeException(sprintf('tls-crypt key "%s" could not be found', $profileTlsCryptKey));
         }
 
         // no key yet, create one
