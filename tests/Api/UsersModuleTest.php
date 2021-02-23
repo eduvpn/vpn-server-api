@@ -29,7 +29,7 @@ class UsersModuleTest extends TestCase
     /** @var \LC\Server\Storage */
     private $storage;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->storage = new Storage(
             new PDO('sqlite::memory:'),

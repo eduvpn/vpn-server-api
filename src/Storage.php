@@ -62,9 +62,9 @@ class Storage implements OtpStorageInterface
         user_id,
         (SELECT otp_secret FROM otp WHERE user_id = users.user_id) AS otp_secret,
         session_expires_at,
-        permission_list, 
+        permission_list,
         is_disabled
-    FROM 
+    FROM
         users
 SQL
         );
@@ -96,9 +96,9 @@ SQL
 <<< 'SQL'
     SELECT
         session_expires_at
-    FROM 
+    FROM
         users
-    WHERE 
+    WHERE
         user_id = :user_id
 SQL
         );
@@ -120,7 +120,7 @@ SQL
 <<< 'SQL'
     SELECT
         permission_list
-    FROM 
+    FROM
         users
     WHERE
         user_id = :user_id
@@ -139,14 +139,14 @@ SQL
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    SELECT 
+    SELECT
         client_id,
-        COUNT(DISTINCT user_id) AS client_count 
+        COUNT(DISTINCT user_id) AS client_count
     FROM
-        certificates 
-    GROUP BY 
-        client_id 
-    ORDER BY 
+        certificates
+    GROUP BY
+        client_id
+    ORDER BY
         client_count DESC
 SQL
         );
@@ -164,17 +164,17 @@ SQL
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    SELECT 
-        u.user_id AS user_id, 
+    SELECT
+        u.user_id AS user_id,
         u.is_disabled AS user_is_disabled,
         c.display_name AS display_name,
         c.valid_from,
         c.valid_to,
         c.client_id
-    FROM 
-        users u, certificates c 
-    WHERE 
-        u.user_id = c.user_id AND 
+    FROM
+        users u, certificates c
+    WHERE
+        u.user_id = c.user_id AND
         c.common_name = :common_name
 SQL
         );
@@ -195,9 +195,9 @@ SQL
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    DELETE FROM 
-        users 
-    WHERE 
+    DELETE FROM
+        users
+    WHERE
         user_id = :user_id
 SQL
         );
@@ -245,7 +245,7 @@ SQL
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    INSERT INTO certificates 
+    INSERT INTO certificates
         (common_name, user_id, display_name, valid_from, valid_to, client_id)
     VALUES
         (:common_name, :user_id, :display_name, :valid_from, :valid_to, :client_id)
@@ -271,14 +271,14 @@ SQL
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
-        common_name, 
-        display_name, 
-        valid_from, 
+        common_name,
+        display_name,
+        valid_from,
         valid_to,
         client_id
-    FROM 
+    FROM
         certificates
-    WHERE 
+    WHERE
         user_id = :user_id
     ORDER BY
         valid_from DESC
@@ -299,9 +299,9 @@ SQL
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    DELETE FROM 
-        certificates 
-    WHERE 
+    DELETE FROM
+        certificates
+    WHERE
         common_name = :common_name
 SQL
         );
@@ -319,11 +319,11 @@ SQL
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    DELETE FROM 
-        certificates 
-    WHERE 
-        user_id = :user_id 
-    AND 
+    DELETE FROM
+        certificates
+    WHERE
+        user_id = :user_id
+    AND
         client_id = :client_id
 SQL
         );
@@ -343,10 +343,10 @@ SQL
         $stmt = $this->db->prepare(
 <<< 'SQL'
     UPDATE
-        users 
-    SET 
-        is_disabled = 1 
-    WHERE 
+        users
+    SET
+        is_disabled = 1
+    WHERE
         user_id = :user_id
 SQL
         );
@@ -365,10 +365,10 @@ SQL
         $stmt = $this->db->prepare(
 <<< 'SQL'
     UPDATE
-        users 
-    SET 
-        is_disabled = 0 
-    WHERE 
+        users
+    SET
+        is_disabled = 0
+    WHERE
         user_id = :user_id
 SQL
         );
@@ -388,10 +388,10 @@ SQL
 <<< 'SQL'
     SELECT
         is_disabled
-    FROM 
+    FROM
         users
-    WHERE 
-        user_id = :user_id 
+    WHERE
+        user_id = :user_id
 SQL
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
@@ -420,7 +420,7 @@ SQL
         // wants to connect and gets this exact same IP address...
         $stmt = $this->db->prepare(
 <<< 'SQL'
-        UPDATE 
+        UPDATE
             connection_log
         SET
             disconnected_at = :date_time,
@@ -428,9 +428,9 @@ SQL
         WHERE
             profile_id = :profile_id
         AND
-            ip4 = :ip4 
+            ip4 = :ip4
         AND
-            ip6 = :ip6 
+            ip6 = :ip6
         AND
             disconnected_at IS NULL
 SQL
@@ -447,7 +447,7 @@ SQL
         // certificate, or the user account may be deleted...
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    INSERT INTO connection_log 
+    INSERT INTO connection_log
         (
             user_id,
             profile_id,
@@ -455,20 +455,20 @@ SQL
             ip4,
             ip6,
             connected_at
-        ) 
+        )
     VALUES
         (
             (
                 SELECT
                     u.user_id
-                FROM 
+                FROM
                     users u, certificates c
                 WHERE
                     u.user_id = c.user_id
                 AND
                     c.common_name = :common_name
-            ),                
-            :profile_id, 
+            ),
+            :profile_id,
             :common_name,
             :ip4,
             :ip6,
@@ -498,19 +498,19 @@ SQL
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    UPDATE 
+    UPDATE
         connection_log
-    SET 
-        disconnected_at = :disconnected_at, 
+    SET
+        disconnected_at = :disconnected_at,
         bytes_transferred = :bytes_transferred
-    WHERE 
-        profile_id = :profile_id 
+    WHERE
+        profile_id = :profile_id
     AND
-        common_name = :common_name 
+        common_name = :common_name
     AND
-        ip4 = :ip4 
+        ip4 = :ip4
     AND
-        ip6 = :ip6 
+        ip6 = :ip6
     AND
         connected_at = :connected_at
 SQL
@@ -535,13 +535,13 @@ SQL
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    SELECT 
+    SELECT
         l.user_id,
         l.common_name,
-        l.profile_id, 
-        l.ip4, 
-        l.ip6, 
-        l.connected_at, 
+        l.profile_id,
+        l.ip4,
+        l.ip6,
+        l.connected_at,
         l.disconnected_at,
         l.bytes_transferred,
         l.client_lost,
@@ -573,22 +573,22 @@ SQL
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    SELECT 
+    SELECT
         user_id,
-        profile_id, 
-        common_name, 
-        ip4, 
-        ip6, 
-        connected_at, 
+        profile_id,
+        common_name,
+        ip4,
+        ip6,
+        connected_at,
         disconnected_at,
         client_lost
     FROM
         connection_log
     WHERE
         (ip4 = :ip_address OR ip6 = :ip_address)
-    AND 
+    AND
         connected_at < :date_time
-    AND 
+    AND
         (disconnected_at > :date_time OR disconnected_at IS NULL)
 SQL
         );
@@ -651,8 +651,8 @@ SQL
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
-        id, message, date_time 
-    FROM 
+        id, message, date_time
+    FROM
         system_messages
     WHERE
         type = :type
@@ -675,8 +675,8 @@ SQL
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    INSERT INTO system_messages 
-        (type, message, date_time) 
+    INSERT INTO system_messages
+        (type, message, date_time)
     VALUES
         (:type, :message, :date_time)
 SQL
@@ -697,7 +697,7 @@ SQL
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    DELETE FROM 
+    DELETE FROM
         system_messages
     WHERE id = :message_id
 SQL
@@ -718,8 +718,8 @@ SQL
         $stmt = $this->db->prepare(
 <<< 'SQL'
     SELECT
-        id, type, message, date_time 
-    FROM 
+        id, type, message, date_time
+    FROM
         user_messages
     WHERE
         user_id = :user_id
@@ -746,8 +746,8 @@ SQL
         $this->addUser($userId);
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    INSERT INTO user_messages 
-        (user_id, type, message, date_time) 
+    INSERT INTO user_messages
+        (user_id, type, message, date_time)
     VALUES
         (:user_id, :type, :message, :date_time)
 SQL
@@ -916,9 +916,9 @@ SQL
     {
         $stmt = $this->db->prepare(
 <<< 'SQL'
-    SELECT 
+    SELECT
         COUNT(*)
-    FROM 
+    FROM
         users
     WHERE user_id = :user_id
 SQL
@@ -931,7 +931,7 @@ SQL
             // user does not exist yet
             $stmt = $this->db->prepare(
 <<< 'SQL'
-    INSERT INTO 
+    INSERT INTO
         users (
             user_id,
             session_expires_at,

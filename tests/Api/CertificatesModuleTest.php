@@ -27,7 +27,7 @@ class CertificatesModuleTest extends TestCase
     /** @var \LC\Common\Http\Service */
     private $service;
 
-    public function setUp()
+    protected function setUp()
     {
         $random = new TestRandom(['random_1', 'random_2']);
         $storage = new Storage(

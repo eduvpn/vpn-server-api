@@ -27,7 +27,7 @@ class OpenVpnModuleTest extends TestCase
     /** @var \LC\Common\Http\Service */
     private $service;
 
-    public function setUp()
+    protected function setUp()
     {
         $config = Config::fromFile(sprintf('%s/data/openvpn_module_config.php', __DIR__));
         $storage = new Storage(

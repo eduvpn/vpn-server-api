@@ -7,7 +7,7 @@
  * SPDX-License-Identifier: AGPL-3.0+
  */
 
-return  [
+return [
   'apiConsumers' => [
     'vpn-user-portal' => 'abcdef',
     'vpn-server-node' => 'aabbcc',

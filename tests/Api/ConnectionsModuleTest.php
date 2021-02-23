@@ -23,7 +23,7 @@ class ConnectionsModuleTest extends TestCase
     /** @var \LC\Common\Http\Service */
     private $service;
 
-    public function setUp()
+    protected function setUp()
     {
         $storage = new Storage(
             new PDO('sqlite::memory:'),

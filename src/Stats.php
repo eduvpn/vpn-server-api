@@ -44,13 +44,13 @@ class Stats
             $db = $this->storage->getPdo();
             $stmt = $db->prepare(
 <<< 'SQL'
-    SELECT 
+    SELECT
         user_id,
-        common_name, 
-        connected_at, 
-        disconnected_at, 
+        common_name,
+        connected_at,
+        disconnected_at,
         bytes_transferred
-    FROM 
+    FROM
         connection_log
     WHERE
         profile_id = :profile_id

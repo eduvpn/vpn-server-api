@@ -21,7 +21,7 @@ class InfoModuleTest extends TestCase
     /** @var \LC\Common\Http\Service */
     private $service;
 
-    public function setUp()
+    protected function setUp()
     {
         $config = Config::fromFile(sprintf('%s/data/info_module_config.php', __DIR__));
 
