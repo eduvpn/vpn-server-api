@@ -150,7 +150,7 @@
             "dist": {
                 "type": "path",
                 "url": "../vpn-lib-common",
-                "reference": "f3c5433516d6bd6ab57af07085820ca18ba9b06b"
+                "reference": "1a4590c96d7bdffb023d874c49d73cdf92d5dcb8"
             },
             "require": {
                 "ext-curl": "*",
@@ -1990,7 +1990,7 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.22.0",
+            "version": "v1.22.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
@@ -2049,7 +2049,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.22.0"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.22.1"
             },
             "funding": [
                 {
