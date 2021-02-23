@@ -9,6 +9,7 @@
     private IPv4 and IPv6 ranges and transplant them in your configuration file
     manually
 - remove `tlsProtection` option support, `tls-crypt` will always be used
+- always allow tls-crypt key generation
 
 ## 2.2.9 (2020-11-27)
 - update for `ProfileConfig` refactor
