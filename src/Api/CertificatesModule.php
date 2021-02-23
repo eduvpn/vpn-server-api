@@ -130,7 +130,7 @@ class CertificatesModule implements ServiceModuleInterface
                 $profileConfig = new ProfileConfig($this->config->s('vpnProfiles')->s($profileId));
                 $serverName = $profileConfig->hostName();
                 $certInfo = $this->ca->serverCert($serverName);
-                $certInfo['tls_crypt'] = $this->tlsCrypt->get($profileId, true);
+                $certInfo['tls_crypt'] = $this->tlsCrypt->get($profileId);
                 $certInfo['ca'] = $this->ca->caCert();
 
                 return new ApiResponse('add_server_certificate', $certInfo, 201);
