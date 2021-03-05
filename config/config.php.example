@@ -41,8 +41,7 @@ return [
             // DEFAULT = false
             'blockLan' => true,
 
-            // IPv4 and IPv6 routes to push to the client, only used when
-            // defaultGateway is false
+            // IPv4 and IPv6 routes to push to the client
             // DEFAULT = []
             'routes' => [
                 //'192.168.1.0/24',
