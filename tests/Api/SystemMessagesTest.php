@@ -29,7 +29,7 @@ class SystemMessagesTest extends TestCase
             new PDO('sqlite::memory:'),
             'schema'
         );
-        $storage->setDateTime(new DateTime('2016-01-01 08:00:00'));
+        $storage->setDateTime(new DateTime('2016-01-01T08:00:00+00:00'));
         $storage->init();
         $storage->addSystemMessage('motd', 'Hello World!');
 

@@ -10,6 +10,7 @@
 namespace LC\Server\Api;
 
 use DateTime;
+use DateTimeZone;
 use LC\Common\Config;
 use LC\Common\FileIO;
 use LC\Common\Http\ApiResponse;
@@ -73,7 +74,9 @@ class InfoModule implements ServiceModuleInterface
                 $parsedCert = openssl_x509_parse($certData);
 
                 $validFrom = new DateTime('@'.$parsedCert['validFrom_time_t']);
+                $validFrom->setTimezone(new DateTimeZone('UTC'));
                 $validTo = new DateTime('@'.$parsedCert['validTo_time_t']);
+                $validTo->setTimezone(new DateTimeZone('UTC'));
 
                 return new ApiResponse(
                     'ca_info',
