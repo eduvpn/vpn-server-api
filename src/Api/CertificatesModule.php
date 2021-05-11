@@ -95,6 +95,21 @@ class CertificatesModule implements ServiceModuleInterface
             }
         );
 
+        $service->get(
+            '/ca_expires_at',
+            /**
+             * @return \LC\Common\Http\Response
+             */
+            function (Request $request, array $hookData) {
+                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
+                $caPem = $this->ca->caCert();
+                $certInfo = openssl_x509_parse($caPem);
+                $expiresAt = new DateTime('@'.$certInfo['validTo_time_t']);
+
+                return new ApiResponse('ca_expires_at', $expiresAt->format(DateTime::ATOM));
+            }
+        );
+
         /*
          * This provides the CA (public) certificate and the "tls-auth" key
          * for this instance. The API call has a terrible name...
