@@ -337,25 +337,6 @@ SQL
      *
      * @return void
      */
-    public function deleteCertificatesOfUserId($userId)
-    {
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    DELETE FROM
-        certificates
-    WHERE
-        user_id = :user_id
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->execute();
-    }
-
-    /**
-     * @param string $userId
-     *
-     * @return void
-     */
     public function disableUser($userId)
     {
         $this->addUser($userId);

@@ -185,28 +185,6 @@ class CertificatesModule implements ServiceModuleInterface
             }
         );
 
-        $service->post(
-            '/delete_client_certificates_of_user_id',
-            /**
-             * @return \LC\Common\Http\Response
-             */
-            function (Request $request, array $hookData) {
-                AuthUtils::requireUser($hookData, ['vpn-user-portal']);
-
-                $userId = InputValidation::userId($request->requirePostParameter('user_id'));
-
-                $this->storage->addUserMessage(
-                    $userId,
-                    'notification',
-                    'all certificates deleted'
-                );
-
-                $this->storage->deleteCertificatesOfUserId($userId);
-
-                return new ApiResponse('delete_client_certificates_of_user_id');
-            }
-        );
-
         $service->get(
             '/client_certificate_list',
             /**
