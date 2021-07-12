@@ -17,6 +17,7 @@ use LC\Common\Http\Service;
 use LC\Server\Storage;
 use PDO;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 class ConnectionsModuleTest extends TestCase
 {
@@ -39,7 +40,8 @@ class ConnectionsModuleTest extends TestCase
         $config = Config::fromFile(sprintf('%s/data/config.php', __DIR__));
         $connectionsModule = new TestConnectionsModule(
             $config,
-            $storage
+            $storage,
+            new NullLogger()
         );
         $connectionsModule->setDateTime(new DateTime('2018-01-01 00:00:00'));
 
