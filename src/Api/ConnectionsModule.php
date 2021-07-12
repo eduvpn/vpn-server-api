@@ -21,6 +21,7 @@ use LC\Common\Http\ServiceModuleInterface;
 use LC\Common\ProfileConfig;
 use LC\Server\Api\Exception\ConnectionsModuleException;
 use LC\Server\Storage;
+use Psr\Log\LoggerInterface;
 
 class ConnectionsModule implements ServiceModuleInterface
 {
@@ -33,10 +34,14 @@ class ConnectionsModule implements ServiceModuleInterface
     /** @var \LC\Server\Storage */
     private $storage;
 
-    public function __construct(Config $config, Storage $storage)
+    /** @var \Psr\Log\LoggerInterface */
+    private $logger;
+
+    public function __construct(Config $config, Storage $storage, LoggerInterface $logger)
     {
         $this->config = $config;
         $this->storage = $storage;
+        $this->logger = $logger;
         $this->dateTime = new DateTime();
     }
 
@@ -101,8 +106,9 @@ class ConnectionsModule implements ServiceModuleInterface
         $ip6 = InputValidation::ip6($request->requirePostParameter('ip6'));
         $connectedAt = InputValidation::connectedAt($request->requirePostParameter('connected_at'));
 
-        $this->verifyConnection($profileId, $commonName);
+        $userId = $this->verifyConnection($profileId, $commonName);
         $this->storage->clientConnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)));
+        $this->logger->info('USER_ID: '.$userId.' IP_4: '.$ip4.'IP_6: '.$ip6);
     }
 
     /**
@@ -120,13 +126,20 @@ class ConnectionsModule implements ServiceModuleInterface
         $bytesTransferred = InputValidation::bytesTransferred($request->requirePostParameter('bytes_transferred'));
 
         $this->storage->clientDisconnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)), new DateTime(sprintf('@%d', $disconnectedAt)), $bytesTransferred);
+
+        $userId = '???';
+        if (false !== $userCertInfo = $this->storage->getUserCertificateInfo($commonName)) {
+            $userId = $userCertInfo['user_id'];
+        }
+
+        $this->logger->info('USER_ID: '.$userId.' IP_4: '.$ip4.'IP_6: '.$ip6);
     }
 
     /**
      * @param string $profileId
      * @param string $commonName
      *
-     * @return void
+     * @return string
      */
     private function verifyConnection($profileId, $commonName)
     {
@@ -157,6 +170,8 @@ class ConnectionsModule implements ServiceModuleInterface
         }
 
         $this->verifyAcl($profileId, $userId);
+
+        return $userId;
     }
 
     /**

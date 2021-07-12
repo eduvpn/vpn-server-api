@@ -67,7 +67,8 @@ try {
     $service->addModule(
         new ConnectionsModule(
             $config,
-            $storage
+            $storage,
+            $logger
         )
     );
 
