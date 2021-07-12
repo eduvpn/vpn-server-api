@@ -108,7 +108,7 @@ class ConnectionsModule implements ServiceModuleInterface
 
         $userId = $this->verifyConnection($profileId, $commonName);
         $this->storage->clientConnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)));
-        $this->logger->info('USER_ID: '.$userId.' IP_4: '.$ip4.'IP_6: '.$ip6);
+        $this->logger->info(sprintf('CONNECT %s (%s) [%s,%s]', $userId, $profileId, $ip4, $ip6));
     }
 
     /**
@@ -132,7 +132,7 @@ class ConnectionsModule implements ServiceModuleInterface
             $userId = $userCertInfo['user_id'];
         }
 
-        $this->logger->info('USER_ID: '.$userId.' IP_4: '.$ip4.'IP_6: '.$ip6);
+        $this->logger->info(sprintf('DISCONNECT %s (%s) [%s,%s]', $userId, $profileId, $ip4, $ip6));
     }
 
     /**
