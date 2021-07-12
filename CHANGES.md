@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.11 (...)
+- write connect/disconnect events to [syslog](https://github.com/eduvpn/documentation/blob/v2/LOGGING.md#syslog)
+
 ## 2.2.10 (2021-02-23)
 - do not rewrite `config.php` files during deployment, it is a terrible idea as
   it reformats the configuration file and removes the comments. To that end:
