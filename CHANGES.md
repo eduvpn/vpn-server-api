@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.11 (...)
+## 2.2.11 (2021-07-13)
 - write connect/disconnect events to [syslog](https://github.com/eduvpn/documentation/blob/v2/LOGGING.md#syslog)
 
 ## 2.2.10 (2021-02-23)
