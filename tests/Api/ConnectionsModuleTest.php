@@ -68,6 +68,7 @@ class ConnectionsModuleTest extends TestCase
                 [
                     'profile_id' => 'internet',
                     'common_name' => '12345678901234567890123456789012',
+                    'originating_ip' => '1.2.3.4',
                     'ip4' => '10.10.10.10',
                     'ip6' => 'fd00:4242:4242:4242::',
                     'connected_at' => '12345678',
@@ -87,6 +88,7 @@ class ConnectionsModuleTest extends TestCase
                 [
                     'profile_id' => 'acl',
                     'common_name' => '12345678901234567890123456789012',
+                    'originating_ip' => '1.2.3.4',
                     'ip4' => '10.10.10.10',
                     'ip6' => 'fd00:4242:4242:4242::',
                     'connected_at' => '12345678',
@@ -110,6 +112,7 @@ class ConnectionsModuleTest extends TestCase
                 [
                     'profile_id' => 'acl2',
                     'common_name' => '12345678901234567890123456789012',
+                    'originating_ip' => '1.2.3.4',
                     'ip4' => '10.10.10.10',
                     'ip6' => 'fd00:4242:4242:4242::',
                     'connected_at' => '12345678',
@@ -129,6 +132,7 @@ class ConnectionsModuleTest extends TestCase
                 [
                     'profile_id' => 'internet',
                     'common_name' => '12345678901234567890123456789012',
+                    'originating_ip' => '1.2.3.4',
                     'ip4' => '10.10.10.10',
                     'ip6' => 'fd00:4242:4242:4242::',
                     'connected_at' => '12345678',

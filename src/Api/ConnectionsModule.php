@@ -102,13 +102,13 @@ class ConnectionsModule implements ServiceModuleInterface
     {
         $profileId = InputValidation::profileId($request->requirePostParameter('profile_id'));
         $commonName = InputValidation::commonName($request->requirePostParameter('common_name'));
+        $originatingIp = InputValidation::ipAddress($request->requirePostParameter('originating_ip'));
         $ip4 = InputValidation::ip4($request->requirePostParameter('ip4'));
         $ip6 = InputValidation::ip6($request->requirePostParameter('ip6'));
         $connectedAt = InputValidation::connectedAt($request->requirePostParameter('connected_at'));
-
         $userId = $this->verifyConnection($profileId, $commonName);
         $this->storage->clientConnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)));
-        $this->logger->info(sprintf('CONNECT %s (%s) [%s,%s]', $userId, $profileId, $ip4, $ip6));
+        $this->logger->info(sprintf('CONNECT %s (%s) [%s => %s,%s]', $userId, $profileId, $originatingIp, $ip4, $ip6));
     }
 
     /**
@@ -118,9 +118,9 @@ class ConnectionsModule implements ServiceModuleInterface
     {
         $profileId = InputValidation::profileId($request->requirePostParameter('profile_id'));
         $commonName = InputValidation::commonName($request->requirePostParameter('common_name'));
+        $originatingIp = InputValidation::ipAddress($request->requirePostParameter('originating_ip'));
         $ip4 = InputValidation::ip4($request->requirePostParameter('ip4'));
         $ip6 = InputValidation::ip6($request->requirePostParameter('ip6'));
-
         $connectedAt = InputValidation::connectedAt($request->requirePostParameter('connected_at'));
         $disconnectedAt = InputValidation::disconnectedAt($request->requirePostParameter('disconnected_at'));
         $bytesTransferred = InputValidation::bytesTransferred($request->requirePostParameter('bytes_transferred'));
@@ -132,7 +132,7 @@ class ConnectionsModule implements ServiceModuleInterface
             $userId = $userCertInfo['user_id'];
         }
 
-        $this->logger->info(sprintf('DISCONNECT %s (%s) [%s,%s]', $userId, $profileId, $ip4, $ip6));
+        $this->logger->info(sprintf('DISCONNECT %s (%s) [%s => %s,%s]', $userId, $profileId, $originatingIp, $ip4, $ip6));
     }
 
     /**
