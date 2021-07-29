@@ -108,7 +108,7 @@ class ConnectionsModule implements ServiceModuleInterface
         $connectedAt = InputValidation::connectedAt($request->requirePostParameter('connected_at'));
         $userId = $this->verifyConnection($profileId, $commonName);
         $this->storage->clientConnect($profileId, $commonName, $ip4, $ip6, new DateTime(sprintf('@%d', $connectedAt)));
-        $this->logger->info(sprintf('CONNECT %s (%s) [%s => %s,%s]', $userId, $profileId, $originatingIp, $ip4, $ip6));
+        $this->logger->info($this->logMessage('CONNECT', $userId, $profileId, $originatingIp, $ip4, $ip6));
     }
 
     /**
@@ -131,8 +131,7 @@ class ConnectionsModule implements ServiceModuleInterface
         if (false !== $userCertInfo = $this->storage->getUserCertificateInfo($commonName)) {
             $userId = $userCertInfo['user_id'];
         }
-
-        $this->logger->info(sprintf('DISCONNECT %s (%s) [%s => %s,%s]', $userId, $profileId, $originatingIp, $ip4, $ip6));
+        $this->logger->info($this->logMessage('DISCONNECT', $userId, $profileId, $originatingIp, $ip4, $ip6));
     }
 
     /**
@@ -191,6 +190,39 @@ class ConnectionsModule implements ServiceModuleInterface
                 throw new ConnectionsModuleException($userId, sprintf('unable to connect, user permissions are [%s], but requires any of [%s]', implode(',', $userPermissionList), implode(',', $profilePermissionList)));
             }
         }
+    }
+
+    /**
+     * @param string $eventType
+     * @param string $userId
+     * @param string $profileId
+     * @param string $originatingIp
+     * @param string $ipFour
+     * @param string $ipSix
+     *
+     * @return string
+     */
+    private function logMessage($eventType, $userId, $profileId, $originatingIp, $ipFour, $ipSix)
+    {
+        return str_replace(
+            [
+                '{{EVENT_TYPE}}',
+                '{{USER_ID}}',
+                '{{PROFILE_ID}}',
+                '{{ORIGINATING_IP}}',
+                '{{IP_FOUR}}',
+                '{{IP_SIX}}',
+            ],
+            [
+                $eventType,
+                $userId,
+                $profileId,
+                $originatingIp,
+                $ipFour,
+                $ipSix,
+            ],
+            $this->config->requireString('connectionLogFormat', '{{EVENT_TYPE}} {{USER_ID}} ({{PROFILE_ID}}) [{{IP_FOUR}},{{IP_SIX}}]')
+        );
     }
 
     /**

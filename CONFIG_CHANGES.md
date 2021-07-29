@@ -8,6 +8,15 @@ This will help upgrades to a future 3.x release. Configuration changes during
 the 2.x life cycle are NOT required. Any existing configuration file will keep
 working!
 
+## 2.2.12
+
+- added `connectionLogFormat` configuration option that takes a `string`. You
+  can format the string you want to generate the log line in `syslog` you like 
+  for your particular situation. The default value is 
+  `{{EVENT_TYPE}} {{USER_ID}} ({{PROFILE_ID}}) [{{IP_FOUR}},{{IP_SIX}}]`. If 
+  you also want to log the client's originating IP address you can e.g. use 
+  `{{EVENT_TYPE}} {{USER_ID}} ({{PROFILE_ID}}) [{{ORIGINATING_IP}} => {{IP_FOUR}},{{IP_SIX}}]`.
+  
 ## 2.2.10
 
 - the `tlsProtection` configuration option was removed. It will always be 

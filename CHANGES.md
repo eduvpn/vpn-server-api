@@ -1,7 +1,8 @@
 # Changelog
 
 ## 2.2.12 (...)
-- also log "originating" client IP address
+- allow configuring the format of the log line written to syslog and also make
+  it possible to log the client's originating IP
 
 ## 2.2.11 (2021-07-13)
 - write connect/disconnect events to [syslog](https://github.com/eduvpn/documentation/blob/v2/LOGGING.md#syslog)
