@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.2.12 (...)
+## 2.2.12 (2021-08-02)
 - allow configuring the format of the log line written to syslog and also make
   it possible to log the client's originating IP
 
