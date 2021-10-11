@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.0 (...)
+- switch default key type to ECDSA from RSA to improve VPN client/server key 
+  generation performance
+
 ## 2.2.12 (2021-08-02)
 - allow configuring the format of the log line written to syslog and also make
   it possible to log the client's originating IP

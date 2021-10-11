@@ -130,7 +130,7 @@ try {
     // we need easyRsaDataDir for migrations to vpn-ca
     $easyRsaDataDir = sprintf('%s/easy-rsa', $dataDir);
     $vpnCaPath = $config->requireString('vpnCaPath', '/usr/bin/vpn-ca');
-    $vpnCaKeyType = $config->requireString('vpnCaKeyType', 'RSA');
+    $vpnCaKeyType = $config->requireString('vpnCaKeyType', 'ECDSA');
     // VpnCa gets the easyRsaDataDir in case a migration is needed...
     $ca = new VpnCa($vpnCaDir, $vpnCaKeyType, $vpnCaPath, $easyRsaDataDir);
 
