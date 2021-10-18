@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.3.0 (...)
+## 2.3.0 (2021-10-18)
 - switch default key type to ECDSA from RSA to improve VPN client/server key 
   generation performance
 
