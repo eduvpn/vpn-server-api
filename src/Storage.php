@@ -334,29 +334,6 @@ SQL
 
     /**
      * @param string $userId
-     * @param string $authKey
-     *
-     * @return void
-     */
-    public function deleteCertificatesOfAuthKey($userId, $authKey)
-    {
-        $stmt = $this->db->prepare(
-<<< 'SQL'
-    DELETE FROM
-        certificates
-    WHERE
-        user_id = :user_id
-    AND
-        auth_key = :auth_key
-SQL
-        );
-        $stmt->bindValue(':user_id', $userId, PDO::PARAM_STR);
-        $stmt->bindValue(':auth_key', $authKey, PDO::PARAM_STR);
-        $stmt->execute();
-    }
-
-    /**
-     * @param string $userId
      *
      * @return void
      */

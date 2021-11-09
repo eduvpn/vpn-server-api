@@ -8,11 +8,6 @@ This will help upgrades to a future 3.x release. Configuration changes during
 the 2.x life cycle are NOT required. Any existing configuration file will keep
 working!
 
-## 2.3.1
-
-- support `excludedRoutes` configuration option that instructs OpenVPN clients
-  to route specified prefixes outside of the VPN.
-
 ## 2.3.0
 
 - switch the default key type to ECDSA from RSA. If you want to keep using RSA
