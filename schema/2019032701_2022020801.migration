@@ -1,1 +1,1 @@
-CREATE INDEX connection_log_ip4 ON connection_log(ip4);
+CREATE INDEX IF NOT EXISTS connection_log_ip4 ON connection_log(ip4);
