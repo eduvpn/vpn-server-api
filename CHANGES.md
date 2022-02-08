@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.1 (...)
+- add database index to `connection_log` table to improve performance of 
+  `Storage::clientConnect` [#64](https://todo.sr.ht/~eduvpn/server/64)
+
 ## 2.3.0 (2021-10-18)
 - switch default key type to ECDSA from RSA to improve VPN client/server key 
   generation performance

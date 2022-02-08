@@ -18,7 +18,7 @@ use PDO;
 
 class Storage implements OtpStorageInterface
 {
-    const CURRENT_SCHEMA_VERSION = '2019032701';
+    const CURRENT_SCHEMA_VERSION = '2022020801';
 
     /** @var \PDO */
     private $db;
