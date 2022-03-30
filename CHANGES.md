@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.3.2 (...)
+- fix PHP 8.1 compatibility
+
 ## 2.3.1 (2022-02-09)
 - add database index to `connection_log` table to improve performance of 
   `Storage::clientConnect` [#64](https://todo.sr.ht/~eduvpn/server/64)
