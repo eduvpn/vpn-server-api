@@ -9,7 +9,7 @@
 
 namespace LC\Server\Tests;
 
-use LC\OpenVpn\ManagementSocketInterface;
+use LC\Server\OpenVpnMgmt\ManagementSocketInterface;
 
 /**
  * Abstraction to use the OpenVPN management interface using a socket

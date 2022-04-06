@@ -18,10 +18,10 @@ use LC\Common\Http\InputValidation;
 use LC\Common\Http\Request;
 use LC\Common\Http\Service;
 use LC\Common\Http\ServiceModuleInterface;
+use LC\Common\Log\LoggerInterface;
 use LC\Common\ProfileConfig;
 use LC\Server\Api\Exception\ConnectionsModuleException;
 use LC\Server\Storage;
-use Psr\Log\LoggerInterface;
 
 class ConnectionsModule implements ServiceModuleInterface
 {
@@ -34,7 +34,7 @@ class ConnectionsModule implements ServiceModuleInterface
     /** @var \LC\Server\Storage */
     private $storage;
 
-    /** @var \Psr\Log\LoggerInterface */
+    /** @var \LC\Common\Log\LoggerInterface */
     private $logger;
 
     public function __construct(Config $config, Storage $storage, LoggerInterface $logger)

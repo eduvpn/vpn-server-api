@@ -16,9 +16,8 @@ use LC\Common\Http\Request;
 use LC\Common\Http\Response;
 use LC\Common\Http\Service;
 use LC\Common\Json;
-use LC\Common\Logger;
+use LC\Common\Log\SysLogger;
 use LC\Common\Random;
-use LC\OpenVpn\ManagementSocket;
 use LC\Server\Api\CertificatesModule;
 use LC\Server\Api\ConnectionsModule;
 use LC\Server\Api\InfoModule;
@@ -32,10 +31,11 @@ use LC\Server\Api\UsersModule;
 use LC\Server\CA\VpnCa;
 use LC\Server\OpenVpn\DaemonSocket;
 use LC\Server\OpenVpn\ServerManager;
+use LC\Server\OpenVpnMgmt\ManagementSocket;
 use LC\Server\Storage;
 use LC\Server\TlsCrypt;
 
-$logger = new Logger('vpn-server-api');
+$logger = new SysLogger('vpn-server-api');
 
 try {
     // this is provided by Apache, using CanonicalName

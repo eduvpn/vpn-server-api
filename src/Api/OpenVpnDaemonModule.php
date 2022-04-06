@@ -16,11 +16,11 @@ use LC\Common\Http\InputValidation;
 use LC\Common\Http\Request;
 use LC\Common\Http\Service;
 use LC\Common\Http\ServiceModuleInterface;
+use LC\Common\Log\LoggerInterface;
+use LC\Common\Log\NullLogger;
 use LC\Common\ProfileConfig;
 use LC\Server\OpenVpn\DaemonSocket;
 use LC\Server\Storage;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use RangeException;
 use RuntimeException;
 
@@ -38,7 +38,7 @@ class OpenVpnDaemonModule implements ServiceModuleInterface
     /** @var \LC\Server\OpenVpn\DaemonSocket */
     private $daemonSocket;
 
-    /** @var \Psr\Log\LoggerInterface */
+    /** @var \LC\Common\Log\LoggerInterface */
     private $logger;
 
     public function __construct(Config $config, Storage $storage, DaemonSocket $daemonSocket)

@@ -10,10 +10,10 @@
 namespace LC\Server\OpenVpn;
 
 use LC\Common\Config;
+use LC\Common\Log\LoggerInterface;
 use LC\Common\ProfileConfig;
-use LC\OpenVpn\ConnectionManager;
-use LC\OpenVpn\ManagementSocketInterface;
-use Psr\Log\LoggerInterface;
+use LC\Server\OpenVpnMgmt\ConnectionManager;
+use LC\Server\OpenVpnMgmt\ManagementSocketInterface;
 use RangeException;
 
 /**
@@ -24,10 +24,10 @@ class ServerManager
     /** @var \LC\Common\Config */
     private $config;
 
-    /** @var \Psr\Log\LoggerInterface */
+    /** @var \LC\Common\Log\LoggerInterface */
     private $logger;
 
-    /** @var \LC\OpenVpn\ManagementSocketInterface */
+    /** @var \LC\Server\OpenVpnMgmt\ManagementSocketInterface */
     private $managementSocket;
 
     public function __construct(Config $config, LoggerInterface $logger, ManagementSocketInterface $managementSocket)

@@ -14,13 +14,13 @@ use LC\Common\Config;
 use LC\Common\Http\BasicAuthenticationHook;
 use LC\Common\Http\Request;
 use LC\Common\Http\Service;
+use LC\Common\Log\NullLogger;
 use LC\Server\Api\OpenVpnModule;
 use LC\Server\OpenVpn\ServerManager;
 use LC\Server\Storage;
 use LC\Server\Tests\TestSocket;
 use PDO;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 
 class OpenVpnModuleTest extends TestCase
 {

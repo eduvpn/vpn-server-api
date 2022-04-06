@@ -11,11 +11,11 @@ require_once dirname(__DIR__).'/vendor/autoload.php';
 $baseDir = dirname(__DIR__);
 
 use LC\Common\Config;
-use LC\Common\Logger;
-use LC\OpenVpn\ManagementSocket;
+use LC\Common\Log\SysLogger;
 use LC\Server\Api\OpenVpnDaemonModule;
 use LC\Server\OpenVpn\DaemonSocket;
 use LC\Server\OpenVpn\ServerManager;
+use LC\Server\OpenVpnMgmt\ManagementSocket;
 use LC\Server\Storage;
 
 try {
@@ -23,7 +23,7 @@ try {
     $configDir = sprintf('%s/config', $baseDir);
     $configFile = sprintf('%s/config.php', $configDir);
     $config = Config::fromFile($configFile);
-    $logger = new Logger($argv[0]);
+    $logger = new SysLogger($argv[0]);
     $dataDir = sprintf('%s/data', $baseDir);
     $storage = new Storage(
         new PDO(
