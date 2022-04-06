@@ -79,12 +79,12 @@ function convertToProtoPort(array $profilePortMapping, array $portClientCount)
  */
 function showHelp(array $argv)
 {
-    echo 'SYNTAX: '.$argv[0].PHP_EOL.PHP_EOL;
-    echo '--json                use JSON output format'.PHP_EOL;
-    echo '--alert [percentage]  only show entries where IP space use is over specified'.PHP_EOL;
-    echo '                      percentage. The default percentage for --alert is 90 '.PHP_EOL;
-    echo '--connections         include connected clients (only with --json and when'.PHP_EOL;
-    echo '                      using vpn-daemon)'.PHP_EOL;
+    echo 'SYNTAX: '.$argv[0].\PHP_EOL.\PHP_EOL;
+    echo '--json                use JSON output format'.\PHP_EOL;
+    echo '--alert [percentage]  only show entries where IP space use is over specified'.\PHP_EOL;
+    echo '                      percentage. The default percentage for --alert is 90 '.\PHP_EOL;
+    echo '--connections         include connected clients (only with --json and when'.\PHP_EOL;
+    echo '                      using vpn-daemon)'.\PHP_EOL;
 }
 
 /**
@@ -96,7 +96,7 @@ function outputConversion(array $outputData, $asJson)
 {
     // JSON
     if ($asJson) {
-        echo json_encode($outputData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        echo json_encode($outputData, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
 
         return;
     }
@@ -106,9 +106,9 @@ function outputConversion(array $outputData, $asJson)
         return;
     }
     $headerKeys = array_keys($outputData[0]);
-    echo implode(',', $headerKeys).PHP_EOL;
+    echo implode(',', $headerKeys).\PHP_EOL;
     foreach ($outputData as $outputRow) {
-        echo implode(',', array_values($outputRow)).PHP_EOL;
+        echo implode(',', array_values($outputRow)).\PHP_EOL;
     }
 }
 
@@ -236,6 +236,6 @@ try {
         outputConversion($outputData, $asJson);
     }
 } catch (Exception $e) {
-    echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
+    echo sprintf('ERROR: %s', $e->getMessage()).\PHP_EOL;
     exit(1);
 }

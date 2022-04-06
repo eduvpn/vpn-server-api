@@ -25,6 +25,6 @@ try {
     $storage->cleanOtpLog(new DateTime('now -5 minutes'));
     $storage->cleanUserMessages(new DateTime('now -32 days'));
 } catch (Exception $e) {
-    echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
+    echo sprintf('ERROR: %s', $e->getMessage()).\PHP_EOL;
     exit(1);
 }

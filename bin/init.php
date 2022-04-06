@@ -38,6 +38,6 @@ try {
     );
     $storage->init();
 } catch (Exception $e) {
-    echo sprintf('ERROR: %s', $e->getMessage()).PHP_EOL;
+    echo sprintf('ERROR: %s', $e->getMessage()).\PHP_EOL;
     exit(1);
 }

@@ -29,7 +29,7 @@ for ($i = 1; $i < $argc; ++$i) {
         $showFamily = [4];
     }
     if ('--help' === $argv[$i]) {
-        echo 'SYNTAX: '.$argv[0].' [-4] [-6]'.PHP_EOL;
+        echo 'SYNTAX: '.$argv[0].' [-4] [-6]'.\PHP_EOL;
         exit(0);
     }
 }
@@ -40,7 +40,7 @@ if (in_array(4, $showFamily, true)) {
         hexdec(bin2hex(random_bytes(1))),
         hexdec(bin2hex(random_bytes(1)))
     );
-    echo $ipFourPrefix.PHP_EOL;
+    echo $ipFourPrefix.\PHP_EOL;
 }
 
 if (in_array(6, $showFamily, true)) {
@@ -51,5 +51,5 @@ if (in_array(6, $showFamily, true)) {
         bin2hex(random_bytes(2)),
         bin2hex(random_bytes(2))
     );
-    echo $ipSixPrefix.PHP_EOL;
+    echo $ipSixPrefix.\PHP_EOL;
 }

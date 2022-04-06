@@ -15,6 +15,7 @@ return PhpCsFixer\Config::create()
             'pow_to_exponentiation' => false,
             'strict_comparison' => true,
             'strict_param' => true,
+            'combine_nested_dirname' => false,
             'php_unit_strict' => true,
             'header_comment' => [
                 'header' => <<< 'EOD'
