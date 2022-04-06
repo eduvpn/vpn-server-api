@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.3.3 (...)
+- switch from `psr/log` to `SysLogger` from `vpn-lib-common`
+- source formatting
+- pull in `lc/openvpn-connection-manager` dependency in the source code, drop 
+  it as external dependency and switch to using `SysLogger` from 
+  `vpn-lib-common`
+
 ## 2.3.2 (2022-04-05)
 - fix PHP 8.1 compatibility
 
