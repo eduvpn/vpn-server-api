@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.3.3 (...)
+## 2.3.3 (2022-04-07)
 - switch from `psr/log` to `SysLogger` from `vpn-lib-common`
 - source formatting
 - pull in `lc/openvpn-connection-manager` dependency in the source code, drop 
