@@ -86,8 +86,6 @@ class InfoModule implements ServiceModuleInterface
                         'ca_key_type' => $this->config->requireString('vpnCaKeyType', 'ECDSA'),
                     ]
                 );
-
-                return new ApiResponse('ca_info', $caInfo);
             }
         );
     }
