@@ -10,6 +10,7 @@
 namespace LC\Server\Tests\Api;
 
 use DateTime;
+use fkooman\Otp\Base32;
 use fkooman\Otp\FrkOtp;
 use fkooman\Otp\OtpInfo;
 use LC\Common\Http\BasicAuthenticationHook;
@@ -17,7 +18,6 @@ use LC\Common\Http\Request;
 use LC\Common\Http\Service;
 use LC\Server\Api\UsersModule;
 use LC\Server\Storage;
-use fkooman\Otp\Base32;
 use PDO;
 use PHPUnit\Framework\TestCase;
 

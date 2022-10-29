@@ -43,7 +43,7 @@ class Stats
 
             $db = $this->storage->getPdo();
             $stmt = $db->prepare(
-<<< 'SQL'
+                <<< 'SQL'
     SELECT
         user_id,
         common_name,

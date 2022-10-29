@@ -62,7 +62,7 @@ class Storage implements OtpStorageInterface
     public function getUsers()
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     SELECT
         user_id,
         (SELECT otp_secret FROM otp WHERE user_id = users.user_id) AS otp_secret,
@@ -98,7 +98,7 @@ SQL
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     SELECT
         session_expires_at
     FROM
@@ -122,7 +122,7 @@ SQL
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     SELECT
         permission_list
     FROM
@@ -143,7 +143,7 @@ SQL
     public function getAppUsage()
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     SELECT
         client_id,
         COUNT(DISTINCT user_id) AS client_count
@@ -168,7 +168,7 @@ SQL
     public function getUserCertificateInfo($commonName)
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     SELECT
         u.user_id AS user_id,
         u.is_disabled AS user_is_disabled,
@@ -199,7 +199,7 @@ SQL
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     DELETE FROM
         users
     WHERE
@@ -220,7 +220,7 @@ SQL
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     UPDATE
         users
     SET
@@ -249,7 +249,7 @@ SQL
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     INSERT INTO certificates
         (common_name, user_id, display_name, valid_from, valid_to, client_id)
     VALUES
@@ -274,7 +274,7 @@ SQL
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     SELECT
         common_name,
         display_name,
@@ -303,7 +303,7 @@ SQL
     public function deleteCertificate($commonName)
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     DELETE FROM
         certificates
     WHERE
@@ -323,7 +323,7 @@ SQL
     public function deleteCertificatesOfClientId($userId, $clientId)
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     DELETE FROM
         certificates
     WHERE
@@ -346,7 +346,7 @@ SQL
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     UPDATE
         users
     SET
@@ -368,7 +368,7 @@ SQL
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     UPDATE
         users
     SET
@@ -390,7 +390,7 @@ SQL
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     SELECT
         is_disabled
     FROM
@@ -424,7 +424,7 @@ SQL
         // disconnect event to the log. We fix this when a new client
         // wants to connect and gets this exact same IP address...
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
         UPDATE
             connection_log
         SET
@@ -451,7 +451,7 @@ SQL
         // log as well, not just the common_name... the user may delete the
         // certificate, or the user account may be deleted...
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     INSERT INTO connection_log
         (
             user_id,
@@ -502,7 +502,7 @@ SQL
     public function clientDisconnect($profileId, $commonName, $ip4, $ip6, DateTime $connectedAt, DateTime $disconnectedAt, $bytesTransferred)
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     UPDATE
         connection_log
     SET
@@ -539,7 +539,7 @@ SQL
     public function getConnectionLogForUser($userId)
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     SELECT
         l.user_id,
         l.common_name,
@@ -577,7 +577,7 @@ SQL
     public function getLogEntry(DateTime $dateTime, $ipAddress)
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     SELECT
         user_id,
         profile_id,
@@ -612,7 +612,7 @@ SQL
     public function cleanConnectionLog(DateTime $dateTime)
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     DELETE FROM
         connection_log
     WHERE
@@ -633,7 +633,7 @@ SQL
     public function cleanUserMessages(DateTime $dateTime)
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     DELETE FROM
         user_messages
     WHERE
@@ -654,7 +654,7 @@ SQL
     public function systemMessages($type)
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     SELECT
         id, message, date_time
     FROM
@@ -679,7 +679,7 @@ SQL
     public function addSystemMessage($type, $message)
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     INSERT INTO system_messages
         (type, message, date_time)
     VALUES
@@ -701,7 +701,7 @@ SQL
     public function deleteSystemMessage($messageId)
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     DELETE FROM
         system_messages
     WHERE id = :message_id
@@ -721,7 +721,7 @@ SQL
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     SELECT
         id, type, message, date_time
     FROM
@@ -750,7 +750,7 @@ SQL
     {
         $this->addUser($userId);
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     INSERT INTO user_messages
         (user_id, type, message, date_time)
     VALUES
@@ -920,7 +920,7 @@ SQL
     private function addUser($userId)
     {
         $stmt = $this->db->prepare(
-<<< 'SQL'
+            <<< 'SQL'
     SELECT
         COUNT(*)
     FROM
@@ -935,7 +935,7 @@ SQL
         if (1 !== (int) $stmt->fetchColumn()) {
             // user does not exist yet
             $stmt = $this->db->prepare(
-<<< 'SQL'
+                <<< 'SQL'
     INSERT INTO
         users (
             user_id,
