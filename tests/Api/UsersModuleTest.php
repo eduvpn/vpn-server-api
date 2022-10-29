@@ -17,7 +17,7 @@ use LC\Common\Http\Request;
 use LC\Common\Http\Service;
 use LC\Server\Api\UsersModule;
 use LC\Server\Storage;
-use ParagonIE\ConstantTime\Base32;
+use fkooman\Otp\Base32;
 use PDO;
 use PHPUnit\Framework\TestCase;
 

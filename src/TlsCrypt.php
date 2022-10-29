@@ -10,7 +10,7 @@
 namespace LC\Server;
 
 use LC\Common\FileIO;
-use ParagonIE\ConstantTime\Hex;
+use LC\Common\Hex;
 
 class TlsCrypt
 {
