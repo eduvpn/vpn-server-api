@@ -50,7 +50,7 @@
         "ext-pdo": "*",
         "ext-spl": "*",
         "ext-sqlite3": "*",
-        "fkooman/otp-verifier": "^0",
+        "fkooman/otp-verifier": "^0.4",
         "fkooman/sqlite-migrate": "^0",
         "lc/common": "v2.x-dev",
         "php": ">=5.4"

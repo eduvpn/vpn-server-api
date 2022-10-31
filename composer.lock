@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aa25434e5ef231f0bbbb267f94241af1",
+    "content-hash": "8d47612f07832dcfb16b1bd9b801164b",
     "packages": [
         {
             "name": "fkooman/otp-verifier",
@@ -151,7 +151,7 @@
             "dist": {
                 "type": "path",
                 "url": "../vpn-lib-common",
-                "reference": "01cc731dbb919dde4e1e84510e525cb607011feb"
+                "reference": "ec6247c3f6427855fd38e116b3b6bf42f730c0e3"
             },
             "require": {
                 "ext-curl": "*",
